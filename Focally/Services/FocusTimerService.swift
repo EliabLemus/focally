@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import UserNotifications
+import AppKit
 
 class FocusTimerService: ObservableObject {
     @Published var isActive = false
@@ -100,6 +101,12 @@ class FocusTimerService: ObservableObject {
 
     private func onSessionComplete() {
         // Play sound (repeat based on settings)
+        let soundEnabled = defaults.object(forKey: "soundEnabled") as? Bool ?? true
+        guard soundEnabled else {
+            postCompletionNotification()
+            return
+        }
+
         let soundName = defaults.string(forKey: "soundName") ?? "Bell"
         let repeatCount = defaults.integer(forKey: "soundRepeatCount")
         let count = repeatCount > 0 ? repeatCount : 1
@@ -107,20 +114,38 @@ class FocusTimerService: ObservableObject {
         for i in 0..<count {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 3.5) { [weak self] in
                 guard let self = self else { return }
-                let sound: NSSound?
-                if let url = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
-                    sound = NSSound(contentsOf: url, byReference: true)
-                } else {
-                    sound = NSSound(named: soundName)
-                }
-                sound?.play()
-                if let s = sound {
-                    self.activeSounds.append(s)
-                }
+                guard let sound = self.makeSound(named: soundName) else { return }
+                sound.play()
+                self.activeSounds.append(sound)
             }
         }
 
-        // Show notification
+        postCompletionNotification()
+    }
+
+    private func makeSound(named soundName: String) -> NSSound? {
+        guard let url = soundURL(for: soundName) else { return nil }
+        return NSSound(contentsOf: url, byReference: true)
+    }
+
+    private func soundURL(for soundName: String) -> URL? {
+        if soundName == "Bell",
+           let bundledURL = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
+            return bundledURL
+        }
+
+        let systemSoundURL = URL(fileURLWithPath: "/System/Library/Sounds")
+            .appendingPathComponent(soundName)
+            .appendingPathExtension("aiff")
+
+        if FileManager.default.fileExists(atPath: systemSoundURL.path) {
+            return systemSoundURL
+        }
+
+        return nil
+    }
+
+    private func postCompletionNotification() {
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         content.title = "Focus session ended"

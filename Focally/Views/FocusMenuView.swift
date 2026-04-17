@@ -83,7 +83,7 @@ struct FocusMenuView: View {
                     timerService.cancelSession()
                     dndService.deactivateDND()
                 } label: {
-                    Label("End", systemImage: "stop.fill")
+                    Label("Stop", systemImage: "stop.fill")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

@@ -2,6 +2,9 @@ import Foundation
 import Combine
 
 class SlackService: ObservableObject {
+    static let defaultStatusEmoji = ":hourglass_flowing_sand:"
+    static let statusEmojiDefaultsKey = "slackStatusEmoji"
+
     @Published var isEnabled = false {
         didSet {
             UserDefaults.standard.set(isEnabled, forKey: "slackEnabled")
@@ -27,12 +30,19 @@ class SlackService: ObservableObject {
 
     // MARK: - Public API
 
-    func setStatus(emoji: String, text: String, expirationTimestamp: Int) {
+    func savedStatusEmoji() -> String {
+        let rawValue = UserDefaults.standard.string(forKey: Self.statusEmojiDefaultsKey) ?? Self.defaultStatusEmoji
+        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
+    }
+
+    func setStatus(text: String, expirationTimestamp: Int, customEmoji: String? = nil) {
         guard isEnabled, let token = token else { return }
+        let statusEmoji = normalizedStatusEmoji(customEmoji)
 
         let profile: [String: String] = [
             "status_text": text,
-            "status_emoji": emoji,
+            "status_emoji": statusEmoji,
             "status_expiration": "\(expirationTimestamp)"
         ]
 
@@ -65,7 +75,7 @@ class SlackService: ObservableObject {
                     self?.isConnected = true
                     self?.connectionError = nil
                     self?.lastStatusText = text
-                    print("[Focally] Slack status set: \(emoji) \(text)")
+                    print("[Focally] Slack status set: \(statusEmoji) \(text)")
                 } else {
                     let errorMsg = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
@@ -115,14 +125,14 @@ class SlackService: ObservableObject {
     }
 
     func testConnection() {
-        guard let token = token else {
+        guard token != nil else {
             connectionError = "No token configured"
             isConnected = false
             return
         }
 
         // Test by setting a quick status and clearing it
-        setStatus(emoji: "🧪", text: "Testing Focally", expirationTimestamp: Int(Date().timeIntervalSince1970) + 10)
+        setStatus(text: "Testing Focally", expirationTimestamp: Int(Date().timeIntervalSince1970) + 10, customEmoji: ":test_tube:")
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             self?.clearStatus()
@@ -138,5 +148,10 @@ class SlackService: ObservableObject {
             // Don't auto-test, just mark as potentially connected
             self.isConnected = true
         }
+    }
+
+    private func normalizedStatusEmoji(_ emoji: String?) -> String {
+        let trimmed = emoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? savedStatusEmoji() : trimmed
     }
 }

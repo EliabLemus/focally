@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "hourglass.circle.fill", accessibilityDescription: "Focally")
+            button.image = NSImage(systemSymbolName: "hourglass", accessibilityDescription: "Focally")
             button.action = #selector(togglePopover)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
@@ -82,9 +82,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func onSessionStarted() {
         let expiration = Int(Date().timeIntervalSince1970) + (timerService.durationMinutes * 60)
         slackService.setStatus(
-            emoji: timerService.currentEmoji,
             text: timerService.currentActivity,
-            expirationTimestamp: expiration
+            expirationTimestamp: expiration,
+            customEmoji: slackService.savedStatusEmoji()
         )
     }
 
@@ -97,6 +97,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let event = NSApp.currentEvent, event.type == .rightMouseUp {
             showContextMenu(button: button)
+            return
+        }
+
+        if timerService.isActive {
+            if popover.isShown {
+                popover.performClose(button)
+            }
+            endSession()
             return
         }
 
@@ -163,7 +171,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Settings"
             window.styleMask = [.titled, .closable]
-            window.setContentSize(NSSize(width: 400, height: 350))
+            window.setContentSize(NSSize(width: 420, height: 430))
             window.center()
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -178,13 +186,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem?.button else { return }
 
         if timerService.isActive {
-            button.image = NSImage(systemSymbolName: "play.circle.fill", accessibilityDescription: "Focus Active")
+            button.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: "Stop Focus Session")
             let newText = " \(timerService.currentEmoji) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
             if button.title != newText {
                 button.title = newText
             }
         } else {
-            button.image = NSImage(systemSymbolName: "hourglass.circle.fill", accessibilityDescription: "Focally")
+            button.image = NSImage(systemSymbolName: "hourglass", accessibilityDescription: "Focally")
             button.title = ""
         }
 
