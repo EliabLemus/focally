@@ -65,12 +65,12 @@ class SlackService: ObservableObject {
                     self?.isConnected = true
                     self?.connectionError = nil
                     self?.lastStatusText = text
-                    print("[OnItFocus] Slack status set: \(emoji) \(text)")
+                    print("[Focally] Slack status set: \(emoji) \(text)")
                 } else {
                     let errorMsg = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
                     self?.isConnected = false
-                    print("[OnItFocus] Slack error: \(errorMsg)")
+                    print("[Focally] Slack error: \(errorMsg)")
                 }
             }
         }.resume()
@@ -96,7 +96,7 @@ class SlackService: ObservableObject {
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    print("[OnItFocus] Slack clear error: \(error.localizedDescription)")
+                    print("[Focally] Slack clear error: \(error.localizedDescription)")
                     return
                 }
 
@@ -108,7 +108,7 @@ class SlackService: ObservableObject {
 
                 if ok {
                     self?.lastStatusText = nil
-                    print("[OnItFocus] Slack status cleared")
+                    print("[Focally] Slack status cleared")
                 }
             }
         }.resume()
@@ -122,7 +122,7 @@ class SlackService: ObservableObject {
         }
 
         // Test by setting a quick status and clearing it
-        setStatus(emoji: "🧪", text: "Testing OnItFocus", expirationTimestamp: Int(Date().timeIntervalSince1970) + 10)
+        setStatus(emoji: "🧪", text: "Testing Focally", expirationTimestamp: Int(Date().timeIntervalSince1970) + 10)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             self?.clearStatus()

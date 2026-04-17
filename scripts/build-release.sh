@@ -1,18 +1,18 @@
 #!/bin/bash
 set -euo pipefail
 
-# Build script for OnItFocus
+# Build script for Focally
 # Usage: ./scripts/build-release.sh
-# Output: build/OnItFocus.dmg
+# Output: build/Focally.dmg
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="$PROJECT_DIR/build"
-APP_NAME="OnItFocus"
+APP_NAME="Focally"
 ARCHIVE_NAME="$APP_NAME"
 VERSION="${1:-$(git describe --tags --always 2>/dev/null || echo '0.0.0')}"
 
-echo "🔧 Building OnItFocus v$VERSION..."
+echo "🔧 Building Focally v$VERSION..."
 
 # Clean
 rm -rf "$BUILD_DIR"
@@ -25,8 +25,8 @@ xcodegen generate 2>&1 | tail -1
 # Build Release
 echo "📦 Building Release..."
 xcodebuild build \
-    -project "$PROJECT_DIR/OnItFocus.xcodeproj" \
-    -scheme OnItFocus \
+    -project "$PROJECT_DIR/Focally.xcodeproj" \
+    -scheme Focally \
     -configuration Release \
     -destination 'platform=macOS' \
     -derivedDataPath "$BUILD_DIR/DerivedData" \

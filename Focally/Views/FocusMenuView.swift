@@ -32,7 +32,7 @@ struct FocusMenuView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
 
-            Text("OnItFocus")
+            Text("Focally")
                 .font(.headline)
 
             Text("Ready to focus")

@@ -1,0 +1,388 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0972ACA31DECEB6215662878 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 967C5726395E3635788BAEEE /* Resources */; };
+		4E030561EE6C59693736B49E /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E13FFAD610634D3C20A063 /* FocusSession.swift */; };
+		679740AFC847642945563E39 /* bell.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 8106D91600D3C2013F5ACD33 /* bell.aiff */; };
+		71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */; };
+		7C262F088F990DED923716C5 /* DNDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E3F6355136EFD90EE198C8 /* DNDService.swift */; };
+		84AC2BAA9F2CCA1495A302B5 /* SlackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0179E6DB0D32C6C38E33CE35 /* SlackService.swift */; };
+		852FEB641C068C8AFD126EE5 /* FocusMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4E01047F1BAA28E91430337 /* FocusMenuView.swift */; };
+		8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */; };
+		AC2AF556BA64BF482606A1B0 /* ActivityInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9721E28A6A0CBFB8506A5F6F /* ActivityInputView.swift */; };
+		EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1032F662E9204A6D804DD2EF /* FocusTimerService.swift */; };
+		EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B872379B2018EE66D478415E /* Assets.xcassets */; };
+		F38696014F84656D6286B4B8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8132A336C230D8B7FD4EC1DE /* SettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0179E6DB0D32C6C38E33CE35 /* SlackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackService.swift; sourceTree = "<group>"; };
+		1032F662E9204A6D804DD2EF /* FocusTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTimerService.swift; sourceTree = "<group>"; };
+		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
+		442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnItFocusApp.swift; sourceTree = "<group>"; };
+		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		8106D91600D3C2013F5ACD33 /* bell.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = bell.aiff; sourceTree = "<group>"; };
+		8132A336C230D8B7FD4EC1DE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8E5322A16B3B60603C5509F9 /* Focally.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Focally.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		967C5726395E3635788BAEEE /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Focally/Resources; sourceTree = SOURCE_ROOT; };
+		9721E28A6A0CBFB8506A5F6F /* ActivityInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityInputView.swift; sourceTree = "<group>"; };
+		A6B424719CB23B5544233E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B0E13FFAD610634D3C20A063 /* FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSession.swift; sourceTree = "<group>"; };
+		B872379B2018EE66D478415E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C4E01047F1BAA28E91430337 /* FocusMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMenuView.swift; sourceTree = "<group>"; };
+		F2E3F6355136EFD90EE198C8 /* DNDService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		122010126CD7EFB3D8B2BF85 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9721E28A6A0CBFB8506A5F6F /* ActivityInputView.swift */,
+				C4E01047F1BAA28E91430337 /* FocusMenuView.swift */,
+				8132A336C230D8B7FD4EC1DE /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		33154AF2EF8078375483C6A2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8E5322A16B3B60603C5509F9 /* Focally.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4051D8D7C7F98FDA8B860CCE = {
+			isa = PBXGroup;
+			children = (
+				967C5726395E3635788BAEEE /* Resources */,
+				C30EC7C7E2228B6BE149EDDC /* Focally */,
+				33154AF2EF8078375483C6A2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4E8101EF9D6FF1BD04DC4D3E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B0E13FFAD610634D3C20A063 /* FocusSession.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5AF2FE4BCEA66A832CB8637D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8106D91600D3C2013F5ACD33 /* bell.aiff */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C30EC7C7E2228B6BE149EDDC /* Focally */ = {
+			isa = PBXGroup;
+			children = (
+				B872379B2018EE66D478415E /* Assets.xcassets */,
+				379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */,
+				A6B424719CB23B5544233E17 /* Info.plist */,
+				442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */,
+				4E8101EF9D6FF1BD04DC4D3E /* Models */,
+				5AF2FE4BCEA66A832CB8637D /* Resources */,
+				F00A4423B12F413F1474634A /* Services */,
+				122010126CD7EFB3D8B2BF85 /* Views */,
+			);
+			path = Focally;
+			sourceTree = "<group>";
+		};
+		F00A4423B12F413F1474634A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F2E3F6355136EFD90EE198C8 /* DNDService.swift */,
+				1032F662E9204A6D804DD2EF /* FocusTimerService.swift */,
+				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
+				0179E6DB0D32C6C38E33CE35 /* SlackService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1AC72FE47D0D41C21F0D01AB /* Focally */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CEF1E0001AC6CFE0752BAED /* Build configuration list for PBXNativeTarget "Focally" */;
+			buildPhases = (
+				30DD3BA96A51B15AAC5D15F8 /* Sources */,
+				307B2FF5EED8DE0F2FB98A22 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Focally;
+			packageProductDependencies = (
+			);
+			productName = Focally;
+			productReference = 8E5322A16B3B60603C5509F9 /* Focally.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9D3C71A65D62656251FA73B9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					1AC72FE47D0D41C21F0D01AB = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = F9DBC3DFFF435732D07C9C0B /* Build configuration list for PBXProject "Focally" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4051D8D7C7F98FDA8B860CCE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 33154AF2EF8078375483C6A2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1AC72FE47D0D41C21F0D01AB /* Focally */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		307B2FF5EED8DE0F2FB98A22 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */,
+				0972ACA31DECEB6215662878 /* Resources in Resources */,
+				679740AFC847642945563E39 /* bell.aiff in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		30DD3BA96A51B15AAC5D15F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC2AF556BA64BF482606A1B0 /* ActivityInputView.swift in Sources */,
+				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
+				852FEB641C068C8AFD126EE5 /* FocusMenuView.swift in Sources */,
+				4E030561EE6C59693736B49E /* FocusSession.swift in Sources */,
+				EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */,
+				8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */,
+				71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */,
+				F38696014F84656D6286B4B8 /* SettingsView.swift in Sources */,
+				84AC2BAA9F2CCA1495A302B5 /* SlackService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		10F7F8A7BA61FA50E60011A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Focally/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_NAME = Focally;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		704058E10A134E2B2EDC90FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Focally/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_NAME = Focally;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		E51998DAFD6DBF09F5063CA9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.2.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		F8940EA66B401DD4B1DE8C61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.2.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2CEF1E0001AC6CFE0752BAED /* Build configuration list for PBXNativeTarget "Focally" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10F7F8A7BA61FA50E60011A8 /* Debug */,
+				704058E10A134E2B2EDC90FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F9DBC3DFFF435732D07C9C0B /* Build configuration list for PBXProject "Focally" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F8940EA66B401DD4B1DE8C61 /* Debug */,
+				E51998DAFD6DBF09F5063CA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9D3C71A65D62656251FA73B9 /* Project object */;
+}

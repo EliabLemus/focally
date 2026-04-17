@@ -17,7 +17,7 @@ struct KeychainHelper {
 
         let status = SecItemAdd(query as CFDictionary, nil)
         if status != errSecSuccess {
-            print("[OnItFocus] Keychain save error: \(status)")
+            print("[Focally] Keychain save error: \(status)")
         }
     }
 

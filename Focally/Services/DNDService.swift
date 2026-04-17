@@ -24,13 +24,13 @@ class DNDService: ObservableObject {
         // Use the modern approach with FocusFilterSet
         activateFocusMode()
         isDNDActive = true
-        print("[OnItFocus] DND activated")
+        print("[Focally] DND activated")
     }
 
     func deactivateDND() {
         deactivateFocusMode()
         isDNDActive = false
-        print("[OnItFocus] DND deactivated")
+        print("[Focally] DND deactivated")
     }
 
     private func activateFocusMode() {
@@ -61,9 +61,9 @@ class DNDService: ObservableObject {
             try task.run()
             task.waitUntilExit()
         } catch {
-            print("[OnItFocus] AppleScript error: \(error.localizedDescription)")
+            print("[Focally] AppleScript error: \(error.localizedDescription)")
             // Fallback: try with accessibility API
-            print("[OnItFocus] Make sure OnItFocus has Accessibility permissions in System Settings")
+            print("[Focally] Make sure Focally has Accessibility permissions in System Settings")
         }
     }
 }

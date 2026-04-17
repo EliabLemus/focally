@@ -96,9 +96,29 @@ class FocusTimerService: ObservableObject {
         session?.remainingSeconds = remainingSeconds
     }
 
+    private var activeSounds: [NSSound] = []
+
     private func onSessionComplete() {
-        // Play sound
-        NSSound(named: "Ping")?.play()
+        // Play sound (repeat based on settings)
+        let soundName = defaults.string(forKey: "soundName") ?? "Bell"
+        let repeatCount = defaults.integer(forKey: "soundRepeatCount")
+        let count = repeatCount > 0 ? repeatCount : 1
+
+        for i in 0..<count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 3.5) { [weak self] in
+                guard let self = self else { return }
+                let sound: NSSound?
+                if let url = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
+                    sound = NSSound(contentsOf: url, byReference: true)
+                } else {
+                    sound = NSSound(named: soundName)
+                }
+                sound?.play()
+                if let s = sound {
+                    self.activeSounds.append(s)
+                }
+            }
+        }
 
         // Show notification
         let center = UNUserNotificationCenter.current()

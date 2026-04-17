@@ -9,14 +9,15 @@ struct SettingsView: View {
     @AppStorage("lastDuration") private var lastDuration = 25
     @AppStorage("useSystemTheme") private var useSystemTheme = true
     @AppStorage("soundEnabled") private var soundEnabled = true
-    @AppStorage("soundName") private var soundName = "Ping"
+    @AppStorage("soundName") private var soundName = "Bell"
+    @AppStorage("soundRepeatCount") private var soundRepeatCount = 5
 
     @State private var newDuration = ""
     @State private var predefinedTasks: [PredefinedTask] = []
     @State private var newTaskName = ""
     @State private var newTaskEmoji = "📝"
 
-    let sounds = ["Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass"]
+    let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass"]
 
     var body: some View {
         TabView {
@@ -101,6 +102,10 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.segmented)
+
+                    HStack {
+                        Stepper("Repeat: \(soundRepeatCount)", value: $soundRepeatCount, in: 1...20)
+                    }
                 }
             }
         }

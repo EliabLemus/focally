@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct OnItFocusApp: App {
+struct FocallyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "hourglass.circle.fill", accessibilityDescription: "OnItFocus")
+            button.image = NSImage(systemSymbolName: "hourglass.circle.fill", accessibilityDescription: "Focally")
             button.action = #selector(togglePopover)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
@@ -114,25 +114,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if timerService.isActive {
             let extendItem = NSMenuItem(title: "Extend +5 min", action: #selector(extendSession), keyEquivalent: "")
             extendItem.image = NSImage(systemSymbolName: "forward.fill", accessibilityDescription: "Extend")
+            extendItem.target = self
             menu.addItem(extendItem)
 
             let endItem = NSMenuItem(title: "End Session", action: #selector(endSession), keyEquivalent: "")
             endItem.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: "End")
+            endItem.target = self
             menu.addItem(endItem)
             menu.addItem(NSMenuItem.separator())
         }
 
         let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: "Settings")
+        settingsItem.target = self
         menu.addItem(settingsItem)
 
         menu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit OnItFocus", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "Quit Focally", action: #selector(quitApp), keyEquivalent: "q")
+        quitItem.target = self
         menu.addItem(quitItem)
 
-        menu.delegate = self
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.height), in: button)
+        let buttonOrigin = button.window?.convertToScreen(NSRect(origin: button.frame.origin, size: button.frame.size)).origin ?? .zero
+        menu.popUp(positioning: nil, at: NSPoint(x: buttonOrigin.x, y: buttonOrigin.y - 2), in: nil)
     }
 
     @objc func extendSession() {
@@ -148,8 +152,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if popover?.isShown == true {
             popover?.performClose(nil)
         }
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        NSApp.activate(ignoringOtherApps: true)
+
+        // Open Settings window manually (required for menu bar-only apps)
+        if let settingsWindow = NSApp.windows.first(where: { $0.title == "Settings" || $0.title == "Focally Settings" }) {
+            settingsWindow.makeKeyAndOrderFront(nil)
+        } else {
+            let settingsView = SettingsView()
+                .environmentObject(slackService)
+            let hostingController = NSHostingController(rootView: settingsView)
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "Settings"
+            window.styleMask = [.titled, .closable]
+            window.setContentSize(NSSize(width: 400, height: 350))
+            window.center()
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     @objc func quitApp() {
@@ -166,7 +184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 button.title = newText
             }
         } else {
-            button.image = NSImage(systemSymbolName: "hourglass.circle.fill", accessibilityDescription: "OnItFocus")
+            button.image = NSImage(systemSymbolName: "hourglass.circle.fill", accessibilityDescription: "Focally")
             button.title = ""
         }
 
