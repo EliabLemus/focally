@@ -1,0 +1,56 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Build DMG
+        run: chmod +x scripts/build-release.sh && ./scripts/build-release.sh ${{ github.ref_name }}
+
+      - name: Upload to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.ref_name }} build/OnItFocus-${{ github.ref_name }}.dmg --clobber
+
+      - name: Update Homebrew Tap
+        env:
+          GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          VERSION="${{ github.ref_name }}"
+          DMG_SHA=$(shasum -a 256 build/OnItFocus-${VERSION}.dmg | cut -d' ' -f1)
+
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/EliabLemus/homebrew-onitfocus.git /tmp/homebrew-onitfocus
+          cd /tmp/homebrew-onitfocus
+
+          cat > Casks/onitfocus.rb << EOF
+          cask "onitfocus" do
+            version "${VERSION#v}"
+            sha256 "${DMG_SHA}"
+
+            url "https://github.com/EliabLemus/onitfocus/releases/download/v#{version}/OnItFocus-#{version}.dmg"
+            name "OnItFocus"
+            desc "Minimal macOS menu bar focus timer with automatic DND"
+            homepage "https://github.com/EliabLemus/onitfocus"
+
+            app "OnItFocus.app"
+
+            zap trash: [
+              "~/Library/Application Support/OnItFocus",
+              "~/Library/Preferences/com.openjaime.onitfocus.plist",
+            ]
+          end
+          EOF
+
+          git add -A
+          git commit -m "Update onitfocus cask to ${VERSION}"
+          git push
