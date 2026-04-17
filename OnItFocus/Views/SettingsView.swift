@@ -26,10 +26,15 @@ struct SettingsView: View {
                 .tabItem { Label("Tasks", systemImage: "checklist") }
             connectionsTab
                 .tabItem { Label("Connections", systemImage: "link") }
+            secretsTab
+                .tabItem { Label("Secrets", systemImage: "key.fill") }
             appearanceTab
                 .tabItem { Label("Appearance", systemImage: "paintbrush") }
         }
         .frame(width: 400, height: 350)
+        .onAppear {
+            slackToken = slackService.token ?? ""
+        }
     }
 
     // MARK: - Durations
@@ -163,7 +168,7 @@ struct SettingsView: View {
                 .font(.headline)
 
             // Slack
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Image(systemName: "message.fill")
                         .foregroundStyle(.secondary)
@@ -174,38 +179,25 @@ struct SettingsView: View {
                     Toggle("", isOn: $slackService.isEnabled)
                 }
 
-                if slackService.isEnabled {
-                    VStack(alignment: .leading, spacing: 8) {
-                        SecureField("Slack User Token (xoxp-...)", text: $slackToken)
-                            .textFieldStyle(.roundedBorder)
-                            .onChange(of: slackToken) { _, newValue in
-                                slackService.token = newValue.isEmpty ? nil : newValue
-                            }
-
-                        HStack {
-                            Button("Test Connection") {
-                                slackService.testConnection()
-                            }
-                            .disabled(slackService.token == nil || slackService.token?.isEmpty == true)
-
-                            if slackService.isConnected {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.green)
-                            }
-
-                            Spacer()
-
-                            if let error = slackService.connectionError {
-                                Text(error)
-                                    .font(.caption)
-                                    .foregroundStyle(.red)
-                            }
-                        }
-
-                        Text("Create a Slack app at api.slack.com → OAuth & Permissions → users.profile:write")
-                            .font(.caption2)
+                HStack {
+                    if slackService.isConnected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                        Text("Connected")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    } else if let error = slackService.connectionError {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    } else {
+                        Text("Configure token in Secrets tab")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                    Spacer()
                 }
             }
             .padding(12)
@@ -236,6 +228,78 @@ struct SettingsView: View {
                     Image(systemName: "bolt.fill")
                         .foregroundStyle(.secondary)
                     Text("n8n WebSocket")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Spacer()
+                    Text("Coming soon")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(12)
+                .background(Color.gray.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+
+            Spacer()
+        }
+        .padding(16)
+    }
+
+    // MARK: - Secrets
+
+    private var secretsTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Secrets")
+                .font(.headline)
+
+            Text("Tokens and credentials are stored securely in macOS Keychain.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            // Slack Token
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Image(systemName: "message.fill")
+                        .foregroundStyle(.secondary)
+                    Text("Slack User Token")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+
+                SecureField("xoxp-...", text: $slackToken)
+                    .textFieldStyle(.roundedBorder)
+                    .onChange(of: slackToken) { _, newValue in
+                        slackService.token = newValue.isEmpty ? nil : newValue
+                    }
+
+                HStack {
+                    Button("Save & Test") {
+                        slackService.testConnection()
+                    }
+                    .disabled(slackService.token == nil || slackService.token?.isEmpty == true)
+
+                    if slackService.isConnected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                    }
+
+                    Spacer()
+                }
+
+                Text("Create a Slack app at api.slack.com → OAuth & Permissions → users.profile:write")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Google Calendar (Iteración 3)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: "calendar")
+                        .foregroundStyle(.secondary)
+                    Text("Google Calendar")
                         .font(.subheadline)
                         .fontWeight(.medium)
                     Spacer()

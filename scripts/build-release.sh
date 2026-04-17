@@ -25,6 +25,7 @@ xcodegen generate 2>&1 | tail -1
 # Build Release
 echo "📦 Building Release..."
 xcodebuild build \
+    -project "$PROJECT_DIR/OnItFocus.xcodeproj" \
     -scheme OnItFocus \
     -configuration Release \
     -destination 'platform=macOS' \
