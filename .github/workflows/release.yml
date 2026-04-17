@@ -26,14 +26,17 @@ jobs:
 
       - name: Update Homebrew Tap
         env:
-          GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
         run: |
           VERSION="${{ github.ref_name }}"
           DMG_NAME="Focally-${VERSION}.dmg"
           DMG_SHA=$(shasum -a 256 build/${DMG_NAME} | cut -d' ' -f1)
 
-          git clone https://x-access-token:${TAP_TOKEN}@github.com/EliabLemus/homebrew-focally.git /tmp/homebrew-focally
-          cd /tmp/homebrew-focally
+          # Clone tap repo using gh CLI (handles auth properly)
+          cd /tmp
+          echo "$TAP_TOKEN" | gh auth login --with-token
+          gh repo clone EliabLemus/homebrew-focally homebrew-focally
+          cd homebrew-focally
 
           cat > Casks/focally.rb << EOF
           cask "focally" do
