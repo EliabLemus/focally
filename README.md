@@ -2,7 +2,7 @@
 
 > Minimal macOS menu bar app for focus sessions. Start a timer, get in the zone, let Focally handle the rest.
 
-![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/version-0.2.0-green)
+![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/version-0.2.1-green)
 
 ## What it does
 
