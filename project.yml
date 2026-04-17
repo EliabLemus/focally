@@ -1,7 +1,7 @@
 name: Focally
 options:
   bundleIdPrefix: app.focally
-  xcodeVersion: "16.0"
+  xcodeVersion: "15.0"
   deploymentTarget:
     macOS: "14.0"
   generateEmptyDirectories: true
