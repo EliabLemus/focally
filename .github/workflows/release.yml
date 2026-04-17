@@ -20,37 +20,38 @@ jobs:
       - name: Upload to Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.ref_name }} build/OnItFocus-${{ github.ref_name }}.dmg --clobber
+        run: gh release upload ${{ github.ref_name }} build/Focally-${{ github.ref_name }}.dmg --clobber
 
       - name: Update Homebrew Tap
         env:
           GH_TOKEN: ${{ secrets.TAP_TOKEN }}
         run: |
           VERSION="${{ github.ref_name }}"
-          DMG_SHA=$(shasum -a 256 build/OnItFocus-${VERSION}.dmg | cut -d' ' -f1)
+          DMG_NAME="Focally-${VERSION}.dmg"
+          DMG_SHA=$(shasum -a 256 build/${DMG_NAME} | cut -d' ' -f1)
 
-          git clone https://x-access-token:${TAP_TOKEN}@github.com/EliabLemus/homebrew-onitfocus.git /tmp/homebrew-onitfocus
-          cd /tmp/homebrew-onitfocus
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/EliabLemus/homebrew-focally.git /tmp/homebrew-focally
+          cd /tmp/homebrew-focally
 
-          cat > Casks/onitfocus.rb << EOF
-          cask "onitfocus" do
+          cat > Casks/focally.rb << EOF
+          cask "focally" do
             version "${VERSION#v}"
             sha256 "${DMG_SHA}"
 
-            url "https://github.com/EliabLemus/onitfocus/releases/download/v#{version}/OnItFocus-#{version}.dmg"
-            name "OnItFocus"
-            desc "Minimal macOS menu bar focus timer with automatic DND"
-            homepage "https://github.com/EliabLemus/onitfocus"
+            url "https://github.com/EliabLemus/focally/releases/download/v#{version}/Focally-#{version}.dmg"
+            name "Focally"
+            desc "Minimal macOS menu bar focus timer with automatic DND and Slack status"
+            homepage "https://github.com/EliabLemus/focally"
 
-            app "OnItFocus.app"
+            app "Focally.app"
 
             zap trash: [
-              "~/Library/Application Support/OnItFocus",
-              "~/Library/Preferences/com.openjaime.onitfocus.plist",
+              "~/Library/Application Support/Focally",
+              "~/Library/Preferences/app.focally.mac.plist",
             ]
           end
           EOF
 
           git add -A
-          git commit -m "Update onitfocus cask to ${VERSION}"
+          git commit -m "Update focally cask to ${VERSION}"
           git push
