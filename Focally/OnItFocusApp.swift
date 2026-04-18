@@ -167,14 +167,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popover?.performClose(nil)
         }
 
-        // Open Settings window manually (required for menu bar-only apps)
-        if let settingsWindow, settingsWindow.isVisible {
+        // Reuse the same window so it can be reopened after the user closes it.
+        if let settingsWindow {
             settingsWindow.makeKeyAndOrderFront(nil)
-        } else {
-            let window = settingsWindow ?? makeSettingsWindow()
-            window.makeKeyAndOrderFront(nil)
+            settingsWindow.orderFrontRegardless()
             NSApp.activate(ignoringOtherApps: true)
+            return
         }
+
+        let window = makeSettingsWindow()
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc func quitApp() {

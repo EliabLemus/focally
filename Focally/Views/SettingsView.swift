@@ -52,7 +52,9 @@ struct SettingsView: View {
                     durationsTab
                 }
                     .tabItem { Label("Timer", systemImage: "timer") }
-                tasksTab
+                tabScrollView {
+                    tasksTab
+                }
                     .tabItem { Label("Tasks", systemImage: "checklist") }
                 tabScrollView {
                     connectionsTab
@@ -155,7 +157,7 @@ struct SettingsView: View {
     }
 
     private var tasksTab: some View {
-        VStack(spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Predefined Tasks")
                 .font(.headline)
 
@@ -181,25 +183,32 @@ struct SettingsView: View {
                 Text("No predefined tasks yet")
                     .foregroundStyle(.secondary)
                     .font(.caption)
-            }
-
-            List {
-                ForEach(draftPredefinedTasks) { task in
-                    HStack {
-                        Text(task.emoji)
-                        Text(task.name)
-                        Spacer()
-                        Button {
-                            removeTask(task)
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(draftPredefinedTasks) { task in
+                        HStack {
+                            Text(task.emoji)
+                            Text(task.name)
+                            Spacer()
+                            Button {
+                                removeTask(task)
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.red)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(Color.gray.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
             }
+
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
     private var connectionsTab: some View {
@@ -398,6 +407,7 @@ struct SettingsView: View {
                 .padding(16)
         }
         .scrollIndicators(.visible)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var savedSlackToken: String {
