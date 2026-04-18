@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var eventMonitor: Any?
+    private var settingsWindow: NSWindow?
     let timerService = FocusTimerService()
     let dndService = DNDService()
     let slackService = SlackService()
@@ -84,11 +85,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         slackService.setStatus(
             text: timerService.currentActivity,
             expirationTimestamp: expiration,
-            customEmoji: slackService.savedStatusEmoji()
+            taskEmoji: timerService.currentEmoji,
+            fallbackEmoji: slackService.savedStatusEmoji()
         )
     }
 
     @objc private func onSessionEnded() {
+        dndService.deactivateDND()
         slackService.clearStatus()
     }
 
@@ -97,14 +100,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let event = NSApp.currentEvent, event.type == .rightMouseUp {
             showContextMenu(button: button)
-            return
-        }
-
-        if timerService.isActive {
-            if popover.isShown {
-                popover.performClose(button)
-            }
-            endSession()
             return
         }
 
@@ -119,11 +114,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func showContextMenu(button: NSButton) {
         let menu = NSMenu()
 
-        if timerService.isActive {
+        if timerService.hasSession {
             let extendItem = NSMenuItem(title: "Extend +5 min", action: #selector(extendSession), keyEquivalent: "")
             extendItem.image = NSImage(systemSymbolName: "forward.fill", accessibilityDescription: "Extend")
             extendItem.target = self
             menu.addItem(extendItem)
+
+            let pauseTitle = timerService.isPaused ? "Resume Session" : "Pause Session"
+            let pauseImage = timerService.isPaused ? "play.fill" : "pause.fill"
+            let pauseItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
+            pauseItem.image = NSImage(systemSymbolName: pauseImage, accessibilityDescription: pauseTitle)
+            pauseItem.target = self
+            menu.addItem(pauseItem)
 
             let endItem = NSMenuItem(title: "End Session", action: #selector(endSession), keyEquivalent: "")
             endItem.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: "End")
@@ -151,6 +153,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         timerService.extendFiveMinutes()
     }
 
+    @objc func togglePauseSession() {
+        timerService.togglePause()
+    }
+
     @objc func endSession() {
         timerService.cancelSession()
         dndService.deactivateDND()
@@ -162,17 +168,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Open Settings window manually (required for menu bar-only apps)
-        if let settingsWindow = NSApp.windows.first(where: { $0.title == "Settings" || $0.title == "Focally Settings" }) {
+        if let settingsWindow, settingsWindow.isVisible {
             settingsWindow.makeKeyAndOrderFront(nil)
         } else {
-            let settingsView = SettingsView()
-                .environmentObject(slackService)
-            let hostingController = NSHostingController(rootView: settingsView)
-            let window = NSWindow(contentViewController: hostingController)
-            window.title = "Settings"
-            window.styleMask = [.titled, .closable]
-            window.setContentSize(NSSize(width: 420, height: 430))
-            window.center()
+            let window = settingsWindow ?? makeSettingsWindow()
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
         }
@@ -185,8 +184,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusBar() {
         guard let button = statusItem?.button else { return }
 
-        if timerService.isActive {
-            button.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: "Stop Focus Session")
+        if timerService.hasSession {
+            let imageName = timerService.isPaused ? "play.fill" : "pause.fill"
+            let description = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
+            button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: description)
             let newText = " \(timerService.currentEmoji) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
             if button.title != newText {
                 button.title = newText
@@ -197,6 +198,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         statusItem?.length = NSStatusItem.variableLength
+    }
+
+    private func makeSettingsWindow() -> NSWindow {
+        let settingsView = SettingsView()
+            .environmentObject(slackService)
+        let hostingController = NSHostingController(rootView: settingsView)
+        let window = NSWindow(contentViewController: hostingController)
+        window.title = "Settings"
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.isReleasedWhenClosed = false
+        window.setContentSize(NSSize(width: 420, height: 430))
+        window.minSize = NSSize(width: 420, height: 430)
+        window.center()
+        settingsWindow = window
+        return window
     }
 }
 

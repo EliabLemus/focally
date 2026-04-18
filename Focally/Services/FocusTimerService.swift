@@ -5,6 +5,7 @@ import AppKit
 
 class FocusTimerService: ObservableObject {
     @Published var isActive = false
+    @Published var isPaused = false
     @Published var currentActivity = ""
     @Published var currentEmoji = "📝"
     @Published var remainingSeconds: Int = 0
@@ -13,6 +14,10 @@ class FocusTimerService: ObservableObject {
     private var session: FocusSession?
     private var timer: Timer?
     private let defaults = UserDefaults.standard
+
+    var hasSession: Bool {
+        session != nil
+    }
 
     var remainingTimeString: String {
         let minutes = remainingSeconds / 60
@@ -47,6 +52,7 @@ class FocusTimerService: ObservableObject {
         self.durationMinutes = durationMinutes
         self.remainingSeconds = session.remainingSeconds
         self.isActive = true
+        self.isPaused = false
 
         saveLastUsed(activity: activity, emoji: emoji, duration: durationMinutes)
         startTimer()
@@ -57,6 +63,7 @@ class FocusTimerService: ObservableObject {
         stopTimer()
         session = nil
         isActive = false
+        isPaused = false
         remainingSeconds = 0
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }
@@ -71,6 +78,22 @@ class FocusTimerService: ObservableObject {
 
     func cancelSession() {
         endSession()
+    }
+
+    func pauseSession() {
+        guard isActive, !isPaused else { return }
+        stopTimer()
+        isPaused = true
+    }
+
+    func resumeSession() {
+        guard isActive, isPaused else { return }
+        isPaused = false
+        startTimer()
+    }
+
+    func togglePause() {
+        isPaused ? resumeSession() : pauseSession()
     }
 
     // MARK: - Timer
@@ -109,14 +132,14 @@ class FocusTimerService: ObservableObject {
 
         let soundName = defaults.string(forKey: "soundName") ?? "Bell"
         let repeatCount = defaults.integer(forKey: "soundRepeatCount")
-        let count = repeatCount > 0 ? repeatCount : 1
+        let count = repeatCount > 0 ? repeatCount : 5  // default 5 if never saved
 
         for i in 0..<count {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 3.5) { [weak self] in
                 guard let self = self else { return }
                 guard let sound = self.makeSound(named: soundName) else { return }
-                sound.play()
                 self.activeSounds.append(sound)
+                sound.play()
             }
         }
 
@@ -124,13 +147,20 @@ class FocusTimerService: ObservableObject {
     }
 
     private func makeSound(named soundName: String) -> NSSound? {
-        guard let url = soundURL(for: soundName) else { return nil }
+        guard let url = soundURL(for: soundName) else {
+            print("[Focally] Sound not found for selection: \(soundName)")
+            return nil
+        }
         return NSSound(contentsOf: url, byReference: true)
     }
 
     private func soundURL(for soundName: String) -> URL? {
         if soundName == "Bell",
            let bundledURL = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
+            return bundledURL
+        }
+
+        if let bundledURL = Bundle.main.url(forResource: soundName, withExtension: "aiff") {
             return bundledURL
         }
 
@@ -177,6 +207,7 @@ class FocusTimerService: ObservableObject {
     }
 
     deinit {
+        activeSounds.forEach { $0.stop() }
         stopTimer()
     }
 }

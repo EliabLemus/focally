@@ -48,17 +48,26 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: 0) {
             TabView {
-                durationsTab
+                tabScrollView {
+                    durationsTab
+                }
                     .tabItem { Label("Timer", systemImage: "timer") }
                 tasksTab
                     .tabItem { Label("Tasks", systemImage: "checklist") }
-                connectionsTab
+                tabScrollView {
+                    connectionsTab
+                }
                     .tabItem { Label("Connections", systemImage: "link") }
-                secretsTab
+                tabScrollView {
+                    secretsTab
+                }
                     .tabItem { Label("Secrets", systemImage: "key.fill") }
-                appearanceTab
+                tabScrollView {
+                    appearanceTab
+                }
                     .tabItem { Label("Appearance", systemImage: "paintbrush") }
             }
+            .frame(maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
 
             Divider()
 
@@ -73,7 +82,7 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
-        .frame(width: 420, height: 430)
+        .frame(minWidth: 420, minHeight: 430)
         .onAppear(perform: loadSettings)
         .onChange(of: focusedField) { previous, current in
             if previous == .slackToken, current != .slackToken {
@@ -143,7 +152,6 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .padding(16)
     }
 
     private var tasksTab: some View {
@@ -192,7 +200,6 @@ struct SettingsView: View {
                 }
             }
         }
-        .padding(16)
     }
 
     private var connectionsTab: some View {
@@ -297,7 +304,6 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .padding(16)
     }
 
     private var secretsTab: some View {
@@ -368,7 +374,6 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .padding(16)
     }
 
     private var appearanceTab: some View {
@@ -384,7 +389,15 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .padding(16)
+    }
+
+    private func tabScrollView<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ScrollView {
+            content()
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(16)
+        }
+        .scrollIndicators(.visible)
     }
 
     private var savedSlackToken: String {

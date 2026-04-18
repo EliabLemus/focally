@@ -66,6 +66,12 @@ struct FocusMenuView: View {
                 .font(.system(size: 48, design: .monospaced))
                 .fontWeight(.bold)
 
+            if timerService.isPaused {
+                Text("Paused")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             ProgressView(value: timerService.progress)
                 .progressViewStyle(.linear)
                 .frame(maxWidth: .infinity)
@@ -79,15 +85,13 @@ struct FocusMenuView: View {
                 }
                 .buttonStyle(.bordered)
 
-                Button(role: .destructive) {
-                    timerService.cancelSession()
-                    dndService.deactivateDND()
+                Button {
+                    timerService.togglePause()
                 } label: {
-                    Label("Stop", systemImage: "stop.fill")
+                    Label(timerService.isPaused ? "Resume" : "Pause", systemImage: timerService.isPaused ? "play.fill" : "pause.fill")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .tint(.red)
             }
         }
         .padding(20)

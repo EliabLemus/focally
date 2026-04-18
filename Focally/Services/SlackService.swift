@@ -36,9 +36,9 @@ class SlackService: ObservableObject {
         return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
     }
 
-    func setStatus(text: String, expirationTimestamp: Int, customEmoji: String? = nil) {
+    func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String? = nil, fallbackEmoji: String? = nil) {
         guard isEnabled, let token = token else { return }
-        let statusEmoji = normalizedStatusEmoji(customEmoji)
+        let statusEmoji = normalizedStatusEmoji(taskEmoji, fallbackEmoji: fallbackEmoji)
 
         let profile: [String: String] = [
             "status_text": text,
@@ -132,7 +132,11 @@ class SlackService: ObservableObject {
         }
 
         // Test by setting a quick status and clearing it
-        setStatus(text: "Testing Focally", expirationTimestamp: Int(Date().timeIntervalSince1970) + 10, customEmoji: ":test_tube:")
+        setStatus(
+            text: "Testing Focally",
+            expirationTimestamp: Int(Date().timeIntervalSince1970) + 10,
+            taskEmoji: ":test_tube:"
+        )
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             self?.clearStatus()
@@ -150,8 +154,17 @@ class SlackService: ObservableObject {
         }
     }
 
-    private func normalizedStatusEmoji(_ emoji: String?) -> String {
-        let trimmed = emoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? savedStatusEmoji() : trimmed
+    private func normalizedStatusEmoji(_ taskEmoji: String?, fallbackEmoji: String?) -> String {
+        let taskValue = taskEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !taskValue.isEmpty {
+            return taskValue
+        }
+
+        let fallbackValue = fallbackEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !fallbackValue.isEmpty {
+            return fallbackValue
+        }
+
+        return savedStatusEmoji()
     }
 }
