@@ -22,45 +22,64 @@ brew tap EliabLemus/focally
 brew install --cask focally
 ```
 
-Or [download the latest DMG](https://github.com/EliabLemus/focally/releases).
+[Download latest DMG](https://github.com/EliabLemus/focally/releases) · [Build from source](#build-from-source)
 
 ## How it works
 
 | Step | What happens |
 |------|-------------|
 | **Start** | Pick an activity + duration → timer begins |
-| **Focus** | DND activates, Slack status updates |
+| **Focus** | DND activates, Slack status updates automatically |
 | **Finish** | Bell rings, notification fires, DND deactivates |
 
 ### Controls
 
-- **Left-click** the menu bar icon → focus panel
-- **Right-click** → context menu (settings, quit)
+- **Left-click** ⏳ → focus panel (start, countdown, extend, end)
+- **Right-click** ⏳ → context menu (settings, quit)
+
+### Features
+
+- ⏱️ Focus timer with customizable durations (25/45/60/custom min)
+- 🔇 Automatic Do Not Disturb on session start/end
+- 💬 Slack status sync — shows your current task with emoji
+- 🔔 Alert sound with configurable repeat
+- 📋 Predefined tasks for quick start
+- 🔑 Secrets stored in macOS Keychain
 
 ### Settings
 
-- **Timer** — durations, alert sound, repeat count
-- **Tasks** — predefined activities for quick start
-- **Connections** — Slack, Calendar, n8n *(coming soon)*
-- **Secrets** — tokens stored in macOS Keychain
+| Tab | What it does |
+|-----|-------------|
+| **Timer** | Durations, alert sound, repeat count |
+| **Tasks** | Predefined activities with emojis |
+| **Connections** | Slack workspace toggle |
+| **Secrets** | Tokens and credentials (Keychain) |
 
 ## Permissions
 
-| Permission | Why |
-|---|---|
-| Accessibility | Toggle Do Not Disturb |
-| Notifications | Session end alerts |
-
-System Settings → Privacy & Security → Accessibility → Add Focally
+| Permission | Why | How |
+|---|---|---|
+| Accessibility | Toggle Do Not Disturb | System Settings → Privacy → Accessibility → Add Focally |
+| Notifications | Session alerts | System Settings → Notifications → Focally → Allow |
 
 ## Roadmap
 
-- ✅ **v0.1.0** — MVP: menu bar, timer, DND
-- ✅ **v0.2.0** — Slack status integration
-- 🔜 **v0.3.0** — Google Calendar read
-- 📋 **v0.4.0** — Focus Planner (calendar write)
-- 📋 **v0.5.0** — n8n WebSocket sync
-- 📋 **v0.6.0** — Polish: history, shortcuts, auto-start
+- ✅ v0.1 — MVP: menu bar, timer, DND, settings
+- ✅ v0.2 — Slack status integration
+- 🔜 v0.3 — Google Calendar read
+- 📋 v0.4 — Focus Planner (calendar write)
+- 📋 v0.5 — n8n WebSocket sync
+
+## Build from source
+
+Requires Xcode 16+ and macOS 14+.
+
+```bash
+git clone https://github.com/EliabLemus/focally.git
+cd focally
+xcodegen generate
+xcodebuild build -scheme Focally -destination 'platform=macOS'
+```
 
 ## Tech
 
@@ -68,7 +87,7 @@ SwiftUI · NSStatusBar · macOS 14+ · XcodeGen · GitHub Actions · Homebrew ta
 
 ## Contributing
 
-Pull requests welcome. Fork → branch → PR.
+Fork → branch → PR. Keep it minimal. ✨
 
 ## License
 
