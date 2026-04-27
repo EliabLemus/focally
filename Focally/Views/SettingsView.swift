@@ -3,6 +3,7 @@ import AppKit
 
 struct SettingsView: View {
     @EnvironmentObject var slackService: SlackService
+    @EnvironmentObject var calendarService: GoogleCalendarService
 
     @AppStorage("customDurations") private var customDurationsData = "[25, 45, 60, 90]"
     @AppStorage("useSystemTheme") private var useSystemTheme = true
@@ -12,7 +13,10 @@ struct SettingsView: View {
     @AppStorage(SlackService.statusEmojiDefaultsKey) private var slackStatusEmoji = SlackService.defaultStatusEmoji
 
     @State private var draftSlackToken = ""
+    @State private var draftGoogleClientID = ""
+    @State private var draftGoogleClientSecret = ""
     @State private var draftSlackEnabled = false
+    @State private var draftGoogleCalendarEnabled = false
     @State private var draftSlackEmoji = SlackService.defaultStatusEmoji
     @State private var draftDurations: [Int] = [25, 45, 60, 90]
     @State private var draftPredefinedTasks: [PredefinedTask] = []
@@ -31,6 +35,8 @@ struct SettingsView: View {
     private enum Field {
         case slackToken
         case slackEmoji
+        case googleClientID
+        case googleClientSecret
     }
 
     private let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass"]
@@ -92,6 +98,12 @@ struct SettingsView: View {
             }
             if previous == .slackEmoji, current != .slackEmoji {
                 draftSlackEmoji = normalizedSlackEmoji(draftSlackEmoji)
+            }
+            if previous == .googleClientID, current != .googleClientID {
+                draftGoogleClientID = draftGoogleClientID.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            if previous == .googleClientSecret, current != .googleClientSecret {
+                draftGoogleClientSecret = draftGoogleClientSecret.trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }
     }
@@ -278,16 +290,63 @@ struct SettingsView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Image(systemName: "calendar")
-                        .foregroundStyle(.secondary)
-                    Text("Google Calendar")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text("Coming soon")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.secondary)
+                            Text("Google Calendar")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Spacer()
+                            Toggle("", isOn: $draftGoogleCalendarEnabled)
+                        }
+
+                        HStack {
+                            if calendarService.isSignedIn {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(.green)
+                                Text("Connected")
+                                    .font(.caption)
+                                    .foregroundStyle(.green)
+                            } else if let error = calendarService.connectionError,
+                                      calendarService.isEnabled || !savedGoogleClientID.isEmpty {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.red)
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                            } else {
+                                Text("Configure credentials in Secrets tab")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                        }
+
+                        HStack(spacing: 10) {
+                            Button(calendarService.isSignedIn ? "Sign Out" : "Sign in with Google") {
+                                if calendarService.isSignedIn {
+                                    calendarService.signOut()
+                                } else {
+                                    calendarService.signIn()
+                                }
+                            }
+                            .disabled(!isGoogleCalendarReadyForSignIn)
+
+                            if calendarService.isSignedIn {
+                                Button("Refresh Events") {
+                                    calendarService.fetchTodayEvents()
+                                }
+                            }
+                        }
+
+                        if hasPendingGoogleSettingsChanges {
+                            Text("Save Changes before signing in or refreshing Google Calendar.")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
                 .padding(12)
                 .background(Color.gray.opacity(0.1))
@@ -371,15 +430,33 @@ struct SettingsView: View {
                     Text("Google Calendar")
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Spacer()
-                    Text("Coming soon")
-                        .font(.caption)
+                }
+
+                TextField("Google Client ID", text: $draftGoogleClientID)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($focusedField, equals: .googleClientID)
+
+                SecureField("Google Client Secret", text: $draftGoogleClientSecret)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($focusedField, equals: .googleClientSecret)
+
+                if savedGoogleClientID != draftGoogleClientID || savedGoogleClientSecret != draftGoogleClientSecret {
+                    Text("Save Changes to persist the updated Google credentials.")
+                        .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
+
+                Link("Open Google Cloud Console", destination: URL(string: "https://console.cloud.google.com/apis/credentials")!)
+                    .font(.caption)
+
+                Text("Create an OAuth client with redirect URI http://localhost and scope calendar.readonly.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                 .padding(12)
-                .background(Color.gray.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
 
             Spacer()
         }
@@ -414,14 +491,43 @@ struct SettingsView: View {
         slackService.token ?? ""
     }
 
+    private var savedGoogleClientID: String {
+        calendarService.clientID ?? ""
+    }
+
+    private var savedGoogleClientSecret: String {
+        calendarService.clientSecret ?? ""
+    }
+
+    private var hasPendingGoogleSettingsChanges: Bool {
+        draftGoogleCalendarEnabled != calendarService.isEnabled ||
+        draftGoogleClientID != savedGoogleClientID ||
+        draftGoogleClientSecret != savedGoogleClientSecret
+    }
+
+    private var isGoogleCalendarReadyForSignIn: Bool {
+        if calendarService.isSignedIn {
+            return true
+        }
+
+        if hasPendingGoogleSettingsChanges {
+            return false
+        }
+
+        return calendarService.isEnabled && !savedGoogleClientID.isEmpty && !savedGoogleClientSecret.isEmpty
+    }
+
     private var hasUnsavedChanges: Bool {
         if draftUseSystemTheme != useSystemTheme { return true }
         if draftSoundEnabled != soundEnabled { return true }
         if draftSoundName != soundName { return true }
         if draftSoundRepeatCount != soundRepeatCount { return true }
         if draftSlackEnabled != slackService.isEnabled { return true }
+        if draftGoogleCalendarEnabled != calendarService.isEnabled { return true }
         if normalizedSlackEmoji(draftSlackEmoji) != normalizedSlackEmoji(slackStatusEmoji) { return true }
         if draftSlackToken != savedSlackToken { return true }
+        if draftGoogleClientID != savedGoogleClientID { return true }
+        if draftGoogleClientSecret != savedGoogleClientSecret { return true }
         if draftDurations != decodedDurations(from: customDurationsData) { return true }
         if draftPredefinedTasks != loadTasks() { return true }
         return false
@@ -442,7 +548,10 @@ struct SettingsView: View {
 
     private func loadSettings() {
         draftSlackToken = savedSlackToken
+        draftGoogleClientID = savedGoogleClientID
+        draftGoogleClientSecret = savedGoogleClientSecret
         draftSlackEnabled = slackService.isEnabled
+        draftGoogleCalendarEnabled = calendarService.isEnabled
         draftSlackEmoji = normalizedSlackEmoji(slackStatusEmoji)
         draftDurations = decodedDurations(from: customDurationsData)
         draftPredefinedTasks = loadTasks()
@@ -455,6 +564,8 @@ struct SettingsView: View {
 
     private func saveSettings() {
         commitSlackTokenDraft()
+        draftGoogleClientID = draftGoogleClientID.trimmingCharacters(in: .whitespacesAndNewlines)
+        draftGoogleClientSecret = draftGoogleClientSecret.trimmingCharacters(in: .whitespacesAndNewlines)
 
         useSystemTheme = draftUseSystemTheme
         soundEnabled = draftSoundEnabled
@@ -466,6 +577,11 @@ struct SettingsView: View {
 
         slackService.isEnabled = draftSlackEnabled
         slackService.token = draftSlackToken.isEmpty ? nil : draftSlackToken
+        calendarService.isEnabled = draftGoogleCalendarEnabled
+        calendarService.saveClientCredentials(
+            clientID: draftGoogleClientID,
+            clientSecret: draftGoogleClientSecret
+        )
 
         if draftSlackToken.isEmpty {
             slackService.isConnected = false
@@ -474,6 +590,17 @@ struct SettingsView: View {
             slackService.testConnection()
         } else {
             slackService.connectionError = nil
+        }
+
+        if !calendarService.isEnabled {
+            calendarService.connectionError = nil
+            calendarService.events = []
+        } else if draftGoogleClientID.isEmpty || draftGoogleClientSecret.isEmpty {
+            calendarService.connectionError = "Missing Google Client ID or Client Secret"
+        } else if calendarService.isSignedIn {
+            calendarService.fetchTodayEvents()
+        } else {
+            calendarService.connectionError = nil
         }
 
         saveButtonTitle = "Saved ✓"

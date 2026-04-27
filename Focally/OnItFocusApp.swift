@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 @main
 struct FocallyApp: App {
@@ -8,6 +9,7 @@ struct FocallyApp: App {
         Settings {
             SettingsView()
                 .environmentObject(appDelegate.slackService)
+                .environmentObject(appDelegate.calendarService)
         }
     }
 }
@@ -20,7 +22,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let timerService = FocusTimerService()
     let dndService = DNDService()
     let slackService = SlackService()
+    let calendarService = GoogleCalendarService()
     private var timerUpdate: Timer?
+    private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Setup status item
@@ -34,12 +38,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Setup popover
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 300, height: 350)
+        popover.contentSize = NSSize(width: 300, height: 430)
         popover.behavior = .transient
 
         let contentView = FocusMenuHost(
             timerService: timerService,
-            dndService: dndService
+            dndService: dndService,
+            calendarService: calendarService
         )
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
@@ -76,9 +81,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 popover.performClose(nil)
             }
         }
-    }
 
-    private var cancellables = Set<AnyCancellable>()
+        if calendarService.isEnabled {
+            calendarService.fetchTodayEvents()
+        }
+    }
 
     @objc private func onSessionStarted() {
         let expiration = Int(Date().timeIntervalSince1970) + (timerService.durationMinutes * 60)
@@ -88,6 +95,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             taskEmoji: timerService.currentEmoji,
             fallbackEmoji: slackService.savedStatusEmoji()
         )
+
+        guard calendarService.isEnabled, calendarService.isSignedIn else { return }
+        calendarService.fetchTodayEvents { [weak self] in
+            self?.presentCalendarConflictIfNeeded()
+        }
     }
 
     @objc private func onSessionEnded() {
@@ -207,6 +219,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func makeSettingsWindow() -> NSWindow {
         let settingsView = SettingsView()
             .environmentObject(slackService)
+            .environmentObject(calendarService)
         let hostingController = NSHostingController(rootView: settingsView)
         let window = NSWindow(contentViewController: hostingController)
         window.title = "Settings"
@@ -218,6 +231,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         settingsWindow = window
         return window
     }
+
+    private func presentCalendarConflictIfNeeded() {
+        guard timerService.isActive else { return }
+
+        let sessionInterval = DateInterval(
+            start: Date(),
+            end: Date().addingTimeInterval(TimeInterval(timerService.remainingSeconds))
+        )
+
+        guard let conflict = calendarService.checkConflict(during: sessionInterval) else {
+            return
+        }
+
+        let alert = NSAlert()
+        alert.messageText = "You have a meeting during this focus session"
+        alert.informativeText = "\(conflict.title) is scheduled for \(conflict.timeRange)."
+        alert.addButton(withTitle: "OK")
+        alert.alertStyle = .warning
+        alert.runModal()
+    }
 }
 
 extension AppDelegate: NSMenuDelegate {}
@@ -225,11 +258,13 @@ extension AppDelegate: NSMenuDelegate {}
 struct FocusMenuHost: View {
     @ObservedObject var timerService: FocusTimerService
     @ObservedObject var dndService: DNDService
+    @ObservedObject var calendarService: GoogleCalendarService
 
     var body: some View {
         FocusMenuView()
             .environmentObject(timerService)
             .environmentObject(dndService)
+            .environmentObject(calendarService)
     }
 }
 
@@ -238,5 +273,3 @@ extension Notification.Name {
     static let focusSessionStarted = Notification.Name("focusSessionStarted")
     static let focusSessionEnded = Notification.Name("focusSessionEnded")
 }
-
-import Combine

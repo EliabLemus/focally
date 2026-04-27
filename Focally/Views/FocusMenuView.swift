@@ -3,22 +3,35 @@ import SwiftUI
 struct FocusMenuView: View {
     @EnvironmentObject var timerService: FocusTimerService
     @EnvironmentObject var dndService: DNDService
+    @EnvironmentObject var calendarService: GoogleCalendarService
     @State private var showActivityInput = false
 
     var body: some View {
-        VStack {
-            if timerService.isActive {
-                activeView
-            } else if showActivityInput {
-                ActivityInputView { activity, emoji, duration in
-                    timerService.startActivity(activity, emoji: emoji, durationMinutes: duration)
-                    dndService.activateDND()
-                    showActivityInput = false
-                } onCancel: {
-                    showActivityInput = false
+        ScrollView {
+            VStack {
+                if timerService.isActive {
+                    activeView
+                } else if showActivityInput {
+                    ActivityInputView { activity, emoji, duration in
+                        timerService.startActivity(activity, emoji: emoji, durationMinutes: duration)
+                        dndService.activateDND()
+                        showActivityInput = false
+                    } onCancel: {
+                        showActivityInput = false
+                    }
+                } else {
+                    idleView
                 }
-            } else {
-                idleView
+
+                if calendarService.isEnabled {
+                    Divider()
+                        .padding(.horizontal, 20)
+
+                    CalendarEventsView(sessionInterval: activeSessionInterval, maxVisibleEvents: 3)
+                        .environmentObject(calendarService)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
+                }
             }
         }
         .frame(width: 300)
@@ -95,5 +108,10 @@ struct FocusMenuView: View {
             }
         }
         .padding(20)
+    }
+
+    private var activeSessionInterval: DateInterval? {
+        guard timerService.isActive else { return nil }
+        return DateInterval(start: Date(), end: Date().addingTimeInterval(TimeInterval(timerService.remainingSeconds)))
     }
 }
