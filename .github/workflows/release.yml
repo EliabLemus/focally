@@ -48,7 +48,7 @@ jobs:
             version "${VERSION#v}"
             sha256 "${DMG_SHA}"
 
-            url "https://github.com/EliabLemus/focally/releases/download/v#{version}/Focally-#{version}.dmg"
+            url "https://github.com/EliabLemus/focally/releases/download/v#{version}/Focally-v#{version}.dmg"
             name "Focally"
             desc "Minimal macOS menu bar focus timer with automatic DND and Slack status"
             homepage "https://github.com/EliabLemus/focally"
