@@ -127,11 +127,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         if timerService.hasSession {
-            let extendItem = NSMenuItem(title: "Extend +5 min", action: #selector(extendSession), keyEquivalent: "")
-            extendItem.image = NSImage(systemSymbolName: "forward.fill", accessibilityDescription: "Extend")
-            extendItem.target = self
-            menu.addItem(extendItem)
-
             let pauseTitle = timerService.isPaused ? "Resume Session" : "Pause Session"
             let pauseImage = timerService.isPaused ? "play.fill" : "pause.fill"
             let pauseItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
@@ -161,16 +156,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.popUp(positioning: nil, at: NSPoint(x: buttonOrigin.x, y: buttonOrigin.y - 2), in: nil)
     }
 
-    @objc func extendSession() {
-        timerService.extendFiveMinutes()
-    }
-
     @objc func togglePauseSession() {
         timerService.togglePause()
     }
 
     @objc func endSession() {
-        timerService.cancelSession()
+        timerService.endSession()
         dndService.deactivateDND()
     }
 

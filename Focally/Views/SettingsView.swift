@@ -11,6 +11,15 @@ struct SettingsView: View {
     @AppStorage("soundName") private var soundName = "Bell"
     @AppStorage("soundRepeatCount") private var soundRepeatCount = 5
     @AppStorage(SlackService.statusEmojiDefaultsKey) private var slackStatusEmoji = SlackService.defaultStatusEmoji
+    @AppStorage("pomodoroWorkDuration") private var workDurationMinutes = 25
+    @AppStorage("pomodoroShortBreakDuration") private var shortBreakDurationMinutes = 5
+    @AppStorage("pomodoroLongBreakDuration") private var longBreakDurationMinutes = 15
+    @AppStorage("pomodoroLongBreakInterval") private var roundsUntilLongBreak = 3
+    @AppStorage("isAutoStartEnabled") private var isAutoStartEnabled = true
+    @AppStorage("workSoundName") private var workSoundName = "Bell"
+    @AppStorage("breakSoundName") private var breakSoundName = "Chime"
+    @AppStorage("longBreakSoundName") private var longBreakSoundName = "Melody"
+    @AppStorage("soundVolume") private var soundVolume: Double = 1.0
 
     @State private var draftSlackToken = ""
     @State private var draftGoogleClientID = ""
@@ -31,6 +40,15 @@ struct SettingsView: View {
     @State private var previewSound: NSSound?
     @State private var saveButtonTitle = "Save Changes"
     @FocusState private var focusedField: Field?
+    @State private var draftWorkDurationMinutes: Int = 25
+    @State private var draftShortBreakDurationMinutes: Int = 5
+    @State private var draftLongBreakDurationMinutes: Int = 15
+    @State private var draftRoundsUntilLongBreak: Int = 3
+    @State private var draftAutoStartEnabled: Bool = true
+    @State private var draftWorkSoundName: String = "Bell"
+    @State private var draftBreakSoundName: String = "Chime"
+    @State private var draftLongBreakSoundName: String = "Melody"
+    @State private var draftSoundVolume: Double = 1.0
 
     private enum Field {
         case slackToken
@@ -58,6 +76,10 @@ struct SettingsView: View {
                     durationsTab
                 }
                     .tabItem { Label("Timer", systemImage: "timer") }
+                tabScrollView {
+                    pomodoroTab
+                }
+                    .tabItem { Label("Pomodoro", systemImage: "flame") }
                 tabScrollView {
                     tasksTab
                 }
@@ -477,11 +499,141 @@ struct SettingsView: View {
         }
     }
 
+    private var pomodoroTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Pomodoro Settings")
+                .font(.headline)
+
+            // Durations
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Durations")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                HStack(spacing: 12) {
+                    Picker("Work", selection: $draftWorkDurationMinutes) {
+                        ForEach(1...60, id: \.self) { min in
+                            Text("\(min) min").tag(min)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 120)
+
+                    Picker("Short Break", selection: $draftShortBreakDurationMinutes) {
+                        ForEach(1...30, id: \.self) { min in
+                            Text("\(min) min").tag(min)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 120)
+
+                    Picker("Long Break", selection: $draftLongBreakDurationMinutes) {
+                        ForEach(1...60, id: \.self) { min in
+                            Text("\(min) min").tag(min)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 120)
+                }
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Round Interval
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Long Break Interval")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Picker("Rounds until long break", selection: $draftRoundsUntilLongBreak) {
+                    ForEach(1...10, id: \.self) { rounds in
+                        Text("Every \(rounds) round\(rounds > 1 ? "s" : "")").tag(rounds)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(width: 200)
+
+                Text("After every N work sessions, take a longer break.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Auto-start
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Auto-start Next Session")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Toggle("Automatically start next session after break", isOn: $draftAutoStartEnabled)
+
+                Text("Saves time by starting the next session immediately when a break ends.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Sound Selection
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Sound Preferences")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Toggle("Enable timer sounds", isOn: $soundEnabled)
+
+                if soundEnabled {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Work Session Start")
+                            .font(.caption)
+                            .fontWeight(.medium)
+
+                        soundRowDraft(draftWorkSoundName) { newSound in
+                            draftWorkSoundName = newSound
+                        }
+
+                        Text("Work Session End")
+                            .font(.caption)
+                            .fontWeight(.medium)
+
+                        soundRowDraft(draftBreakSoundName) { newSound in
+                            draftBreakSoundName = newSound
+                        }
+
+                        Text("Long Break")
+                            .font(.caption)
+                            .fontWeight(.medium)
+
+                        soundRowDraft(draftLongBreakSoundName) { newSound in
+                            draftLongBreakSoundName = newSound
+                        }
+
+                        Text("Volume")
+                            .font(.caption)
+                            .fontWeight(.medium)
+
+                        Slider(value: $draftSoundVolume, in: 0...1, step: 0.1)
+                    }
+                    .padding(8)
+                    .background(Color.gray.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            Spacer()
+        }
+    }
+
     private func tabScrollView<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         ScrollView {
             content()
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(16)
         }
         .scrollIndicators(.visible)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -530,6 +682,15 @@ struct SettingsView: View {
         if draftGoogleClientSecret != savedGoogleClientSecret { return true }
         if draftDurations != decodedDurations(from: customDurationsData) { return true }
         if draftPredefinedTasks != loadTasks() { return true }
+        if draftWorkDurationMinutes != workDurationMinutes { return true }
+        if draftShortBreakDurationMinutes != shortBreakDurationMinutes { return true }
+        if draftLongBreakDurationMinutes != longBreakDurationMinutes { return true }
+        if draftRoundsUntilLongBreak != roundsUntilLongBreak { return true }
+        if draftAutoStartEnabled != isAutoStartEnabled { return true }
+        if draftWorkSoundName != workSoundName { return true }
+        if draftBreakSoundName != breakSoundName { return true }
+        if draftLongBreakSoundName != longBreakSoundName { return true }
+        if draftSoundVolume != soundVolume { return true }
         return false
     }
 
@@ -559,6 +720,15 @@ struct SettingsView: View {
         draftSoundEnabled = soundEnabled
         draftSoundName = soundName
         draftSoundRepeatCount = soundRepeatCount
+        draftWorkDurationMinutes = workDurationMinutes
+        draftShortBreakDurationMinutes = shortBreakDurationMinutes
+        draftLongBreakDurationMinutes = longBreakDurationMinutes
+        draftRoundsUntilLongBreak = roundsUntilLongBreak
+        draftAutoStartEnabled = isAutoStartEnabled
+        draftWorkSoundName = workSoundName
+        draftBreakSoundName = breakSoundName
+        draftLongBreakSoundName = longBreakSoundName
+        draftSoundVolume = soundVolume
         saveButtonTitle = "Save Changes"
     }
 
@@ -574,6 +744,17 @@ struct SettingsView: View {
         customDurationsData = encode(draftDurations)
         slackStatusEmoji = normalizedSlackEmoji(draftSlackEmoji)
         saveTasks(draftPredefinedTasks)
+
+        // Pomodoro settings
+        workDurationMinutes = draftWorkDurationMinutes
+        shortBreakDurationMinutes = draftShortBreakDurationMinutes
+        longBreakDurationMinutes = draftLongBreakDurationMinutes
+        roundsUntilLongBreak = draftRoundsUntilLongBreak
+        isAutoStartEnabled = draftAutoStartEnabled
+        workSoundName = draftWorkSoundName
+        breakSoundName = draftBreakSoundName
+        longBreakSoundName = draftLongBreakSoundName
+        soundVolume = draftSoundVolume
 
         slackService.isEnabled = draftSlackEnabled
         slackService.token = draftSlackToken.isEmpty ? nil : draftSlackToken
@@ -716,6 +897,31 @@ struct SettingsView: View {
 
     private func removeTask(_ task: PredefinedTask) {
         draftPredefinedTasks.removeAll { $0.id == task.id }
+    }
+
+    @ViewBuilder
+    private func soundRowDraft(_ soundName: String, action: @escaping (String) -> Void) -> some View {
+        let isSelected = soundName == soundName || soundName == draftWorkSoundName ||
+                        soundName == draftBreakSoundName || soundName == draftLongBreakSoundName
+
+        Button {
+            action(soundName)
+        } label: {
+            HStack {
+                Text(soundName)
+                    .foregroundStyle(.primary)
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(Color.accentColor)
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(Color.gray.opacity(isSelected ? 0.16 : 0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+        }
+        .buttonStyle(.plain)
     }
 }
 

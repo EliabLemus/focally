@@ -8,110 +8,218 @@ struct FocusMenuView: View {
 
     var body: some View {
         ScrollView {
-            VStack {
-                if timerService.isActive {
-                    activeView
+            VStack(spacing: 12) {
+                if timerService.pomodoroState == .idle {
+                    idleView
                 } else if showActivityInput {
                     ActivityInputView { activity, emoji, duration in
-                        timerService.startActivity(activity, emoji: emoji, durationMinutes: duration)
+                        timerService.startWorkSession(activity: activity, emoji: emoji, durationMinutes: duration)
                         dndService.activateDND()
                         showActivityInput = false
                     } onCancel: {
                         showActivityInput = false
                     }
                 } else {
-                    idleView
+                    activeView
                 }
 
                 if calendarService.isEnabled {
                     Divider()
                         .padding(.horizontal, 20)
 
-                    CalendarEventsView(sessionInterval: activeSessionInterval, maxVisibleEvents: 3)
-                        .environmentObject(calendarService)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
+                    calendarSection
+                }
+
+                if calendarService.currentMeeting != nil && timerService.isWork {
+                    meetingWarning
                 }
             }
+            .frame(width: 350)
+            .padding(.vertical, 20)
         }
-        .frame(width: 300)
     }
 
     // MARK: - Idle State
 
     private var idleView: some View {
         VStack(spacing: 16) {
-            Image(systemName: "hourglass.circle.fill")
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
+            Text(timerService.stateIcon)
+                .font(.system(size: 48))
 
-            Text("Focally")
+            Text(timerService.phaseName)
                 .font(.headline)
 
-            Text("Ready to focus")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            Button {
-                showActivityInput = true
-            } label: {
-                Label("Start Focus Session", systemImage: "play.fill")
-                    .frame(maxWidth: .infinity)
+            if !timerService.currentActivity.isEmpty {
+                Text(timerService.currentActivity)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
+
+            HStack(spacing: 12) {
+                Button(action: {
+                    showActivityInput = true
+                }) {
+                    Label("Start Focus", systemImage: "play.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button(action: {
+                    timerService.resetToIdle()
+                }) {
+                    Label("Reset", systemImage: "arrow.counterclockwise")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
         }
-        .padding(20)
     }
 
     // MARK: - Active State
 
     private var activeView: some View {
         VStack(spacing: 16) {
-            Text(timerService.currentEmoji)
-                .font(.system(size: 36))
+            // Timer Display
+            VStack(spacing: 8) {
+                Text(timerService.stateIcon)
+                    .font(.system(size: 40))
 
-            Text(timerService.currentActivity)
-                .font(.headline)
-                .lineLimit(1)
+                Text(timerService.remainingTimeString)
+                    .font(.system(size: 72, weight: .light, design: .monospaced))
 
-            Text(timerService.remainingTimeString)
-                .font(.system(size: 48, design: .monospaced))
-                .fontWeight(.bold)
+                if timerService.isBreak {
+                    Text(timerService.isLongBreak ? "Long Break" : "Short Break")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("Focus")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                }
 
-            if timerService.isPaused {
-                Text("Paused")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if timerService.isWork {
+                    Text("Round \(timerService.currentRound) / \(timerService.roundsUntilLongBreak)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
-            ProgressView(value: timerService.progress)
-                .progressViewStyle(.linear)
-                .frame(maxWidth: .infinity)
+            // Progress Bar
+            if timerService.isWork {
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.gray.opacity(0.3))
 
-            HStack(spacing: 12) {
-                Button {
-                    timerService.extendFiveMinutes()
-                } label: {
-                    Label("+5 min", systemImage: "forward.fill")
-                        .frame(maxWidth: .infinity)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.green)
+                            .frame(width: geometry.size.width * timerService.progress)
+                    }
                 }
-                .buttonStyle(.bordered)
+                .frame(height: 6)
+                .padding(.horizontal, 8)
+            }
 
-                Button {
-                    timerService.togglePause()
-                } label: {
-                    Label(timerService.isPaused ? "Resume" : "Pause", systemImage: timerService.isPaused ? "play.fill" : "pause.fill")
-                        .frame(maxWidth: .infinity)
+            // Controls
+            HStack(spacing: 8) {
+                if timerService.isPaused {
+                    Button(action: {
+                        timerService.resumeSession()
+                    }) {
+                        Label("Resume", systemImage: "play.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                } else {
+                    Button(action: {
+                        timerService.pauseSession()
+                    }) {
+                        Label("Pause", systemImage: "pause.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
+
+                if timerService.isBreak {
+                    Button(action: {
+                        timerService.skipToNextPhase()
+                    }) {
+                        Label("Skip", systemImage: "forward.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
         }
-        .padding(20)
     }
 
-    private var activeSessionInterval: DateInterval? {
-        guard timerService.isActive else { return nil }
-        return DateInterval(start: Date(), end: Date().addingTimeInterval(TimeInterval(timerService.remainingSeconds)))
+    // MARK: - Calendar Section
+
+    private var calendarSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: "calendar")
+                Text("Calendar")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                if calendarService.isSignedIn {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                } else {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.caption)
+                }
+            }
+
+            if let currentMeeting = calendarService.currentMeeting {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(currentMeeting.title)
+                        .font(.caption)
+                        .foregroundColor(.primary)
+
+                    Text(currentMeeting.timeRange)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(8)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(6)
+            } else {
+                Text("No events today")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    // MARK: - Meeting Warning
+
+    private var meetingWarning: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.orange)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Meeting in Progress")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+
+                Text("DND is automatically enabled")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(8)
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(6)
+        .padding(.horizontal, 20)
     }
 }

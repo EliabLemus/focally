@@ -17,6 +17,12 @@ final class GoogleCalendarService: NSObject, ObservableObject, ASWebAuthenticati
     @Published var events: [CalendarEvent] = []
     @Published var connectionError: String?
 
+    /// The calendar event currently in progress, if any.
+    var currentMeeting: CalendarEvent? {
+        let now = Date()
+        return events.first { now >= $0.startTime && now < $0.endTime }
+    }
+
     private static let enabledDefaultsKey = "googleCalendarEnabled"
     private static let tokenExpirationDefaultsKey = "googleCalendarTokenExpiration"
     private static let clientIDKey = "google-calendar-client-id"
