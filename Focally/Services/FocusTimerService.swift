@@ -25,8 +25,8 @@ class FocusTimerService: ObservableObject {
     // Sound preferences
     @Published var soundEnabled: Bool = true
     @Published var workSoundName: String = "Bell"
-    @Published var breakSoundName: String = "Chime"
-    @Published var longBreakSoundName: String = "Melody"
+    @Published var breakSoundName: String = "Ping"
+    @Published var longBreakSoundName: String = "Glass"
     @Published var soundVolume: Double = 1.0
 
     // Timer management
@@ -35,6 +35,7 @@ class FocusTimerService: ObservableObject {
 
     // Active sounds
     private var activeSounds: [NSSound] = []
+    private var soundRepeatCount: Int = 5
 
     // History
     private let historyDirectory: URL = {
@@ -77,9 +78,10 @@ class FocusTimerService: ObservableObject {
         longBreakDurationMinutes = defaults.integer(forKey: "longBreakDurationMinutes")
         soundEnabled = defaults.bool(forKey: "soundEnabled")
         workSoundName = defaults.string(forKey: "workSoundName") ?? "Bell"
-        breakSoundName = defaults.string(forKey: "breakSoundName") ?? "Chime"
-        longBreakSoundName = defaults.string(forKey: "longBreakSoundName") ?? "Melody"
+        breakSoundName = defaults.string(forKey: "breakSoundName") ?? "Ping"
+        longBreakSoundName = defaults.string(forKey: "longBreakSoundName") ?? "Glass"
         soundVolume = defaults.double(forKey: "soundVolume")
+        soundRepeatCount = max(defaults.object(forKey: "soundRepeatCount") as? Int ?? 5, 1)
     }
 
     private func saveSettings() {
@@ -146,6 +148,7 @@ class FocusTimerService: ObservableObject {
         isPaused = false
 
         startTimer()
+        playSound(.workStart)
         postNotification(.workSessionStarted)
 
         NotificationCenter.default.post(name: .focusSessionStarted, object: nil)
@@ -330,7 +333,7 @@ class FocusTimerService: ObservableObject {
             soundName = breakSoundName
         }
 
-        let repeatCount = 2
+        let repeatCount = max(soundRepeatCount, 1)
         for i in 0..<repeatCount {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.8) { [weak self] in
                 guard let self = self else { return }
@@ -361,6 +364,11 @@ class FocusTimerService: ObservableObject {
 
     private func soundURL(for soundName: String) -> URL? {
         // Check bundled sounds first
+        if soundName == "Bell",
+           let bundledURL = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
+            return bundledURL
+        }
+
         if let bundledURL = Bundle.main.url(forResource: soundName, withExtension: "aiff") {
             return bundledURL
         }

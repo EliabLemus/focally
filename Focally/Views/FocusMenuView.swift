@@ -5,6 +5,7 @@ struct FocusMenuView: View {
     @EnvironmentObject var dndService: DNDService
     @EnvironmentObject var calendarService: GoogleCalendarService
     @State private var showActivityInput = false
+    @State private var hasPredefinedTasks = false
 
     var body: some View {
         ScrollView {
@@ -38,6 +39,7 @@ struct FocusMenuView: View {
             .padding(.horizontal, 18)
             .padding(.vertical, 18)
         }
+        .onAppear(perform: loadPredefinedTasksState)
     }
 
     // MARK: - Idle State
@@ -107,6 +109,24 @@ struct FocusMenuView: View {
                 .buttonStyle(.plain)
                 .background(Color.primary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                if hasPredefinedTasks {
+                    Button(action: {
+                        showActivityInput = true
+                    }) {
+                        HStack {
+                            Text("📚 Start with Saved Task")
+                                .fontWeight(.medium)
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                    }
+                    .buttonStyle(.plain)
+                    .background(Color.accentColor.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
             }
         }
     }
@@ -293,6 +313,16 @@ private extension FocusMenuView {
         }
 
         return "Round \(visibleRound) / \(timerService.roundsUntilLongBreak)"
+    }
+
+    func loadPredefinedTasksState() {
+        guard let data = UserDefaults.standard.data(forKey: PredefinedTask.defaultsKey),
+              let tasks = try? JSONDecoder().decode([PredefinedTask].self, from: data) else {
+            hasPredefinedTasks = false
+            return
+        }
+
+        hasPredefinedTasks = !tasks.isEmpty
     }
 
     @ViewBuilder

@@ -19,8 +19,8 @@ struct SettingsView: View {
     @AppStorage("pomodoroLongBreakInterval") private var roundsUntilLongBreak = 3
     @AppStorage("isAutoStartEnabled") private var isAutoStartEnabled = true
     @AppStorage("workSoundName") private var workSoundName = "Bell"
-    @AppStorage("breakSoundName") private var breakSoundName = "Chime"
-    @AppStorage("longBreakSoundName") private var longBreakSoundName = "Melody"
+    @AppStorage("breakSoundName") private var breakSoundName = "Ping"
+    @AppStorage("longBreakSoundName") private var longBreakSoundName = "Glass"
     @AppStorage("soundVolume") private var soundVolume: Double = 1.0
 
     @State private var draftSlackToken = ""
@@ -48,8 +48,8 @@ struct SettingsView: View {
     @State private var draftRoundsUntilLongBreak: Int = 3
     @State private var draftAutoStartEnabled: Bool = true
     @State private var draftWorkSoundName: String = "Bell"
-    @State private var draftBreakSoundName: String = "Chime"
-    @State private var draftLongBreakSoundName: String = "Melody"
+    @State private var draftBreakSoundName: String = "Ping"
+    @State private var draftLongBreakSoundName: String = "Glass"
     @State private var draftSoundVolume: Double = 1.0
 
     private enum Field {
@@ -59,7 +59,7 @@ struct SettingsView: View {
         case googleClientSecret
     }
 
-    private let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass"]
+    private let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass", "Basso", "Blow", "Bottle", "Frog", "Funk", "Sosumi"]
     private let slackEmojiSuggestions: [EmojiSuggestion] = [
         .init(symbol: "⏳", value: SlackService.defaultStatusEmoji),
         .init(symbol: "🎧", value: ":headphones:"),
@@ -604,15 +604,15 @@ struct SettingsView: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
 
-                Toggle("Enable timer sounds", isOn: $soundEnabled)
+                Toggle("Enable timer sounds", isOn: $draftSoundEnabled)
 
-                if soundEnabled {
+                if draftSoundEnabled {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Work Session Start")
                             .font(.caption)
                             .fontWeight(.medium)
 
-                        soundRowDraft(draftWorkSoundName) { newSound in
+                        soundPickerRows(selectedSound: draftWorkSoundName) { newSound in
                             draftWorkSoundName = newSound
                         }
 
@@ -620,7 +620,7 @@ struct SettingsView: View {
                             .font(.caption)
                             .fontWeight(.medium)
 
-                        soundRowDraft(draftBreakSoundName) { newSound in
+                        soundPickerRows(selectedSound: draftBreakSoundName) { newSound in
                             draftBreakSoundName = newSound
                         }
 
@@ -628,7 +628,7 @@ struct SettingsView: View {
                             .font(.caption)
                             .fontWeight(.medium)
 
-                        soundRowDraft(draftLongBreakSoundName) { newSound in
+                        soundPickerRows(selectedSound: draftLongBreakSoundName) { newSound in
                             draftLongBreakSoundName = newSound
                         }
 
@@ -922,28 +922,32 @@ struct SettingsView: View {
     }
 
     @ViewBuilder
-    private func soundRowDraft(_ soundName: String, action: @escaping (String) -> Void) -> some View {
-        let isSelected = soundName == soundName || soundName == draftWorkSoundName ||
-                        soundName == draftBreakSoundName || soundName == draftLongBreakSoundName
+    private func soundPickerRows(selectedSound: String, action: @escaping (String) -> Void) -> some View {
+        VStack(spacing: 6) {
+            ForEach(sounds, id: \.self) { soundOption in
+                let isSelected = selectedSound == soundOption
 
-        Button {
-            action(soundName)
-        } label: {
-            HStack {
-                Text(soundName)
-                    .foregroundStyle(.primary)
-                Spacer()
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(Color.accentColor)
+                Button {
+                    action(soundOption)
+                    previewSoundSelection(named: soundOption)
+                } label: {
+                    HStack {
+                        Text(soundOption)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if isSelected {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(Color.gray.opacity(isSelected ? 0.16 : 0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(Color.gray.opacity(isSelected ? 0.16 : 0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 6))
         }
-        .buttonStyle(.plain)
     }
 }
 

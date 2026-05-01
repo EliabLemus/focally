@@ -19,9 +19,7 @@ struct ActivityInputView: View {
             Text("Start Focus Session")
                 .font(.headline)
 
-            if predefinedTasks.count >= 2 {
-                predefinedTaskPicker
-            }
+            predefinedTaskSection
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("What are you working on?")
@@ -29,6 +27,9 @@ struct ActivityInputView: View {
                     .foregroundStyle(.secondary)
                 TextField("e.g. Creating monthly reports", text: $activity)
                     .textFieldStyle(.roundedBorder)
+                Text("Choose a saved task for one-click fill, or type a custom activity below.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -123,30 +124,36 @@ struct ActivityInputView: View {
         }
     }
 
-    private var predefinedTaskPicker: some View {
+    private var predefinedTaskSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Quick task")
+            Text("Saved tasks")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(Array(predefinedTasks.enumerated()), id: \.element.id) { index, task in
-                        Button {
-                            applyPredefinedTask(at: index)
-                        } label: {
-                            HStack(spacing: 6) {
-                                Text(task.emoji)
-                                Text(task.name)
-                                    .lineLimit(1)
+            if predefinedTasks.isEmpty {
+                Text("No saved tasks yet. Configure tasks in Settings for one-click starts.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(predefinedTasks.enumerated()), id: \.element.id) { index, task in
+                            Button {
+                                applyPredefinedTask(at: index)
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Text(task.emoji)
+                                    Text(task.name)
+                                        .lineLimit(1)
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 8)
+                                .background(selectedTaskIndex == index ? Color.accentColor : Color.gray.opacity(0.15))
+                                .foregroundStyle(selectedTaskIndex == index ? .white : .primary)
+                                .clipShape(Capsule())
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 8)
-                            .background(selectedTaskIndex == index ? Color.accentColor : Color.gray.opacity(0.15))
-                            .foregroundStyle(selectedTaskIndex == index ? .white : .primary)
-                            .clipShape(Capsule())
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -165,7 +172,7 @@ struct ActivityInputView: View {
 
         predefinedTasks = tasks
 
-        guard tasks.count >= 2 else {
+        guard !tasks.isEmpty else {
             selectedTaskIndex = nil
             return
         }
