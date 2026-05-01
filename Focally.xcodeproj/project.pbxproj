@@ -9,11 +9,9 @@
 /* Begin PBXBuildFile section */
 		0972ACA31DECEB6215662878 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 967C5726395E3635788BAEEE /* Resources */; };
 		1546EA3A0E314D00A7465E21 /* SoundPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */; };
-		157E8E533B2C9CB33D6762B8 /* OnItFocusApp.swift.bak in Resources */ = {isa = PBXBuildFile; fileRef = 23D31D71482D5F96D98F8E38 /* OnItFocusApp.swift.bak */; };
+		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
 		39A58C6BC3D6F565DE7134F3 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844B4C6DBE9625A6C4CAD3B6 /* GoogleCalendarService.swift */; };
-		3DAC256B40D77469E0FD581D /* CalendarEventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5160E69275BBAC62D6D8143 /* CalendarEventsView.swift */; };
 		3FFC3DE7EF5D8190CFE92A60 /* PredefinedTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */; };
-		4E030561EE6C59693736B49E /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E13FFAD610634D3C20A063 /* FocusSession.swift */; };
 		65C855D162E30756C31A2018 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1929A30482E8B887E4AD37 /* CalendarEvent.swift */; };
 		679740AFC847642945563E39 /* bell.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 8106D91600D3C2013F5ACD33 /* bell.aiff */; };
 		6CB349FD5A20890E40E0ECC3 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4414920B6A39DCAF591E7C0D /* NotificationService.swift */; };
@@ -34,7 +32,6 @@
 		0179E6DB0D32C6C38E33CE35 /* SlackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackService.swift; sourceTree = "<group>"; };
 		0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredefinedTask.swift; sourceTree = "<group>"; };
 		1032F662E9204A6D804DD2EF /* FocusTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTimerService.swift; sourceTree = "<group>"; };
-		23D31D71482D5F96D98F8E38 /* OnItFocusApp.swift.bak */ = {isa = PBXFileReference; path = OnItFocusApp.swift.bak; sourceTree = "<group>"; };
 		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnItFocusApp.swift; sourceTree = "<group>"; };
@@ -48,10 +45,9 @@
 		967C5726395E3635788BAEEE /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Resources; path = Focally/Resources; sourceTree = SOURCE_ROOT; };
 		9721E28A6A0CBFB8506A5F6F /* ActivityInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityInputView.swift; sourceTree = "<group>"; };
 		A6B424719CB23B5544233E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		B0E13FFAD610634D3C20A063 /* FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSession.swift; sourceTree = "<group>"; };
-		B5160E69275BBAC62D6D8143 /* CalendarEventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventsView.swift; sourceTree = "<group>"; };
 		B7294FD9B10CC42662103B9B /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		B872379B2018EE66D478415E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C17386F3788F2D2F1263DBDD /* PomodoroState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroState.swift; sourceTree = "<group>"; };
 		C4E01047F1BAA28E91430337 /* FocusMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMenuView.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
 		F2E3F6355136EFD90EE198C8 /* DNDService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDService.swift; sourceTree = "<group>"; };
@@ -62,7 +58,6 @@
 			isa = PBXGroup;
 			children = (
 				9721E28A6A0CBFB8506A5F6F /* ActivityInputView.swift */,
-				B5160E69275BBAC62D6D8143 /* CalendarEventsView.swift */,
 				C4E01047F1BAA28E91430337 /* FocusMenuView.swift */,
 				8132A336C230D8B7FD4EC1DE /* SettingsView.swift */,
 			);
@@ -90,7 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				4F1929A30482E8B887E4AD37 /* CalendarEvent.swift */,
-				B0E13FFAD610634D3C20A063 /* FocusSession.swift */,
+				C17386F3788F2D2F1263DBDD /* PomodoroState.swift */,
 				0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */,
 			);
 			path = Models;
@@ -112,7 +107,6 @@
 				379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */,
 				A6B424719CB23B5544233E17 /* Info.plist */,
 				442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */,
-				23D31D71482D5F96D98F8E38 /* OnItFocusApp.swift.bak */,
 				4E8101EF9D6FF1BD04DC4D3E /* Models */,
 				5AF2FE4BCEA66A832CB8637D /* Resources */,
 				F00A4423B12F413F1474634A /* Services */,
@@ -197,7 +191,6 @@
 			files = (
 				ADF6E6ACAE531242A66946CB /* AppIcon.icns in Resources */,
 				EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */,
-				157E8E533B2C9CB33D6762B8 /* OnItFocusApp.swift.bak in Resources */,
 				0972ACA31DECEB6215662878 /* Resources in Resources */,
 				679740AFC847642945563E39 /* bell.aiff in Resources */,
 			);
@@ -212,16 +205,15 @@
 			files = (
 				AC2AF556BA64BF482606A1B0 /* ActivityInputView.swift in Sources */,
 				65C855D162E30756C31A2018 /* CalendarEvent.swift in Sources */,
-				3DAC256B40D77469E0FD581D /* CalendarEventsView.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
 				852FEB641C068C8AFD126EE5 /* FocusMenuView.swift in Sources */,
-				4E030561EE6C59693736B49E /* FocusSession.swift in Sources */,
 				EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */,
 				39A58C6BC3D6F565DE7134F3 /* GoogleCalendarService.swift in Sources */,
 				77FD86A23B5E36658A3E7A2A /* HistoryService.swift in Sources */,
 				8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */,
 				6CB349FD5A20890E40E0ECC3 /* NotificationService.swift in Sources */,
 				71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */,
+				36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */,
 				3FFC3DE7EF5D8190CFE92A60 /* PredefinedTask.swift in Sources */,
 				F38696014F84656D6286B4B8 /* SettingsView.swift in Sources */,
 				84AC2BAA9F2CCA1495A302B5 /* SlackService.swift in Sources */,
@@ -306,7 +298,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -319,7 +311,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.5.0;
+				MARKETING_VERSION = 0.5.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac;
@@ -365,7 +357,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -384,7 +376,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.5.0;
+				MARKETING_VERSION = 0.5.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

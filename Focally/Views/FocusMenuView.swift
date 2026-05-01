@@ -5,6 +5,7 @@ struct FocusMenuView: View {
     @EnvironmentObject var dndService: DNDService
     @EnvironmentObject var calendarService: GoogleCalendarService
     @EnvironmentObject var historyService: HistoryService
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var showActivityInput = false
     @State private var hasPredefinedTasks = false
     @State private var todaySessions: [HistoryService.SessionEntry] = []
@@ -54,8 +55,8 @@ struct FocusMenuView: View {
         .onReceive(NotificationCenter.default.publisher(for: .focusSessionEnded)) { _ in
             todaySessions = historyService.loadTodaySessions()
         }
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: timerService.pomodoroState)
-        .animation(.spring(response: 0.3), value: showActivityInput)
+        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.85), value: timerService.pomodoroState)
+        .animation(reduceMotion ? nil : .spring(response: 0.3), value: showActivityInput)
     }
 
     // MARK: - Idle State
@@ -69,13 +70,6 @@ struct FocusMenuView: View {
 
                 Text(timerService.phaseName)
                     .font(.headline)
-
-                if !timerService.currentActivity.isEmpty {
-                    Text("\(timerService.currentEmoji) \(timerService.currentActivity)")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
@@ -111,6 +105,7 @@ struct FocusMenuView: View {
                         .stroke(Color.orange.opacity(0.28), lineWidth: 1)
                 )
                 .accessibilityLabel("Quick Start: \(timerService.workDurationMinutes) minute focus session")
+                .accessibilityHint("Double tap to start a \(timerService.workDurationMinutes) minute focus session")
 
                 Button(action: {
                     showActivityInput = true
@@ -128,6 +123,7 @@ struct FocusMenuView: View {
                 .background(Color.primary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .accessibilityLabel("Start custom focus session")
+                .accessibilityHint("Double tap to configure a custom focus session with your own activity and duration")
 
                 if hasPredefinedTasks {
                     Button(action: {
@@ -146,6 +142,7 @@ struct FocusMenuView: View {
                     .background(Color.accentColor.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .accessibilityLabel("Start with saved task")
+                    .accessibilityHint("Double tap to pick from your saved tasks")
                 }
             }
         }
@@ -164,7 +161,9 @@ struct FocusMenuView: View {
                     .font(.system(size: 72, weight: .light, design: .monospaced))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    .contentTransition(.numericText())
+                    .contentTransition(reduceMotion ? .identity : .numericText())
+                    .accessibilityLabel("Time remaining")
+                    .accessibilityValue(timerService.remainingTimeString)
 
                 VStack(spacing: 4) {
                     Text(timerService.phaseName)
@@ -198,19 +197,23 @@ struct FocusMenuView: View {
                         RoundedRectangle(cornerRadius: 5)
                             .fill(progressColor)
                             .frame(width: max(geometry.size.width * timerService.progress, timerService.progress > 0 ? 10 : 0))
-                            .animation(.easeInOut(duration: 0.5), value: timerService.progress)
+                            .animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: timerService.progress)
                     }
                 }
                 .frame(height: 8)
+                .accessibilityLabel("Progress")
+                .accessibilityValue("\(Int(timerService.progress * 100)) percent")
 
                 HStack {
                     Text(timerService.phaseName)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .accessibilityHidden(true)
                     Spacer()
                     Text("\(Int(timerService.progress * 100))%")
                         .font(.caption.monospacedDigit())
                         .foregroundColor(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
             .padding(.horizontal, 6)
@@ -221,11 +224,13 @@ struct FocusMenuView: View {
                         timerService.resumeSession()
                     }
                     .accessibilityLabel("Resume session")
+                    .accessibilityHint("Double tap to resume the paused session")
                 } else {
                     controlButton("Pause", systemImage: "pause.fill", tint: .primary, prominent: false) {
                         timerService.pauseSession()
                     }
                     .accessibilityLabel("Pause session")
+                    .accessibilityHint("Double tap to pause the current session")
                 }
 
                 if timerService.isBreak {
@@ -233,6 +238,7 @@ struct FocusMenuView: View {
                         timerService.skipToNextPhase()
                     }
                     .accessibilityLabel("Skip to next phase")
+                    .accessibilityHint("Double tap to skip this break and start the next work session")
                 }
 
                 controlButton("Stop", systemImage: "stop.fill", tint: .red, prominent: false) {
@@ -240,6 +246,7 @@ struct FocusMenuView: View {
                     dndService.deactivateDND()
                 }
                 .accessibilityLabel("Stop session")
+                .accessibilityHint("Double tap to stop and reset the session")
             }
         }
     }
@@ -280,6 +287,8 @@ struct FocusMenuView: View {
                 .padding(8)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(6)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Current meeting: \(currentMeeting.title), \(currentMeeting.timeRange)")
             } else {
                 Text("No events today")
                     .font(.caption2)
@@ -312,6 +321,8 @@ struct FocusMenuView: View {
         .background(Color.orange.opacity(0.1))
         .cornerRadius(6)
         .padding(.horizontal, 20)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Warning: Meeting in progress. Do Not Disturb is automatically enabled.")
     }
 
     // MARK: - Today's History
@@ -340,7 +351,7 @@ struct FocusMenuView: View {
                             .font(.caption)
                             .lineLimit(1)
                         Spacer()
-                        Text("\(session.durationMinutes)m")
+                        Text(session.timeRange)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -348,6 +359,8 @@ struct FocusMenuView: View {
                     .padding(.vertical, 6)
                     .background(Color.gray.opacity(0.06))
                     .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(session.emoji) \(session.activity), \(session.timeRange)")
                 }
             }
         }

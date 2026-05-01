@@ -30,6 +30,7 @@ class FocusTimerService: ObservableObject {
     // Timer management
     private var timer: Timer?
     private var currentPhaseDuration: Int = 0
+    private var sessionStartTime: Date = Date()
 
     let defaults = UserDefaults.standard
 
@@ -118,6 +119,7 @@ class FocusTimerService: ObservableObject {
 
         saveLastUsed(activity: activity, emoji: emoji, duration: workMins)
 
+        sessionStartTime = Date()
         pomodoroState = .work
         currentPhaseDuration = workDurationMinutes * 60
         remainingSeconds = currentPhaseDuration
@@ -256,7 +258,14 @@ class FocusTimerService: ObservableObject {
         switch pomodoroState {
         case .work:
             // Record completed work session
-            historyService.recordWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes, round: currentRound)
+                historyService.recordWorkSession(
+                activity: currentActivity,
+                emoji: currentEmoji,
+                durationMinutes: workDurationMinutes,
+                round: currentRound,
+                startTime: sessionStartTime,
+                endTime: Date()
+            )
             currentRound += 1
             soundPlayer.play(.workEnd)
 

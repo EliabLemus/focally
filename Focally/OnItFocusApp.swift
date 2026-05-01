@@ -61,6 +61,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }.store(in: &cancellables)
 
+        // Observe pomodoro state to start/stop status bar timer
+        timerService.$pomodoroState
+            .removeDuplicates()
+            .sink { [weak self] state in
+                if state == .idle {
+                    self?.stopStatusBarUpdates()
+                    self?.updateStatusBar()
+                } else if self?.timerUpdate == nil {
+                    self?.startStatusBarUpdates()
+                }
+            }
+            .store(in: &cancellables)
+
         // Observe session start/end for Slack
         NotificationCenter.default.addObserver(
             self,
@@ -74,11 +87,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: .focusSessionEnded,
             object: nil
         )
-
-        // Timer to update menu bar text
-        timerUpdate = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.updateStatusBar()
-        }
 
         // Click-outside monitor to close popover
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
@@ -215,6 +223,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         statusItem?.length = NSStatusItem.variableLength
+    }
+
+    private func startStatusBarUpdates() {
+        guard timerUpdate == nil else { return }
+        timerUpdate = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.updateStatusBar()
+        }
+    }
+
+    private func stopStatusBarUpdates() {
+        timerUpdate?.invalidate()
+        timerUpdate = nil
     }
 
     private func makeSettingsWindow() -> NSWindow {

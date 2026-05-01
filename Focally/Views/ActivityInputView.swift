@@ -27,6 +27,7 @@ struct ActivityInputView: View {
                     .foregroundStyle(.secondary)
                 TextField("e.g. Creating monthly reports", text: $activity)
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityHint("Enter the name of your focus activity")
                 Text("Choose a saved task for one-click fill, or type a custom activity below.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -53,6 +54,7 @@ struct ActivityInputView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Emoji: \(emoji)")
+                        .accessibilityHint("Double tap to select \(emoji) as activity emoji")
                     }
                 }
             }
@@ -78,12 +80,14 @@ struct ActivityInputView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("\(duration) minutes")
+                    .accessibilityHint("Double tap to set duration to \(duration) minutes")
                     }
                 }
                 HStack {
                     TextField("Custom (min)", text: $customMinutes)
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 120)
+                        .accessibilityHint("Enter a custom duration in minutes")
                     Spacer()
                 }
                     .onChange(of: customMinutes) { _, newValue in
@@ -100,6 +104,7 @@ struct ActivityInputView: View {
                 .buttonStyle(.bordered)
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel("Cancel")
+                .accessibilityHint("Double tap to cancel and go back")
 
                 Button {
                     let duration = Int(customMinutes) ?? selectedDuration
@@ -112,6 +117,7 @@ struct ActivityInputView: View {
                 .tint(.blue)
                 .disabled(activity.trimmingCharacters(in: .whitespaces).isEmpty || selectedDuration <= 0)
                 .accessibilityLabel("Start focus session")
+                .accessibilityHint("Double tap to begin the focus session")
             }
         }
         .padding(20)
@@ -165,6 +171,7 @@ struct ActivityInputView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Saved task: \(task.name)")
+                        .accessibilityHint("Double tap to select \(task.name) as your activity")
                     }
                 }
             }

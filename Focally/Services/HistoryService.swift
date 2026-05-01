@@ -26,10 +26,23 @@ class HistoryService: ObservableObject {
         let startTime: Date
         let endTime: Date
         let round: Int
+
+        var timeRange: String {
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+            return "\(formatter.string(from: startTime)) – \(formatter.string(from: endTime))"
+        }
     }
 
-    func recordWorkSession(activity: String, emoji: String, durationMinutes: Int, round: Int) {
-        let today = Date()
+    func recordWorkSession(
+        activity: String,
+        emoji: String,
+        durationMinutes: Int,
+        round: Int,
+        startTime: Date = Date(),
+        endTime: Date = Date()
+    ) {
+        let today = startTime
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let dateKey = formatter.string(from: today)
@@ -48,8 +61,8 @@ class HistoryService: ObservableObject {
             activity: activity,
             emoji: emoji,
             durationMinutes: durationMinutes,
-            startTime: today,
-            endTime: today,
+            startTime: startTime,
+            endTime: endTime,
             round: round
         )
 
