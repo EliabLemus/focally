@@ -23,10 +23,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let dndService = DNDService()
     let slackService = SlackService()
     let calendarService = GoogleCalendarService()
+    let notificationService = NotificationService()
+    let historyService = HistoryService.shared
     private var timerUpdate: Timer?
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        notificationService.requestAuthorization()
+
         // Setup status item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
@@ -44,7 +48,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let contentView = FocusMenuHost(
             timerService: timerService,
             dndService: dndService,
-            calendarService: calendarService
+            calendarService: calendarService,
+            historyService: historyService
         )
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
@@ -263,12 +268,14 @@ struct FocusMenuHost: View {
     @ObservedObject var timerService: FocusTimerService
     @ObservedObject var dndService: DNDService
     @ObservedObject var calendarService: GoogleCalendarService
+    @ObservedObject var historyService: HistoryService
 
     var body: some View {
         FocusMenuView()
             .environmentObject(timerService)
             .environmentObject(dndService)
             .environmentObject(calendarService)
+            .environmentObject(historyService)
     }
 }
 

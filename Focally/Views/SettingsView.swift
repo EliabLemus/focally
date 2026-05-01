@@ -39,7 +39,6 @@ struct SettingsView: View {
     @State private var newDuration = ""
     @State private var newTaskName = ""
     @State private var newTaskEmoji = "📝"
-    @State private var previewSound: NSSound?
     @State private var saveButtonTitle = "Save Changes"
     @FocusState private var focusedField: Field?
     @State private var draftWorkDurationMinutes: Int = 25
@@ -59,7 +58,7 @@ struct SettingsView: View {
         case googleClientSecret
     }
 
-    private let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass", "Basso", "Blow", "Bottle", "Frog", "Funk", "Sosumi"]
+    private let sounds = SoundPlayerService.shared.sounds
     private let slackEmojiSuggestions: [EmojiSuggestion] = [
         .init(symbol: "⏳", value: SlackService.defaultStatusEmoji),
         .init(symbol: "🎧", value: ":headphones:"),
@@ -775,6 +774,7 @@ struct SettingsView: View {
         breakSoundName = draftBreakSoundName
         longBreakSoundName = draftLongBreakSoundName
         soundVolume = draftSoundVolume
+        SoundPlayerService.shared.loadSettings()
 
         slackService.isEnabled = draftSlackEnabled
         slackService.token = draftSlackToken.isEmpty ? nil : draftSlackToken
@@ -832,12 +832,7 @@ struct SettingsView: View {
     }
 
     private func previewSoundSelection(named soundName: String) {
-        previewSound?.stop()
-
-        guard let url = soundURL(for: soundName) else { return }
-        let sound = NSSound(contentsOf: url, byReference: true)
-        previewSound = sound
-        sound?.play()
+        SoundPlayerService.shared.previewSound(named: soundName)
     }
 
     @ViewBuilder
@@ -888,20 +883,7 @@ struct SettingsView: View {
     }
 
     private func soundURL(for soundName: String) -> URL? {
-        if soundName == "Bell",
-           let bundledURL = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
-            return bundledURL
-        }
-
-        let systemSoundURL = URL(fileURLWithPath: "/System/Library/Sounds")
-            .appendingPathComponent(soundName)
-            .appendingPathExtension("aiff")
-
-        if FileManager.default.fileExists(atPath: systemSoundURL.path) {
-            return systemSoundURL
-        }
-
-        return nil
+        return SoundPlayerService.shared.soundURL(for: soundName)
     }
 
     private func loadTasks() -> [PredefinedTask] {

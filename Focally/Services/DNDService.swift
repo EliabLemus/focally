@@ -74,9 +74,12 @@ class DNDService: ObservableObject {
     }
 
     private static func restartNotificationCenter() {
-        NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.notificationcenterui")
-            .first?
-            .forceTerminate()
+        DistributedNotificationCenter.default().postNotificationName(
+            Notification.Name("com.apple.notificationcenterui.dndprefs_changed"),
+            object: nil,
+            deliverImmediately: true
+        )
+        Thread.sleep(forTimeInterval: 0.2)
     }
 
     private static func restoreMenubarIcon() {

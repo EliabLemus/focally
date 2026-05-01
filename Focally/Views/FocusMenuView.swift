@@ -4,8 +4,10 @@ struct FocusMenuView: View {
     @EnvironmentObject var timerService: FocusTimerService
     @EnvironmentObject var dndService: DNDService
     @EnvironmentObject var calendarService: GoogleCalendarService
+    @EnvironmentObject var historyService: HistoryService
     @State private var showActivityInput = false
     @State private var hasPredefinedTasks = false
+    @State private var todaySessions: [HistoryService.SessionEntry] = []
 
     var body: some View {
         ScrollView {
@@ -34,12 +36,26 @@ struct FocusMenuView: View {
                 if calendarService.currentMeeting != nil && timerService.isWork {
                     meetingWarning
                 }
+
+                if !todaySessions.isEmpty {
+                    Divider()
+                        .padding(.horizontal, 20)
+                    historySection
+                }
             }
             .frame(width: 350)
             .padding(.horizontal, 18)
             .padding(.vertical, 18)
         }
-        .onAppear(perform: loadPredefinedTasksState)
+        .onAppear {
+            loadPredefinedTasksState()
+            todaySessions = historyService.loadTodaySessions()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .focusSessionEnded)) { _ in
+            todaySessions = historyService.loadTodaySessions()
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: timerService.pomodoroState)
+        .animation(.spring(response: 0.3), value: showActivityInput)
     }
 
     // MARK: - Idle State
@@ -49,6 +65,7 @@ struct FocusMenuView: View {
             VStack(spacing: 10) {
                 Text(timerService.stateIcon)
                     .font(.system(size: 48))
+                    .accessibilityLabel(timerService.phaseName)
 
                 Text(timerService.phaseName)
                     .font(.headline)
@@ -93,6 +110,7 @@ struct FocusMenuView: View {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .stroke(Color.orange.opacity(0.28), lineWidth: 1)
                 )
+                .accessibilityLabel("Quick Start: \(timerService.workDurationMinutes) minute focus session")
 
                 Button(action: {
                     showActivityInput = true
@@ -109,6 +127,7 @@ struct FocusMenuView: View {
                 .buttonStyle(.plain)
                 .background(Color.primary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .accessibilityLabel("Start custom focus session")
 
                 if hasPredefinedTasks {
                     Button(action: {
@@ -126,6 +145,7 @@ struct FocusMenuView: View {
                     .buttonStyle(.plain)
                     .background(Color.accentColor.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .accessibilityLabel("Start with saved task")
                 }
             }
         }
@@ -138,11 +158,13 @@ struct FocusMenuView: View {
             VStack(spacing: 12) {
                 Text(timerService.stateIcon)
                     .font(.system(size: 40))
+                    .accessibilityLabel(timerService.phaseName)
 
                 Text(timerService.remainingTimeString)
                     .font(.system(size: 72, weight: .light, design: .monospaced))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
+                    .contentTransition(.numericText())
 
                 VStack(spacing: 4) {
                     Text(timerService.phaseName)
@@ -176,6 +198,7 @@ struct FocusMenuView: View {
                         RoundedRectangle(cornerRadius: 5)
                             .fill(progressColor)
                             .frame(width: max(geometry.size.width * timerService.progress, timerService.progress > 0 ? 10 : 0))
+                            .animation(.easeInOut(duration: 0.5), value: timerService.progress)
                     }
                 }
                 .frame(height: 8)
@@ -197,22 +220,26 @@ struct FocusMenuView: View {
                     controlButton("Resume", systemImage: "play.fill", tint: .green, prominent: true) {
                         timerService.resumeSession()
                     }
+                    .accessibilityLabel("Resume session")
                 } else {
                     controlButton("Pause", systemImage: "pause.fill", tint: .primary, prominent: false) {
                         timerService.pauseSession()
                     }
+                    .accessibilityLabel("Pause session")
                 }
 
                 if timerService.isBreak {
                     controlButton("Skip", systemImage: "forward.fill", tint: .blue, prominent: false) {
                         timerService.skipToNextPhase()
                     }
+                    .accessibilityLabel("Skip to next phase")
                 }
 
                 controlButton("Stop", systemImage: "stop.fill", tint: .red, prominent: false) {
                     timerService.resetToIdle()
                     dndService.deactivateDND()
                 }
+                .accessibilityLabel("Stop session")
             }
         }
     }
@@ -284,6 +311,46 @@ struct FocusMenuView: View {
         .padding(8)
         .background(Color.orange.opacity(0.1))
         .cornerRadius(6)
+        .padding(.horizontal, 20)
+    }
+
+    // MARK: - Today's History
+
+    private var historySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: "chart.bar")
+                Text("Today")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                Text("\(historyService.sessionCountToday()) sessions · \(historyService.totalFocusMinutesToday())m focus")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(spacing: 6) {
+                ForEach(todaySessions) { session in
+                    HStack(spacing: 8) {
+                        Text(session.emoji)
+                            .font(.caption)
+                        Text(session.activity)
+                            .font(.caption)
+                            .lineLimit(1)
+                        Spacer()
+                        Text("\(session.durationMinutes)m")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.gray.opacity(0.06))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
+        }
         .padding(.horizontal, 20)
     }
 }

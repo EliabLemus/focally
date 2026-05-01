@@ -52,6 +52,7 @@ struct ActivityInputView: View {
                                 )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Emoji: \(emoji)")
                     }
                 }
             }
@@ -76,6 +77,7 @@ struct ActivityInputView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("\(duration) minutes")
                     }
                 }
                 HStack {
@@ -97,6 +99,7 @@ struct ActivityInputView: View {
                 }
                 .buttonStyle(.bordered)
                 .frame(maxWidth: .infinity)
+                .accessibilityLabel("Cancel")
 
                 Button {
                     let duration = Int(customMinutes) ?? selectedDuration
@@ -108,6 +111,7 @@ struct ActivityInputView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(.blue)
                 .disabled(activity.trimmingCharacters(in: .whitespaces).isEmpty || selectedDuration <= 0)
+                .accessibilityLabel("Start focus session")
             }
         }
         .padding(20)
@@ -135,25 +139,32 @@ struct ActivityInputView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(Array(predefinedTasks.enumerated()), id: \.element.id) { index, task in
-                            Button {
-                                applyPredefinedTask(at: index)
-                            } label: {
-                                HStack(spacing: 6) {
+                VStack(spacing: 8) {
+                    ForEach(Array(predefinedTasks.enumerated()), id: \.element.id) { index, task in
+                        Button {
+                            applyPredefinedTask(at: index)
+                        } label: {
+                            HStack(spacing: 10) {
+                                HStack(spacing: 8) {
                                     Text(task.emoji)
                                     Text(task.name)
                                         .lineLimit(1)
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 8)
-                                .background(selectedTaskIndex == index ? Color.accentColor : Color.gray.opacity(0.15))
-                                .foregroundStyle(selectedTaskIndex == index ? .white : .primary)
-                                .clipShape(Capsule())
+                                Spacer()
+                                if selectedTaskIndex == index {
+                                    Image(systemName: "checkmark")
+                                        .font(.caption.weight(.semibold))
+                                }
                             }
-                            .buttonStyle(.plain)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(selectedTaskIndex == index ? Color.accentColor : Color.gray.opacity(0.15))
+                            .foregroundStyle(selectedTaskIndex == index ? .white : .primary)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Saved task: \(task.name)")
                     }
                 }
             }
