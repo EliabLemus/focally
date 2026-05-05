@@ -1,0 +1,37 @@
+{
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Navigation/TopBarView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TopBarView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TopBarView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TopBarView.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TopBarView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TopBarView.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/WeekCalendarView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/WeekCalendarView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/WeekCalendarView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/WeekCalendarView.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/WeekCalendarView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/WeekCalendarView.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/TimerSettingsCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerSettingsCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerSettingsCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerSettingsCard.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerSettingsCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerSettingsCard.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/TimerPage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerPage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerPage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerPage.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerPage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/TimerPage.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneratedAssetSymbols.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneratedAssetSymbols.swiftdeps"
+  }
+}

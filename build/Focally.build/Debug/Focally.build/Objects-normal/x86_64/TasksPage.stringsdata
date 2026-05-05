@@ -1,0 +1,40 @@
+{
+  "source": "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/TasksPage.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Task Configuration",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 7
+        }
+      },
+      {
+        "comment": "",
+        "key": "Manage your focus sessions and predefined activities.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "Task Configuration",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 15
+        }
+      },
+      {
+        "comment": "",
+        "key": "Changes are saved automatically and applied to future focus sessions.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 61
+        }
+      }
+    ]
+  },
+  "version": 1
+}

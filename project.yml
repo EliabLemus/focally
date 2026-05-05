@@ -60,12 +60,14 @@ targets:
         com.apple.security.automation.apple-events: true
     dependencies: []
   FocallyTests:
-    type: bundle
+    type: bundle.unit-test
     platform: macOS
     sources:
       - FocallyTests
     dependencies:
       - target: Focally
+      - sdk: XCTest.framework
+      - sdk: Cocoa.framework
     settings:
       base:
         INFOPLIST_FILE: FocallyTests/Info.plist
@@ -73,6 +75,9 @@ targets:
         PRODUCT_BUNDLE_NAME: FocallyTests
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: false
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        SWIFT_VERSION: "5.9"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks"
   FocallyUITests:
     type: bundle
     platform: macOS

@@ -1,0 +1,48 @@
+{
+  "source": "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/RecentSessionsList.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Recent Sessions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 11
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export Data",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 18
+        }
+      },
+      {
+        "comment": "",
+        "key": "%.0fm",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 82
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ • %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 74
+        }
+      }
+    ]
+  },
+  "version": 1
+}

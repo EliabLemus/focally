@@ -1,0 +1,32 @@
+{
+  "source": "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/SmartTemplatesCard.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Smart Templates",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 11
+        }
+      },
+      {
+        "comment": "",
+        "key": "AI can suggest task durations based on your past performance.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 15
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable AI Insights",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 24
+        }
+      }
+    ]
+  },
+  "version": 1
+}

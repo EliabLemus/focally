@@ -1,0 +1,44 @@
+{
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/FocallyTypography.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocallyTypography.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocallyTypography.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocallyTypography.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocallyTypography.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocallyTypography.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Models/FocusBlock.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlock.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlock.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlock.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlock.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlock.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/FocusTimerService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTimerService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTimerService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTimerService.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTimerService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTimerService.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/FocusAllocationCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusAllocationCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusAllocationCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusAllocationCard.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusAllocationCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusAllocationCard.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/FocusScoreCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusScoreCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusScoreCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusScoreCard.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusScoreCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusScoreCard.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/FocusBlockView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlockView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlockView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlockView.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlockView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusBlockView.swiftdeps"
+  }
+}

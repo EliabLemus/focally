@@ -1,0 +1,44 @@
+{
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/GoogleCalendarService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GoogleCalendarService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GoogleCalendarService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GoogleCalendarService.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GoogleCalendarService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GoogleCalendarService.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/HistoryService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/HistoryService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/HistoryService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/HistoryService.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/HistoryService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/HistoryService.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/FocusTrendChart.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTrendChart.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTrendChart.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTrendChart.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTrendChart.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/FocusTrendChart.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/GeneralSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneralSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneralSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneralSettingsView.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneralSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/GeneralSettingsView.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/IntegrationsSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IntegrationsSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IntegrationsSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IntegrationsSettingsView.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IntegrationsSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IntegrationsSettingsView.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/IdleDashboardView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IdleDashboardView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IdleDashboardView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IdleDashboardView.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IdleDashboardView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/IdleDashboardView.swiftdeps"
+  }
+}

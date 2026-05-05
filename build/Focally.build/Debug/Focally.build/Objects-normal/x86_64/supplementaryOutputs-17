@@ -1,0 +1,37 @@
+{
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Models/PredefinedTask.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTask.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTask.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTask.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTask.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTask.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/ScheduleService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/ScheduleService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/ScheduleService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/ScheduleService.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/ScheduleService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/ScheduleService.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/RecentSessionsList.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/RecentSessionsList.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/RecentSessionsList.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/RecentSessionsList.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/RecentSessionsList.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/RecentSessionsList.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/SchedulePage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/SchedulePage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/SchedulePage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/SchedulePage.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/SchedulePage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/SchedulePage.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/PredefinedTasksList.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTasksList.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTasksList.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTasksList.dia",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTasksList.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/x86_64/PredefinedTasksList.swiftdeps"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "source": "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/MenuBar/MenuBarDropdownView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Focus",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Task",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start Pomodoro",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 137
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldm",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom Session",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 168
+        }
+      },
+      {
+        "comment": "",
+        "key": "45m",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ of %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 246
+        }
+      },
+      {
+        "comment": "",
+        "key": "Break",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "Deep Focus Mode",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "Daily: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 274
+        }
+      },
+      {
+        "comment": "",
+        "key": "85% Flow State",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 287
+        }
+      }
+    ]
+  },
+  "version": 1
+}

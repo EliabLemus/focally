@@ -1,0 +1,569 @@
+{
+  "" : {
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/Focally-primary.dia",
+    "emit-module-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/Focally-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/Focally-primary-emit-module.dia",
+    "pch" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/Focally-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/Focally-primary.swiftdeps"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/CardModifier.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CardModifier~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/DesignSystemTestView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DesignSystemTestView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/FocallyColors.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyColors~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/FocallyRadius.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyRadius~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/FocallySpacing.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallySpacing~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/FocallyTheme.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTheme~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/DesignSystem/FocallyTypography.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTypography~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Models/CalendarEvent.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CalendarEvent~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Models/FocusBlock.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlock~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Models/PomodoroState.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PomodoroState~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Models/PredefinedTask.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTask~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/OnItFocusApp.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/OnItFocusApp~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/AnalyticsService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/DNDService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/DNDService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/FocusTimerService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTimerService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/GoogleCalendarService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GoogleCalendarService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/HistoryService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/HistoryService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/KeychainHelper.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/KeychainHelper~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/NotificationService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/NotificationService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/ScheduleService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ScheduleService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/SlackService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SlackService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Services/SoundPlayerService.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SoundPlayerService~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/AnalyticsPage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AnalyticsPage~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/FocusAllocationCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusAllocationCard~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/FocusScoreCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusScoreCard~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/FocusTrendChart.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusTrendChart~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Analytics/RecentSessionsList.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/RecentSessionsList~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/MainWindow.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MainWindow~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/MenuBar/MenuBarDropdownView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/MenuBarDropdownView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Navigation/FocallyTab.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyTab~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Navigation/SidebarItemView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarItemView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Navigation/SidebarView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SidebarView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Navigation/TopBarView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TopBarView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/CreateFocusBlockSheet.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/CreateFocusBlockSheet~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/FocusBlockView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocusBlockView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/SchedulePage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SchedulePage~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Schedule/WeekCalendarView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/WeekCalendarView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/AboutSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AboutSettingsView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/AppearanceSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AppearanceSettingsView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/AutomationSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/AutomationSettingsView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/GeneralSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneralSettingsView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/IntegrationsSettingsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IntegrationsSettingsView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/SettingsPage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SettingsPage~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/SharedComponents.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SharedComponents~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/PredefinedTasksList.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/PredefinedTasksList~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/SmartTemplatesCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/SmartTemplatesCard~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/TaskRowView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TaskRowView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/TasksPage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TasksPage~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Tasks/TimerSettingsCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerSettingsCard~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/ActiveFocusView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/ActiveFocusView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/EstimatedTimeCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/EstimatedTimeCard~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/FocallyFocusScoreCard.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/FocallyFocusScoreCard~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/IdleDashboardView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/IdleDashboardView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/TimerControlsView.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerControlsView~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Timer/TimerPage.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/TimerPage~partial.swiftmodule"
+  },
+  "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/openjaime/.openclaw/workspace/projects/focally/build/Focally.build/Debug/Focally.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

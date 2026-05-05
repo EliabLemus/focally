@@ -1,0 +1,16 @@
+{
+  "source": "/Users/openjaime/.openclaw/workspace/projects/focally/Focally/Views/Settings/AppearanceSettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Appearance",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 8
+        }
+      }
+    ]
+  },
+  "version": 1
+}

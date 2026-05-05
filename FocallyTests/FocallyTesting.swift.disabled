@@ -1,0 +1,245 @@
+import Foundation
+import Testing
+@testable import Focally
+
+// MARK: - TimerService Tests
+
+@Suite("FocusTimerService")
+struct FocusTimerServiceTests {
+
+    @Test("Initial state is idle")
+    func initialState() {
+        let service = makeService()
+        #expect(service.pomodoroState == .idle)
+        #expect(service.isActive == false)
+        #expect(service.isPaused == false)
+        #expect(service.remainingSeconds == 0)
+    }
+
+    @Test("Start work session sets correct state")
+    func startWorkSession() {
+        let service = makeService()
+        service.startWorkSession(activity: "Test", emoji: "📝", durationMinutes: 25)
+
+        #expect(service.pomodoroState == .work)
+        #expect(service.currentActivity == "Test")
+        #expect(service.currentEmoji == "📝")
+        #expect(service.remainingSeconds == 25 * 60)
+        #expect(service.durationMinutes == 25)
+        #expect(service.isActive == true)
+        #expect(service.isPaused == false)
+    }
+
+    @Test("Pause and resume")
+    func pauseResume() {
+        let service = makeService()
+        service.startWorkSession(activity: "Test", emoji: "📝", durationMinutes: 25)
+
+        service.pauseSession()
+        #expect(service.isPaused == true)
+        #expect(service.isActive == true)
+
+        service.resumeSession()
+        #expect(service.isPaused == false)
+        #expect(service.isActive == true)
+    }
+
+    @Test("Reset to idle clears state")
+    func resetToIdle() {
+        let service = makeService()
+        service.startWorkSession(activity: "Test", emoji: "📝", durationMinutes: 25)
+        service.resetToIdle()
+
+        #expect(service.pomodoroState == .idle)
+        #expect(service.isActive == false)
+        #expect(service.remainingSeconds == 0)
+        #expect(service.currentActivity == "")
+        #expect(service.currentEmoji == "📝")
+    }
+
+    @Test("Computed properties")
+    func computedProperties() {
+        let service = makeService()
+        #expect(service.stateIcon == "⏸️")
+
+        service.startWorkSession(activity: "Test", emoji: "📝", durationMinutes: 25)
+        #expect(service.stateIcon == "🟢")
+        #expect(service.isWork == true)
+        #expect(service.isBreak == false)
+        #expect(service.isLongBreak == false)
+
+        service.startShortBreak()
+        #expect(service.stateIcon == "🟡")
+        #expect(service.isBreak == true)
+        #expect(service.isWork == false)
+
+        service.startLongBreak()
+        #expect(service.stateIcon == "🔵")
+        #expect(service.isLongBreak == true)
+
+        service.resetToIdle()
+        #expect(service.stateIcon == "⏸️")
+    }
+
+    // Helper to create service without side effects
+    private func makeService() -> FocusTimerService {
+        FocusTimerService(
+            soundPlayer: MockSoundPlayerService(),
+            notificationService: MockNotificationService(),
+            historyService: MockHistoryService()
+        )
+    }
+}
+
+// MARK: - SoundPlayerService Tests
+
+@Suite("SoundPlayerService")
+struct SoundPlayerServiceTests {
+
+    @Test("Sound list is not empty")
+    func soundListNotEmpty() {
+        let service = SoundPlayerService.shared
+        #expect(!service.sounds.isEmpty)
+    }
+
+    @Test("Sound list contains expected system sounds")
+    func soundListContainsExpected() {
+        let service = SoundPlayerService.shared
+        #expect(service.sounds.contains("Basso"))
+        #expect(service.sounds.contains("Glass"))
+        #expect(service.sounds.contains("Ping"))
+        #expect(service.sounds.contains("Hero"))
+    }
+
+    @Test("soundURL returns nil for unknown sound")
+    func soundURLUnknown() {
+        let service = SoundPlayerService.shared
+        #expect(service.soundURL(for: "NonExistentSound") == nil)
+    }
+
+    @Test("soundURL returns valid URL for known sounds")
+    func soundURLValidForKnownSounds() {
+        let service = SoundPlayerService.shared
+        for sound in service.sounds {
+            let url = service.soundURL(for: sound)
+            #expect(url != nil, "Sound URL for \(sound) should not be nil")
+        }
+    }
+}
+
+// MARK: - HistoryService Tests
+
+@Suite("HistoryService")
+struct HistoryServiceTests {
+
+    @Test("Load sessions for empty date returns empty array")
+    func loadEmptyDate() {
+        let service = HistoryService.shared
+        let date = Date.distantPast
+        let sessions = service.loadSessions(for: date)
+        #expect(sessions.isEmpty)
+    }
+
+    @Test("SessionEntry is Codable")
+    func sessionEntryCodable() throws {
+        let entry = HistoryService.SessionEntry(
+            id: UUID(),
+            activity: "Testing",
+            emoji: "🧪",
+            durationMinutes: 25,
+            startTime: Date(),
+            endTime: Date().addingTimeInterval(25 * 60),
+            round: 1
+        )
+
+        let data = try JSONEncoder().encode(entry)
+        let decoded = try JSONDecoder().decode(HistoryService.SessionEntry.self, from: data)
+
+        #expect(decoded.activity == entry.activity)
+        #expect(decoded.emoji == entry.emoji)
+        #expect(decoded.durationMinutes == entry.durationMinutes)
+        #expect(decoded.round == entry.round)
+    }
+
+    @Test("Record and load session")
+    func recordAndLoad() {
+        let service = HistoryService.shared
+        let activity = "UnitTest-\(UUID().uuidString.prefix(8))"
+
+        service.recordWorkSession(
+            activity: activity,
+            emoji: "🧪",
+            durationMinutes: 1,
+            round: 0,
+            startTime: Date(),
+            endTime: Date()
+        )
+
+        let sessions = service.loadTodaySessions()
+        let recorded = sessions.last { $0.activity == activity }
+        #expect(recorded != nil)
+        #expect(recorded?.durationMinutes == 1)
+    }
+}
+
+// MARK: - PomodoroState Tests
+
+@Suite("PomodoroState")
+struct PomodoroStateTests {
+
+    @Test("All cases have raw values")
+    func rawValues() {
+        #expect(PomodoroState.idle.rawValue == "idle")
+        #expect(PomodoroState.work.rawValue == "work")
+        #expect(PomodoroState.shortBreak.rawValue == "shortBreak")
+        #expect(PomodoroState.longBreak.rawValue == "longBreak")
+        #expect(PomodoroState.completed.rawValue == "completed")
+    }
+
+    @Test("Init from raw value")
+    func initFromRawValue() {
+        #expect(PomodoroState(rawValue: "work") == .work)
+        #expect(PomodoroState(rawValue: "invalid") == nil)
+    }
+}
+
+// MARK: - Mock Services
+
+class MockSoundPlayerService: SoundPlayerService {
+    var shouldPlaySound = false
+
+    override func play(_ sound: SoundType) {
+        shouldPlaySound = true
+    }
+
+    override func stopAll() {
+        shouldPlaySound = false
+    }
+}
+
+class MockNotificationService: NotificationService {
+    var notificationsSent: [NotificationService.Event] = []
+
+    override func notify(_ event: NotificationService.Event) {
+        notificationsSent.append(event)
+    }
+
+    override func requestAuthorization() {
+        // Mock implementation
+    }
+}
+
+class MockHistoryService: HistoryService {
+    var recordedSessions: [(activity: String, emoji: String, duration: Int, round: Int, startTime: Date, endTime: Date)] = []
+
+    override func recordWorkSession(
+        activity: String,
+        emoji: String,
+        durationMinutes: Int,
+        round: Int,
+        startTime: Date,
+        endTime: Date
+    ) {
+        recordedSessions.append((activity, emoji, durationMinutes, round, startTime, endTime))
+    }
+}
