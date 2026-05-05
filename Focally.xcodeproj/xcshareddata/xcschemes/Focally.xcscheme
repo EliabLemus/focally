@@ -21,6 +21,20 @@
                ReferencedContainer = "container:Focally.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FocallyUITests"
+               BuildableName = "FocallyUITests.xctest"
+               BlueprintName = "FocallyUITests"
+               ReferencedContainer = "container:Focally.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
