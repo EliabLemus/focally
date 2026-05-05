@@ -1,12 +1,13 @@
 #!/bin/bash
 # Script simplificado para ejecutar UI tests - Diagnóstico
-# Versión: 2.0 - Más robusto y con mejor error handling
+# Versión: 2.1 - Usa ruta absoluta del script
 
 set -e
 
-cd "$(dirname "$0")/.."
+# Obtener ruta absoluta del script y subir un nivel
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-PROJECT_DIR="$(pwd)"
 XCODE_PROJECT="Focally.xcodeproj"
 SCHEME="FocallyUITests"
 
@@ -26,10 +27,11 @@ fi
 # Verificar que el proyecto existe
 echo ""
 echo "2️⃣ Verificando proyecto..."
-if [ -f "$PROJECT_DIR/$XCODE_PROJECT" ]; then
+if [ -d "$PROJECT_DIR/$XCODE_PROJECT" ]; then
     echo "✅ Proyecto encontrado: $XCODE_PROJECT"
 else
     echo "❌ Proyecto NO encontrado"
+    echo "ℹ️  Buscando en: $PROJECT_DIR/$XCODE_PROJECT"
     exit 1
 fi
 

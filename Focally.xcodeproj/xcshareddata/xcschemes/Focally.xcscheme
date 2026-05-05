@@ -48,6 +48,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FocallyTests"
+               BuildableName = "FocallyTests.xctest"
+               BlueprintName = "FocallyTests"
+               ReferencedContainer = "container:Focally.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "FocallyUITests"
                BuildableName = "FocallyUITests.xctest"
                BlueprintName = "FocallyUITests"
