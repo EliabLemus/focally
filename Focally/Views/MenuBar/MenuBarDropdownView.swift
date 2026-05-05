@@ -51,6 +51,7 @@ struct MenuBarDropdownView: View {
             Text("Focus")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
+                .accessibilityIdentifier("headerFocusText")
 
             Spacer()
 
@@ -61,6 +62,7 @@ struct MenuBarDropdownView: View {
                         .foregroundStyle(Color.focallyOnSurfaceVariant.opacity(0.6))
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settingsButton")
 
                 Button(action: {}) {
                     Image(systemName: "ellipsis")
@@ -68,6 +70,7 @@ struct MenuBarDropdownView: View {
                         .foregroundStyle(Color.focallyOnSurfaceVariant.opacity(0.6))
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("moreButton")
             }
             .padding(4)
             .background(Circle().fill(Color.black.opacity(0.05)))
@@ -91,6 +94,7 @@ struct MenuBarDropdownView: View {
                 .foregroundStyle(Color.focallyOnSurface)
                 .textFieldStyle(.plain)
                 .autocorrectionDisabled()
+                .accessibilityIdentifier("taskInputTextField")
                 .onSubmit {
                     if !taskInput.isEmpty {
                         timerService.startWorkSession(
@@ -177,6 +181,7 @@ struct MenuBarDropdownView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("customSessionButton")
         }
     }
 

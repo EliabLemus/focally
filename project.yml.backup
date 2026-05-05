@@ -59,22 +59,8 @@ targets:
       properties:
         com.apple.security.automation.apple-events: true
     dependencies: []
-  FocallyTests:
-    type: bundle
-    platform: macOS
-    sources:
-      - FocallyTests
-    dependencies:
-      - target: Focally
-    settings:
-      base:
-        INFOPLIST_FILE: FocallyTests/Info.plist
-        PRODUCT_BUNDLE_IDENTIFIER: app.focally.mac.Tests
-        PRODUCT_BUNDLE_NAME: FocallyTests
-        CODE_SIGN_STYLE: Automatic
-        GENERATE_INFOPLIST_FILE: false
   FocallyUITests:
-    type: bundle
+    type: ui-test-bundle
     platform: macOS
     sources:
       - FocallyUITests

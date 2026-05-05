@@ -156,6 +156,11 @@ class FocusTimerService: ObservableObject {
         isActive = true
         isPaused = false
 
+        // Auto-activate DND when session starts
+        if let dndService = (NSApp.delegate as? AppDelegate)?.dndService {
+            dndService.activateDND()
+        }
+
         startTimer()
         notificationService.notify(.workSessionStarted(activity: currentActivity, durationMinutes: workDurationMinutes))
 

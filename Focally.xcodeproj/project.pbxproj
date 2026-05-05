@@ -20,6 +20,7 @@
 		22CE09543F47353743C5813D /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */; };
 		24FE2C7D6FB650BB2C5AD8F1 /* Tasks in Resources */ = {isa = PBXBuildFile; fileRef = 27F8F15DF606273DE32B3B14 /* Tasks */; };
 		28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */; };
+		29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */; };
 		34338A611D5C7DB3F143BE0C /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E3FA282EB5A6ACDC331EF9 /* AnalyticsService.swift */; };
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
 		39A248BCEF89B6D08450BB25 /* TasksPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455AC520CE3339E97869E3F3 /* TasksPage.swift */; };
@@ -29,6 +30,7 @@
 		4E171CBDCAE413F2F4D0F49F /* FocallyTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */; };
 		502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */; };
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
+		5CD5CAB420941B661BEE493E /* FocallyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477773A2189585C852109D56 /* FocallyTests.swift */; };
 		5D4D0DA99FF251508C00D382 /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D087C179B816CA86B0EA42F /* FocusBlock.swift */; };
 		5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440DA683BDD9156AD84D322C /* FocallyColors.swift */; };
 		62800918C6A9ABAF71CE9F6C /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */; };
@@ -38,6 +40,7 @@
 		71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */; };
 		72C50B6FF38D05A2E9F440C5 /* FocallySpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */; };
 		75AE11EE54E0E7089F054303 /* FocusScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DF61381E873FA5E6F36707 /* FocusScoreCard.swift */; };
+		770F5F1D32B61DCA10E6A79E /* ExampleTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78AD6C29AF098505B5C18B0D /* ExampleTest.swift */; };
 		77FD86A23B5E36658A3E7A2A /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */; };
 		7C262F088F990DED923716C5 /* DNDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E3F6355136EFD90EE198C8 /* DNDService.swift */; };
 		803039DD967F5D993EC45A02 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */; };
@@ -80,6 +83,23 @@
 		FF1F6F73C5FB3708C3AD140D /* FocusBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696DBC7778A0F797F047B996 /* FocusBlockView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		02532483FC99B405A079B530 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9D3C71A65D62656251FA73B9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1AC72FE47D0D41C21F0D01AB;
+			remoteInfo = Focally;
+		};
+		1D142BD0D61C024E91962404 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9D3C71A65D62656251FA73B9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1AC72FE47D0D41C21F0D01AB;
+			remoteInfo = Focally;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		0179E6DB0D32C6C38E33CE35 /* SlackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackService.swift; sourceTree = "<group>"; };
 		048105A570F946E2833492F3 /* Timer */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Timer; path = Focally/Views/Timer; sourceTree = SOURCE_ROOT; };
@@ -92,6 +112,7 @@
 		1032F662E9204A6D804DD2EF /* FocusTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTimerService.swift; sourceTree = "<group>"; };
 		126D47EF69130589A232D146 /* FocallyTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTypography.swift; sourceTree = "<group>"; };
 		1664CE1EFAF35F33F9B5F97A /* AnalyticsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsPage.swift; sourceTree = "<group>"; };
+		1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyUITests.swift; sourceTree = "<group>"; };
 		18DF61381E873FA5E6F36707 /* FocusScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusScoreCard.swift; sourceTree = "<group>"; };
 		18DF9DEEC76304DC26DB445F /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		191E59EB17B55941B8BE4DFC /* TimerPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerPage.swift; sourceTree = "<group>"; };
@@ -109,6 +130,7 @@
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnItFocusApp.swift; sourceTree = "<group>"; };
 		455AC520CE3339E97869E3F3 /* TasksPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksPage.swift; sourceTree = "<group>"; };
+		477773A2189585C852109D56 /* FocallyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTests.swift; sourceTree = "<group>"; };
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
@@ -125,6 +147,8 @@
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
 		7329B648E3CF152B279F34FE /* RecentSessionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSessionsList.swift; sourceTree = "<group>"; };
 		76965E6EAEB36C5A93B396A0 /* Navigation */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Navigation; path = Focally/Views/Navigation; sourceTree = SOURCE_ROOT; };
+		78725EBDF060275E30C78665 /* FocallyTests.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocallyTests.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		78AD6C29AF098505B5C18B0D /* ExampleTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleTest.swift; sourceTree = "<group>"; };
 		80AE26497177767F58D61D45 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		810114785EFF92E93469DBC9 /* SmartTemplatesCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTemplatesCard.swift; sourceTree = "<group>"; };
 		8106D91600D3C2013F5ACD33 /* bell.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = bell.aiff; sourceTree = "<group>"; };
@@ -139,12 +163,14 @@
 		9ACE0919D2BAEFCCC24A8A9C /* FocusAllocationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusAllocationCard.swift; sourceTree = "<group>"; };
 		9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedTimeCard.swift; sourceTree = "<group>"; };
 		A6B424719CB23B5544233E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B5043C8ECE27D0D64ACE0515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B7294FD9B10CC42662103B9B /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleDashboardView.swift; sourceTree = "<group>"; };
 		B872379B2018EE66D478415E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C17386F3788F2D2F1263DBDD /* PomodoroState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroState.swift; sourceTree = "<group>"; };
 		C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
 		C9102C13F0BCCC126E86559F /* FocallyFocusScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyFocusScoreCard.swift; sourceTree = "<group>"; };
+		CBFE7A23E5D451FB60786396 /* FocallyUITests.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocallyUITests.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDFBAC5608BA076F787C1281 /* Schedule */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Schedule; path = Focally/Views/Schedule; sourceTree = SOURCE_ROOT; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
@@ -158,6 +184,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		03C34BF8A79CDE73FF89AA66 /* FocallyUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */,
+				B5043C8ECE27D0D64ACE0515 /* Info.plist */,
+			);
+			path = FocallyUITests;
+			sourceTree = "<group>";
+		};
 		0AEF4C2BBDBDF4F45D0BD085 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -200,6 +235,8 @@
 			isa = PBXGroup;
 			children = (
 				8E5322A16B3B60603C5509F9 /* Focally.app */,
+				78725EBDF060275E30C78665 /* FocallyTests.bundle */,
+				CBFE7A23E5D451FB60786396 /* FocallyUITests.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -217,6 +254,8 @@
 				27F8F15DF606273DE32B3B14 /* Tasks */,
 				048105A570F946E2833492F3 /* Timer */,
 				C30EC7C7E2228B6BE149EDDC /* Focally */,
+				4D234CE276AA16E933B7536D /* FocallyTests */,
+				03C34BF8A79CDE73FF89AA66 /* FocallyUITests */,
 				33154AF2EF8078375483C6A2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -227,6 +266,15 @@
 				6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */,
 			);
 			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		4D234CE276AA16E933B7536D /* FocallyTests */ = {
+			isa = PBXGroup;
+			children = (
+				78AD6C29AF098505B5C18B0D /* ExampleTest.swift */,
+				477773A2189585C852109D56 /* FocallyTests.swift */,
+			);
+			path = FocallyTests;
 			sourceTree = "<group>";
 		};
 		4E8101EF9D6FF1BD04DC4D3E /* Models */ = {
@@ -379,6 +427,42 @@
 			productReference = 8E5322A16B3B60603C5509F9 /* Focally.app */;
 			productType = "com.apple.product-type.application";
 		};
+		421C378FD351C0B40085048E /* FocallyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F16376535F4DDF3F59789B9D /* Build configuration list for PBXNativeTarget "FocallyTests" */;
+			buildPhases = (
+				6A996F35F08B4E809EEA6050 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				907A8260BF1DE598DF78C51C /* PBXTargetDependency */,
+			);
+			name = FocallyTests;
+			packageProductDependencies = (
+			);
+			productName = FocallyTests;
+			productReference = 78725EBDF060275E30C78665 /* FocallyTests.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+		94362290CFDEA1E1D0588B06 /* FocallyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1BDAD57F46A0555065D0421 /* Build configuration list for PBXNativeTarget "FocallyUITests" */;
+			buildPhases = (
+				F783AD9C2ABB3765E06D05FD /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4705473FD3AC236939242679 /* PBXTargetDependency */,
+			);
+			name = FocallyUITests;
+			packageProductDependencies = (
+			);
+			productName = FocallyUITests;
+			productReference = CBFE7A23E5D451FB60786396 /* FocallyUITests.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -389,6 +473,12 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					1AC72FE47D0D41C21F0D01AB = {
+						ProvisioningStyle = Automatic;
+					};
+					421C378FD351C0B40085048E = {
+						ProvisioningStyle = Automatic;
+					};
+					94362290CFDEA1E1D0588B06 = {
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -408,6 +498,8 @@
 			projectRoot = "";
 			targets = (
 				1AC72FE47D0D41C21F0D01AB /* Focally */,
+				421C378FD351C0B40085048E /* FocallyTests */,
+				94362290CFDEA1E1D0588B06 /* FocallyUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -501,7 +593,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6A996F35F08B4E809EEA6050 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				770F5F1D32B61DCA10E6A79E /* ExampleTest.swift in Sources */,
+				5CD5CAB420941B661BEE493E /* FocallyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F783AD9C2ABB3765E06D05FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4705473FD3AC236939242679 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1AC72FE47D0D41C21F0D01AB /* Focally */;
+			targetProxy = 02532483FC99B405A079B530 /* PBXContainerItemProxy */;
+		};
+		907A8260BF1DE598DF78C51C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1AC72FE47D0D41C21F0D01AB /* Focally */;
+			targetProxy = 1D142BD0D61C024E91962404 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		10F7F8A7BA61FA50E60011A8 /* Debug */ = {
@@ -525,6 +647,40 @@
 			};
 			name = Debug;
 		};
+		56D938045B62ECB3D7CB8032 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocallyTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac.Tests;
+				PRODUCT_BUNDLE_NAME = FocallyTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		59FD3D472D0A3F4E558097D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocallyUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac.UITests;
+				PRODUCT_BUNDLE_NAME = FocallyUITests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 		704058E10A134E2B2EDC90FA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -543,6 +699,40 @@
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		786B79E1DF35913B52BE5BFE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocallyTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac.Tests;
+				PRODUCT_BUNDLE_NAME = FocallyTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7AF102B645A5E33723DD5256 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocallyUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac.UITests;
+				PRODUCT_BUNDLE_NAME = FocallyUITests;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -679,6 +869,24 @@
 			buildConfigurations = (
 				10F7F8A7BA61FA50E60011A8 /* Debug */,
 				704058E10A134E2B2EDC90FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D1BDAD57F46A0555065D0421 /* Build configuration list for PBXNativeTarget "FocallyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				59FD3D472D0A3F4E558097D7 /* Debug */,
+				7AF102B645A5E33723DD5256 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F16376535F4DDF3F59789B9D /* Build configuration list for PBXNativeTarget "FocallyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56D938045B62ECB3D7CB8032 /* Debug */,
+				786B79E1DF35913B52BE5BFE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
