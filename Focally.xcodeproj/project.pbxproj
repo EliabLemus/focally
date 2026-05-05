@@ -32,6 +32,7 @@
 		502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */; };
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
 		5D4D0DA99FF251508C00D382 /* FocusBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D087C179B816CA86B0EA42F /* FocusBlock.swift */; };
+		5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */; };
 		5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440DA683BDD9156AD84D322C /* FocallyColors.swift */; };
 		62800918C6A9ABAF71CE9F6C /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */; };
 		65C855D162E30756C31A2018 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1929A30482E8B887E4AD37 /* CalendarEvent.swift */; };
@@ -51,6 +52,7 @@
 		93BF8041B02840C835DC9371 /* FocusAllocationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ACE0919D2BAEFCCC24A8A9C /* FocusAllocationCard.swift */; };
 		970D3C8AD2A7D59A0BB95DCC /* FocallyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */; };
 		97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */; };
+		9D003B67FFA09D45E6CE18BD /* HistoryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9525B861215559EF5E9D021 /* HistoryServiceTests.swift */; };
 		9FDAC7602453C24664E4CB03 /* Settings in Resources */ = {isa = PBXBuildFile; fileRef = 28994D2A7C018DFC7876ACE9 /* Settings */; };
 		A5C5DDFD64A5AA925679A34B /* AboutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */; };
 		A948378CE62D949DB545599B /* Navigation in Resources */ = {isa = PBXBuildFile; fileRef = 76965E6EAEB36C5A93B396A0 /* Navigation */; };
@@ -67,6 +69,7 @@
 		B83B768C2CF5BCC948DBD75B /* DesignSystemTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2677CB56C06B2FD04DCAF2 /* DesignSystemTestView.swift */; };
 		B85765DC57360EB88FC07D4F /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */; };
 		C36B2949A17645A1C9679416 /* AnalyticsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CE1EFAF35F33F9B5F97A /* AnalyticsPage.swift */; };
+		C8E3101214D8C67323091F56 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */; };
 		CAECDE4AC6D75573BAECAF34 /* ActiveFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */; };
 		CC6B0E5B7BD7393534E5039F /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */; };
 		CF4E0D7D8E95689E6B3A9010 /* SchedulePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93CAAC808829D5F520CC656 /* SchedulePage.swift */; };
@@ -81,6 +84,7 @@
 		EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B872379B2018EE66D478415E /* Assets.xcassets */; };
 		F2B8CBD723F1F53867939192 /* FocallyTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126D47EF69130589A232D146 /* FocallyTypography.swift */; };
 		F94CE01D65F077489B5FCEC0 /* MenuBarDropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */; };
+		FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */; };
 		FEB794232080603BE2B0EE0F /* CreateFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D447524B8FAB7156D08A9B4 /* CreateFocusBlockSheet.swift */; };
 		FF1F6F73C5FB3708C3AD140D /* FocusBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696DBC7778A0F797F047B996 /* FocusBlockView.swift */; };
 /* End PBXBuildFile section */
@@ -134,10 +138,12 @@
 		333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
 		3BB16BD2F3E3AA2EE81EAAB3 /* AutomationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationSettingsView.swift; sourceTree = "<group>"; };
+		3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroStateTests.swift; sourceTree = "<group>"; };
 		440DA683BDD9156AD84D322C /* FocallyColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyColors.swift; sourceTree = "<group>"; };
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnItFocusApp.swift; sourceTree = "<group>"; };
 		455AC520CE3339E97869E3F3 /* TasksPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksPage.swift; sourceTree = "<group>"; };
+		494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerServiceTests.swift; sourceTree = "<group>"; };
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
@@ -176,6 +182,7 @@
 		C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
 		C9102C13F0BCCC126E86559F /* FocallyFocusScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyFocusScoreCard.swift; sourceTree = "<group>"; };
 		CBFE7A23E5D451FB60786396 /* FocallyUITests.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocallyUITests.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9525B861215559EF5E9D021 /* HistoryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceTests.swift; sourceTree = "<group>"; };
 		DDFBAC5608BA076F787C1281 /* Schedule */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Schedule; path = Focally/Views/Schedule; sourceTree = SOURCE_ROOT; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
@@ -189,6 +196,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6DA4D07112D1628A5CC62BC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8E3101214D8C67323091F56 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		940DAB78F702C65FEA6C9C5A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -299,8 +314,11 @@
 			isa = PBXGroup;
 			children = (
 				051BDBCD3E21F1FD15B3D7CF /* FocallyTesting.swift.disabled */,
+				D9525B861215559EF5E9D021 /* HistoryServiceTests.swift */,
 				0267CB7D5ABFC1ED7C04FCAB /* Info.plist */,
+				3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */,
 				1C18F5B206E8657516539F2E /* SimpleTests.swift */,
+				494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */,
 			);
 			path = FocallyTests;
 			sourceTree = "<group>";
@@ -480,6 +498,7 @@
 			buildConfigurationList = D1BDAD57F46A0555065D0421 /* Build configuration list for PBXNativeTarget "FocallyUITests" */;
 			buildPhases = (
 				F783AD9C2ABB3765E06D05FD /* Sources */,
+				6DA4D07112D1628A5CC62BC2 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -635,7 +654,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D003B67FFA09D45E6CE18BD /* HistoryServiceTests.swift in Sources */,
+				FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */,
 				B089356893019F08B27B5734 /* SimpleTests.swift in Sources */,
+				5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

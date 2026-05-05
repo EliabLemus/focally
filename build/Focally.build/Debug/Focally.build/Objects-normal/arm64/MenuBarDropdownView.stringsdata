@@ -39,7 +39,7 @@
         "key": "Custom Session",
         "location": {
           "startingColumn": 26,
-          "startingLine": 168
+          "startingLine": 169
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "45m",
         "location": {
           "startingColumn": 26,
-          "startingLine": 174
+          "startingLine": 175
         }
       },
       {
@@ -55,7 +55,7 @@
         "key": "%@ of %@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 246
+          "startingLine": 249
         }
       },
       {
@@ -63,7 +63,7 @@
         "key": "Break",
         "location": {
           "startingColumn": 49,
-          "startingLine": 200
+          "startingLine": 201
         }
       },
       {
@@ -71,7 +71,7 @@
         "key": "Deep Focus Mode",
         "location": {
           "startingColumn": 59,
-          "startingLine": 200
+          "startingLine": 201
         }
       },
       {
@@ -79,7 +79,7 @@
         "key": "Daily: %@",
         "location": {
           "startingColumn": 26,
-          "startingLine": 274
+          "startingLine": 277
         }
       },
       {
@@ -87,7 +87,7 @@
         "key": "85% Flow State",
         "location": {
           "startingColumn": 26,
-          "startingLine": 287
+          "startingLine": 290
         }
       }
     ]

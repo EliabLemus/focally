@@ -150,6 +150,7 @@ struct MenuBarDropdownView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("startPomodoroButton")
 
             // Custom Session Button
             Button(action: {
@@ -211,6 +212,7 @@ struct MenuBarDropdownView: View {
                         .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier(timerService.isPaused ? "playButton" : "pauseButton")
 
                 // Stop button
                 Button(action: { timerService.resetToIdle() }) {
@@ -219,6 +221,7 @@ struct MenuBarDropdownView: View {
                         .foregroundStyle(Color.focallyError)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("stopPomodoroButton")
             }
 
             // Timer display

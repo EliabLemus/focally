@@ -81,10 +81,12 @@ targets:
   FocallyUITests:
     type: bundle
     platform: macOS
+    productType: com.apple.product-type.bundle.ui-test
     sources:
       - FocallyUITests
     dependencies:
       - target: Focally
+      - sdk: XCTest.framework
     settings:
       base:
         INFOPLIST_FILE: FocallyUITests/Info.plist
