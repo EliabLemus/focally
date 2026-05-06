@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MenuBarDropdownView: View {
     @EnvironmentObject var timerService: FocusTimerService
+    @EnvironmentObject var dndService: DNDService
     @EnvironmentObject var historyService: HistoryService
     @Environment(\.colorScheme) var colorScheme
 
@@ -201,6 +202,21 @@ struct MenuBarDropdownView: View {
                     Text(timerService.isBreak ? "Break" : "Deep Focus Mode")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                    // DND Badge
+                    if dndService.isDNDActive {
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(Color.purple)
+                                .frame(width: 6, height: 6)
+                            Text("DND Active")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(Color.purple)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(Color.purple.opacity(0.1)))
+                    }
                 }
 
                 Spacer()
