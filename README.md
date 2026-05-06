@@ -95,6 +95,17 @@ Fork → branch → PR. Keep it minimal. ✨
 
 For detailed release procedures and troubleshooting, see [docs/RELEASE_GUIDE.md](docs/RELEASE_GUIDE.md).
 
+### Focus Integration
+
+For complete instructions on using Apple Shortcuts integration with Focally, see [docs/FOCUS_INTEGRATION_USER_GUIDE.md](docs/FOCUS_INTEGRATION_USER_GUIDE.md).
+
+**Quick Start**:
+1. Focally generates test shortcuts in `~/Library/Application Support/Focally/Shortcuts/`
+2. Open Focally → Settings → Integrations
+3. Drag `Focally Focus On.shortcut` and `Focally Focus Off.shortcut` to the drop zone
+4. Enable "Focus Integration"
+5. Done!
+
 ## License
 
 [MIT](LICENSE)
