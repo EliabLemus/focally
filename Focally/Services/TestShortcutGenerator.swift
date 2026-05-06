@@ -66,7 +66,7 @@ class TestShortcutGenerator {
     // MARK: - Shortcut Generators
 
     private func generateFocusOnShortcut() throws {
-        let name = "Focally Focus On"
+        let name = "Focally Start Focus"
         let actions: [[String: Any]] = [
             [
                 "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
@@ -99,7 +99,7 @@ class TestShortcutGenerator {
     }
 
     private func generateFocusOffShortcut() throws {
-        let name = "Focally Focus Off"
+        let name = "Focally End Focus"
         let actions: [[String: Any]] = [
             [
                 "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
@@ -137,6 +137,7 @@ class TestShortcutGenerator {
         let workflow: [String: Any] = [
             "WFWorkflowActions": actions,
             "WFWorkflowClientVersion": "2605.0.5",
+            "WFWorkflowName": name,
             "WFWorkflowIcon": [
                 "WFWorkflowIconStartColor": icon["WFWorkflowIconStartColor"] ?? 2077030912,
                 "WFWorkflowIconGlyphNumber": icon["WFWorkflowIconGlyphNumber"] ?? 61440
