@@ -251,7 +251,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(shortcutDropHandler)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
-        window.styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 1200, height: 800))
         window.minSize = NSSize(width: 900, height: 600)
