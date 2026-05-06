@@ -16,16 +16,31 @@ Puedes crear tus propios shortcuts manualmente en la app de Shortcuts de Apple.
 
 ### Paso 1: Encontrar los archivos de shortcuts
 
-Focally **genera automáticamente** los shortcuts de prueba al primer lanzamiento:
+Focally **genera automáticamente** los shortcuts de prueba al primer lanzamiento.
+
+**IMPORTANTE**: Los shortcuts se generan en el directorio de Application Support de TU usuario.
 
 ```bash
-# Los shortcuts están aquí:
-~/Library/Application Support/Focally/Shortcuts/
+# Busca en TU directorio de Application Support:
+ls ~/Library/Application\ Support/Focally/Shortcuts/
+
+# Si no existen, ejecuta este comando (reemplaza 'eliabemusbarrios' por tu usuario):
+ls /Users/eliabemusbarrios/Library/Application\ Support/Focally/Shortcuts/
+```
+
+**Cómo encontrar tu usuario de macOS**:
+```bash
+whoami  # Muestra tu usuario actual
+ls ~/Library/Application\ Support/  # Lista todos los directorios de apps
 ```
 
 Archivos generados:
 - `Focally Focus On.shortcut`
 - `Focally Focus Off.shortcut`
+
+**Nota**: Si ves que el directorio `Focally/Shortcuts/` está vacío o no existe:
+1. Reabre Focally (se generarán al primer lanzamiento)
+2. Verifica que sea TU directorio de Application Support (reemplaza `openjaime` por tu usuario)
 
 ### Paso 2: Abrir Focally
 
@@ -60,7 +75,19 @@ Debajo de la toggle de "Focus Integration", verás:
 ### Paso 5: Arrastrar los shortcuts
 
 1. Abre **Finder**
-2. Ve a: `~/Library/Application Support/Focally/Shortcuts/`
+2. Navega a TU directorio de Application Support:
+   - Abre la carpeta de usuario (tu nombre de usuario)
+   - Ve a `Library/Application Support/Focally/Shortcuts/`
+   
+   **O usa Go to Folder** en Finder:
+   - Presiona `Cmd + Shift + G`
+   - Pega: `/Users/TU_USUARIO/Library/Application Support/Focally/Shortcuts/`
+   - Presiona Enter
+   
+   **O usa este comando en Terminal para abrirlo directamente** (reemplaza `eliabemusbarrios` por tu usuario):
+   ```bash
+   open /Users/eliabemusbarrios/Library/Application\ Support/Focally/Shortcuts/
+   ```
 3. Arrastra **BOTH** archivos a la zona de drop:
    - `Focally Focus On.shortcut`
    - `Focally Focus Off.shortcut`
