@@ -35,6 +35,8 @@ class FocusTimerService: ObservableObject {
     let soundPlayer: SoundPlayerService
     let notificationService: NotificationService
     let historyService: HistoryService
+    let dndService: DNDService
+    let focusIntegrationService: FocusIntegrationService
 
     // Timer management
     private var timer: Timer?
@@ -49,10 +51,14 @@ class FocusTimerService: ObservableObject {
 
     init(soundPlayer: SoundPlayerService = .shared,
          notificationService: NotificationService = NotificationService(),
-         historyService: HistoryService = .shared) {
+         historyService: HistoryService = .shared,
+         dndService: DNDService = DNDService(),
+         focusIntegrationService: FocusIntegrationService = FocusIntegrationService()) {
         self.soundPlayer = soundPlayer
         self.notificationService = notificationService
         self.historyService = historyService
+        self.dndService = dndService
+        self.focusIntegrationService = focusIntegrationService
         loadSettings()
         loadLastSession()
     }
@@ -156,10 +162,8 @@ class FocusTimerService: ObservableObject {
         isActive = true
         isPaused = false
 
-        // Auto-activate DND when session starts
-        if let dndService = (NSApp.delegate as? AppDelegate)?.dndService {
-            dndService.activateDND()
-        }
+        // Activate focus based on user's integration preference
+        activateFocusIntegration()
 
         startTimer()
         notificationService.notify(.workSessionStarted(activity: currentActivity, durationMinutes: workDurationMinutes))
@@ -201,6 +205,7 @@ class FocusTimerService: ObservableObject {
         currentActivity = ""
         currentEmoji = "📝"
 
+        deactivateFocusIntegration()
         notificationService.notify(.sessionEnded)
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }
@@ -253,6 +258,7 @@ class FocusTimerService: ObservableObject {
         remainingSeconds = 0
         isActive = false
         isPaused = false
+        deactivateFocusIntegration()
         notificationService.notify(.sessionEnded)
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }
@@ -430,5 +436,44 @@ class FocusTimerService: ObservableObject {
 
     private func clampDuration(_ minutes: Int) -> Int {
         min(max(minutes, TimerDefaults.durationRange.lowerBound), TimerDefaults.durationRange.upperBound)
+    }
+
+    // MARK: - Focus Integration Helpers
+
+    private func activateFocusIntegration() {
+        let integration = focusIntegrationService
+
+        if integration.isEnabled {
+            switch integration.mode {
+            case .shortcuts:
+                // Shortcuts mode: let FocusIntegrationService handle it
+                integration.activateFocus()
+            case .legacyDND:
+                // Legacy mode: use DNDService as before
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                    self?.dndService.activateDND()
+                }
+            }
+        } else {
+            // Default behavior when integration is disabled: use legacy DND
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.dndService.activateDND()
+            }
+        }
+    }
+
+    private func deactivateFocusIntegration() {
+        let integration = focusIntegrationService
+
+        if integration.isEnabled {
+            switch integration.mode {
+            case .shortcuts:
+                integration.deactivateFocus()
+            case .legacyDND:
+                dndService.deactivateDND()
+            }
+        } else {
+            dndService.deactivateDND()
+        }
     }
 }
