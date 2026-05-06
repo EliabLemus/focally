@@ -104,26 +104,89 @@ class TestShortcutGenerator {
         // Sign the workflow using shortcuts command
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
-        process.arguments = ["sign", "--input", workflowFile.path, "--output", shortcutsDirectory.appendingPathComponent("Focally Start Focus.shortcut").path]
+        process.arguments = ["sign", "--input", workflowFile.path, "--output", self.shortcutsDirectory.appendingPathComponent("Focally Start Focus.shortcut").path]
 
         let outputPipe = Pipe()
         let errorPipe = Pipe()
         process.standardOutput = outputPipe
         process.standardError = errorPipe
-
+        
         try process.run()
         process.waitUntilExit()
-
+        
         // Check for errors
         let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
         let errorMessage = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-
+        
         if !errorMessage.isEmpty && process.terminationStatus != 0 {
             logger.error("Failed to sign shortcut: \(errorMessage)")
         } else {
             logger.info("✅ Generated Focally Start Focus.shortcut")
         }
-
+        
+        // Clean up temp file
+        try? fileManager.removeItem(at: workflowFile)
+    }
+    
+    private func generateFocusOffShortcut() throws {
+        // Create temporary workflow file
+        let tempDir = fileManager.temporaryDirectory
+        let workflowFile = tempDir.appendingPathComponent("focally_focus_off.workflow")
+        
+        // Create workflow JSON
+        let workflow: [String: Any] = [
+            "WFWorkflowActions": [
+                [
+                    "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
+                    "WFWorkflowActionParameters": [
+                        "WFSettingDoNotDisturbEnabled": false
+                    ]
+                ],
+                [
+                    "WFWorkflowActionIdentifier": "is.workflow.actions.focus",
+                    "WFWorkflowActionParameters": [
+                        "WFFocusModeName": ""  // Empty string = turn off focus
+                    ]
+                ]
+            ],
+            "WFWorkflowClientVersion": "2605.0.5",
+            "WFWorkflowIcon": [
+                "WFWorkflowIconStartColor": 2077030912,
+                "WFWorkflowIconGlyphNumber": 61440
+            ],
+            "WFWorkflowMinimumClientVersion": 900,
+            "WFWorkflowMinimumClientVersionString": "900",
+            "WFWorkflowTypes": ["NCWidget", "WatchKit"]
+        ]
+        
+        let workflowData = try JSONSerialization.data(withJSONObject: workflow, options: .prettyPrinted)
+        try workflowData.write(to: workflowFile)
+        
+        logger.info("Created workflow file at \(workflowFile.path)")
+        
+        // Sign the workflow using shortcuts command
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
+        process.arguments = ["sign", "--input", workflowFile.path, "--output", shortcutsDirectory.appendingPathComponent("Focally End Focus.shortcut").path]
+        
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+        
+        try process.run()
+        process.waitUntilExit()
+        
+        // Check for errors
+        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+        let errorMessage = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        
+        if !errorMessage.isEmpty && process.terminationStatus != 0 {
+            logger.error("Failed to sign shortcut: \(errorMessage)")
+        } else {
+            logger.info("✅ Generated Focally End Focus.shortcut")
+        }
+        
         // Clean up temp file
         try? fileManager.removeItem(at: workflowFile)
     }
