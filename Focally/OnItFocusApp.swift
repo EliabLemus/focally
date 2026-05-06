@@ -251,7 +251,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(shortcutDropHandler)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 1200, height: 800))
         window.minSize = NSSize(width: 900, height: 600)
@@ -316,11 +316,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func appearance(for theme: ThemeChoice) -> NSAppearance? {
         switch theme {
         case .light:
-            return NSAppearance(named: .aqua)
+            return NSAppearance(named: NSAppearance.Name.aqua)
         case .dark:
-            return NSAppearance(named: .darkAqua)
+            return NSAppearance(named: NSAppearance.Name.darkAqua)
         case .system:
-            return nil
+            return nil as NSAppearance?
         }
     }
 
