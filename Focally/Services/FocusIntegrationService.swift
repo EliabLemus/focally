@@ -22,7 +22,7 @@ enum FocusIntegrationMode: String, CaseIterable, Identifiable {
 
 // MARK: - Focus Integration Error
 
-enum FocusIntegrationError: LocalizedError {
+enum FocusIntegrationError: Error, LocalizedError {
     case shortcutNotFound(String)
     case shortcutExecutionFailed(String)
     case processError(String)
