@@ -91,6 +91,10 @@ SwiftUI · NSStatusBar · macOS 14+ · XcodeGen · GitHub Actions · Homebrew ta
 
 Fork → branch → PR. Keep it minimal. ✨
 
+### Making Releases
+
+For detailed release procedures and troubleshooting, see [docs/RELEASE_GUIDE.md](docs/RELEASE_GUIDE.md).
+
 ## License
 
 [MIT](LICENSE)
