@@ -251,14 +251,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(shortcutDropHandler)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.styleMask = styleMask
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 1200, height: 800))
         window.minSize = NSSize(width: 900, height: 600)
         window.center()
         mainWindow = window
         applySavedTheme()
-        window.makeKeyAndOrderFront(nil)
+        window.makeKeyAndOrderFront(nil as Any?)
         window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
     }
