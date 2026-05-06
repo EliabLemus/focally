@@ -5,7 +5,7 @@ import SwiftUI
 // MARK: - Test Shortcut Generator
 
 /// Generates test shortcuts for Focally integration
-/// Creates binary plist .shortcut files that can be imported via drag & drop
+/// Creates signed .shortcut files using the native `shortcuts` command
 /// Generates test shortcuts ONLY ONCE on first launch
 /// Shortcuts are generated in ~/Library/Application Support/Focally/Shortcuts/
 class TestShortcutGenerator {
@@ -59,102 +59,135 @@ class TestShortcutGenerator {
 
         if !fileManager.fileExists(atPath: shortcutsDirectory.path, isDirectory: &isDirectory) {
             try fileManager.createDirectory(at: shortcutsDirectory, withIntermediateDirectories: true)
-            logger.info("Created shortcuts directory at: \(self.shortcutsDirectory.path, privacy: .public)")
+            logger.info("Created shortcuts directory at: \(shortcutsDirectory.path, privacy: .public)")
         }
     }
 
     // MARK: - Shortcut Generators
 
     private func generateFocusOnShortcut() throws {
-        let name = "Focally Start Focus"
-        let actions: [[String: Any]] = [
-            [
-                "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
-                "WFWorkflowActionParameters": [
-                    "WFSettingDoNotDisturbEnabled": true
-                ]
-            ],
-            [
-                "WFWorkflowActionIdentifier": "is.workflow.actions.focus",
-                "WFWorkflowActionParameters": [
-                    "WFFocusModeName": "work"
-                ]
-            ]
-        ]
+        // Create temporary workflow file
+        let tempDir = fileManager.temporaryDirectory
+        let workflowFile = tempDir.appendingPathComponent("focally_focus_on.workflow")
 
-        let icon: [String: Any] = [
-            "WFWorkflowIconStartColor": 2077030912,
-            "WFWorkflowIconGlyphNumber": 61440
-        ]
-
-        let shortcutData = try buildShortcutPlist(
-            name: name,
-            actions: actions,
-            icon: icon
-        )
-
-        let url = shortcutsDirectory.appendingPathComponent("\(name).shortcut")
-        try shortcutData.write(to: url)
-        logger.info("Generated \(name).shortcut at \(url.path, privacy: .public)")
-    }
-
-    private func generateFocusOffShortcut() throws {
-        let name = "Focally End Focus"
-        let actions: [[String: Any]] = [
-            [
-                "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
-                "WFWorkflowActionParameters": [
-                    "WFSettingDoNotDisturbEnabled": false
-                ]
-            ],
-            [
-                "WFWorkflowActionIdentifier": "is.workflow.actions.focus",
-                "WFWorkflowActionParameters": [
-                    "WFFocusModeName": ""  // Empty string = turn off focus
-                ]
-            ]
-        ]
-
-        let icon: [String: Any] = [
-            "WFWorkflowIconStartColor": 2077030912,
-            "WFWorkflowIconGlyphNumber": 61440
-        ]
-
-        let shortcutData = try buildShortcutPlist(
-            name: name,
-            actions: actions,
-            icon: icon
-        )
-
-        let url = shortcutsDirectory.appendingPathComponent("\(name).shortcut")
-        try shortcutData.write(to: url)
-        logger.info("Generated \(name).shortcut at \(url.path, privacy: .public)")
-    }
-
-    // MARK: - Plist Builder
-
-    private func buildShortcutPlist(name: String, actions: [[String: Any]], icon: [String: Any]) throws -> Data {
+        // Create workflow JSON
         let workflow: [String: Any] = [
-            "WFWorkflowActions": actions,
+            "WFWorkflowActions": [
+                [
+                    "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
+                    "WFWorkflowActionParameters": [
+                        "WFSettingDoNotDisturbEnabled": true
+                    ]
+                ],
+                [
+                    "WFWorkflowActionIdentifier": "is.workflow.actions.focus",
+                    "WFWorkflowActionParameters": [
+                        "WFFocusModeName": "work"
+                    ]
+                ]
+            ],
             "WFWorkflowClientVersion": "2605.0.5",
-            "WFWorkflowName": name,
             "WFWorkflowIcon": [
-                "WFWorkflowIconStartColor": icon["WFWorkflowIconStartColor"] ?? 2077030912,
-                "WFWorkflowIconGlyphNumber": icon["WFWorkflowIconGlyphNumber"] ?? 61440
+                "WFWorkflowIconStartColor": 2077030912,
+                "WFWorkflowIconGlyphNumber": 61440
             ],
             "WFWorkflowMinimumClientVersion": 900,
             "WFWorkflowMinimumClientVersionString": "900",
-            "WFWorkflowInputContentItemClasses": ["WFAppStoreAppContentItem", "WFArticleContentItem", "WFContactContentItem", "WFDateContentItem", "WFEmailAddressContentItem", "WFFolderContentItem", "WFGenericFileContentItem", "WFImageContentItem", "WFiTunesProductContentItem", "WFLocationContentItem", "WFDCMapLinkContentItem", "WFAVAssetContentItem", "WFPDFContentItem", "WFPhoneNumberContentItem", "WFRichTextContentItem", "WFSafariWebPageContentItem", "WFStringContentItem", "WFURLContentItem"],
-            "WFWorkflowOutputContentItemClasses": ["WFAppStoreAppContentItem", "WFArticleContentItem", "WFContactContentItem", "WFDateContentItem", "WFEmailAddressContentItem", "WFFolderContentItem", "WFGenericFileContentItem", "WFImageContentItem", "WFiTunesProductContentItem", "WFLocationContentItem", "WFDCMapLinkContentItem", "WFAVAssetContentItem", "WFPDFContentItem", "WFPhoneNumberContentItem", "WFRichTextContentItem", "WFSafariWebPageContentItem", "WFStringContentItem", "WFURLContentItem"],
             "WFWorkflowTypes": ["NCWidget", "WatchKit"]
         ]
 
-        let plist = try PropertyListSerialization.data(
-            fromPropertyList: workflow,
-            format: .binary,
-            options: 0
-        )
+        let workflowData = try JSONSerialization.data(withJSONObject: workflow, options: .prettyPrinted)
+        try workflowData.write(to: workflowFile)
 
-        return plist
+        logger.info("Created workflow file at \(workflowFile.path)")
+
+        // Sign the workflow using shortcuts command
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
+        process.arguments = ["sign", "--input", workflowFile.path, "--output", shortcutsDirectory.appendingPathComponent("Focally Start Focus.shortcut").path]
+
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+
+        try process.run()
+        process.waitUntilExit()
+
+        // Check for errors
+        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+        let errorMessage = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        if !errorMessage.isEmpty && process.terminationStatus != 0 {
+            logger.error("Failed to sign shortcut: \(errorMessage)")
+        } else {
+            logger.info("✅ Generated Focally Start Focus.shortcut")
+        }
+
+        // Clean up temp file
+        try? fileManager.removeItem(at: workflowFile)
+    }
+
+    private func generateFocusOffShortcut() throws {
+        // Create temporary workflow file
+        let tempDir = fileManager.temporaryDirectory
+        let workflowFile = tempDir.appendingPathComponent("focally_focus_off.workflow")
+
+        // Create workflow JSON
+        let workflow: [String: Any] = [
+            "WFWorkflowActions": [
+                [
+                    "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
+                    "WFWorkflowActionParameters": [
+                        "WFSettingDoNotDisturbEnabled": false
+                    ]
+                ],
+                [
+                    "WFWorkflowActionIdentifier": "is.workflow.actions.focus",
+                    "WFWorkflowActionParameters": [
+                        "WFFocusModeName": ""  // Empty string = turn off focus
+                    ]
+                ]
+            ],
+            "WFWorkflowClientVersion": "2605.0.5",
+            "WFWorkflowIcon": [
+                "WFWorkflowIconStartColor": 2077030912,
+                "WFWorkflowIconGlyphNumber": 61440
+            ],
+            "WFWorkflowMinimumClientVersion": 900,
+            "WFWorkflowMinimumClientVersionString": "900",
+            "WFWorkflowTypes": ["NCWidget", "WatchKit"]
+        ]
+
+        let workflowData = try JSONSerialization.data(withJSONObject: workflow, options: .prettyPrinted)
+        try workflowData.write(to: workflowFile)
+
+        logger.info("Created workflow file at \(workflowFile.path)")
+
+        // Sign the workflow using shortcuts command
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
+        process.arguments = ["sign", "--input", workflowFile.path, "--output", shortcutsDirectory.appendingPathComponent("Focally End Focus.shortcut").path]
+
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+
+        try process.run()
+        process.waitUntilExit()
+
+        // Check for errors
+        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+        let errorMessage = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        if !errorMessage.isEmpty && process.terminationStatus != 0 {
+            logger.error("Failed to sign shortcut: \(errorMessage)")
+        } else {
+            logger.info("✅ Generated Focally End Focus.shortcut")
+        }
+
+        // Clean up temp file
+        try? fileManager.removeItem(at: workflowFile)
     }
 }
