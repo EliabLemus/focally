@@ -29,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let historyService = HistoryService.shared
     let shortcutDropHandler = ShortcutDropHandler()
     let testShortcutGenerator = TestShortcutGenerator()
-    lazy var timerService: FocusTimerService = FocusTimerService(
+    private lazy var timerService = FocusTimerService(
         soundPlayer: .shared,
         notificationService: notificationService,
         historyService: historyService,
@@ -72,7 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applySavedTheme()
 
         // Observe timer changes
-        timerService.objectWillChange.sink { [weak self] (_: Never) in
+        timerService.objectWillChange.sink { [weak self] _ in
             DispatchQueue.main.async {
                 self?.updateStatusBar()
             }
