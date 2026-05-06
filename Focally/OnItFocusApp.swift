@@ -29,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let historyService = HistoryService.shared
     let shortcutDropHandler = ShortcutDropHandler()
     let testShortcutGenerator = TestShortcutGenerator()
-    lazy var timerService = FocusTimerService(
+    lazy var timerService: FocusTimerService = FocusTimerService(
         soundPlayer: .shared,
         notificationService: notificationService,
         historyService: historyService,
@@ -72,7 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applySavedTheme()
 
         // Observe timer changes
-        timerService.objectWillChange.sink { [weak self] _ in
+        timerService.objectWillChange.sink { [weak self] (_: Never) in
             DispatchQueue.main.async {
                 self?.updateStatusBar()
             }
@@ -81,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Observe pomodoro state to start/stop status bar timer
         timerService.$pomodoroState
             .removeDuplicates()
-            .sink { [weak self] state in
+            .sink { [weak self] (state: PomodoroState) in
                 if state == .idle {
                     self?.stopStatusBarUpdates()
                     self?.updateStatusBar()
