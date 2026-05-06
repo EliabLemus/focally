@@ -43,6 +43,7 @@
 		75AE11EE54E0E7089F054303 /* FocusScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DF61381E873FA5E6F36707 /* FocusScoreCard.swift */; };
 		77FD86A23B5E36658A3E7A2A /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */; };
 		7C262F088F990DED923716C5 /* DNDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E3F6355136EFD90EE198C8 /* DNDService.swift */; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* FocusIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* FocusIntegrationService.swift */; };
 		803039DD967F5D993EC45A02 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */; };
 		809EBE91F71EE7FC5E7AE0C8 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */; };
 		84AC2BAA9F2CCA1495A302B5 /* SlackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0179E6DB0D32C6C38E33CE35 /* SlackService.swift */; };
@@ -87,7 +88,10 @@
 		FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */; };
 		FEB794232080603BE2B0EE0F /* CreateFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D447524B8FAB7156D08A9B4 /* CreateFocusBlockSheet.swift */; };
 		FF1F6F73C5FB3708C3AD140D /* FocusBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696DBC7778A0F797F047B996 /* FocusBlockView.swift */; };
-/* End PBXBuildFile section */
+		SIQ1BB16PL3H6MGZZN3XEA3H /* ShortcutDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16X216XALO1TPSWP5IODF1UN /* ShortcutDropHandler.swift */; };
+		4665F790710A7EFC1C5C3A6E /* TestShortcutGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2ECABBAFCFA0C3003B0A88 /* TestShortcutGenerator.swift */; };
+		IHUD48QJW83111Z2DAEDODOT /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166G24KEKCGRB6ZMFG7JHEGQ /* UTType+Shortcut.swift */; };
+		/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		02532483FC99B405A079B530 /* PBXContainerItemProxy */ = {
@@ -189,11 +193,15 @@
 		E989B997F730EA3BE022253C /* Analytics */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Analytics; path = Focally/Views/Analytics; sourceTree = SOURCE_ROOT; };
 		F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
 		F2E3F6355136EFD90EE198C8 /* DNDService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDService.swift; sourceTree = "<group>"; };
+		B2C3D4E5F6A7B8C9D0E1F2A3 /* FocusIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusIntegrationService.swift; sourceTree = "<group>"; };
 		F90F068B7D2A7CEED482B916 /* TimerSettingsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerSettingsCard.swift; sourceTree = "<group>"; };
 		F93CAAC808829D5F520CC656 /* SchedulePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulePage.swift; sourceTree = "<group>"; };
 		FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		FF9300C00888F0B7546C94C7 /* FocusTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTrendChart.swift; sourceTree = "<group>"; };
-/* End PBXFileReference section */
+		16X216XALO1TPSWP5IODF1UN /* ShortcutDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutDropHandler.swift; sourceTree = "<group>"; };
+		CA2ECABBAFCFA0C3003B0A88 /* TestShortcutGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestShortcutGenerator.swift; sourceTree = "<group>"; };
+		166G24KEKCGRB6ZMFG7JHEGQ /* UTType+Shortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UTType+Shortcut.swift"; sourceTree = "<group>"; };
+		/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6DA4D07112D1628A5CC62BC2 /* Frameworks */ = {
@@ -427,6 +435,7 @@
 			children = (
 				07E3FA282EB5A6ACDC331EF9 /* AnalyticsService.swift */,
 				F2E3F6355136EFD90EE198C8 /* DNDService.swift */,
+				B2C3D4E5F6A7B8C9D0E1F2A3 /* FocusIntegrationService.swift */,
 				1032F662E9204A6D804DD2EF /* FocusTimerService.swift */,
 				844B4C6DBE9625A6C4CAD3B6 /* GoogleCalendarService.swift */,
 				8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */,
@@ -435,6 +444,10 @@
 				0CDF86C485BBCBEA26892F4B /* ScheduleService.swift */,
 				0179E6DB0D32C6C38E33CE35 /* SlackService.swift */,
 				E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */,
+			
+				16X216XALO1TPSWP5IODF1UN /* ShortcutDropHandler.swift */,
+				166G24KEKCGRB6ZMFG7JHEGQ /* UTType+Shortcut.swift */,
+				CA2ECABBAFCFA0C3003B0A88 /* TestShortcutGenerator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -602,6 +615,7 @@
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
 				FEB794232080603BE2B0EE0F /* CreateFocusBlockSheet.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* FocusIntegrationService.swift in Sources */,
 				B83B768C2CF5BCC948DBD75B /* DesignSystemTestView.swift in Sources */,
 				97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */,
 				5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */,
@@ -647,6 +661,10 @@
 				B3683A382B1B2A7F5F62CDC3 /* TimerSettingsCard.swift in Sources */,
 				151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */,
 				B51CB69C4C2F2E4EB0DAA3FC /* WeekCalendarView.swift in Sources */,
+			
+				SIQ1BB16PL3H6MGZZN3XEA3H /* ShortcutDropHandler.swift in Sources */,
+				4665F790710A7EFC1C5C3A6E /* TestShortcutGenerator.swift in Sources */,
+				IHUD48QJW83111Z2DAEDODOT /* UTType+Shortcut.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -658,6 +676,10 @@
 				FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */,
 				B089356893019F08B27B5734 /* SimpleTests.swift in Sources */,
 				5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */,
+			
+				SIQ1BB16PL3H6MGZZN3XEA3H /* ShortcutDropHandler.swift in Sources */,
+				4665F790710A7EFC1C5C3A6E /* TestShortcutGenerator.swift in Sources */,
+				IHUD48QJW83111Z2DAEDODOT /* UTType+Shortcut.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -666,6 +688,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */,
+			
+				SIQ1BB16PL3H6MGZZN3XEA3H /* ShortcutDropHandler.swift in Sources */,
+				4665F790710A7EFC1C5C3A6E /* TestShortcutGenerator.swift in Sources */,
+				IHUD48QJW83111Z2DAEDODOT /* UTType+Shortcut.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

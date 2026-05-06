@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import os.log
 
 @main
 struct FocallyApp: App {
@@ -14,20 +15,35 @@ struct FocallyApp: App {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "AppDelegate")
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var eventMonitor: Any?
     private var mainWindow: NSWindow?
-    let timerService = FocusTimerService()
+    private var themeObserver: NSObjectProtocol?
     let dndService = DNDService()
+    let focusIntegrationService = FocusIntegrationService()
     let slackService = SlackService()
     let calendarService = GoogleCalendarService()
     let notificationService = NotificationService()
     let historyService = HistoryService.shared
+    let shortcutDropHandler = ShortcutDropHandler()
+    let testShortcutGenerator = TestShortcutGenerator()
+    lazy var timerService = FocusTimerService(
+        soundPlayer: .shared,
+        notificationService: notificationService,
+        historyService: historyService,
+        dndService: dndService,
+        focusIntegrationService: focusIntegrationService
+    )
     private var timerUpdate: Timer?
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Generate test shortcuts on first launch
+        generateTestShortcutsIfNeeded()
+        
+        applySavedTheme()
         notificationService.requestAuthorization()
 
         // Setup status item
@@ -47,10 +63,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let contentView = MenuBarDropdownView()
             .environmentObject(timerService)
             .environmentObject(dndService)
+            .environmentObject(focusIntegrationService)
             .environmentObject(calendarService)
             .environmentObject(historyService)
+            .environmentObject(shortcutDropHandler)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
+        applySavedTheme()
 
         // Observe timer changes
         timerService.objectWillChange.sink { [weak self] _ in
@@ -97,6 +116,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             calendarService.fetchTodayEvents()
         }
 
+        themeObserver = NotificationCenter.default.addObserver(
+            forName: UserDefaults.didChangeNotification,
+            object: UserDefaults.standard,
+            queue: .main
+        ) { [weak self] _ in
+            self?.applySavedTheme()
+        }
+
         // Cmd+Shift+F to open main window
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if event.modifierFlags.contains([.command, .shift]) && event.characters == "f" {
@@ -123,7 +150,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func onSessionEnded() {
-        dndService.deactivateDND()
         slackService.clearStatus()
     }
 
@@ -139,6 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(button)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            applySavedTheme()
             popover.contentViewController?.view.window?.makeKey()
         }
     }
@@ -187,7 +214,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func endSession() {
         timerService.endSession()
-        dndService.deactivateDND()
     }
 
     @objc func openSettings() {
@@ -218,9 +244,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hostingView = MainWindow()
             .environmentObject(timerService)
             .environmentObject(dndService)
+            .environmentObject(focusIntegrationService)
             .environmentObject(slackService)
             .environmentObject(calendarService)
             .environmentObject(historyService)
+            .environmentObject(shortcutDropHandler)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
@@ -229,6 +257,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.minSize = NSSize(width: 900, height: 600)
         window.center()
         mainWindow = window
+        applySavedTheme()
         window.makeKeyAndOrderFront(nil)
         window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
@@ -269,10 +298,53 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         timerUpdate = nil
     }
 
+    private func applySavedTheme() {
+        let theme = ThemeChoice(
+            rawValue: UserDefaults.standard.string(forKey: "appTheme") ?? ThemeChoice.system.rawValue
+        ) ?? .system
+        let appearance = appearance(for: theme)
+
+        NSApp.appearance = appearance
+        statusItem?.button?.appearance = appearance
+        popover?.appearance = appearance
+        popover?.contentViewController?.view.appearance = appearance
+        popover?.contentViewController?.view.window?.appearance = appearance
+        mainWindow?.appearance = appearance
+        mainWindow?.contentViewController?.view.appearance = appearance
+    }
+
+    private func appearance(for theme: ThemeChoice) -> NSAppearance? {
+        switch theme {
+        case .light:
+            return NSAppearance(named: .aqua)
+        case .dark:
+            return NSAppearance(named: .darkAqua)
+        case .system:
+            return nil
+        }
+    }
+
     private var aboutMenuTitle: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
         return "About Focally (v\(version), build \(build))"
+    }
+
+    // MARK: - Test Shortcuts
+
+    private func generateTestShortcutsIfNeeded() {
+        let key = "FocallyTestShortcutsGenerated"
+        let hasGenerated = UserDefaults.standard.bool(forKey: key)
+
+        guard !hasGenerated else { return }
+
+        do {
+            try testShortcutGenerator.generateAllTestShortcuts()
+            UserDefaults.standard.set(true, forKey: key)
+            logger.info("✅ Test shortcuts generated successfully")
+        } catch {
+            logger.error("Failed to generate test shortcuts: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     private func presentCalendarConflictIfNeeded() {
