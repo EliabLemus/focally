@@ -66,12 +66,12 @@ class TestShortcutGenerator {
     // MARK: - Shortcut Generators
 
     private func generateFocusOnShortcut() throws {
-        // Create temporary workflow file
+        // Create temporary .shortcut file with binary plist format
         let tempDir = fileManager.temporaryDirectory
-        let workflowFile = tempDir.appendingPathComponent("focally_focus_on.workflow")
+        let shortcutFile = tempDir.appendingPathComponent("focally_focus_on.shortcut")
 
-        // Create workflow JSON
-        let workflow: [String: Any] = [
+        // Create shortcut plist
+        let shortcut: [String: Any] = [
             "WFWorkflowActions": [
                 [
                     "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
@@ -87,6 +87,7 @@ class TestShortcutGenerator {
                 ]
             ],
             "WFWorkflowClientVersion": "2605.0.5",
+            "WFWorkflowName": "Focally Start Focus",
             "WFWorkflowIcon": [
                 "WFWorkflowIconStartColor": 2077030912,
                 "WFWorkflowIconGlyphNumber": 61440
@@ -96,15 +97,19 @@ class TestShortcutGenerator {
             "WFWorkflowTypes": ["NCWidget", "WatchKit"]
         ]
 
-        let workflowData = try JSONSerialization.data(withJSONObject: workflow, options: .prettyPrinted)
-        try workflowData.write(to: workflowFile)
+        let shortcutData = try PropertyListSerialization.data(
+            fromPropertyList: shortcut,
+            format: .binary,
+            options: 0
+        )
+        try shortcutData.write(to: shortcutFile)
 
-        logger.info("Created workflow file at \(workflowFile.path)")
+        logger.info("Created shortcut file at \(shortcutFile.path)")
 
-        // Sign the workflow using shortcuts command
+        // Sign the shortcut using shortcuts command
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
-        process.arguments = ["sign", "--input", workflowFile.path, "--output", self.shortcutsDirectory.appendingPathComponent("Focally Start Focus.shortcut").path]
+        process.arguments = ["sign", "--mode", "anyone", "--input", shortcutFile.path, "--output", self.shortcutsDirectory.appendingPathComponent("Focally Start Focus.shortcut").path]
 
         let outputPipe = Pipe()
         let errorPipe = Pipe()
@@ -125,16 +130,16 @@ class TestShortcutGenerator {
         }
 
         // Clean up temp file
-        try? fileManager.removeItem(at: workflowFile)
+        try? fileManager.removeItem(at: shortcutFile)
     }
 
     private func generateFocusOffShortcut() throws {
-        // Create temporary workflow file
+        // Create temporary .shortcut file with binary plist format
         let tempDir = fileManager.temporaryDirectory
-        let workflowFile = tempDir.appendingPathComponent("focally_focus_off.workflow")
+        let shortcutFile = tempDir.appendingPathComponent("focally_focus_off.shortcut")
 
-        // Create workflow JSON
-        let workflow: [String: Any] = [
+        // Create shortcut plist
+        let shortcut: [String: Any] = [
             "WFWorkflowActions": [
                 [
                     "WFWorkflowActionIdentifier": "is.workflow.actions.dnd.set",
@@ -150,6 +155,7 @@ class TestShortcutGenerator {
                 ]
             ],
             "WFWorkflowClientVersion": "2605.0.5",
+            "WFWorkflowName": "Focally End Focus",
             "WFWorkflowIcon": [
                 "WFWorkflowIconStartColor": 2077030912,
                 "WFWorkflowIconGlyphNumber": 61440
@@ -159,15 +165,19 @@ class TestShortcutGenerator {
             "WFWorkflowTypes": ["NCWidget", "WatchKit"]
         ]
 
-        let workflowData = try JSONSerialization.data(withJSONObject: workflow, options: .prettyPrinted)
-        try workflowData.write(to: workflowFile)
+        let shortcutData = try PropertyListSerialization.data(
+            fromPropertyList: shortcut,
+            format: .binary,
+            options: 0
+        )
+        try shortcutData.write(to: shortcutFile)
 
-        logger.info("Created workflow file at \(workflowFile.path)")
+        logger.info("Created shortcut file at \(shortcutFile.path)")
 
-        // Sign the workflow using shortcuts command
+        // Sign the shortcut using shortcuts command
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
-        process.arguments = ["sign", "--input", workflowFile.path, "--output", self.shortcutsDirectory.appendingPathComponent("Focally End Focus.shortcut").path]
+        process.arguments = ["sign", "--mode", "anyone", "--input", shortcutFile.path, "--output", self.shortcutsDirectory.appendingPathComponent("Focally End Focus.shortcut").path]
 
         let outputPipe = Pipe()
         let errorPipe = Pipe()
@@ -188,6 +198,6 @@ class TestShortcutGenerator {
         }
 
         // Clean up temp file
-        try? fileManager.removeItem(at: workflowFile)
+        try? fileManager.removeItem(at: shortcutFile)
     }
 }
