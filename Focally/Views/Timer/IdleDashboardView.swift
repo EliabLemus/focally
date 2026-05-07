@@ -1,10 +1,14 @@
 import SwiftUI
 
 struct IdleDashboardView: View {
-    @EnvironmentObject var timerService: FocusTimerService
-    @EnvironmentObject var dndService: DNDService
+    @EnvironmentObject private var timerService: FocusTimerService
+    @EnvironmentObject private var dndService: DNDService
+    @EnvironmentObject private var predefinedTaskStore: PredefinedTaskStore
+    @EnvironmentObject private var slackService: SlackService
 
-    let onStartSession: () -> Void
+    @State private var taskInput: String = ""
+    @State private var selectedEmoji: String = FocusStatusOption.common[0].emoji
+    @State private var selectedDuration: Int = 25
 
     var body: some View {
         GeometryReader { geometry in
@@ -39,6 +43,7 @@ struct IdleDashboardView: View {
             }
         }
         .background(Color.focallyBackground)
+        .onAppear(perform: syncFromService)
     }
 
     private var headerRow: some View {
@@ -47,11 +52,11 @@ struct IdleDashboardView: View {
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyPrimary)
 
-            Text("Set the next deep work block and begin with one clear action.")
+            Text("Start the next block without digging through settings.")
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("Everything here reflects your real timer and focus settings—no filler, just the next session at a glance.")
+            Text("Pick the task, pick the status, choose the time, and go.")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
@@ -66,12 +71,12 @@ struct IdleDashboardView: View {
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyPrimary)
 
-                    Text(timerService.currentActivity.isEmpty ? "Deep work block" : timerService.currentActivity)
+                    Text("Custom focus block")
                         .font(.system(size: 30, weight: .semibold, design: .default))
                         .foregroundStyle(Color.focallyOnSurface)
                         .lineLimit(2)
 
-                    Text(timerService.currentActivity.isEmpty ? "Use your saved duration and launch straight into focused time." : "Your saved activity is ready to start with the current timer settings.")
+                    Text("This starts with your chosen duration and the same quiet-mode automation the timer uses everywhere else.")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                         .fixedSize(horizontal: false, vertical: true)
@@ -79,57 +84,75 @@ struct IdleDashboardView: View {
 
                 Spacer(minLength: 16)
 
-                statusBadge(
-                    title: dndService.isDNDActive ? "Focus active" : "Focus ready",
-                    systemImage: dndService.isDNDActive ? "moon.fill" : "sparkles"
-                )
+                statusBadge(title: focusBadgeTitle, systemImage: focusBadgeIcon)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(configuredTimeString)
-                    .font(.system(size: 92, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color.focallyOnSurface)
-                    .monospacedDigit()
-                    .minimumScaleFactor(0.7)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    CompactStatusEmojiButton(selection: $selectedEmoji, options: FocusStatusOption.common)
 
-                Text("Configured work duration")
+                    TextField("What are you focusing on?", text: $taskInput)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                Text(slackStatusSummary)
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                DurationControl(minutes: $selectedDuration, range: 5...180, step: 5)
             }
 
             HStack(spacing: 12) {
-                metricPill(systemImage: "timer", title: "Work", value: "\(timerService.workDurationMinutes)m")
+                metricPill(systemImage: "timer", title: "Work", value: "\(selectedDuration)m")
                 metricPill(systemImage: "cup.and.saucer.fill", title: "Break", value: "\(timerService.shortBreakDurationMinutes)m")
                 metricPill(systemImage: "repeat", title: "Cycle", value: "\(timerService.roundsUntilLongBreak) rounds")
             }
 
-            Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 12) {
+                    Button(action: startSession) {
+                        Label("Start focus session", systemImage: "play.fill")
+                            .font(.focallyBodyBold)
+                            .foregroundStyle(Color.focallyOnPrimary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.focallyPrimary)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Start focus session")
 
-            HStack(spacing: 12) {
-                Button(action: onStartSession) {
-                    Label("Start focus session", systemImage: "play.fill")
-                        .font(.focallyBodyBold)
-                        .foregroundStyle(Color.focallyOnPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color.focallyPrimary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Auto-start breaks")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyOnSurfaceVariant)
+                        Text(timerService.isAutoStartEnabled ? "Enabled" : "Manual")
+                            .font(.focallyBodyBold)
+                            .foregroundStyle(Color.focallyOnSurface)
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(minWidth: 148, minHeight: 52, alignment: .leading)
+                    .background(Color.focallySurfaceContainerLowest.opacity(0.72))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Start focus session")
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Auto-start breaks")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                    Text(timerService.isAutoStartEnabled ? "Enabled" : "Manual")
-                        .font(.focallyBodyBold)
-                        .foregroundStyle(Color.focallyOnSurface)
+                pomodoroCard
+
+                if !predefinedTaskStore.tasks.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Or launch a saved preset")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 10)], spacing: 10) {
+                            ForEach(predefinedTaskStore.tasks.prefix(4)) { task in
+                                PredefinedTaskQuickButton(task: task) {
+                                    start(task: task)
+                                }
+                            }
+                        }
+                    }
                 }
-                .padding(.horizontal, 14)
-                .frame(minWidth: 148, minHeight: 52, alignment: .leading)
-                .background(Color.focallySurfaceContainerLowest.opacity(0.72))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
         .padding(28)
@@ -199,12 +222,76 @@ struct IdleDashboardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
-    private var configuredTimeString: String {
-        if timerService.hasSession {
-            return timerService.remainingTimeString
+    private func syncFromService() {
+        if taskInput.isEmpty {
+            taskInput = timerService.currentActivity
         }
+        selectedEmoji = timerService.currentEmoji
+        selectedDuration = timerService.workDurationMinutes
+        slackService.refreshEmojiCatalogIfPossible()
+    }
 
-        return String(format: "%d:00", timerService.workDurationMinutes)
+    private func startSession() {
+        let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        let activity = trimmed.isEmpty ? "Focus Session" : trimmed
+        timerService.updateWorkDuration(minutes: selectedDuration)
+        timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration)
+    }
+
+    private func start(task: PredefinedTask) {
+        timerService.updateWorkDuration(minutes: task.durationMinutes)
+        timerService.startWorkSession(activity: task.name, emoji: task.emoji, durationMinutes: task.durationMinutes)
+    }
+
+    private func startPomodoro() {
+        let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        let activity = trimmed.isEmpty ? "Pomodoro" : trimmed
+        timerService.startPomodoroSession(activity: activity, emoji: selectedEmoji)
+    }
+
+    private var pomodoroCard: some View {
+        HStack(spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Pomodoro")
+                    .font(.focallyBodyBold)
+                    .foregroundStyle(Color.focallyOnSurface)
+                Text("Classic 25 · 5 · 15 cadence with 4 rounds. Quick Session stays free-form.")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+            }
+
+            Spacer()
+
+            Button(action: startPomodoro) {
+                Label("Start Pomodoro", systemImage: "timer")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyPrimary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background(Color.focallySurfaceContainerLowest.opacity(0.72))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private var focusBadgeTitle: String {
+        if timerService.isPaused {
+            return "Notifications live"
+        }
+        return dndService.isDNDActive ? "Focus active" : "Focus ready"
+    }
+
+    private var focusBadgeIcon: String {
+        if timerService.isPaused {
+            return "bell.badge"
+        }
+        return dndService.isDNDActive ? "moon.fill" : "sparkles"
+    }
+
+    private var slackStatusSummary: String {
+        CompactStatusEmojiButton.isSlackShortcode(selectedEmoji)
+            ? "Slack status will use \(selectedEmoji)."
+            : "Slack status will use \(selectedEmoji)."
     }
 }
 
@@ -284,8 +371,8 @@ private extension IdleDashboardView {
                 VStack(spacing: 12) {
                     statusRow(
                         title: "Do Not Disturb",
-                        value: dndService.isDNDActive ? "Currently on" : "Will activate on start",
-                        icon: dndService.isDNDActive ? "moon.fill" : "moon.zzz.fill"
+                        value: timerService.isPaused ? "Paused, notifications can come through" : (dndService.isDNDActive ? "Currently on" : "Will activate on start"),
+                        icon: timerService.isPaused ? "bell.badge" : (dndService.isDNDActive ? "moon.fill" : "moon.zzz.fill")
                     )
 
                     statusRow(

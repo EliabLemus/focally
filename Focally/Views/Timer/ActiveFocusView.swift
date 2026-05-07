@@ -74,7 +74,7 @@ struct ActiveFocusView: View {
                     .frame(maxWidth: 760)
 
                 Text(timerService.isPaused
-                     ? "Your session is paused. Resume when you're ready to continue the block."
+                     ? "Your session is paused. Notifications can come in again until you resume."
                      : "Stay with the current block. The timer, controls, and next milestone are all here.")
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
@@ -159,7 +159,7 @@ struct ActiveFocusView: View {
         ) {
             VStack(alignment: .leading, spacing: 10) {
                 supportMetric(title: "System status", value: dndService.isDNDActive ? "Do Not Disturb is active" : "Do Not Disturb is off")
-                supportMetric(title: "Session state", value: timerService.isPaused ? "Paused" : "Running")
+                supportMetric(title: "Session state", value: timerService.isPaused ? "Paused · notifications are back" : "Running")
                 supportMetric(title: "When this ends", value: nextBreakSummary)
             }
         }

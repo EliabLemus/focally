@@ -5,6 +5,7 @@ import os.log
 class SlackService: ObservableObject {
     static let defaultStatusEmoji = ":hourglass_flowing_sand:"
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
+    static let emojiListURL = URL(string: "https://slack.com/api/emoji.list")!
 
     @Published var isEnabled = false {
         didSet {
@@ -14,6 +15,7 @@ class SlackService: ObservableObject {
     @Published var isConnected = false
     @Published var connectionError: String?
     @Published var lastStatusText: String?
+    @Published var workspaceEmojiCodes: [String] = []
 
     private let keychainKey = "slack-token"
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "SlackService")
@@ -170,6 +172,42 @@ class SlackService: ObservableObject {
         if token != nil {
             // Don't auto-test, just mark as potentially connected
             self.isConnected = true
+            refreshEmojiCatalogIfPossible()
+        }
+    }
+
+    func refreshEmojiCatalogIfPossible() {
+        guard let token, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            workspaceEmojiCodes = []
+            return
+        }
+
+        guard let request = makeSlackRequest(url: Self.emojiListURL, token: token, formFields: [:]) else {
+            return
+        }
+
+        performSlackRequest(request) { [weak self] data, _, error in
+            guard let self else { return }
+
+            if let error {
+                self.logger.error("Slack emoji.list request failed: \(error.localizedDescription, privacy: .public)")
+                return
+            }
+
+            guard let json = self.decodeSlackResponseBody(data),
+                  let ok = json["ok"] as? Bool,
+                  ok,
+                  let emojiMap = json["emoji"] as? [String: String] else {
+                return
+            }
+
+            let codes = emojiMap.keys
+                .map { ":\($0):" }
+                .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+
+            DispatchQueue.main.async {
+                self.workspaceEmojiCodes = codes
+            }
         }
     }
 
@@ -212,6 +250,7 @@ class SlackService: ObservableObject {
                     if token.hasPrefix("xoxp-") {
                         self?.isConnected = true
                         self?.connectionError = nil
+                        self?.refreshEmojiCatalogIfPossible()
                         self?.logger.info("Slack auth.test succeeded for a user token")
                     } else {
                         self?.isConnected = false

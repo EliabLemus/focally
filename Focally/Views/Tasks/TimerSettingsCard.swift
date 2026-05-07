@@ -149,6 +149,8 @@ struct TimerInputRow: View {
 }
 
 struct FocusModeCard: View {
+    @EnvironmentObject private var timerService: FocusTimerService
+
     var body: some View {
         VStack(spacing: 0) {
             // Gradient background
@@ -161,13 +163,23 @@ struct FocusModeCard: View {
             .cornerRadius(12)
 
             // Content
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Flow Mode")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Pomodoro Mode")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
-                Text("Optimized for knowledge work.")
+                Text("Quick Session stays custom. Pomodoro keeps a predictable cadence.")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
+                Text("\(timerService.workDurationMinutes)m focus · \(timerService.shortBreakDurationMinutes)m short break · \(timerService.roundsUntilLongBreak) rounds")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.9))
+
+                Button("Use classic 25/5/15") {
+                    timerService.configurePomodoroPreset()
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white)
             }
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)

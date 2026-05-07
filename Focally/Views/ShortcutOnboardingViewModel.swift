@@ -104,9 +104,8 @@ final class ShortcutOnboardingViewModel: ObservableObject {
         generationError = nil
 
         focusIntegrationService.isEnabled = true
-        focusIntegrationService.mode = .directDND
         isPreparingIntegration = false
-        logger.info("Prepared direct DND mode")
+        logger.info("Prepared focus integration")
     }
 
     func prepareManagedShortcuts() {
@@ -142,7 +141,6 @@ final class ShortcutOnboardingViewModel: ObservableObject {
         allShortcutsVerified = false
         generationError = nil
 
-        focusIntegrationService.mode = .directDND
         focusIntegrationService.runNativeShortcutTest(.start)
         let startSucceeded = focusIntegrationService.lastError == nil && focusIntegrationService.isFocusActive
 

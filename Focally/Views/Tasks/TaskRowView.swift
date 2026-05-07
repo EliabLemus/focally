@@ -2,17 +2,22 @@ import SwiftUI
 
 struct TaskRowView: View {
     let task: PredefinedTask
+    let onStart: () -> Void
+    let onEdit: () -> Void
+    let onDelete: () -> Void
+
     @State private var isHovered = false
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(hex: task.iconBgColor))
-                .frame(width: 32, height: 32)
+            Text(task.emoji)
+                .font(.system(size: 18))
+                .frame(width: 40, height: 40)
+                .background(Color(hex: task.iconBgColor))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay {
-                    Image(systemName: task.icon)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color(hex: task.iconFgColor))
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color(hex: task.iconFgColor).opacity(0.24), lineWidth: 1)
                 }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -20,22 +25,33 @@ struct TaskRowView: View {
                     .font(.focallyBodyBold)
                     .foregroundStyle(Color.focallyOnSurface)
 
-                Text("\(task.durationMinutes)m • \(task.cycles) cycles")
+                Text("\(task.durationMinutes)m • \(task.cycles) cycle\(task.cycles == 1 ? "" : "s")")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }
 
             Spacer()
 
+            Button(action: onStart) {
+                Text("Start")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnPrimary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.focallyPrimary)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+
             HStack(spacing: 4) {
-                Button(action: {}) {
+                Button(action: onEdit) {
                     Image(systemName: "pencil")
                         .font(.system(size: 14))
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
                 .buttonStyle(.plain)
 
-                Button(action: {}) {
+                Button(action: onDelete) {
                     Image(systemName: "trash")
                         .font(.system(size: 14))
                         .foregroundStyle(Color.focallyError)

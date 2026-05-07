@@ -3,6 +3,7 @@ import SwiftUI
 struct TimerPage: View {
     @EnvironmentObject var timerService: FocusTimerService
     @EnvironmentObject var dndService: DNDService
+    @EnvironmentObject var predefinedTaskStore: PredefinedTaskStore
 
     var body: some View {
         Group {
@@ -11,25 +12,10 @@ struct TimerPage: View {
                     .environmentObject(timerService)
                     .environmentObject(dndService)
             } else {
-                IdleDashboardView(
-                    onStartSession: {
-                        if timerService.currentActivity.isEmpty {
-                            timerService.startWorkSession(
-                                activity: "Focus Session",
-                                emoji: "🍅",
-                                durationMinutes: timerService.workDurationMinutes
-                            )
-                        } else {
-                            timerService.startWorkSession(
-                                activity: timerService.currentActivity,
-                                emoji: timerService.currentEmoji,
-                                durationMinutes: timerService.workDurationMinutes
-                            )
-                        }
-                    }
-                )
-                .environmentObject(timerService)
-                .environmentObject(dndService)
+                IdleDashboardView()
+                    .environmentObject(timerService)
+                    .environmentObject(dndService)
+                    .environmentObject(predefinedTaskStore)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

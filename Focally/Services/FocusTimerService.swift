@@ -11,7 +11,7 @@ class FocusTimerService: ObservableObject {
         static let workDuration = 25
         static let shortBreakDuration = 5
         static let longBreakDuration = 15
-        static let roundsUntilLongBreak = 3
+        static let roundsUntilLongBreak = 4
         static let autoStartBreaks = true
     }
 
@@ -130,6 +130,30 @@ class FocusTimerService: ObservableObject {
         saveSettings()
     }
 
+    func updateRoundsUntilLongBreak(_ rounds: Int) {
+        roundsUntilLongBreak = max(1, rounds)
+        saveSettings()
+    }
+
+    func configurePomodoroPreset(workMinutes: Int = TimerDefaults.workDuration,
+                                 shortBreakMinutes: Int = TimerDefaults.shortBreakDuration,
+                                 longBreakMinutes: Int = TimerDefaults.longBreakDuration,
+                                 rounds: Int = TimerDefaults.roundsUntilLongBreak,
+                                 autoStart: Bool = TimerDefaults.autoStartBreaks) {
+        workDurationMinutes = clampDuration(workMinutes)
+        shortBreakDurationMinutes = clampDuration(shortBreakMinutes)
+        longBreakDurationMinutes = clampDuration(longBreakMinutes)
+        roundsUntilLongBreak = max(1, rounds)
+        isAutoStartEnabled = autoStart
+        durationMinutes = workDurationMinutes
+        saveSettings()
+    }
+
+    func startPomodoroSession(activity: String, emoji: String = "🍅") {
+        configurePomodoroPreset()
+        startWorkSession(activity: activity, emoji: emoji, durationMinutes: workDurationMinutes)
+    }
+
     private func saveLastUsed(activity: String, emoji: String, duration: Int) {
         defaults.set(activity, forKey: "lastActivity")
         defaults.set(emoji, forKey: "lastEmoji")
@@ -238,11 +262,13 @@ class FocusTimerService: ObservableObject {
         guard isActive, !isPaused else { return }
         stopTimer()
         isPaused = true
+        deactivateFocusIntegration()
     }
 
     func resumeSession() {
         guard isActive, isPaused else { return }
         isPaused = false
+        activateFocusIntegration()
         startTimer()
     }
 
@@ -443,25 +469,11 @@ class FocusTimerService: ObservableObject {
 
     @MainActor
     private func activateFocusIntegration() {
-        let integration = focusIntegrationService
-
-        if integration.isEnabled {
-            integration.activateFocus()
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.dndService.activateDND()
-            }
-        }
+        focusIntegrationService.activateFocus()
     }
 
     @MainActor
     private func deactivateFocusIntegration() {
-        let integration = focusIntegrationService
-
-        if integration.isEnabled {
-            integration.deactivateFocus()
-        } else {
-            dndService.deactivateDND()
-        }
+        focusIntegrationService.deactivateFocus()
     }
 }

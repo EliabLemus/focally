@@ -49,12 +49,10 @@ struct MainWindow: View {
             TimerPage()
         case .tasks:
             TasksPage()
-        case .schedule:
-            SchedulePage()
-        case .analytics:
-            AnalyticsPage()
         case .settings:
             SettingsPage()
+        case .schedule, .analytics:
+            TimerPage()
         }
     }
 

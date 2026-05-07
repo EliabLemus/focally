@@ -94,7 +94,7 @@ struct SettingsPage: View {
                         Spacer()
 
                         Button(action: openShortcutSetup) {
-                            Text("Open Focus Setup Guide")
+                            Text("Open Focus Shortcuts Guide")
                                 .font(.focallyButton)
                                 .foregroundStyle(Color.focallyOnPrimary)
                                 .padding(.horizontal, FocallySpacing.md)

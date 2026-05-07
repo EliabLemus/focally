@@ -7,6 +7,8 @@ enum FocallyTab: String, CaseIterable, Identifiable {
     case analytics = "Analytics"
     case settings = "Settings"
 
+    static let visibleTabs: [FocallyTab] = [.timer, .tasks, .settings]
+
     var id: String { rawValue }
 
     var icon: String {
@@ -20,12 +22,6 @@ enum FocallyTab: String, CaseIterable, Identifiable {
     }
 
     var activeIcon: String {
-        switch self {
-        case .timer: return "timer"
-        case .tasks: return "checklist"
-        case .schedule: return "calendar"
-        case .analytics: return "chart.bar.fill"
-        case .settings: return "gearshape"
-        }
+        icon
     }
 }

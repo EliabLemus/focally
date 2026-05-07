@@ -21,7 +21,7 @@ struct TasksPage: View {
                 .padding(.horizontal, FocallySpacing.lg)
                 .padding(.top, FocallySpacing.lg)
 
-                Text("Manage your focus sessions and predefined activities.")
+                Text("Manage free-form focus sessions, Pomodoro defaults, and saved activities.")
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOutline)
                     .padding(.horizontal, FocallySpacing.lg)

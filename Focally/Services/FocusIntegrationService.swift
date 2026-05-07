@@ -1,6 +1,5 @@
 import AppIntents
 import Foundation
-import Combine
 import os.log
 
 // MARK: - Focus Integration Mode
@@ -14,7 +13,7 @@ enum FocusIntegrationMode: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .directDND: return "Direct System DND"
-        case .appShortcuts: return "Managed Shortcuts"
+        case .appShortcuts: return "Focus Shortcuts"
         }
     }
 
@@ -58,6 +57,7 @@ final class FocusIntegrationService: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "FocusIntegrationService")
     private let defaults = UserDefaults.standard
     private let managedShortcutsService = ManagedFocusShortcutsService.shared
+    private let directDNDService = DNDService()
 
     private static let kMode = "focusIntegrationMode"
     private static let kEnabled = "focusIntegrationEnabled"
@@ -72,9 +72,11 @@ final class FocusIntegrationService: ObservableObject {
 
     @Published var lastError: FocusIntegrationError?
     @Published var isFocusActive: Bool = false
+    @Published var lastShortcutIssue: String?
 
     private init() {
-        self.isEnabled = defaults.object(forKey: Self.kEnabled) as? Bool ?? false
+        self.isEnabled = true
+        defaults.set(true, forKey: Self.kEnabled)
 
         let storedMode = defaults.string(forKey: Self.kMode)
         switch storedMode {
@@ -88,46 +90,17 @@ final class FocusIntegrationService: ObservableObject {
     }
 
     func activateFocus() {
-        guard isEnabled else {
-            logger.info("Focus integration disabled; skipping activation")
-            return
-        }
-
-        lastError = nil
-
-        switch mode {
-        case .directDND:
-            performDirectFocusAction(.start, source: "direct system DND")
-        case .appShortcuts:
-            performManagedShortcutAction(.start)
-        }
+        performCombinedFocusAction(.start)
     }
 
     func deactivateFocus() {
-        guard isEnabled else {
-            logger.info("Focus integration disabled; skipping deactivation")
-            return
-        }
-
-        lastError = nil
-
-        switch mode {
-        case .directDND:
-            performDirectFocusAction(.end, source: "direct system DND")
-        case .appShortcuts:
-            performManagedShortcutAction(.end)
-        }
+        performCombinedFocusAction(.end)
     }
 
     func runNativeShortcutTest(_ action: FocusIntegrationAction) {
         lastError = nil
-
-        switch mode {
-        case .directDND:
-            performDirectFocusAction(action, source: "direct system DND")
-        case .appShortcuts:
-            performManagedShortcutAction(action)
-        }
+        lastShortcutIssue = nil
+        performDirectFocusAction(action, source: "manual test")
     }
 
     static func performFromAppIntent(_ action: FocusIntegrationAction) async throws {
@@ -140,52 +113,56 @@ final class FocusIntegrationService: ObservableObject {
         }
     }
 
+    var isUsingShortcutsAutomation: Bool {
+        isEnabled && managedShortcutsService.allManagedShortcutsInstalled
+    }
+
+    var statusText: String {
+        if let error = lastError {
+            return error.localizedDescription
+        }
+        if isFocusActive {
+            if let lastShortcutIssue, !lastShortcutIssue.isEmpty {
+                return "Do Not Disturb active. Shortcuts backup needs attention."
+            }
+            return "Do Not Disturb active and shortcuts were attempted."
+        }
+        if managedShortcutsService.allManagedShortcutsInstalled {
+            return "Ready. Focally will try direct Do Not Disturb and Focus Shortcuts together."
+        }
+        return "Ready. Focally will turn on quiet mode directly and also try the bundled Focus Shortcuts."
+    }
+
+    private func performCombinedFocusAction(_ action: FocusIntegrationAction) {
+        lastError = nil
+        lastShortcutIssue = nil
+
+        performDirectFocusAction(action, source: "direct system DND")
+        attemptManagedShortcutAction(action)
+    }
+
     private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String) {
         switch action {
         case .start:
-            DNDService().activateDND()
+            directDNDService.activateDND()
             isFocusActive = true
             logger.info("Focus activated via \(source, privacy: .public)")
         case .end:
-            DNDService().deactivateDND()
+            directDNDService.deactivateDND()
             isFocusActive = false
             logger.info("Focus deactivated via \(source, privacy: .public)")
         }
     }
 
-    private func performManagedShortcutAction(_ action: FocusIntegrationAction) {
+    private func attemptManagedShortcutAction(_ action: FocusIntegrationAction) {
         do {
             try managedShortcutsService.runShortcut(for: action)
-            isFocusActive = action == .start
-            logger.info("Focus \(action == .start ? "activated" : "deactivated", privacy: .public) via managed shortcuts")
+            logger.info("Managed shortcut backup succeeded for \(action == .start ? "start" : "end", privacy: .public)")
         } catch {
-            isFocusActive = false
-            lastError = .managedShortcutsUnavailable(error.localizedDescription)
-            logger.error("Managed shortcut execution failed: \(error.localizedDescription, privacy: .public)")
+            let message = error.localizedDescription
+            lastShortcutIssue = message
+            logger.error("Managed shortcut backup failed: \(message, privacy: .public)")
         }
-    }
-
-    var isUsingShortcutsAutomation: Bool {
-        isEnabled && mode == .appShortcuts
-    }
-
-    var statusText: String {
-        if !isEnabled {
-            return "Disabled"
-        }
-        if let error = lastError {
-            return error.localizedDescription
-        }
-        if mode == .appShortcuts {
-            if managedShortcutsService.allManagedShortcutsInstalled {
-                return isFocusActive ? "Managed shortcuts ran successfully" : "Managed shortcuts installed and ready"
-            }
-            return managedShortcutsService.setupSummary
-        }
-        if isFocusActive {
-            return "Do Not Disturb Active"
-        }
-        return "Ready to turn on system DND"
     }
 }
 
