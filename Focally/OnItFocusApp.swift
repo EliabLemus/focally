@@ -14,6 +14,7 @@ struct FocallyApp: App {
     }
 }
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "AppDelegate")
     private var statusItem: NSStatusItem?
@@ -23,13 +24,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var onboardingWindow: NSWindow?
     private var themeObserver: NSObjectProtocol?
     let dndService = DNDService()
-    let focusIntegrationService = FocusIntegrationService()
+    let focusIntegrationService = FocusIntegrationService.shared
     let slackService = SlackService()
     let calendarService = GoogleCalendarService()
     let notificationService = NotificationService()
     let historyService = HistoryService.shared
     let shortcutDropHandler = ShortcutDropHandler()
-    let testShortcutGenerator = TestShortcutGenerator()
+    let managedShortcutsService = ManagedFocusShortcutsService.shared
     private lazy var timerService = FocusTimerService(
         soundPlayer: .shared,
         notificationService: notificationService,
@@ -43,9 +44,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Show onboarding if not completed
         showOnboardingIfNeeded()
-
-        // Generate test shortcuts on first launch (legacy, kept for compatibility)
-        generateTestShortcutsIfNeeded()
 
         applySavedTheme()
         notificationService.requestAuthorization()
@@ -71,6 +69,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(calendarService)
             .environmentObject(historyService)
             .environmentObject(shortcutDropHandler)
+            .environmentObject(managedShortcutsService)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
         applySavedTheme()
@@ -106,6 +105,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self,
             selector: #selector(onSessionEnded),
             name: .focusSessionEnded,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(openShortcutOnboarding),
+            name: .focusOpenShortcutOnboarding,
             object: nil
         )
 
@@ -253,6 +258,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(calendarService)
             .environmentObject(historyService)
             .environmentObject(shortcutDropHandler)
+            .environmentObject(managedShortcutsService)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
         let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
@@ -266,6 +272,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.makeKeyAndOrderFront(nil as Any?)
         window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc func openShortcutOnboarding() {
+        if popover?.isShown == true {
+            popover?.performClose(nil)
+        }
+
+        if let onboardingWindow {
+            onboardingWindow.makeKeyAndOrderFront(nil)
+            onboardingWindow.orderFrontRegardless()
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        showOnboardingWindow()
     }
 
     @objc func quitApp() {
@@ -344,7 +365,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        logger.info("Showing shortcuts onboarding")
+        logger.info("Showing focus integration onboarding")
 
         // Delay slightly to allow the app to fully launch
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
@@ -353,8 +374,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showOnboardingWindow() {
+        if let onboardingWindow {
+            onboardingWindow.makeKeyAndOrderFront(nil)
+            onboardingWindow.orderFrontRegardless()
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
         let onboardingView = ShortcutOnboardingView(
-            testShortcutGenerator: testShortcutGenerator,
+            managedShortcutsService: managedShortcutsService,
             focusIntegrationService: focusIntegrationService
         )
 
@@ -364,7 +392,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Focally Shortcuts Setup"
+        window.title = "Focally Focus Integration Setup"
         window.isReleasedWhenClosed = false
         window.center()
 
@@ -377,23 +405,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         onboardingWindow = window
         applySavedTheme()
-    }
-
-    // MARK: - Test Shortcuts
-
-    private func generateTestShortcutsIfNeeded() {
-        let key = "FocallyTestShortcutsGenerated"
-        let hasGenerated = UserDefaults.standard.bool(forKey: key)
-
-        guard !hasGenerated else { return }
-
-        do {
-            try testShortcutGenerator.generateAllTestShortcuts()
-            UserDefaults.standard.set(true, forKey: key)
-            logger.info("✅ Test shortcuts generated successfully")
-        } catch {
-            logger.error("Failed to generate test shortcuts: \(error.localizedDescription, privacy: .public)")
-        }
     }
 
     private func presentCalendarConflictIfNeeded() {
@@ -424,4 +435,5 @@ extension Notification.Name {
     static let focusSessionStarted = Notification.Name("focusSessionStarted")
     static let focusSessionEnded = Notification.Name("focusSessionEnded")
     static let focusNavigateToSettings = Notification.Name("focusNavigateToSettings")
+    static let focusOpenShortcutOnboarding = Notification.Name("focusOpenShortcutOnboarding")
 }

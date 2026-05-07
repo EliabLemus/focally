@@ -1,3 +1,4 @@
+import AppIntents
 import Foundation
 import Combine
 import os.log
@@ -5,107 +6,100 @@ import os.log
 // MARK: - Focus Integration Mode
 
 enum FocusIntegrationMode: String, CaseIterable, Identifiable {
-    case shortcuts = "shortcuts"
-    case legacyDND = "legacyDND"
+    case directDND = "directDND"
+    case appShortcuts = "appShortcuts"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .shortcuts: return "Apple Focus / Shortcuts"
-        case .legacyDND: return "Legacy DND Fallback"
+        case .directDND: return "Direct System DND"
+        case .appShortcuts: return "Managed Shortcuts"
         }
     }
 
-    var isRecommended: Bool { self == .shortcuts }
+    var isRecommended: Bool { self == .directDND }
 }
 
 // MARK: - Focus Integration Error
 
 enum FocusIntegrationError: Error, LocalizedError {
-    case shortcutNotFound(String)
-    case shortcutExecutionFailed(String)
+    case nativeIntegrationUnavailable
+    case managedShortcutsUnavailable(String)
     case processError(String)
 
     var errorDescription: String? {
         switch self {
-        case .shortcutNotFound(let name):
-            return "Shortcut \"\(name)\" not found. Create it in the Shortcuts app."
-        case .shortcutExecutionFailed(let detail):
-            return "Shortcut execution failed: \(detail)"
+        case .nativeIntegrationUnavailable:
+            return "Focally couldn't update system Do Not Disturb with the current focus integration."
+        case .managedShortcutsUnavailable(let detail):
+            return detail
         case .processError(let detail):
             return "System error: \(detail)"
         }
     }
 }
 
+// MARK: - Focus Integration Action
+
+enum FocusIntegrationAction {
+    case start
+    case end
+}
+
 // MARK: - Focus Integration Service
 
-class FocusIntegrationService: ObservableObject {
+@MainActor
+final class FocusIntegrationService: ObservableObject {
+    static let shared = FocusIntegrationService()
+    static let startActionName = "Start Focus"
+    static let endActionName = "End Focus"
+
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "FocusIntegrationService")
     private let defaults = UserDefaults.standard
+    private let managedShortcutsService = ManagedFocusShortcutsService.shared
 
-    // Keys
     private static let kMode = "focusIntegrationMode"
     private static let kEnabled = "focusIntegrationEnabled"
-    private static let kStartShortcut = "focusStartShortcutName"
-    private static let kEndShortcut = "focusEndShortcutName"
 
-    // Published state
     @Published var isEnabled: Bool {
         didSet { defaults.set(isEnabled, forKey: Self.kEnabled) }
     }
+
     @Published var mode: FocusIntegrationMode {
         didSet { defaults.set(mode.rawValue, forKey: Self.kMode) }
     }
-    @Published var startShortcutName: String {
-        didSet { defaults.set(startShortcutName, forKey: Self.kStartShortcut) }
-    }
-    @Published var endShortcutName: String {
-        didSet { defaults.set(endShortcutName, forKey: Self.kEndShortcut) }
-    }
+
     @Published var lastError: FocusIntegrationError?
     @Published var isFocusActive: Bool = false
 
-    // Default shortcut names
-    static let defaultStartShortcut = "Focally Start Focus"
-    static let defaultEndShortcut = "Focally End Focus"
-
-    init() {
+    private init() {
         self.isEnabled = defaults.object(forKey: Self.kEnabled) as? Bool ?? false
-        let rawMode = defaults.string(forKey: Self.kMode) ?? FocusIntegrationMode.shortcuts.rawValue
-        self.mode = FocusIntegrationMode(rawValue: rawMode) ?? .shortcuts
-        self.startShortcutName = defaults.string(forKey: Self.kStartShortcut) ?? Self.defaultStartShortcut
-        self.endShortcutName = defaults.string(forKey: Self.kEndShortcut) ?? Self.defaultEndShortcut
-    }
 
-    // MARK: - Activation / Deactivation
+        let storedMode = defaults.string(forKey: Self.kMode)
+        switch storedMode {
+        case FocusIntegrationMode.directDND.rawValue, "legacyDND", "shortcuts", nil:
+            self.mode = .directDND
+        case FocusIntegrationMode.appShortcuts.rawValue:
+            self.mode = .appShortcuts
+        default:
+            self.mode = .directDND
+        }
+    }
 
     func activateFocus() {
         guard isEnabled else {
             logger.info("Focus integration disabled; skipping activation")
             return
         }
+
         lastError = nil
 
         switch mode {
-        case .shortcuts:
-            runShortcut(named: startShortcutName) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success:
-                        self?.isFocusActive = true
-                        self?.logger.info("Focus activated via Shortcuts")
-                    case .failure(let error):
-                        self?.lastError = error
-                        self?.logger.error("Focus activation failed: \(error.localizedDescription)")
-                    }
-                }
-            }
-        case .legacyDND:
-            // Legacy mode is handled by DNDService directly
-            logger.info("Focus integration set to legacy DND; DNDService handles activation")
-            isFocusActive = true
+        case .directDND:
+            performDirectFocusAction(.start, source: "direct system DND")
+        case .appShortcuts:
+            performManagedShortcutAction(.start)
         }
     }
 
@@ -114,87 +108,67 @@ class FocusIntegrationService: ObservableObject {
             logger.info("Focus integration disabled; skipping deactivation")
             return
         }
+
         lastError = nil
 
         switch mode {
-        case .shortcuts:
-            runShortcut(named: endShortcutName) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success:
-                        self?.isFocusActive = false
-                        self?.logger.info("Focus deactivated via Shortcuts")
-                    case .failure(let error):
-                        self?.lastError = error
-                        self?.logger.error("Focus deactivation failed: \(error.localizedDescription)")
-                    }
-                }
-            }
-        case .legacyDND:
-            logger.info("Focus integration set to legacy DND; DNDService handles deactivation")
+        case .directDND:
+            performDirectFocusAction(.end, source: "direct system DND")
+        case .appShortcuts:
+            performManagedShortcutAction(.end)
+        }
+    }
+
+    func runNativeShortcutTest(_ action: FocusIntegrationAction) {
+        lastError = nil
+
+        switch mode {
+        case .directDND:
+            performDirectFocusAction(action, source: "direct system DND")
+        case .appShortcuts:
+            performManagedShortcutAction(action)
+        }
+    }
+
+    static func performFromAppIntent(_ action: FocusIntegrationAction) async throws {
+        await MainActor.run {
+            FocusIntegrationService.shared.performDirectFocusAction(action, source: "App Intent")
+        }
+
+        if let error = await MainActor.run(body: { FocusIntegrationService.shared.lastError }) {
+            throw error
+        }
+    }
+
+    private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String) {
+        switch action {
+        case .start:
+            DNDService().activateDND()
+            isFocusActive = true
+            logger.info("Focus activated via \(source, privacy: .public)")
+        case .end:
+            DNDService().deactivateDND()
             isFocusActive = false
+            logger.info("Focus deactivated via \(source, privacy: .public)")
         }
     }
 
-    // MARK: - Test Actions
-
-    func testActivation() {
-        activateFocus()
-    }
-
-    func testDeactivation() {
-        deactivateFocus()
-    }
-
-    // MARK: - Shortcuts Execution
-
-    private func runShortcut(named name: String, completion: @escaping (Result<Void, FocusIntegrationError>) -> Void) {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedName.isEmpty else {
-            completion(.failure(.shortcutNotFound(name)))
-            return
-        }
-
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
-        process.arguments = ["run", trimmedName]
-
-        let pipe = Pipe()
-        let errorPipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = errorPipe
-
+    private func performManagedShortcutAction(_ action: FocusIntegrationAction) {
         do {
-            logger.info("Running shortcut: \"\(trimmedName, privacy: .public)\"")
-            try process.run()
-
-            // Use a background thread to wait so we don't block main
-            DispatchQueue.global(qos: .userInitiated).async {
-                process.waitUntilExit()
-
-                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-                let errorMessage = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-
-                if process.terminationStatus == 0 {
-                    completion(.success(()))
-                } else {
-                    let detail = errorMessage.isEmpty ? "Exit code \(process.terminationStatus)" : errorMessage
-                    completion(.failure(.shortcutExecutionFailed(detail)))
-                }
-            }
+            try managedShortcutsService.runShortcut(for: action)
+            isFocusActive = action == .start
+            logger.info("Focus \(action == .start ? "activated" : "deactivated", privacy: .public) via managed shortcuts")
         } catch {
-            completion(.failure(.processError(error.localizedDescription)))
+            isFocusActive = false
+            lastError = .managedShortcutsUnavailable(error.localizedDescription)
+            logger.error("Managed shortcut execution failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
-    // MARK: - Helpers
-
-    /// Whether the shortcuts mode is active and integration is enabled
-    var isUsingShortcuts: Bool {
-        isEnabled && mode == .shortcuts
+    var isUsingShortcutsAutomation: Bool {
+        isEnabled && mode == .appShortcuts
     }
 
-    /// Status text for display in UI
     var statusText: String {
         if !isEnabled {
             return "Disabled"
@@ -202,9 +176,66 @@ class FocusIntegrationService: ObservableObject {
         if let error = lastError {
             return error.localizedDescription
         }
-        if isFocusActive {
-            return mode == .shortcuts ? "Focus Active (Shortcuts)" : "DND Active (Legacy)"
+        if mode == .appShortcuts {
+            if managedShortcutsService.allManagedShortcutsInstalled {
+                return isFocusActive ? "Managed shortcuts ran successfully" : "Managed shortcuts installed and ready"
+            }
+            return managedShortcutsService.setupSummary
         }
-        return mode == .shortcuts ? "Ready (Shortcuts)" : "Ready (Legacy)"
+        if isFocusActive {
+            return "Do Not Disturb Active"
+        }
+        return "Ready to turn on system DND"
+    }
+}
+
+// MARK: - App Intents
+
+@available(macOS 14.0, *)
+struct StartFocusAppIntent: AppIntent {
+    static var title: LocalizedStringResource = "Start Focus"
+    static var description = IntentDescription("Optional automation action that turns on Focally's direct system Do Not Disturb integration from the Shortcuts app.")
+    static var openAppWhenRun: Bool = false
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        try await FocusIntegrationService.performFromAppIntent(.start)
+        return .result(dialog: "Focus started.")
+    }
+}
+
+@available(macOS 14.0, *)
+struct EndFocusAppIntent: AppIntent {
+    static var title: LocalizedStringResource = "End Focus"
+    static var description = IntentDescription("Optional automation action that turns off Focally's direct system Do Not Disturb integration from the Shortcuts app.")
+    static var openAppWhenRun: Bool = false
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        try await FocusIntegrationService.performFromAppIntent(.end)
+        return .result(dialog: "Focus ended.")
+    }
+}
+
+@available(macOS 14.0, *)
+struct FocallyAppShortcutsProvider: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: StartFocusAppIntent(),
+            phrases: [
+                "Start focus with \(.applicationName)",
+                "Turn on focus with \(.applicationName)"
+            ],
+            shortTitle: "Start Focus",
+            systemImageName: "moon.circle.fill"
+        )
+
+        AppShortcut(
+            intent: EndFocusAppIntent(),
+            phrases: [
+                "End focus with \(.applicationName)",
+                "Turn off focus with \(.applicationName)"
+            ],
+            shortTitle: "End Focus",
+            systemImageName: "moon.zzz.fill"
+        )
     }
 }

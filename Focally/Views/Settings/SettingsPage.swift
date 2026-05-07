@@ -22,6 +22,7 @@ enum SettingsSubpage: String, CaseIterable, Identifiable {
 
 struct SettingsPage: View {
     @EnvironmentObject var shortcutDropHandler: ShortcutDropHandler
+    @EnvironmentObject var focusIntegrationService: FocusIntegrationService
     @State private var selectedSubpage: SettingsSubpage = .general
 
     var body: some View {
@@ -86,30 +87,14 @@ struct SettingsPage: View {
 
                     // Footer
                     HStack {
-                        Button(action: {}) {
-                            Text("Reset to Default")
-                                .font(.focallyCaption)
-                                .foregroundStyle(Color.focallyTertiary)
-                        }
-                        .buttonStyle(.plain)
+                        Text("Changes are saved automatically.")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyOutline)
 
                         Spacer()
 
-                        Button(action: {}) {
-                            Text("Cancel")
-                                .font(.focallyButton)
-                                .foregroundStyle(Color.focallyOnSurfaceVariant)
-                                .padding(.horizontal, FocallySpacing.md)
-                                .padding(.vertical, 6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
-                                        .fill(Color.focallySurfaceContainerHigh)
-                                )
-                        }
-                        .buttonStyle(.plain)
-
-                        Button(action: {}) {
-                            Text("Save Changes")
+                        Button(action: openShortcutSetup) {
+                            Text("Open Focus Setup Guide")
                                 .font(.focallyButton)
                                 .foregroundStyle(Color.focallyOnPrimary)
                                 .padding(.horizontal, FocallySpacing.md)
@@ -120,6 +105,7 @@ struct SettingsPage: View {
                                 )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Open Focus Setup Guide")
                     }
                     .padding(.horizontal, FocallySpacing.lg)
                     .padding(.vertical, FocallySpacing.md)
@@ -148,5 +134,10 @@ struct SettingsPage: View {
         case .about:
             AboutSettingsView()
         }
+    }
+
+    private func openShortcutSetup() {
+        selectedSubpage = .integrations
+        NotificationCenter.default.post(name: .focusOpenShortcutOnboarding, object: nil)
     }
 }

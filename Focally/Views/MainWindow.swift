@@ -13,6 +13,21 @@ struct MainWindow: View {
                     Text(selectedTab.rawValue)
                         .font(.focallyH2)
                         .foregroundStyle(Color.focallyOnSurface)
+                } rightContent: {
+                    if selectedTab != .settings {
+                        Button(action: openSettingsTab) {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color.focallyOnSurfaceVariant)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.focallySurfaceContainer)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Open Settings")
+                    }
                 }
 
                 content
@@ -41,5 +56,9 @@ struct MainWindow: View {
         case .settings:
             SettingsPage()
         }
+    }
+
+    private func openSettingsTab() {
+        selectedTab = .settings
     }
 }

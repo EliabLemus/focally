@@ -1,10 +1,15 @@
 import SwiftUI
 
-struct TopBarView<LeftContent: View>: View {
+struct TopBarView<LeftContent: View, RightContent: View>: View {
     let leftContent: LeftContent
+    let rightContent: RightContent
 
-    init(@ViewBuilder leftContent: () -> LeftContent) {
+    init(
+        @ViewBuilder leftContent: () -> LeftContent,
+        @ViewBuilder rightContent: () -> RightContent = { EmptyView() }
+    ) {
         self.leftContent = leftContent()
+        self.rightContent = rightContent()
     }
 
     var body: some View {
@@ -14,33 +19,7 @@ struct TopBarView<LeftContent: View>: View {
 
             Spacer()
 
-            HStack(spacing: 6) {
-                // History button
-                Button(action: {}) {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                        .frame(width: 32, height: 32)
-                        .background(
-                            Circle()
-                                .fill(Color.focallySurfaceContainer)
-                        )
-                }
-                .buttonStyle(.plain)
-
-                // Settings button
-                Button(action: {}) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                        .frame(width: 32, height: 32)
-                        .background(
-                            Circle()
-                                .fill(Color.focallySurfaceContainer)
-                        )
-                }
-                .buttonStyle(.plain)
-            }
+            rightContent
             .padding(.trailing, FocallySpacing.md)
         }
         .frame(height: 48)

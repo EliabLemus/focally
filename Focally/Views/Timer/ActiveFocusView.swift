@@ -71,25 +71,21 @@ struct ActiveFocusView: View {
 
             Spacer()
 
-            HStack(spacing: 8) {
-                Button(action: {}) {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                }
-                .buttonStyle(.plain)
-
-                Button(action: {}) {
+            Button(action: openSettings) {
                     Image(systemName: "gearshape")
                         .font(.system(size: 18))
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
                 .buttonStyle(.plain)
-            }
+                .accessibilityLabel("Open Settings")
         }
         .padding(.horizontal, 24)
         .padding(.top, 8)
         .padding(.bottom, 16)
+    }
+
+    private func openSettings() {
+        NotificationCenter.default.post(name: .focusNavigateToSettings, object: nil)
     }
 
     // MARK: - Badge Row

@@ -4,6 +4,7 @@ import AppKit
 import Foundation
 import os.log
 
+@MainActor
 class FocusTimerService: ObservableObject {
     private enum TimerDefaults {
         static let durationRange = 1...600
@@ -53,7 +54,7 @@ class FocusTimerService: ObservableObject {
          notificationService: NotificationService = NotificationService(),
          historyService: HistoryService = .shared,
          dndService: DNDService = DNDService(),
-         focusIntegrationService: FocusIntegrationService = FocusIntegrationService()) {
+         focusIntegrationService: FocusIntegrationService) {
         self.soundPlayer = soundPlayer
         self.notificationService = notificationService
         self.historyService = historyService
@@ -64,8 +65,6 @@ class FocusTimerService: ObservableObject {
     }
 
     deinit {
-        saveLastSession()
-        savePomodoroState()
         soundPlayer.stopAll()
         timer?.invalidate()
     }
@@ -268,7 +267,9 @@ class FocusTimerService: ObservableObject {
     private func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.tick()
+            Task { @MainActor in
+                self?.tick()
+            }
         }
     }
 
@@ -440,38 +441,25 @@ class FocusTimerService: ObservableObject {
 
     // MARK: - Focus Integration Helpers
 
+    @MainActor
     private func activateFocusIntegration() {
         let integration = focusIntegrationService
 
         if integration.isEnabled {
-            switch integration.mode {
-            case .shortcuts:
-                // Shortcuts mode: let FocusIntegrationService handle it
-                integration.activateFocus()
-            case .legacyDND:
-                // Legacy mode: use DNDService as before
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                    self?.dndService.activateDND()
-                }
-            }
+            integration.activateFocus()
         } else {
-            // Default behavior when integration is disabled: use legacy DND
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.dndService.activateDND()
             }
         }
     }
 
+    @MainActor
     private func deactivateFocusIntegration() {
         let integration = focusIntegrationService
 
         if integration.isEnabled {
-            switch integration.mode {
-            case .shortcuts:
-                integration.deactivateFocus()
-            case .legacyDND:
-                dndService.deactivateDND()
-            }
+            integration.deactivateFocus()
         } else {
             dndService.deactivateDND()
         }

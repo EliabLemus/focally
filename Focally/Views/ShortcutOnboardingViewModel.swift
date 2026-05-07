@@ -18,11 +18,11 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .welcome:
             return "Welcome to Focally"
         case .explanation:
-            return "Apple Shortcuts Integration"
+            return "Direct DND First"
         case .installation:
-            return "Install Test Shortcuts"
+            return "Optional Managed Shortcuts"
         case .verification:
-            return "Verify Shortcuts"
+            return "Verify Your Setup"
         case .completion:
             return "Setup Complete"
         }
@@ -31,15 +31,15 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .welcome:
-            return "Let's set up Apple Shortcuts to enhance your focus sessions."
+            return "Let's enable Focally's focus integration the honest way."
         case .explanation:
-            return "Shortcuts let Focally control Focus modes for a more immersive experience."
+            return "Direct System DND stays the default install-and-it-just-works path. Managed shortcuts are optional if you want Apple's visible Add flow."
         case .installation:
-            return "We'll install test shortcuts that you can customize later."
+            return "Focally can stage its bundled signed Focus shortcuts for you, but Apple still asks you to press Add once per shortcut."
         case .verification:
-            return "Let's verify the shortcuts are working correctly."
+            return "We'll confirm direct DND and optionally check whether the managed shortcuts were imported after that Add step."
         case .completion:
-            return "Your shortcuts are ready to go!"
+            return "You're ready to use direct DND now, with managed shortcuts available whenever you've finished Apple's one-time Add flow on Focally's bundled signed files."
         }
     }
 }
@@ -47,28 +47,24 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 // MARK: - Onboarding ViewModel
 
 @MainActor
-class ShortcutOnboardingViewModel: ObservableObject {
+final class ShortcutOnboardingViewModel: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "ShortcutOnboardingViewModel")
-    private let testShortcutGenerator: TestShortcutGenerator
     private let focusIntegrationService: FocusIntegrationService
+    let managedShortcutsService: ManagedFocusShortcutsService
 
-    // Published state
     @Published var currentStep: OnboardingStep = .welcome
-    @Published var isGeneratingShortcuts: Bool = false
+    @Published var isPreparingIntegration: Bool = false
     @Published var generationError: String?
     @Published var isVerifying: Bool = false
     @Published var verificationResults: [String: Bool] = [:]
     @Published var allShortcutsVerified: Bool = false
 
-    // Completion callback
     var onComplete: (() -> Void)?
 
-    init(testShortcutGenerator: TestShortcutGenerator, focusIntegrationService: FocusIntegrationService) {
-        self.testShortcutGenerator = testShortcutGenerator
+    init(managedShortcutsService: ManagedFocusShortcutsService, focusIntegrationService: FocusIntegrationService) {
+        self.managedShortcutsService = managedShortcutsService
         self.focusIntegrationService = focusIntegrationService
     }
-
-    // MARK: - Navigation
 
     func nextStep() {
         guard currentStep.rawValue < OnboardingStep.allCases.count - 1 else {
@@ -77,12 +73,10 @@ class ShortcutOnboardingViewModel: ObservableObject {
         }
 
         switch currentStep {
+        case .explanation:
+            prepareNativeIntegration()
         case .installation:
-            // Auto-trigger generation when moving to installation step
-            generateShortcuts()
-        case .verification:
-            // Auto-verify when moving to verification step
-            verifyShortcuts()
+            verifySetup()
         default:
             break
         }
@@ -105,60 +99,81 @@ class ShortcutOnboardingViewModel: ObservableObject {
         completeOnboarding()
     }
 
-    // MARK: - Shortcuts Generation
-
-    func generateShortcuts() {
-        isGeneratingShortcuts = true
+    func prepareNativeIntegration() {
+        isPreparingIntegration = true
         generationError = nil
 
-        Task { @MainActor in
-            do {
-                try testShortcutGenerator.generateAllTestShortcuts()
-                logger.info("✅ Shortcuts generated successfully")
-                isGeneratingShortcuts = false
-            } catch {
-                logger.error("Failed to generate shortcuts: \(error.localizedDescription, privacy: .public)")
-                generationError = error.localizedDescription
-                isGeneratingShortcuts = false
-            }
+        focusIntegrationService.isEnabled = true
+        focusIntegrationService.mode = .directDND
+        isPreparingIntegration = false
+        logger.info("Prepared direct DND mode")
+    }
+
+    func prepareManagedShortcuts() {
+        generationError = nil
+        managedShortcutsService.prepareSignedShortcuts()
+
+        if let error = managedShortcutsService.lastError {
+            generationError = error
         }
     }
 
-    // MARK: - Shortcuts Verification
+    func prepareAndOpenManagedShortcuts() {
+        generationError = nil
+        managedShortcutsService.prepareAndOpenForImport()
 
-    func verifyShortcuts() {
+        if let error = managedShortcutsService.lastError {
+            generationError = error
+        }
+    }
+
+    func openManagedShortcuts() {
+        generationError = nil
+        managedShortcutsService.openSignedShortcutsForImport()
+
+        if let error = managedShortcutsService.lastError {
+            generationError = error
+        }
+    }
+
+    func verifySetup() {
         isVerifying = true
         verificationResults = [:]
         allShortcutsVerified = false
+        generationError = nil
 
-        Task { @MainActor in
-            // Verify each shortcut
-            let startShortcutVerified = await testShortcutGenerator.verifyShortcut(named: "Focally Start Focus")
-            let endShortcutVerified = await testShortcutGenerator.verifyShortcut(named: "Focally End Focus")
+        focusIntegrationService.mode = .directDND
+        focusIntegrationService.runNativeShortcutTest(.start)
+        let startSucceeded = focusIntegrationService.lastError == nil && focusIntegrationService.isFocusActive
 
-            verificationResults["Focally Start Focus"] = startShortcutVerified
-            verificationResults["Focally End Focus"] = endShortcutVerified
+        focusIntegrationService.runNativeShortcutTest(.end)
+        let endSucceeded = focusIntegrationService.lastError == nil && !focusIntegrationService.isFocusActive
 
-            allShortcutsVerified = startShortcutVerified && endShortcutVerified
-            isVerifying = false
+        managedShortcutsService.refreshInstallationState()
+        let managedInstalled = managedShortcutsService.allManagedShortcutsInstalled
 
-            logger.info("Verification results: Start: \(startShortcutVerified), End: \(endShortcutVerified)")
+        verificationResults["Direct DND On"] = startSucceeded
+        verificationResults["Direct DND Off"] = endSucceeded
+        verificationResults["Managed Shortcuts Imported"] = managedInstalled
+        allShortcutsVerified = startSucceeded && endSucceeded
+        isVerifying = false
+
+        if !allShortcutsVerified {
+            generationError = focusIntegrationService.lastError?.localizedDescription
         }
+
+        logger.info("Verification results: direct on=\(startSucceeded), direct off=\(endSucceeded), managed installed=\(managedInstalled)")
     }
 
     func retryVerification() {
-        verifyShortcuts()
+        verifySetup()
     }
-
-    // MARK: - Completion
 
     func completeOnboarding() {
         logger.info("Onboarding completed")
         setOnboardingCompleted()
         onComplete?()
     }
-
-    // MARK: - UserDefaults Management
 
     private func setOnboardingCompleted() {
         UserDefaults.standard.set(true, forKey: "FocallyShortcutOnboardingCompleted")
