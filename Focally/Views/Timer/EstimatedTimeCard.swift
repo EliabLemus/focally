@@ -1,35 +1,35 @@
 import SwiftUI
 
 struct EstimatedTimeCard: View {
-    @Environment(\.colorScheme) var colorScheme
-
-    private let estimatedEndTime = Date().addingTimeInterval(25 * 60)
+    @EnvironmentObject var timerService: FocusTimerService
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "clock")
-                .font(.system(size: 20))
-                .foregroundStyle(.orange)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Estimated End")
-                    .font(.focallyBodyBold)
-                    .foregroundStyle(Color.focallyOnSurface)
-
-                Text("11:45 AM")
-                    .font(.focallyH2)
+        SupportCard(
+            title: "Estimated end",
+            icon: "clock.badge.checkmark",
+            tint: Color.focallySecondary
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                supportMetric(title: "Finish time", value: estimatedEndTimeString)
+                supportMetric(title: "Time remaining", value: timerService.remainingMinutesString)
+                supportMetric(title: "Current phase", value: timerService.phaseName)
             }
-        }
-        .padding(16)
-        .background(Color.focallySurfaceContainerLow)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(borderColor, lineWidth: 0.5)
         }
     }
 
-    private var borderColor: Color {
-        Color.focallyCardBorder
+    private func supportMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+            Text(value)
+                .font(.focallyBodyBold)
+                .foregroundStyle(Color.focallyOnSurface)
+        }
+    }
+
+    private var estimatedEndTimeString: String {
+        let endDate = Date().addingTimeInterval(TimeInterval(max(timerService.remainingSeconds, 0)))
+        return endDate.formatted(date: .omitted, time: .shortened)
     }
 }

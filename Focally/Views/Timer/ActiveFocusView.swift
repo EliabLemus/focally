@@ -7,40 +7,28 @@ struct ActiveFocusView: View {
     @State private var showFinishConfirmation = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Top Bar
-            topBar
+        GeometryReader { geometry in
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    statusStrip
 
-            // Center Content
-            VStack(spacing: 24) {
-                // Deep Work Phase Badge
-                badgeRow
+                    VStack(spacing: 24) {
+                        focusHero
+                            .frame(minHeight: geometry.size.height > 780 ? 420 : 360)
 
-                // Task Name
-                taskNameRow
+                        TimerControlsView(
+                            onPause: { timerService.togglePause() },
+                            onFinish: { showFinishConfirmation = true }
+                        )
+                        .environmentObject(timerService)
 
-                // Task Description
-                taskDescriptionRow
-
-                // Timer
-                timerRow
-
-                // Ambient Glow
-                ambientGlow
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 40)
-
-            // Controls
-            TimerControlsView(
-                onPause: { timerService.togglePause() },
-                onFinish: {
-                    showFinishConfirmation = true
+                        supportCards(for: geometry.size.width)
+                    }
                 }
-            )
-
-            // Bottom Cards
-            bottomCards
+                .padding(.horizontal, 24)
+                .padding(.top, 24)
+                .padding(.bottom, 28)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.focallyBackground)
@@ -49,131 +37,133 @@ struct ActiveFocusView: View {
         }
     }
 
-    // MARK: - Top Bar
+    private var statusStrip: some View {
+        HStack(spacing: 12) {
+            statusPill(
+                title: timerService.isPaused ? "Paused" : "In focus",
+                icon: timerService.isPaused ? "pause.fill" : "bolt.fill",
+                tint: timerService.isPaused ? Color.focallySecondary : Color.focallyPrimary
+            )
 
-    private var topBar: some View {
-        HStack {
-            // DND Badge (shown only when session is active)
-            if dndService.isDNDActive {
-                HStack(spacing: 6) {
-                    Image(systemName: "moon.fill")
-                        .font(.system(size: 10))
-                    Text("DO NOT DISTURB ACTIVE")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyPrimary)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(Color.focallyPrimary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .animation(.easeInOut(duration: 0.3), value: dndService.isDNDActive)
-            }
+            statusPill(
+                title: dndService.isDNDActive ? "Do Not Disturb on" : "Do Not Disturb off",
+                icon: dndService.isDNDActive ? "moon.fill" : "moon.slash.fill",
+                tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant
+            )
 
             Spacer()
 
-            Button(action: openSettings) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Open Settings")
-        }
-        .padding(.horizontal, 24)
-        .padding(.top, 8)
-        .padding(.bottom, 16)
-    }
-
-    private func openSettings() {
-        NotificationCenter.default.post(name: .focusNavigateToSettings, object: nil)
-    }
-
-    // MARK: - Badge Row
-
-    private var badgeRow: some View {
-        HStack(spacing: 8) {
-            Text("DEEP WORK PHASE")
-                .font(.focallyCaption)
-                .foregroundStyle(Color.focallyPrimary)
-            Circle()
-                .fill(Color.focallyPrimary)
-                .frame(width: 8, height: 8)
-                .onAppear {
-                    startPulseAnimation()
-                }
-                .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: timerService.isPaused)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(Color.focallyPrimary.opacity(0.05))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    // MARK: - Task Name
-
-    private var taskNameRow: some View {
-        VStack(spacing: 8) {
-            Text(timerService.currentActivity)
-                .font(.focallyDisplay)
-                .foregroundStyle(Color.focallyOnSurface)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-        }
-    }
-
-    // MARK: - Task Description
-
-    private var taskDescriptionRow: some View {
-        Text("Stay focused and minimize distractions")
-            .font(.focallyBody)
-            .foregroundStyle(Color.focallyOnSurfaceVariant)
-            .lineLimit(2)
-            .multilineTextAlignment(.center)
-    }
-
-    // MARK: - Timer
-
-    private var timerRow: some View {
-        VStack(spacing: 8) {
-            Text(timerService.remainingTimeString)
-                .font(.system(size: 160, weight: .bold, design: .monospaced))
-                .foregroundStyle(Color.focallyOnSurface)
-                .monospacedDigit()
-                .contentTransition(.numericText())
-                .animation(.easeInOut(duration: 0.2), value: timerService.remainingSeconds)
-
-            Text("Session \(timerService.currentRound + 1) of \(timerService.roundsUntilLongBreak)")
+            Text(nextBreakSummary)
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
         }
     }
 
-    // MARK: - Ambient Glow
+    private var focusHero: some View {
+        VStack(spacing: 20) {
+            VStack(spacing: 10) {
+                Text(timerService.phaseName.uppercased())
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyPrimary)
 
-    private var ambientGlow: some View {
-        Circle()
-            .fill(Color.focallyPrimary.opacity(0.05))
-            .frame(width: 400, height: 400)
-            .blur(radius: 100)
-            .offset(y: -80)
-    }
+                Text(timerService.currentActivity)
+                    .font(.system(size: 34, weight: .semibold, design: .default))
+                    .foregroundStyle(Color.focallyOnSurface)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .frame(maxWidth: 760)
 
-    // MARK: - Bottom Cards
+                Text(timerService.isPaused
+                     ? "Your session is paused. Resume when you're ready to continue the block."
+                     : "Stay with the current block. The timer, controls, and next milestone are all here.")
+                    .font(.focallyBody)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 620)
+            }
 
-    private var bottomCards: some View {
-        HStack(spacing: 12) {
-            focusScoreCard
-                .frame(maxWidth: .infinity)
-            EstimatedTimeCard()
-                .frame(maxWidth: .infinity)
-            EnvironmentCard()
-                .frame(maxWidth: .infinity)
+            VStack(spacing: 14) {
+                Text(timerService.remainingTimeString)
+                    .font(.system(size: 148, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Color.focallyOnSurface)
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.55)
+                    .lineLimit(1)
+                    .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.2), value: timerService.remainingSeconds)
+
+                VStack(spacing: 8) {
+                    ProgressView(value: timerService.progress)
+                        .progressViewStyle(.linear)
+                        .tint(Color.focallyPrimary)
+                        .frame(maxWidth: 420)
+
+                    HStack(spacing: 18) {
+                        heroMeta(title: "Elapsed", value: elapsedTimeString)
+                        heroMeta(title: "Current round", value: "\(timerService.currentRound + 1) / \(timerService.roundsUntilLongBreak)")
+                        heroMeta(title: "Next", value: nextPhaseLabel)
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 24)
-        .padding(.bottom, 24)
+        .padding(.horizontal, 32)
+        .padding(.vertical, 32)
+        .frame(maxWidth: .infinity)
+        .background(heroBackground)
+        .overlay {
+            RoundedRectangle(cornerRadius: 28)
+                .stroke(Color.focallyCardBorder, lineWidth: 0.75)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 28))
     }
 
-    // MARK: - Finish Confirmation Sheet
+    private func supportCards(for width: CGFloat) -> some View {
+        Group {
+            if width >= 980 {
+                HStack(alignment: .top, spacing: 14) {
+                    sessionProgressCard
+                    EstimatedTimeCard()
+                    focusModeCard
+                }
+            } else {
+                VStack(spacing: 14) {
+                    sessionProgressCard
+                    EstimatedTimeCard()
+                    focusModeCard
+                }
+            }
+        }
+    }
+
+    private var sessionProgressCard: some View {
+        SupportCard(
+            title: "Session cadence",
+            icon: "waveform.path.ecg",
+            tint: Color.focallyPrimary
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                supportMetric(title: "Current block", value: "Round \(timerService.currentRound + 1)")
+                supportMetric(title: "Long break cadence", value: "Every \(timerService.roundsUntilLongBreak) rounds")
+                supportMetric(title: "Auto-start breaks", value: timerService.isAutoStartEnabled ? "Enabled" : "Manual")
+            }
+        }
+    }
+
+    private var focusModeCard: some View {
+        SupportCard(
+            title: "Focus mode",
+            icon: dndService.isDNDActive ? "moon.fill" : "moon.slash.fill",
+            tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallySecondary
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                supportMetric(title: "System status", value: dndService.isDNDActive ? "Do Not Disturb is active" : "Do Not Disturb is off")
+                supportMetric(title: "Session state", value: timerService.isPaused ? "Paused" : "Running")
+                supportMetric(title: "When this ends", value: nextBreakSummary)
+            }
+        }
+    }
 
     private var finishConfirmationSheet: some View {
         VStack(spacing: 20) {
@@ -210,68 +200,131 @@ struct ActiveFocusView: View {
         .padding(32)
     }
 
-    // MARK: - Helper Methods
-
-    private func startPulseAnimation() {
-        // Animation is handled by .repeatForever on badge
+    private func statusPill(title: String, icon: String, tint: Color) -> some View {
+        Label(title, systemImage: icon)
+            .font(.focallyCaption)
+            .foregroundStyle(Color.focallyOnSurface)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(tint.opacity(0.14))
+            .clipShape(Capsule())
     }
 
-    private var focusScoreCard: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "bolt.fill")
-                .font(.system(size: 20))
-                .foregroundStyle(Color.focallyPrimary)
+    private func heroMeta(title: String, value: String) -> some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+            Text(value)
+                .font(.focallyBodyBold)
+                .foregroundStyle(Color.focallyOnSurface)
+        }
+        .frame(minWidth: 110)
+    }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Focus Score")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-                Text("94%")
-                    .font(.focallyH2)
+    private func supportMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+            Text(value)
+                .font(.focallyBodyBold)
+                .foregroundStyle(Color.focallyOnSurface)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var heroBackground: some View {
+        RoundedRectangle(cornerRadius: 28)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.focallySurfaceContainerHigh,
+                        Color.focallySurfaceContainerLow,
+                        Color.focallySurfaceContainerLowest
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay {
+                ZStack {
+                    Circle()
+                        .fill(Color.focallyPrimary.opacity(timerService.isPaused ? 0.08 : 0.16))
+                        .frame(width: 320, height: 320)
+                        .blur(radius: 40)
+                        .offset(x: -180, y: -70)
+
+                    Circle()
+                        .fill(Color.focallySecondary.opacity(0.12))
+                        .frame(width: 260, height: 260)
+                        .blur(radius: 34)
+                        .offset(x: 220, y: 120)
+                }
             }
+    }
 
-            Spacer()
+    private var elapsedTimeString: String {
+        let elapsedSeconds = max((timerService.workDurationMinutes * 60) - timerService.remainingSeconds, 0)
+        let minutes = elapsedSeconds / 60
+        let seconds = elapsedSeconds % 60
+        return String(format: "%d:%02d", minutes, seconds)
+    }
 
-            Text("High")
-                .font(.focallyMicro)
-                .foregroundStyle(Color.focallyPrimary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 2)
-                .background(Color.focallyPrimary.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+    private var nextBreakSummary: String {
+        if timerService.currentRound + 1 >= timerService.roundsUntilLongBreak {
+            return "Long break next · \(timerService.longBreakDurationMinutes)m"
         }
-        .padding(20)
-        .background(Color.focallySurfaceContainerLowest)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.focallyCardBorder, lineWidth: 0.5)
+
+        return "Short break next · \(timerService.shortBreakDurationMinutes)m"
+    }
+
+    private var nextPhaseLabel: String {
+        if timerService.currentRound + 1 >= timerService.roundsUntilLongBreak {
+            return "Long break"
         }
+
+        return "Short break"
     }
 }
 
-struct EnvironmentCard: View {
+struct SupportCard<Content: View>: View {
+    let title: String
+    let icon: String
+    let tint: Color
+    let content: Content
+
+    init(title: String, icon: String, tint: Color, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.icon = icon
+        self.tint = tint
+        self.content = content()
+    }
+
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "brain.head.profile")
-                .font(.system(size: 20))
-                .foregroundStyle(Color.focallySecondary)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 34, height: 34)
+                    .background(tint.opacity(0.14))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Environment")
-                    .font(.focallyBodyBold)
-                    .foregroundStyle(Color.focallyOnSurface)
-
-                Text("Calm")
+                Text(title)
                     .font(.focallyH2)
+                    .foregroundStyle(Color.focallyOnSurface)
             }
+
+            content
         }
-        .padding(16)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.focallySurfaceContainerLow)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.focallyCardBorder, lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.focallyCardBorder, lineWidth: 0.75)
         }
     }
 }

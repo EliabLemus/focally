@@ -124,6 +124,12 @@ gh run list --repo EliabLemus/focally --limit 1
 - `success` → Release successful!
 - `failure` → Review logs and fix
 
+**NEW RULE — always do this before declaring the release done:**
+- Confirm the workflow finished with `success`
+- Confirm the GitHub Release exists and is not draft
+- Confirm the DMG asset was uploaded
+- Confirm the Homebrew tap was updated to the same version and SHA256
+
 ### 7. Verify Release
 
 ```bash
@@ -138,6 +144,8 @@ gh release view --repo EliabLemus/focally v0.7.0 --json assets
 ```
 
 ### 8. Verify Homebrew Tap
+
+This step is mandatory. A release is **not done** until the tap matches the release asset.
 
 ```bash
 # Check version in cask
@@ -232,6 +240,8 @@ After workflow completion:
 - [ ] DMG uploaded: `gh release view v0.7.0 --json assets`
 - [ ] Homebrew tap updated: version and SHA256 correct
 - [ ] Installation test: `brew upgrade --cask focally`
+
+**Do not stop at tag push.** Always verify workflow + release asset + tap before reporting success.
 
 ## References
 
