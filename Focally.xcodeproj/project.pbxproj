@@ -91,6 +91,8 @@
 		FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */; };
 		FEB794232080603BE2B0EE0F /* CreateFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D447524B8FAB7156D08A9B4 /* CreateFocusBlockSheet.swift */; };
 		FF1F6F73C5FB3708C3AD140D /* FocusBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696DBC7778A0F797F047B996 /* FocusBlockView.swift */; };
+		BC24C2AFDAECF65B792F4E291DA6E0B1 /* ShortcutOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11045B2C06461E6549D8D2D59CDB89E /* ShortcutOnboardingView.swift */; };
+		220A8248890BE12936C03D583BCD5D39 /* ShortcutOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12867E0786CB6A7E3AC439CA81D015BA /* ShortcutOnboardingViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -201,6 +203,8 @@
 		F93CAAC808829D5F520CC656 /* SchedulePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulePage.swift; sourceTree = "<group>"; };
 		FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		FF9300C00888F0B7546C94C7 /* FocusTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTrendChart.swift; sourceTree = "<group>"; };
+		A11045B2C06461E6549D8D2D59CDB89E /* ShortcutOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutOnboardingView.swift; sourceTree = "<group>"; };
+		12867E0786CB6A7E3AC439CA81D015BA /* ShortcutOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutOnboardingViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -249,7 +253,10 @@
 			children = (
 				4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */,
 				6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */,
-				590A7EFBC009126860A31878 /* Analytics */,
+				
+				A11045B2C06461E6549D8D2D59CDB89E /* ShortcutOnboardingView.swift */,
+				12867E0786CB6A7E3AC439CA81D015BA /* ShortcutOnboardingViewModel.swift */,
+590A7EFBC009126860A31878 /* Analytics */,
 				4A2B7356CDB6634F3D74235D /* MenuBar */,
 				0AEF4C2BBDBDF4F45D0BD085 /* Navigation */,
 				E0C4358D797BEF8C38C58B27 /* Schedule */,
@@ -648,7 +655,10 @@
 				A9B36E8ADD6E0B6C2B437CE6 /* ScheduleService.swift in Sources */,
 				DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */,
 				22CE09543F47353743C5813D /* SharedComponents.swift in Sources */,
-				E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */,
+				
+				BC24C2AFDAECF65B792F4E291DA6E0B1 /* ShortcutOnboardingView.swift in Sources */,
+				220A8248890BE12936C03D583BCD5D39 /* ShortcutOnboardingViewModel.swift in Sources */,
+E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */,
 				28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */,
 				AAB08AFF8D55115118E12B39 /* SidebarView.swift in Sources */,
 				84AC2BAA9F2CCA1495A302B5 /* SlackService.swift in Sources */,

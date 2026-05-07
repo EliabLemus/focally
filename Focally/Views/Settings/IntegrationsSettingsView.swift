@@ -347,6 +347,47 @@ struct IntegrationsSettingsView: View {
         .onDrop(of: [.fileURL], isTargeted: $isTargetingDropZone) { providers in
             handleShortcutDrop(providers: providers)
         }
+
+        // Reset Onboarding Card
+        VStack(alignment: .leading, spacing: FocallySpacing.md) {
+            HStack(spacing: FocallySpacing.md) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                        .fill(Color.focallyErrorContainer.opacity(0.1))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color.focallyError)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Reset Shortcuts Onboarding")
+                        .font(.focallyBodyBold)
+                        .foregroundStyle(Color.focallyOnSurface)
+
+                    Text("Show the onboarding wizard again to reinstall shortcuts.")
+                        .font(.focallyBody)
+                        .foregroundStyle(Color.focallyOutline)
+                }
+
+                Spacer()
+
+                Button(action: resetOnboarding) {
+                    Text("Reset")
+                        .font(.focallyButton)
+                        .foregroundStyle(Color.white)
+                        .padding(.horizontal, FocallySpacing.md)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                                .fill(Color.focallyError)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(FocallySpacing.lg)
+        .focallyCard()
         }
         .onAppear(perform: loadCredentials)
     }
@@ -451,6 +492,12 @@ struct IntegrationsSettingsView: View {
         } else {
             calendarService.signIn()
         }
+    }
+
+    // MARK: - Reset Onboarding
+
+    private func resetOnboarding() {
+        ShortcutOnboardingViewModel.resetOnboarding()
     }
 
     // MARK: - Shortcut Drop Handling

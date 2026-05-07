@@ -20,6 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover?
     private var eventMonitor: Any?
     private var mainWindow: NSWindow?
+    private var onboardingWindow: NSWindow?
     private var themeObserver: NSObjectProtocol?
     let dndService = DNDService()
     let focusIntegrationService = FocusIntegrationService()
@@ -40,9 +41,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Generate test shortcuts on first launch
+        // Show onboarding if not completed
+        showOnboardingIfNeeded()
+
+        // Generate test shortcuts on first launch (legacy, kept for compatibility)
         generateTestShortcutsIfNeeded()
-        
+
         applySavedTheme()
         notificationService.requestAuthorization()
 
@@ -329,6 +333,50 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
         return "About Focally (v\(version), build \(build))"
+    }
+
+    // MARK: - Onboarding
+
+    @MainActor
+    private func showOnboardingIfNeeded() {
+        guard !ShortcutOnboardingViewModel.isOnboardingCompleted() else {
+            logger.info("Onboarding already completed, skipping")
+            return
+        }
+
+        logger.info("Showing shortcuts onboarding")
+
+        // Delay slightly to allow the app to fully launch
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.showOnboardingWindow()
+        }
+    }
+
+    private func showOnboardingWindow() {
+        let onboardingView = ShortcutOnboardingView(
+            testShortcutGenerator: testShortcutGenerator,
+            focusIntegrationService: focusIntegrationService
+        )
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: 600),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Focally Shortcuts Setup"
+        window.isReleasedWhenClosed = false
+        window.center()
+
+        let hostingController = NSHostingController(rootView: onboardingView)
+        window.contentViewController = hostingController
+
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+        NSApp.activate(ignoringOtherApps: true)
+
+        onboardingWindow = window
+        applySavedTheme()
     }
 
     // MARK: - Test Shortcuts

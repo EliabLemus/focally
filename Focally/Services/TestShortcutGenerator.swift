@@ -52,6 +52,52 @@ class TestShortcutGenerator {
         shortcutsDirectory.appendingPathComponent("\(name).shortcut")
     }
 
+    // MARK: - Verification
+
+    /// Verify if a shortcut file exists and is valid
+    /// - Parameter name: Name of the shortcut without .shortcut extension
+    /// - Returns: true if the shortcut exists and is a valid file
+    func verifyShortcut(named name: String) async -> Bool {
+        let shortcutURL = shortcutsDirectory.appendingPathComponent("\(name).shortcut")
+
+        // Check if file exists
+        guard fileManager.fileExists(atPath: shortcutURL.path) else {
+            logger.warning("Shortcut not found: \(name)")
+            return false
+        }
+
+        // Check if it's a valid shortcut file by verifying it's a valid plist
+        guard let shortcutData = try? Data(contentsOf: shortcutURL),
+              let _ = try? PropertyListSerialization.propertyList(from: shortcutData, options: [], format: nil) else {
+            logger.warning("Shortcut file is corrupted: \(name)")
+            return false
+        }
+
+        // Optional: Try to validate with shortcuts command (may fail if shortcuts app is not open)
+        // We don't require this to pass because the shortcuts command can be flaky
+        logger.info("✅ Shortcut verified: \(name)")
+        return true
+    }
+
+    /// Verify all shortcuts
+    /// - Returns: Dictionary of shortcut names to verification status
+    func verifyAllShortcuts() async -> [String: Bool] {
+        var results: [String: Bool] = [:]
+
+        results["Focally Start Focus"] = await verifyShortcut(named: "Focally Start Focus")
+        results["Focally End Focus"] = await verifyShortcut(named: "Focally End Focus")
+
+        return results
+    }
+
+    /// Check if any shortcuts have been generated
+    /// - Returns: true if at least one shortcut file exists
+    func hasAnyShortcuts() -> Bool {
+        let startURL = shortcutsDirectory.appendingPathComponent("Focally Start Focus.shortcut")
+        let endURL = shortcutsDirectory.appendingPathComponent("Focally End Focus.shortcut")
+        return fileManager.fileExists(atPath: startURL.path) || fileManager.fileExists(atPath: endURL.path)
+    }
+
     // MARK: - Private Methods
 
     private func ensureShortcutsDirectoryExists() throws {
