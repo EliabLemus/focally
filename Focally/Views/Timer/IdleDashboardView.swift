@@ -7,7 +7,7 @@ struct IdleDashboardView: View {
     @EnvironmentObject private var slackService: SlackService
 
     @State private var taskInput: String = ""
-    @State private var selectedEmoji: String = FocusStatusOption.common[0].emoji
+    @State private var selectedEmoji: String = "🎯"
     @State private var selectedDuration: Int = 25
 
     var body: some View {
@@ -487,3 +487,4 @@ private extension View {
             }
     }
 }
+

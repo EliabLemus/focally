@@ -63,3 +63,19 @@ final class PredefinedTaskStore: ObservableObject {
         return tasks
     }
 }
+
+extension PredefinedTask {
+    /// Valida el emoji para Slack y retorna warnings si es necesario
+    /// - Parameter slackService: Servicio de Slack para validar
+    /// - Returns: Array de mensajes de warning (vacío si no hay problemas)
+    func validateForSlack(slackService: SlackService) -> [String] {
+        guard slackService.isConnected else { return [] }
+        guard EmojiValidator.isValidForSlack(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) else {
+            return [
+                "This emoji may not display correctly in Slack. Consider selecting an emoji from your workspace."
+            ]
+        }
+
+        return []
+    }
+}

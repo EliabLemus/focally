@@ -23,6 +23,7 @@ class SlackService: ObservableObject {
     private let profileSetURL = URL(string: "https://slack.com/api/users.profile.set")!
     private let authTestURL = URL(string: "https://slack.com/api/auth.test")!
     private let endDndURL = URL(string: "https://slack.com/api/dnd.endDnd")!
+    private let dndSetSnoozeURL = URL(string: "https://slack.com/api/dnd.setSnooze")!
 
     var token: String? {
         get { KeychainHelper.load(key: keychainKey) }
@@ -168,6 +169,11 @@ class SlackService: ObservableObject {
             return
         }
         let statusEmoji = normalizedStatusEmoji(in: text, taskEmoji: taskEmoji, fallbackEmoji: fallbackEmoji)
+
+        // Registrar uso del emoji (async para evitar conflicto con @MainActor)
+        Task { @MainActor in
+            EmojiUsageTracker.shared.recordUsage(statusEmoji)
+        }
 
         let profile: [String: String] = [
             "status_text": text,
@@ -322,6 +328,67 @@ class SlackService: ObservableObject {
 
             DispatchQueue.main.async {
                 self.workspaceEmojiCodes = codes
+                self.logger.info("Loaded \(codes.count, privacy: .public) Slack workspace emojis")
+            }
+        }
+    }
+
+    /// Valida si un emoji existe en el workspace de Slack
+    /// - Parameter emoji: Emoji unicode o shortcode a validar
+    /// - Returns: true si es válido, false si no
+    func validateEmoji(_ emoji: String) -> Bool {
+        return EmojiValidator.isValidForSlack(emoji, workspaceEmojis: workspaceEmojiCodes)
+    }
+
+    /// Pausa las notificaciones de Slack por X minutos (DND de Slack)
+    /// - Parameter minutes: Duración en minutos para pausar notificaciones
+    func setSlackDNDSnooze(minutes: Int) {
+        guard isEnabled, let token else {
+            logger.info("Skipping setSlackDNDSnooze because Slack is disabled or no token")
+            return
+        }
+
+        let numMinutes = max(1, minutes)
+        logger.info("setSlackDNDSnooze called for \(numMinutes, privacy: .public) minutes")
+
+        guard let request = makeSlackRequest(url: dndSetSnoozeURL, token: token, formFields: [
+            "num_minutes": "\(numMinutes)"
+        ]) else {
+            connectionError = "Failed to prepare Slack DND snooze request"
+            isConnected = false
+            return
+        }
+
+        performSlackRequest(request) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self?.connectionError = error.localizedDescription
+                    self?.lastActionMessage = "Slack DND snooze failed"
+                    self?.isConnected = false
+                    self?.logger.error("Slack setSlackDNDSnooze request failed: \(error.localizedDescription, privacy: .public)")
+                    return
+                }
+
+                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+                guard let json = self?.decodeSlackResponseBody(data) else {
+                    self?.connectionError = "Invalid response from Slack"
+                    self?.lastActionMessage = "Slack DND snooze failed"
+                    self?.isConnected = false
+                    return
+                }
+
+                let ok = json["ok"] as? Bool ?? false
+                if ok && (200...299).contains(statusCode) {
+                    self?.connectionError = nil
+                    self?.lastActionMessage = "Slack notifications paused"
+                    self?.logger.info("Slack DND snooze set successfully for \(numMinutes, privacy: .public) minutes")
+                } else {
+                    let errorMsg = json["error"] as? String ?? "Unknown error"
+                    self?.connectionError = errorMsg
+                    self?.lastActionMessage = "Slack DND snooze failed"
+                    self?.isConnected = false
+                    self?.logger.error("Slack setSlackDNDSnooze failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                }
             }
         }
     }
@@ -511,5 +578,147 @@ class SlackService: ObservableObject {
         let prefix = token.prefix(4)
         let suffix = token.suffix(4)
         return "\(prefix)…\(suffix)"
+    }
+}
+
+// MARK: - Emoji Validator
+
+/// Valida y convierte emojis entre formatos (unicode ↔ Slack shortcode)
+public struct EmojiValidator {
+    /// Valida si un emoji es válido para Slack
+    /// - Parameter emoji: String con emoji unicode o :shortcode:
+    /// - Returns: true si es válido, false si no
+    public static func isValidForSlack(_ emoji: String, workspaceEmojis: [String]) -> Bool {
+        let trimmed = emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+
+        // Si es shortcode, verificar si existe en workspace
+        if isSlackShortcode(trimmed) {
+            return workspaceEmojis.contains(trimmed)
+        }
+
+        // Si es unicode, siempre válido para UI (Slack mostrará ? si no existe)
+        return true
+    }
+
+    /// Intenta convertir un emoji unicode a shortcode del workspace
+    /// - Parameters:
+    ///   - emoji: Emoji unicode
+    ///   - workspaceEmojis: Lista de shortcodes del workspace
+    /// - Returns: Shortcode si encuentra match cercano, nil si no
+    public static func convertUnicodeToShortcode(_ emoji: String, workspaceEmojis: [String]) -> String? {
+        // Primero: match exacto por nombre del emoji (si tuviéramos metadata)
+        // Por ahora: heurística simple basada en categorías comunes
+
+        let emojiMap: [String: String] = [
+            "🧠": ":brain:",
+            "💻": ":computer:",
+            "📝": ":memo:",
+            "📚": ":books:",
+            "🎯": ":dart:",
+            "⚡️": ":zap:",
+            "☕️": ":coffee:",
+            "🍅": ":tomato:"
+        ]
+
+        // Buscar match exacto en map
+        if let shortcode = emojiMap[emoji], workspaceEmojis.contains(shortcode) {
+            return shortcode
+        }
+
+        // Buscar en workspace por similitud de nombre
+        // (esto requeriría metadata de Slack API que incluye nombres)
+        // Por ahora, intentamos match directo si el shortcode tiene formato :emoji:
+        let potentialShortcode = ":\(emojiName(emoji)):"
+        if workspaceEmojis.contains(potentialShortcode) {
+            return potentialShortcode
+        }
+
+        return nil
+    }
+
+    /// Verifica si un string es un shortcode de Slack
+    public static func isSlackShortcode(_ value: String) -> Bool {
+        value.hasPrefix(":") && value.hasSuffix(":") && value.count > 2
+    }
+
+    /// Extrae el nombre base de un emoji unicode (simplificado)
+    private static func emojiName(_ emoji: String) -> String {
+        // Map simplificado de emojis comunes a nombres
+        let names: [String: String] = [
+            "🧠": "brain",
+            "💻": "computer",
+            "📝": "pencil",
+            "📚": "books",
+            "🎯": "dart",
+            "⚡": "zap",
+            "☕": "coffee",
+            "🍅": "tomato"
+        ]
+        return names[emoji] ?? "simple_smile"
+    }
+}
+
+// MARK: - Emoji Usage Tracker
+
+/// Rastrea el uso de emojis para mostrar sugerencias de recientes
+@MainActor
+public final class EmojiUsageTracker: ObservableObject {
+    public static let shared = EmojiUsageTracker()
+
+    private static let maxRecentCount = 12
+    private static let usageKey = "emojiUsageHistory"
+
+    @Published private(set) public var recentEmojis: [String] = []
+
+    private let defaults = UserDefaults.standard
+
+    private init() {
+        loadRecentEmojis()
+    }
+
+    /// Registra el uso de un emoji
+    public func recordUsage(_ emoji: String) {
+        let trimmed = emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        // Mover al inicio si ya existe, o agregar al inicio
+        recentEmojis.removeAll { $0 == trimmed }
+        recentEmojis.insert(trimmed, at: 0)
+
+        // Limitar tamaño
+        if recentEmojis.count > Self.maxRecentCount {
+            recentEmojis = Array(recentEmojis.prefix(Self.maxRecentCount))
+        }
+
+        saveRecentEmojis()
+    }
+
+    /// Obtiene los emojis recientes, filtrando por workspace si está disponible
+    public func getRecentEmojis(forWorkspace workspaceEmojis: [String]? = nil) -> [String] {
+        guard let workspaceEmojis = workspaceEmojis else {
+            return recentEmojis
+        }
+
+        // Filtrar para mostrar solo emojis válidos en el workspace
+        return recentEmojis.filter { emoji in
+            if EmojiValidator.isSlackShortcode(emoji) {
+                return workspaceEmojis.contains(emoji)
+            }
+            return true
+        }
+    }
+
+    private func loadRecentEmojis() {
+        if let data = defaults.data(forKey: Self.usageKey),
+           let decoded = try? JSONDecoder().decode([String].self, from: data) {
+            recentEmojis = decoded
+        }
+    }
+
+    private func saveRecentEmojis() {
+        if let encoded = try? JSONEncoder().encode(recentEmojis) {
+            defaults.set(encoded, forKey: Self.usageKey)
+        }
     }
 }

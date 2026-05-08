@@ -152,7 +152,7 @@ final class FocusIntegrationService: ObservableObject {
 
         performDirectFocusAction(action, source: "direct system DND")
         attemptManagedShortcutAction(action)
-        performSlackFocusAction(action)
+        performSlackFocusAction(action, durationMinutes: action == .start ? 25 : nil)
     }
 
     private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String) {
@@ -179,14 +179,17 @@ final class FocusIntegrationService: ObservableObject {
         }
     }
 
-    private func performSlackFocusAction(_ action: FocusIntegrationAction) {
+    private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil) {
         guard slackService.isEnabled else { return }
         switch action {
         case .start:
-            slackService.disableSlackDND()
+            let duration = durationMinutes ?? 25
+            slackService.disableSlackDND()  // Primero end DND existente
+            slackService.setSlackDNDSnooze(minutes: duration)  // Luego snooze por X minutos
             slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
         case .end:
             slackService.clearStatus()
+            slackService.disableSlackDND()  // End snooze y DND
         }
     }
 }

@@ -9,7 +9,7 @@ struct MenuBarDropdownView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var taskInput: String = ""
-    @State private var selectedEmoji: String = FocusStatusOption.common[0].emoji
+    @State private var selectedEmoji: String = "🎯"
     @State private var selectedDuration: Int = 25
 
     var body: some View {
@@ -346,3 +346,4 @@ struct MenuBarDropdownView: View {
         return hours > 0 ? "\(hours)h \(mins)m" : "\(mins)m"
     }
 }
+

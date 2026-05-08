@@ -32,6 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let shortcutDropHandler = ShortcutDropHandler()
     let managedShortcutsService = ManagedFocusShortcutsService.shared
     let predefinedTaskStore = PredefinedTaskStore()
+    let usageTracker = EmojiUsageTracker.shared
     private lazy var timerService = FocusTimerService(
         soundPlayer: .shared,
         notificationService: notificationService,
@@ -73,6 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(shortcutDropHandler)
             .environmentObject(managedShortcutsService)
             .environmentObject(predefinedTaskStore)
+            .environmentObject(usageTracker)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
         applySavedTheme()
@@ -263,6 +265,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(shortcutDropHandler)
             .environmentObject(managedShortcutsService)
             .environmentObject(predefinedTaskStore)
+            .environmentObject(usageTracker)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
         let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]

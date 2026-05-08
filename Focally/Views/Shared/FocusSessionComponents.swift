@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct FocusStatusOption: Identifiable, Hashable {
+public struct FocusStatusOption: Identifiable, Hashable {
     let emoji: String
     let label: String
     let shortcode: String?
@@ -39,12 +39,17 @@ struct TaskColorOption: Identifiable, Hashable {
     ]
 }
 
-struct CompactStatusEmojiButton: View {
+public struct CompactStatusEmojiButton: View {
     @Binding var selection: String
     let options: [FocusStatusOption]
 
     @EnvironmentObject private var slackService: SlackService
     @State private var isPopoverPresented = false
+
+    /// Determina si el emoji actual tiene problemas de validación
+    private var hasValidationError: Bool {
+        slackService.isConnected && !EmojiValidator.isValidForSlack(selection, workspaceEmojis: slackService.workspaceEmojiCodes)
+    }
 
     var body: some View {
         Button {
@@ -65,6 +70,12 @@ struct CompactStatusEmojiButton: View {
                 }
                 .foregroundStyle(Color.focallyOnSurface)
 
+                if hasValidationError {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(Color.focallyError)
+                }
+
                 Image(systemName: "chevron.down")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
@@ -75,7 +86,7 @@ struct CompactStatusEmojiButton: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay {
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.focallyCardBorder, lineWidth: 0.75)
+                    .stroke(hasValidationError ? Color.focallyError : Color.focallyCardBorder, lineWidth: hasValidationError ? 1.5 : 0.75)
             }
         }
         .buttonStyle(.plain)
@@ -95,8 +106,17 @@ private struct EmojiSelectionPopover: View {
     let options: [FocusStatusOption]
 
     @EnvironmentObject private var slackService: SlackService
+    @EnvironmentObject private var usageTracker: EmojiUsageTracker
+
     @State private var draftValue: String = ""
 
+    /// Emojis recientes basados en uso
+    private var recentCodes: [String] {
+        let workspaceEmojis = slackService.isConnected ? slackService.workspaceEmojiCodes : nil
+        return usageTracker.getRecentEmojis(forWorkspace: workspaceEmojis)
+    }
+
+    /// Emojis del workspace filtrados por búsqueda
     private var workspaceCodes: [String] {
         let query = draftValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !query.isEmpty else { return Array(slackService.workspaceEmojiCodes.prefix(12)) }
@@ -104,6 +124,11 @@ private struct EmojiSelectionPopover: View {
             .filter { $0.lowercased().contains(query) }
             .prefix(12)
             .map { $0 }
+    }
+
+    /// Determina si mostrar sección de workspace
+    private var showWorkspaceSection: Bool {
+        slackService.isConnected && !slackService.workspaceEmojiCodes.isEmpty
     }
 
     var body: some View {
@@ -123,6 +148,37 @@ private struct EmojiSelectionPopover: View {
             }
             .buttonStyle(.plain)
 
+            // SECCIÓN 1: Recientes (prioridad)
+            if !recentCodes.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Recent")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 8)], spacing: 8) {
+                        ForEach(recentCodes, id: \.self) { code in
+                            emojiButton(code)
+                        }
+                    }
+                }
+            }
+
+            // SECCIÓN 2: Workspace (solo si Slack está configurado y hay búsqueda o hay recientes vacíos)
+            if showWorkspaceSection, !workspaceCodes.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Slack workspace")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], spacing: 8) {
+                        ForEach(workspaceCodes, id: \.self) { code in
+                            emojiButton(code)
+                        }
+                    }
+                }
+            }
+
+            // SECCIÓN 3: Common (menor prioridad cuando Slack está configurado)
             VStack(alignment: .leading, spacing: 8) {
                 Text("Common")
                     .font(.focallyCaption)
@@ -156,37 +212,39 @@ private struct EmojiSelectionPopover: View {
                     }
                 }
             }
-
-            if !workspaceCodes.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Slack workspace")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], spacing: 8) {
-                        ForEach(workspaceCodes, id: \.self) { code in
-                            Button {
-                                apply(code)
-                            } label: {
-                                Text(code)
-                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(Color.focallyOnSurface)
-                                    .lineLimit(1)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 8)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-            }
         }
         .padding(16)
         .frame(width: 320)
         .onAppear { draftValue = selection }
+    }
+
+    /// Botón simple para mostrar un emoji (shortcode o unicode)
+    private func emojiButton(_ code: String) -> some View {
+        Button {
+            apply(code)
+        } label: {
+            if Self.isSlackShortcode(code) {
+                Text(code)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.focallyOnSurface)
+                    .lineLimit(1)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            } else {
+                Text(code)
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.focallyOnSurface)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private func commitDraft() {
@@ -198,16 +256,18 @@ private struct EmojiSelectionPopover: View {
         guard !normalized.isEmpty else { return }
         selection = normalized
         draftValue = normalized
+        usageTracker.recordUsage(normalized)
     }
 
     private func normalizedValue(from rawValue: String) -> String {
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return selection }
 
-        if CompactStatusEmojiButton.isSlackShortcode(trimmed) {
+        if Self.isSlackShortcode(trimmed) {
             return trimmed
         }
 
+        // Si es texto alfanumérico, convertir a shortcode
         if trimmed.range(of: #"^[a-zA-Z0-9_+\- ]+$"#, options: .regularExpression) != nil {
             let slug = trimmed
                 .lowercased()
@@ -221,9 +281,13 @@ private struct EmojiSelectionPopover: View {
     private static func matches(_ selection: String, against option: FocusStatusOption) -> Bool {
         selection == option.emoji || selection == option.shortcode
     }
+
+    private static func isSlackShortcode(_ value: String) -> Bool {
+        value.hasPrefix(":") && value.hasSuffix(":") && value.count > 2
+    }
 }
 
-struct DurationControl: View {
+public struct DurationControl: View {
     @Binding var minutes: Int
     var range: ClosedRange<Int> = 5...180
     var step: Int = 5
@@ -277,7 +341,7 @@ struct DurationControl: View {
     }
 }
 
-struct PredefinedTaskQuickButton: View {
+public struct PredefinedTaskQuickButton: View {
     let task: PredefinedTask
     let action: () -> Void
 
@@ -310,3 +374,146 @@ struct PredefinedTaskQuickButton: View {
         .buttonStyle(.plain)
     }
 }
+
+// MARK: - Emoji Validator
+
+/// Valida y convierte emojis entre formatos (unicode ↔ Slack shortcode)
+public struct EmojiValidator {
+    /// Valida si un emoji es válido para Slack
+    /// - Parameter emoji: String con emoji unicode o :shortcode:
+    /// - Returns: true si es válido, false si no
+    public static func isValidForSlack(_ emoji: String, workspaceEmojis: [String]) -> Bool {
+        let trimmed = emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+
+        // Si es shortcode, verificar si existe en workspace
+        if isSlackShortcode(trimmed) {
+            return workspaceEmojis.contains(trimmed)
+        }
+
+        // Si es unicode, siempre válido para UI (Slack mostrará ? si no existe)
+        return true
+    }
+
+    /// Intenta convertir un emoji unicode a shortcode del workspace
+    /// - Parameters:
+    ///   - emoji: Emoji unicode
+    ///   - workspaceEmojis: Lista de shortcodes del workspace
+    /// - Returns: Shortcode si encuentra match cercano, nil si no
+    public static func convertUnicodeToShortcode(_ emoji: String, workspaceEmojis: [String]) -> String? {
+        // Primero: match exacto por nombre del emoji (si tuviéramos metadata)
+        // Por ahora: heurística simple basada en categorías comunes
+
+        let emojiMap: [String: String] = [
+            "🧠": ":brain:",
+            "💻": ":computer:",
+            "📝": ":memo:",
+            "📚": ":books:",
+            "🎯": ":dart:",
+            "⚡️": ":zap:",
+            "☕️": ":coffee:",
+            "🍅": ":tomato:"
+        ]
+
+        // Buscar match exacto en map
+        if let shortcode = emojiMap[emoji], workspaceEmojis.contains(shortcode) {
+            return shortcode
+        }
+
+        // Buscar en workspace por similitud de nombre
+        // (esto requeriría metadata de Slack API que incluye nombres)
+        // Por ahora, intentamos match directo si el shortcode tiene formato :emoji:
+        let potentialShortcode = ":\(emojiName(emoji)):"
+        if workspaceEmojis.contains(potentialShortcode) {
+            return potentialShortcode
+        }
+
+        return nil
+    }
+
+    /// Verifica si un string es un shortcode de Slack
+    public static func isSlackShortcode(_ value: String) -> Bool {
+        value.hasPrefix(":") && value.hasSuffix(":") && value.count > 2
+    }
+
+    /// Extrae el nombre base de un emoji unicode (simplificado)
+    private static func emojiName(_ emoji: Character) -> String {
+        // Map simplificado de emojis comunes a nombres
+        let names: [Character: String] = [
+            "🧠": "brain",
+            "💻": "computer",
+            "📝": "pencil",
+            "📚": "books",
+            "🎯": "dart",
+            "⚡": "zap",
+            "☕": "coffee",
+            "🍅": "tomato"
+        ]
+        return names[emoji] ?? "simple_smile"
+    }
+}
+
+// MARK: - Emoji Usage Tracker
+
+/// Rastrea el uso de emojis para mostrar sugerencias de recientes
+@MainActor
+public final class EmojiUsageTracker: ObservableObject {
+    public static let shared = EmojiUsageTracker()
+
+    private static let maxRecentCount = 12
+    private static let usageKey = "emojiUsageHistory"
+
+    @Published private(set) public var recentEmojis: [String] = []
+
+    private let defaults = UserDefaults.standard
+
+    private init() {
+        loadRecentEmojis()
+    }
+
+    /// Registra el uso de un emoji
+    public func recordUsage(_ emoji: String) {
+        let trimmed = emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        // Mover al inicio si ya existe, o agregar al inicio
+        recentEmojis.removeAll { $0 == trimmed }
+        recentEmojis.insert(trimmed, at: 0)
+
+        // Limitar tamaño
+        if recentEmojis.count > Self.maxRecentCount {
+            recentEmojis = Array(recentEmojis.prefix(Self.maxRecentCount))
+        }
+
+        saveRecentEmojis()
+    }
+
+    /// Obtiene los emojis recientes, filtrando por workspace si está disponible
+    public func getRecentEmojis(forWorkspace workspaceEmojis: [String]? = nil) -> [String] {
+        guard let workspaceEmojis = workspaceEmojis else {
+            return recentEmojis
+        }
+
+        // Filtrar para mostrar solo emojis válidos en el workspace
+        return recentEmojis.filter { emoji in
+            if EmojiValidator.isSlackShortcode(emoji) {
+                return workspaceEmojis.contains(emoji)
+            }
+            return true
+        }
+    }
+
+    private func loadRecentEmojis() {
+        if let data = defaults.data(forKey: Self.usageKey),
+           let decoded = try? JSONDecoder().decode([String].self, from: data) {
+            recentEmojis = decoded
+        }
+    }
+
+    private func saveRecentEmojis() {
+        if let encoded = try? JSONEncoder().encode(recentEmojis) {
+            defaults.set(encoded, forKey: Self.usageKey)
+        }
+    }
+}
+
