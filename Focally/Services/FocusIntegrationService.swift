@@ -58,6 +58,7 @@ final class FocusIntegrationService: ObservableObject {
     private let defaults = UserDefaults.standard
     private let managedShortcutsService = ManagedFocusShortcutsService.shared
     private let directDNDService: DNDService
+    private let slackService: SlackService
 
     private static let kMode = "focusIntegrationMode"
     private static let kEnabled = "focusIntegrationEnabled"
@@ -74,8 +75,9 @@ final class FocusIntegrationService: ObservableObject {
     @Published var isFocusActive: Bool = false
     @Published var lastShortcutIssue: String?
 
-    private init(dndService: DNDService = .shared) {
+    private init(dndService: DNDService = .shared, slackService: SlackService = SlackService()) {
         self.directDNDService = dndService
+        self.slackService = slackService
         self.isEnabled = true
         defaults.set(true, forKey: Self.kEnabled)
 
@@ -102,6 +104,16 @@ final class FocusIntegrationService: ObservableObject {
         lastError = nil
         lastShortcutIssue = nil
         performDirectFocusAction(action, source: "manual test")
+    }
+
+    func runSlackTest(completion: ((Bool, String) -> Void)? = nil) {
+        slackService.disableSlackDND()
+        slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let success = self.slackService.connectionError == nil
+            let message = self.slackService.lastActionMessage ?? (success ? "Slack focus integration succeeded" : (self.slackService.connectionError ?? "Slack focus integration failed"))
+            completion?(success, message)
+        }
     }
 
     static func performFromAppIntent(_ action: FocusIntegrationAction) async throws {
@@ -140,6 +152,7 @@ final class FocusIntegrationService: ObservableObject {
 
         performDirectFocusAction(action, source: "direct system DND")
         attemptManagedShortcutAction(action)
+        performSlackFocusAction(action)
     }
 
     private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String) {
@@ -163,6 +176,17 @@ final class FocusIntegrationService: ObservableObject {
             let message = error.localizedDescription
             lastShortcutIssue = message
             logger.error("Managed shortcut backup failed: \(message, privacy: .public)")
+        }
+    }
+
+    private func performSlackFocusAction(_ action: FocusIntegrationAction) {
+        guard slackService.isEnabled else { return }
+        switch action {
+        case .start:
+            slackService.disableSlackDND()
+            slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
+        case .end:
+            slackService.clearStatus()
         }
     }
 }

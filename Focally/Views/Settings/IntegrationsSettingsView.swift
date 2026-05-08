@@ -10,6 +10,7 @@ struct IntegrationsSettingsView: View {
     @State private var slackToken = ""
     @State private var googleClientID = ""
     @State private var googleClientSecret = ""
+    @State private var slackTestFeedback: String?
 
     var body: some View {
         VStack(spacing: FocallySpacing.lg) {
@@ -47,12 +48,20 @@ struct IntegrationsSettingsView: View {
                 primaryButton("Save Token", action: saveSlackToken)
                 secondaryButton("Test Connection", action: testSlackConnection)
                     .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                secondaryButton("Test Focus Integration", action: testSlackFocusIntegration)
+                    .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
 
             if let slackError = slackService.connectionError, !slackError.isEmpty {
                 Text(slackError)
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyError)
+            }
+
+            if let slackTestFeedback, !slackTestFeedback.isEmpty {
+                Text(slackTestFeedback)
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
             }
         }
         .padding(FocallySpacing.lg)
@@ -338,6 +347,14 @@ struct IntegrationsSettingsView: View {
     private func testSlackConnection() {
         saveSlackToken()
         slackService.testConnection()
+    }
+
+    private func testSlackFocusIntegration() {
+        saveSlackToken()
+        focusIntegrationService.runSlackTest { success, message in
+            slackTestFeedback = message
+            if success { slackService.connectionError = nil }
+        }
     }
 
     private func saveGoogleCredentials() {
