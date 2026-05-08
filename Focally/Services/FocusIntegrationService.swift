@@ -57,7 +57,7 @@ final class FocusIntegrationService: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "FocusIntegrationService")
     private let defaults = UserDefaults.standard
     private let managedShortcutsService = ManagedFocusShortcutsService.shared
-    private let directDNDService = DNDService()
+    private let directDNDService: DNDService
 
     private static let kMode = "focusIntegrationMode"
     private static let kEnabled = "focusIntegrationEnabled"
@@ -74,7 +74,8 @@ final class FocusIntegrationService: ObservableObject {
     @Published var isFocusActive: Bool = false
     @Published var lastShortcutIssue: String?
 
-    private init() {
+    private init(dndService: DNDService = .shared) {
+        self.directDNDService = dndService
         self.isEnabled = true
         defaults.set(true, forKey: Self.kEnabled)
 
@@ -123,14 +124,14 @@ final class FocusIntegrationService: ObservableObject {
         }
         if isFocusActive {
             if let lastShortcutIssue, !lastShortcutIssue.isEmpty {
-                return "Do Not Disturb active. Shortcuts backup needs attention."
+                return "Quiet mode is active. The shortcut backup needs attention."
             }
-            return "Do Not Disturb active and shortcuts were attempted."
+            return "Quiet mode is active and the shortcut backup was attempted."
         }
         if managedShortcutsService.allManagedShortcutsInstalled {
-            return "Ready. Focally will try direct Do Not Disturb and Focus Shortcuts together."
+            return "Ready. Focally will turn on quiet mode directly and also try the bundled shortcuts."
         }
-        return "Ready. Focally will turn on quiet mode directly and also try the bundled Focus Shortcuts."
+        return "Ready. Focally will turn on quiet mode directly and then try the bundled shortcuts."
     }
 
     private func performCombinedFocusAction(_ action: FocusIntegrationAction) {
@@ -145,11 +146,11 @@ final class FocusIntegrationService: ObservableObject {
         switch action {
         case .start:
             directDNDService.activateDND()
-            isFocusActive = true
+            isFocusActive = directDNDService.isDNDActive
             logger.info("Focus activated via \(source, privacy: .public)")
         case .end:
             directDNDService.deactivateDND()
-            isFocusActive = false
+            isFocusActive = directDNDService.isDNDActive
             logger.info("Focus deactivated via \(source, privacy: .public)")
         }
     }

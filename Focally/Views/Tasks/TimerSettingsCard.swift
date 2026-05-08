@@ -175,7 +175,7 @@ struct FocusModeCard: View {
                     .foregroundStyle(.white.opacity(0.9))
 
                 Button("Use classic 25/5/15") {
-                    timerService.configurePomodoroPreset()
+                    timerService.applyPomodoroPreset(.classic)
                 }
                 .buttonStyle(.plain)
                 .font(.system(size: 11, weight: .semibold))

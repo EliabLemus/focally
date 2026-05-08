@@ -103,8 +103,8 @@ struct ShortcutOnboardingView: View {
         VStack(spacing: FocallySpacing.lg) {
             heroCard(
                 icon: "moon.circle.fill",
-                title: "Direct DND First",
-                subtitle: "Install Focally, enable Focus Integration, and it can toggle macOS Do Not Disturb immediately — no Shortcuts import required for the main path."
+                title: "Quiet Mode On by Default",
+                subtitle: "Install Focally, enable Focus Integration, and it can toggle macOS Do Not Disturb right away — no extra setup for the main path."
             )
 
             VStack(alignment: .leading, spacing: FocallySpacing.md) {
@@ -122,8 +122,8 @@ struct ShortcutOnboardingView: View {
 
                 benefitItem(
                     icon: "square.and.arrow.down",
-                    title: "Optional Managed Shortcuts",
-                    description: "If you want Apple's visual Add flow, Focally can stage its bundled signed Focus On/Off shortcuts and open them for you."
+                    title: "Optional shortcut files",
+                    description: "If Apple needs the visual Add step, Focally can stage its bundled signed Focus On/Off shortcuts and open them for you."
                 )
             }
         }
@@ -133,14 +133,14 @@ struct ShortcutOnboardingView: View {
         VStack(spacing: FocallySpacing.lg) {
             heroCard(
                 icon: "bolt.badge.clock",
-                title: "Two Honest Paths",
-                subtitle: "Direct DND is the install-and-it-just-works default. Managed shortcuts are optional for people who want Apple's visible Add step."
+                title: "Quiet mode, handled automatically",
+                subtitle: "Focally turns on Do Not Disturb directly. The bundled shortcut files are only there if Apple needs the visual Add step."
             )
 
             VStack(alignment: .leading, spacing: FocallySpacing.md) {
-                infoRow(number: "1", text: "Direct System DND stays recommended and works as soon as Focus Integration is enabled — no Apple Add screen involved.")
-                infoRow(number: "2", text: "Managed shortcuts are optional. Focally bundles the real signed .shortcut files inside the app, stages them for you, and opens them on demand.")
-                infoRow(number: "3", text: "Apple still shows one visual Add confirmation per shortcut. After you press Add once, Focally can run them automatically without manual editing.")
+                infoRow(number: "1", text: "Focally uses direct Do Not Disturb first as soon as Focus Integration is enabled.")
+                infoRow(number: "2", text: "If Apple needs the visual Add step, Focally stages the bundled signed shortcut files and opens them for you.")
+                infoRow(number: "3", text: "After that one visual confirmation, Focally can use the shortcut backup automatically without manual editing.")
             }
             .padding(FocallySpacing.lg)
             .background(
@@ -154,7 +154,7 @@ struct ShortcutOnboardingView: View {
         VStack(spacing: FocallySpacing.lg) {
             heroCard(
                 icon: "square.and.arrow.down.on.square",
-                title: "Optional Managed Shortcuts",
+                title: "Shortcut files for Apple’s Add step",
                 subtitle: viewModel.managedShortcutsService.setupSummary
             )
 
@@ -162,13 +162,13 @@ struct ShortcutOnboardingView: View {
                 statusRow(
                     title: "Signed files ready",
                     isComplete: viewModel.managedShortcutsService.allSignedShortcutsExist,
-                    detail: "Focally copies the bundled signed Focus On/Off .shortcut files from the app into Application Support so they're easy to open."
+                    detail: "Focally copies the bundled signed Focus On/Off .shortcut files into Application Support so they’re easy to open."
                 )
 
                 statusRow(
-                    title: "Imported in Shortcuts",
+                    title: "Visual Add step done",
                     isComplete: viewModel.managedShortcutsService.allManagedShortcutsInstalled,
-                    detail: "After Apple shows the Add dialog once for each shortcut and you press Add, Focally can run the installed shortcuts by name."
+                    detail: "After Apple shows the Add dialog once for each shortcut and you press Add, Focally can run the backup automatically."
                 )
             }
             .padding(FocallySpacing.lg)
@@ -179,7 +179,7 @@ struct ShortcutOnboardingView: View {
 
             HStack(spacing: FocallySpacing.sm) {
                 Button(action: viewModel.prepareManagedShortcuts) {
-                    primaryButtonLabel("Stage Bundled Files", icon: "wand.and.stars")
+                    primaryButtonLabel("Stage Files", icon: "wand.and.stars")
                 }
                 .buttonStyle(.plain)
 
@@ -190,14 +190,14 @@ struct ShortcutOnboardingView: View {
             }
 
             messageCard(
-                text: "Managed shortcuts stay optional. Focally never silently imports them: it stages the bundled signed files, then Apple shows the Add button once per shortcut.",
+                text: "The shortcut files stay optional. Focally never silently imports them: it stages the bundled signed files, then Apple shows the Add button once per shortcut.",
                 color: Color.focallyPrimary,
                 icon: "sparkles"
             )
 
             HStack(spacing: FocallySpacing.sm) {
                 Button(action: viewModel.openManagedShortcuts) {
-                    secondaryButtonLabel("Open Bundled Files", icon: "square.and.arrow.up")
+                    secondaryButtonLabel("Open Files", icon: "square.and.arrow.up")
                 }
                 .buttonStyle(.plain)
                 .disabled(!viewModel.managedShortcutsService.allSignedShortcutsExist)
@@ -223,8 +223,8 @@ struct ShortcutOnboardingView: View {
         VStack(spacing: FocallySpacing.lg) {
             heroCard(
                 icon: viewModel.allShortcutsVerified ? "checkmark.seal.fill" : "checkmark.shield",
-                title: viewModel.allShortcutsVerified ? "Direct DND Verified" : "Verify Both Paths",
-                subtitle: "Direct DND should pass immediately. Managed shortcuts only show ready after the Add step happened in Shortcuts once per file."
+                title: viewModel.allShortcutsVerified ? "Quiet mode verified" : "Verify the setup",
+                subtitle: "Direct DND should pass immediately. The shortcut backup only shows ready after the visual Add step happened once per file."
             )
 
             VStack(alignment: .leading, spacing: FocallySpacing.sm) {
@@ -245,7 +245,7 @@ struct ShortcutOnboardingView: View {
 
             if !viewModel.managedShortcutsService.allManagedShortcutsInstalled {
                 messageCard(
-                    text: "Managed shortcuts are still optional. If you skipped the Apple Add dialogs, direct DND remains the supported default and nothing else needs to be created manually.",
+                    text: "The shortcut backup is still optional. If you skipped the Apple Add dialogs, direct DND remains the supported default and nothing else needs to be created manually.",
                     color: Color.focallyPrimary,
                     icon: "lightbulb.fill"
                 )
@@ -266,14 +266,14 @@ struct ShortcutOnboardingView: View {
         VStack(spacing: FocallySpacing.lg) {
             heroCard(
                 icon: "checkmark.seal.fill",
-                title: "You're All Set",
-                subtitle: "Use Direct System DND by default. Switch to Managed Shortcuts later only if you want Focally to run the Apple-approved shortcut files after the one-time Add step."
+                title: "You’re all set",
+                subtitle: "Use direct Do Not Disturb by default. The shortcut backup only matters later if you want the Apple visual Add step for the bundled files."
             )
 
             VStack(alignment: .leading, spacing: FocallySpacing.md) {
-                nextStepItem(step: "1", title: "Keep Direct System DND enabled", description: "That remains the fastest, recommended, install-and-it-just-works path.")
-                nextStepItem(step: "2", title: "Stage managed shortcuts only if you need them", description: "Focally can stage its bundled signed files and open both Apple Add screens from Settings > Integrations.")
-                nextStepItem(step: "3", title: "Press Add once, then verify", description: "After each shortcut is added in Shortcuts, use Verify to confirm Focally can run them automatically.")
+                nextStepItem(step: "1", title: "Keep direct Do Not Disturb enabled", description: "That remains the fastest, recommended path.")
+                nextStepItem(step: "2", title: "Only stage the shortcut backup if you need it", description: "Focally can stage its bundled signed files and open the Apple visual Add screens from Settings > Integrations.")
+                nextStepItem(step: "3", title: "Press Add once, then verify", description: "After each shortcut is added in Shortcuts, use Verify to confirm Focally can run the backup automatically.")
             }
         }
     }

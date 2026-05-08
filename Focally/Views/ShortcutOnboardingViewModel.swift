@@ -18,9 +18,9 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
         case .welcome:
             return "Welcome to Focally"
         case .explanation:
-            return "Direct DND First"
+            return "Quiet Mode, Automatically"
         case .installation:
-            return "Optional Managed Shortcuts"
+            return "Shortcut Backup"
         case .verification:
             return "Verify Your Setup"
         case .completion:
@@ -31,15 +31,15 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .welcome:
-            return "Let's enable Focally's focus integration the honest way."
+            return "Let’s turn on quiet mode the easy way."
         case .explanation:
-            return "Direct System DND stays the default install-and-it-just-works path. Managed shortcuts are optional if you want Apple's visible Add flow."
+            return "Focally turns on Do Not Disturb directly by default. The bundled shortcut backup only exists if Apple needs the visual Add step."
         case .installation:
-            return "Focally can stage its bundled signed Focus shortcuts for you, but Apple still asks you to press Add once per shortcut."
+            return "Focally can stage its bundled signed Focus shortcut files for you, then Apple asks for one visual Add confirmation per file."
         case .verification:
-            return "We'll confirm direct DND and optionally check whether the managed shortcuts were imported after that Add step."
+            return "We’ll confirm direct quiet mode and optionally check whether the shortcut backup was added after that visual step."
         case .completion:
-            return "You're ready to use direct DND now, with managed shortcuts available whenever you've finished Apple's one-time Add flow on Focally's bundled signed files."
+            return "You’re ready to use direct Do Not Disturb now, with the shortcut backup available whenever you finish Apple’s one-time Add step."
         }
     }
 }
@@ -152,7 +152,7 @@ final class ShortcutOnboardingViewModel: ObservableObject {
 
         verificationResults["Direct DND On"] = startSucceeded
         verificationResults["Direct DND Off"] = endSucceeded
-        verificationResults["Managed Shortcuts Imported"] = managedInstalled
+        verificationResults["Shortcut Backup Added"] = managedInstalled
         allShortcutsVerified = startSucceeded && endSucceeded
         isVerifying = false
 

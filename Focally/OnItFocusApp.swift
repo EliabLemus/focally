@@ -23,7 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var mainWindow: NSWindow?
     private var onboardingWindow: NSWindow?
     private var themeObserver: NSObjectProtocol?
-    let dndService = DNDService()
+    let dndService = DNDService.shared
     let focusIntegrationService = FocusIntegrationService.shared
     let slackService = SlackService()
     let calendarService = GoogleCalendarService()

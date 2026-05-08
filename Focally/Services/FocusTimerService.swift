@@ -15,6 +15,11 @@ class FocusTimerService: ObservableObject {
         static let autoStartBreaks = true
     }
 
+    enum PomodoroPreset {
+        case classic
+        case custom(workMinutes: Int, shortBreakMinutes: Int, longBreakMinutes: Int, rounds: Int, autoStart: Bool)
+    }
+
     // Existing properties for UI compatibility
     @Published var isActive = false
     @Published var isPaused = false
@@ -149,8 +154,22 @@ class FocusTimerService: ObservableObject {
         saveSettings()
     }
 
+    func applyPomodoroPreset(_ preset: PomodoroPreset) {
+        switch preset {
+        case .classic:
+            configurePomodoroPreset()
+        case .custom(let workMinutes, let shortBreakMinutes, let longBreakMinutes, let rounds, let autoStart):
+            configurePomodoroPreset(
+                workMinutes: workMinutes,
+                shortBreakMinutes: shortBreakMinutes,
+                longBreakMinutes: longBreakMinutes,
+                rounds: rounds,
+                autoStart: autoStart
+            )
+        }
+    }
+
     func startPomodoroSession(activity: String, emoji: String = "🍅") {
-        configurePomodoroPreset()
         startWorkSession(activity: activity, emoji: emoji, durationMinutes: workDurationMinutes)
     }
 

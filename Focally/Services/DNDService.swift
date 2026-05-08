@@ -1,7 +1,9 @@
 import Cocoa
 import os.log
 
-class DNDService: ObservableObject {
+final class DNDService: ObservableObject {
+    static let shared = DNDService()
+
     private static let notificationCenterAppId = "com.apple.notificationcenterui" as CFString
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "DNDService")

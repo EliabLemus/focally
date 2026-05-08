@@ -108,7 +108,7 @@ struct IntegrationsSettingsView: View {
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text("Focally handles quiet mode automatically. It always tries direct Do Not Disturb first and then the bundled Focus Shortcuts as backup.")
+                    Text("Focally handles quiet mode automatically. It turns on Do Not Disturb first and only uses the bundled shortcuts as a backup detail if needed.")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                         .fixedSize(horizontal: false, vertical: true)
@@ -125,10 +125,10 @@ struct IntegrationsSettingsView: View {
                 )
 
                 focusStatusRow(
-                    title: "Focus Shortcuts",
+                    title: "Bundled shortcut backup",
                     subtitle: managedShortcutsService.allManagedShortcutsInstalled
-                        ? "Installed and ready as the backup path."
-                        : "Import once so Focally can use them as the backup path too.",
+                        ? "Installed and ready if Apple needs the visual Add step."
+                        : "Optional: open once so Apple can show the visual Add step.",
                     isReady: managedShortcutsService.allManagedShortcutsInstalled
                 )
 
@@ -139,11 +139,11 @@ struct IntegrationsSettingsView: View {
                 }
 
                 HStack(spacing: FocallySpacing.sm) {
-                    primaryButton("Install Focus Shortcuts") {
+                    primaryButton("Stage Shortcut Files") {
                         managedShortcutsService.prepareAndOpenForImport()
                     }
 
-                    secondaryButton("Verify Installation") {
+                    secondaryButton("Refresh Status") {
                         managedShortcutsService.refreshInstallationState()
                     }
                 }

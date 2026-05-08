@@ -94,7 +94,7 @@ struct SettingsPage: View {
                         Spacer()
 
                         Button(action: openShortcutSetup) {
-                            Text("Open Focus Shortcuts Guide")
+                            Text("Manage Focus Integration")
                                 .font(.focallyButton)
                                 .foregroundStyle(Color.focallyOnPrimary)
                                 .padding(.horizontal, FocallySpacing.md)
@@ -105,7 +105,7 @@ struct SettingsPage: View {
                                 )
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("Open Focus Setup Guide")
+                        .accessibilityLabel("Manage Focus Integration")
                     }
                     .padding(.horizontal, FocallySpacing.lg)
                     .padding(.vertical, FocallySpacing.md)
