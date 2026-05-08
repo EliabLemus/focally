@@ -20,6 +20,7 @@
 		1CDEA207B423CA61E8D21033 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1825FA0D4F141DB46F655310 /* Cocoa.framework */; };
 		2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */; };
 		22CE09543F47353743C5813D /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */; };
+		AB1234567890ABCDEF1234567890ABCDEF1235 /* FocusSessionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1234567890ABCDEF1234567890ABCDEF1234 /* FocusSessionComponents.swift */; };
 		24FE2C7D6FB650BB2C5AD8F1 /* Tasks in Resources */ = {isa = PBXBuildFile; fileRef = 27F8F15DF606273DE32B3B14 /* Tasks */; };
 		28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */; };
 		29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */; };
@@ -169,6 +170,7 @@
 		696DBC7778A0F797F047B996 /* FocusBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBlockView.swift; sourceTree = "<group>"; };
 		69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
 		6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
+		AB1234567890ABCDEF1234567890ABCDEF1234 /* FocusSessionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/FocusSessionComponents.swift; sourceTree = "<group>"; };
 		6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDropdownView.swift; sourceTree = "<group>"; };
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
 		7329B648E3CF152B279F34FE /* RecentSessionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSessionsList.swift; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 			children = (
 				4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */,
 				6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */,
+				AB1234567890ABCDEF1234567890ABCDEF1234 /* FocusSessionComponents.swift */,
 				F4546DFFE30B32483B8C72A5 /* ShortcutOnboardingView.swift */,
 				4B9E6C8304B13DCAD83B1CFB /* ShortcutOnboardingViewModel.swift */,
 				590A7EFBC009126860A31878 /* Analytics */,
@@ -662,6 +665,7 @@
 				A9B36E8ADD6E0B6C2B437CE6 /* ScheduleService.swift in Sources */,
 				DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */,
 				22CE09543F47353743C5813D /* SharedComponents.swift in Sources */,
+				AB1234567890ABCDEF1234567890ABCDEF1235 /* FocusSessionComponents.swift in Sources */,
 				E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */,
 				5268929AD485C2D5E2A9E710 /* ShortcutOnboardingView.swift in Sources */,
 				796BBCC6BC73846D9E297E11 /* ShortcutOnboardingViewModel.swift in Sources */,
