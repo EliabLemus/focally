@@ -69,15 +69,22 @@ final class SoundPlayerService: ObservableObject {
     }
 
     func soundURL(for soundName: String) -> URL? {
+        let candidates: [(String, String)] = [
+            (soundName, "aiff"),
+            (soundName.lowercased(), "aiff"),
+            (soundName, "wav"),
+            (soundName.lowercased(), "wav")
+        ]
+
         if soundName == "Bell",
            let bundledURL = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
             return bundledURL
         }
-        if let bundledURL = Bundle.main.url(forResource: soundName, withExtension: "aiff") {
-            return bundledURL
-        }
-        if let bundledURL = Bundle.main.url(forResource: soundName.lowercased(), withExtension: "wav") {
-            return bundledURL
+
+        for (name, ext) in candidates {
+            if let bundledURL = Bundle.main.url(forResource: name, withExtension: ext) {
+                return bundledURL
+            }
         }
 
         let systemSoundURL = URL(fileURLWithPath: "/System/Library/Sounds")
@@ -160,6 +167,12 @@ final class SoundPlayerService: ObservableObject {
             logger.warning("Sound not found: \(soundName, privacy: .public)")
             return nil
         }
-        return NSSound(contentsOf: url, byReference: true)
+
+        guard let sound = NSSound(contentsOf: url, byReference: true) else {
+            logger.warning("Failed to load sound at URL: \(url.path, privacy: .public)")
+            return nil
+        }
+
+        return sound
     }
 }

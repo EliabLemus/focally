@@ -117,6 +117,8 @@ struct IntegrationsSettingsView: View {
                 Spacer()
             }
 
+            soundPreviewSection
+
             VStack(alignment: .leading, spacing: 12) {
                 focusStatusRow(
                     title: "Direct Do Not Disturb",
@@ -189,6 +191,50 @@ struct IntegrationsSettingsView: View {
 
             Spacer()
         }
+    }
+
+    private var soundPreviewSection: some View {
+        let soundPlayer = SoundPlayerService.shared
+
+        return VStack(alignment: .leading, spacing: FocallySpacing.sm) {
+            Text("Completion Sound Preview")
+                .font(.focallyBodyBold)
+                .foregroundStyle(Color.focallyOnSurface)
+
+            Text("Choose a completion sound and preview it instantly.")
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+            HStack(spacing: FocallySpacing.sm) {
+                Picker("Completion Sound", selection: completionSoundBinding(for: soundPlayer)) {
+                    ForEach(SoundPlayerService.CompletionSoundVariant.allCases) { variant in
+                        Text(variant.rawValue).tag(variant.rawValue)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(maxWidth: 240)
+
+                Button("Preview") {
+                    soundPlayer.previewSound(named: soundPlayer.completionSoundName)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding(FocallySpacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: FocallyRadius.md)
+                .fill(Color.focallySurfaceContainerLow)
+        )
+    }
+
+    private func completionSoundBinding(for soundPlayer: SoundPlayerService) -> Binding<String> {
+        Binding(
+            get: { soundPlayer.completionSoundName },
+            set: { newValue in
+                soundPlayer.completionSoundName = newValue
+                soundPlayer.saveSettings()
+            }
+        )
     }
 
     private func connectionBadge(connected: Bool) -> some View {
