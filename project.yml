@@ -22,25 +22,27 @@ targets:
     platform: macOS
     sources:
       - Focally
-      - path: Focally/DesignSystem
-        type: folder
-      - path: Focally/Views/Navigation
-        type: folder
-      - path: Focally/Views/Timer
-        type: folder
-      - path: Focally/Views/Tasks
-        type: folder
-      - path: Focally/Views/Schedule
-        type: folder
-      - path: Focally/Views/Analytics
-        type: folder
-      - path: Focally/Views/Settings
-        type: folder
-      - path: Focally/Resources
-        type: folder
+      - path: Focally/Resources/AppIcon.icns
         buildPhase: resources
-      - path: Focally/Resources/Fonts
-        type: folder
+      - path: Focally/Resources/bell.aiff
+        buildPhase: resources
+      - path: Focally/Resources/confirmation_003.aiff
+        buildPhase: resources
+      - path: Focally/Resources/focally-focus-off-signed.shortcut
+        buildPhase: resources
+      - path: Focally/Resources/focally-focus-on-signed.shortcut
+        buildPhase: resources
+      - path: Focally/Resources/glass_005.aiff
+        buildPhase: resources
+      - path: Focally/Resources/pluck_002.aiff
+        buildPhase: resources
+      - path: Focally/Resources/Fonts/Inter-Bold.ttf
+        buildPhase: resources
+      - path: Focally/Resources/Fonts/Inter-Medium.ttf
+        buildPhase: resources
+      - path: Focally/Resources/Fonts/Inter-Regular.ttf
+        buildPhase: resources
+      - path: Focally/Resources/Fonts/Inter-SemiBold.ttf
         buildPhase: resources
     settings:
       base:

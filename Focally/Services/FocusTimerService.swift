@@ -237,8 +237,10 @@ class FocusTimerService: ObservableObject {
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }
 
-    func endSession() {
+    func endSession(playCompletionSound: Bool = true) {
         stopTimer()
+        deactivateFocusIntegration()
+
         pomodoroState = .idle
         currentRound = 0
         remainingSeconds = 0
@@ -247,7 +249,10 @@ class FocusTimerService: ObservableObject {
         currentActivity = ""
         currentEmoji = "📝"
 
-        deactivateFocusIntegration()
+        if playCompletionSound {
+            soundPlayer.playCompletionSound()
+        }
+
         notificationService.notify(.sessionEnded)
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }
@@ -297,12 +302,12 @@ class FocusTimerService: ObservableObject {
 
     func resetToIdle() {
         stopTimer()
+        deactivateFocusIntegration()
         pomodoroState = .idle
         currentRound = 0
         remainingSeconds = 0
         isActive = false
         isPaused = false
-        deactivateFocusIntegration()
         notificationService.notify(.sessionEnded)
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }

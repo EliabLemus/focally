@@ -50,7 +50,11 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
             content.body = "Your focus session has finished"
         }
 
-        content.sound = .default
+        if case .sessionEnded = event {
+            content.sound = nil
+        } else {
+            content.sound = .default
+        }
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         center.add(request) { error in
             if let error {
