@@ -58,6 +58,18 @@ struct IntegrationsSettingsView: View {
                     .foregroundStyle(Color.focallyError)
             }
 
+            if slackService.isEnabled {
+                if slackService.workspaceEmojiCodes.isEmpty {
+                    Text("Slack emoji catalog: Loading...")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+                } else {
+                    Text("Slack emoji catalog: \(slackService.workspaceEmojiCodes.count) emojis loaded")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyTertiary)
+                }
+            }
+
             if let slackTestFeedback, !slackTestFeedback.isEmpty {
                 Text(slackTestFeedback)
                     .font(.focallyCaption)
@@ -341,7 +353,13 @@ struct IntegrationsSettingsView: View {
         let trimmedToken = slackToken.trimmingCharacters(in: .whitespacesAndNewlines)
         slackService.token = trimmedToken.isEmpty ? nil : trimmedToken
         slackService.connectionError = nil
+        // Auto-enable Slack when a token is saved
+        if !trimmedToken.isEmpty && !slackService.isEnabled {
+            slackService.isEnabled = true
+        }
         slackService.isConnected = !trimmedToken.isEmpty && slackService.isEnabled
+        // Refresh emoji catalog after saving token
+        slackService.refreshEmojiCatalogIfPossible()
     }
 
     private func testSlackConnection() {

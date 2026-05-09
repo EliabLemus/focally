@@ -49,7 +49,7 @@ final class SoundPlayerService: ObservableObject {
     func play(_ soundType: SoundType) {
         guard isEnabled else { return }
         let soundName = resolveSoundName(for: soundType)
-        let repeatCount = soundType == .sessionComplete ? 1 : max(soundRepeatCount, 1)
+        let repeatCount = soundType == .sessionComplete ? 3 : max(soundRepeatCount, 1)
         playSound(named: soundName, repeatCount: repeatCount, interSoundDelay: 1.2)
     }
 
