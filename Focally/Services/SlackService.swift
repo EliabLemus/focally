@@ -99,7 +99,7 @@ class SlackService: ObservableObject {
 
     func setSlackFocusStatus(text: String = "In focus", emoji: String = "🎯", expirationTimestamp: Int? = nil) {
         let maskedToken = maskedToken(token)
-        logger.info("setSlackFocusStatus called. isEnabled=\(self.isEnabled, privacy: .public), token=\(maskedToken, privacy: .public), text=\(text, privacy: .public), emoji=\(emoji, privacy: .public)")
+        logger.info("setSlackFocusStatus called. isEnabled=\(self.isEnabled, privacy: .public), token=\(maskedToken, privacy: .public), text=\(text, privacy: .public), emoji=\(emoji, privacy: .public), workspaceEmojisLoaded=\(self.workspaceEmojiCodes.count, privacy: .public)")
         guard isEnabled else {
             logger.info("Skipping setSlackFocusStatus because Slack integration is disabled")
             return
@@ -310,12 +310,12 @@ class SlackService: ObservableObject {
 
     func refreshEmojiCatalogIfPossible() {
         guard let token, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            logger.info("Skipping emoji catalog refresh: no token")
+            logger.info("Skipping emoji catalog refresh: no token available")
             workspaceEmojiCodes = []
             return
         }
 
-        logger.info("Refreshing Slack emoji catalog (enabled=\(self.isEnabled, privacy: .public))...")
+        logger.info("Refreshing Slack emoji catalog (enabled=\(self.isEnabled, privacy: .public), token length=\(token.count, privacy: .public))...")
 
         guard let request = makeSlackRequest(url: Self.emojiListURL, token: token, formFields: [:]) else {
             logger.error("Failed to prepare Slack emoji.list request")
@@ -383,13 +383,18 @@ class SlackService: ObservableObject {
     /// Pausa las notificaciones de Slack por X minutos (DND de Slack)
     /// - Parameter minutes: Duración en minutos para pausar notificaciones
     func setSlackDNDSnooze(minutes: Int) {
-        guard self.isEnabled, let token = self.token else {
-            logger.warning("Skipping setSlackDNDSnooze because Slack is disabled (\(self.isEnabled, privacy: .public)) or no token (\(self.token != nil, privacy: .public))")
+        guard self.isEnabled else {
+            logger.warning("Skipping setSlackDNDSnooze: Slack is disabled (isEnabled=\(self.isEnabled, privacy: .public))")
+            return
+        }
+        
+        guard let token = self.token, !token.isEmpty else {
+            logger.warning("Skipping setSlackDNDSnooze: No token available")
             return
         }
 
         let numMinutes = max(1, minutes)
-        logger.info("setSlackDNDSnooze called for \(numMinutes, privacy: .public) minutes")
+        logger.info("Setting Slack DND snooze for \(numMinutes, privacy: .public) minutes (token length: \(token.count, privacy: .public))")
 
         guard let request = makeSlackRequest(url: dndSetSnoozeURL, token: token, formFields: [
             "num_minutes": "\(numMinutes)"
@@ -491,20 +496,32 @@ class SlackService: ObservableObject {
 
     private func normalizedStatusEmoji(in text: String, taskEmoji: String?, fallbackEmoji: String?) -> String {
         if let inlineEmoji = firstEmoji(in: text) {
-            return inlineEmoji
+            return normalizeEmojiForSlack(inlineEmoji)
         }
 
         let taskValue = taskEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !taskValue.isEmpty {
-            return taskValue
+            return normalizeEmojiForSlack(taskValue)
         }
 
         let fallbackValue = fallbackEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !fallbackValue.isEmpty {
-            return fallbackValue
+            return normalizeEmojiForSlack(fallbackValue)
         }
 
-        return savedStatusEmoji()
+        return normalizeEmojiForSlack(savedStatusEmoji())
+    }
+
+    private func normalizeEmojiForSlack(_ emoji: String) -> String {
+        let trimmed = emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return savedStatusEmoji() }
+        if EmojiValidator.isSlackShortcode(trimmed) {
+            return trimmed
+        }
+        if let shortcode = EmojiValidator.convertUnicodeToShortcode(trimmed, workspaceEmojis: workspaceEmojiCodes) {
+            return shortcode
+        }
+        return trimmed
     }
 
     private func firstEmoji(in text: String) -> String? {
@@ -522,7 +539,7 @@ class SlackService: ObservableObject {
     }
 
     private func firstSlackEmojiCode(in text: String) -> String? {
-        let pattern = #":\:[a-z0-9_+\-]+:\:"#
+        let pattern = #":[a-z0-9_+\-]+:"#
 
         guard let regex = try? NSRegularExpression(pattern: pattern) else {
             return nil

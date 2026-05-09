@@ -100,7 +100,7 @@ struct MenuBarDropdownView: View {
                 .foregroundStyle(Color.focallyOnPrimary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 12)
-                .background(Color.focallyPrimary)
+                .background(Color.focallySecondary)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .buttonStyle(.plain)

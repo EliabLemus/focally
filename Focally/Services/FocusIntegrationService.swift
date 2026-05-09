@@ -46,6 +46,15 @@ enum FocusIntegrationAction {
     case end
 }
 
+extension FocusIntegrationAction: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .start: return "start"
+        case .end: return "end"
+        }
+    }
+}
+
 // MARK: - Focus Integration Service
 
 @MainActor
@@ -147,6 +156,8 @@ final class FocusIntegrationService: ObservableObject {
     }
 
     private func performCombinedFocusAction(_ action: FocusIntegrationAction) {
+        let slackEnabled = self.slackService.isEnabled
+        logger.info("performCombinedFocusAction called. action=\(action, privacy: .public), slackEnabled=\(slackEnabled, privacy: .public)")
         lastError = nil
         lastShortcutIssue = nil
 
@@ -180,16 +191,23 @@ final class FocusIntegrationService: ObservableObject {
     }
 
     private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil) {
-        guard slackService.isEnabled else { return }
+        let slackEnabled = self.slackService.isEnabled
+        let durationDescription = durationMinutes?.description ?? "nil"
+        logger.info("performSlackFocusAction called. action=\(action, privacy: .public), durationMinutes=\(durationDescription, privacy: .public), slackEnabled=\(slackEnabled, privacy: .public)")
+        guard slackEnabled else {
+            logger.info("Skipping performSlackFocusAction: Slack is disabled")
+            return
+        }
         switch action {
         case .start:
             let duration = durationMinutes ?? 25
-            slackService.disableSlackDND()  // Primero end DND existente
-            slackService.setSlackDNDSnooze(minutes: duration)  // Luego snooze por X minutos
+            logger.info("Starting Slack focus actions for \(duration, privacy: .public) minutes")
+            slackService.setSlackDNDSnooze(minutes: duration)
             slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
         case .end:
+            logger.info("Ending Slack focus actions")
             slackService.clearStatus()
-            slackService.disableSlackDND()  // End snooze y DND
+            slackService.disableSlackDND()
         }
     }
 }

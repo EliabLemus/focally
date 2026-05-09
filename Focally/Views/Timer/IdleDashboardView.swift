@@ -116,7 +116,7 @@ struct IdleDashboardView: View {
                             .foregroundStyle(Color.focallyOnPrimary)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(Color.focallyPrimary)
+                            .background(Color.focallySecondary)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)

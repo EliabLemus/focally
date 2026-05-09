@@ -64,9 +64,17 @@ struct IntegrationsSettingsView: View {
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 } else {
-                    Text("Slack emoji catalog: \(slackService.workspaceEmojiCodes.count) emojis loaded")
+                    HStack(spacing: FocallySpacing.xs) {
+                        Text("Slack emoji catalog: \(slackService.workspaceEmojiCodes.count) emojis loaded")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyTertiary)
+                        Button("Reload") {
+                            slackService.refreshEmojiCatalogIfPossible()
+                        }
                         .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyTertiary)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Color.focallyPrimary)
+                    }
                 }
             }
 

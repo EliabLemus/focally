@@ -123,7 +123,7 @@ final class SoundPlayerService: ObservableObject {
         case .workEnd: return breakSoundName
         case .breakEnd: return workSoundName
         case .longBreakEnd: return workSoundName
-        case .sessionComplete: return completionSoundName
+        case .sessionComplete: return CompletionSoundVariant.primary.rawValue
         }
     }
 
