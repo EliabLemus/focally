@@ -6,11 +6,8 @@ struct MenuBarDropdownView: View {
     @EnvironmentObject private var historyService: HistoryService
     @EnvironmentObject private var predefinedTaskStore: PredefinedTaskStore
     @EnvironmentObject private var slackService: SlackService
+    @EnvironmentObject private var calendarService: GoogleCalendarService
     @Environment(\.colorScheme) private var colorScheme
-
-    @State private var taskInput: String = ""
-    @State private var selectedEmoji: String = "🎯"
-    @State private var selectedDuration: Int = 25
 
     var body: some View {
         VStack(spacing: 0) {
@@ -59,75 +56,7 @@ struct MenuBarDropdownView: View {
     }
 
     private var quickStartSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Quick session")
-                .font(.focallyBodyBold)
-                .foregroundStyle(Color.focallyOnSurface)
-
-            HStack(spacing: 10) {
-                CompactStatusEmojiButton(selection: $selectedEmoji, options: FocusStatusOption.common)
-
-                TextField("What are you focusing on?", text: $taskInput)
-                    .font(.focallyBody)
-                    .foregroundStyle(Color.focallyOnSurface)
-                    .textFieldStyle(.plain)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(Color.focallySurfaceContainerLow)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(borderColor, lineWidth: 0.5)
-                    }
-                    .onSubmit(startSession)
-            }
-
-            Text("Slack status: \(selectedEmoji)")
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(Color.focallyOnSurfaceVariant)
-
-            DurationControl(minutes: $selectedDuration, range: 5...180, step: 5)
-                .padding(.horizontal, 2)
-
-            Button(action: startSession) {
-                HStack {
-                    Label("Start focus", systemImage: "play.fill")
-                        .font(.focallyBodyBold)
-                    Spacer()
-                    Text("\(selectedDuration)m")
-                        .font(.focallyCaption)
-                }
-                .foregroundStyle(Color.focallyOnPrimary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
-                .background(Color.focallySecondary)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 10) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Pomodoro")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOnSurface)
-                    Text("25 · 5 cadence, 4 rounds")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                }
-
-                Spacer()
-
-                Button("Start") {
-                    startPomodoro()
-                }
-                .buttonStyle(.plain)
-                .font(.focallyCaption)
-                .foregroundStyle(Color.focallyPrimary)
-            }
-        }
-        .padding(14)
-        .background(Color.focallySurfaceContainerLowest.opacity(0.65))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        QuickSessionsSection()
     }
 
     private var presetsSection: some View {
@@ -295,36 +224,13 @@ struct MenuBarDropdownView: View {
         }
     }
 
-    private var borderColor: Color {
-        colorScheme == .dark ? Color.white.opacity(0.08) : Color.black.opacity(0.04)
-    }
-
     private func syncFromService() {
-        if taskInput.isEmpty {
-            taskInput = timerService.currentActivity
-        }
-        selectedEmoji = timerService.currentEmoji
-        selectedDuration = timerService.workDurationMinutes
         slackService.refreshEmojiCatalogIfPossible()
-    }
-
-    private func startSession() {
-        let activity = taskInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Focus Session" : taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        timerService.updateWorkDuration(minutes: selectedDuration)
-        timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration)
-        taskInput = ""
     }
 
     private func start(task: PredefinedTask) {
         timerService.updateWorkDuration(minutes: task.durationMinutes)
         timerService.startWorkSession(activity: task.name, emoji: task.emoji, durationMinutes: task.durationMinutes)
-        taskInput = ""
-    }
-
-    private func startPomodoro() {
-        let activity = taskInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Pomodoro" : taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        timerService.startPomodoroSession(activity: activity, emoji: selectedEmoji)
-        taskInput = ""
     }
 
     private func formatDuration(_ seconds: Int) -> String {
@@ -346,4 +252,3 @@ struct MenuBarDropdownView: View {
         return hours > 0 ? "\(hours)h \(mins)m" : "\(mins)m"
     }
 }
-

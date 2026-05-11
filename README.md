@@ -8,7 +8,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Version](https://img.shields.io/badge/version-0.6.4-green)](https://github.com/EliabLemus/focally/releases)
+[![Version](https://img.shields.io/badge/version-0.7.15-green)](https://github.com/EliabLemus/focally/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 </div>
@@ -28,14 +28,19 @@ Focally is one thing: **start a timer, get in the zone, let the app handle the r
 | Feature | Status |
 |---------|--------|
 | Focus timer (25/45/60/custom min) | ✅ |
-| Automatic Do Not Disturb | ✅ |
+| Direct System Do Not Disturb | ✅ |
+| Apple Shortcuts integration | ✅ |
+| App Intents (Start/End Focus) | ✅ |
 | Slack status sync | ✅ |
 | Alert sound with repeat | ✅ |
 | Predefined tasks | ✅ |
 | Keychain-stored secrets | ✅ |
-| Google Calendar read | 🔜 Next |
-| Focus Planner (calendar write) | 📋 Planned |
-| n8n WebSocket sync | 📋 Planned |
+| Google Calendar read | ✅ |
+| Session history | ✅ |
+| Schedule management | ✅ |
+| Analytics | ✅ |
+| Drag & Drop shortcut installation | ✅ |
+| Onboarding wizard | ✅ |
 
 ## Install
 
@@ -57,7 +62,7 @@ brew update && brew upgrade --cask focally
 | Step | What happens |
 |------|-------------|
 | **Start** | Pick an activity + duration → timer begins |
-| **Focus** | DND activates, Slack status updates automatically |
+| **Focus** | Direct System DND activates, optional Apple Shortcuts run, Slack status updates automatically |
 | **Finish** | Bell rings, notification fires, DND deactivates |
 
 ### Controls
@@ -85,7 +90,7 @@ xcodebuild build -scheme Focally -destination 'platform=macOS'
 
 ## Tech
 
-SwiftUI · NSStatusBar · macOS 14+ · XcodeGen · GitHub Actions · Homebrew tap
+SwiftUI · AppKit · App Intents · NSStatusBar · macOS 14+ · XcodeGen · GitHub Actions · Homebrew tap
 
 ## Contributing
 
@@ -97,14 +102,23 @@ For detailed release procedures and troubleshooting, see [docs/RELEASE_GUIDE.md]
 
 ### Focus Integration
 
-For complete instructions on using Apple Shortcuts integration with Focally, see [docs/FOCUS_INTEGRATION_USER_GUIDE.md](docs/FOCUS_INTEGRATION_USER_GUIDE.md).
+Focally provides two modes for focus integration:
 
-**Quick Start**:
-1. Focally generates test shortcuts in `~/Library/Application Support/Focally/Shortcuts/`
-2. Open Focally → Settings → Integrations
-3. Drag `Focally Focus On.shortcut` and `Focally Focus Off.shortcut` to the drop zone
-4. Enable "Focus Integration"
-5. Done!
+**Direct System DND (Recommended)**
+- Focally directly controls macOS Do Not Disturb
+- No setup required
+- Most reliable method
+
+**Apple Shortcuts Integration**
+- Focally generates test shortcuts on first launch
+- Drag & drop shortcuts to Settings → Integrations
+- Optional backup automation
+- Full guide: [docs/FOCUS_INTEGRATION_USER_GUIDE.md](docs/FOCUS_INTEGRATION_USER_GUIDE.md)
+
+**App Intents**
+- Focally exposes "Start Focus" and "End Focus" actions
+- Available in Shortcuts, Spotlight, and Siri
+- No manual setup required
 
 ## License
 

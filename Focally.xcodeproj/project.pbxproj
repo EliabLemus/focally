@@ -16,8 +16,10 @@
 		151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824FFB84C09F608FF1A0E65B /* TopBarView.swift */; };
 		1546EA3A0E314D00A7465E21 /* SoundPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */; };
 		15484DE81EA7074873C79B21 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5722B76D495A722143C67D73 /* TaskRowView.swift */; };
+		18A991C09C7249E696B9A5BE /* CalendarStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A991BF9C7249E696B9A5BE /* CalendarStatusCard.swift */; };
 		1A3BC7FFCD81ED099070BE22 /* DesignSystem in Resources */ = {isa = PBXBuildFile; fileRef = 1BFD2714D8AA41F25ECEE551 /* DesignSystem */; };
 		1CDEA207B423CA61E8D21033 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1825FA0D4F141DB46F655310 /* Cocoa.framework */; };
+		1D61692353E54486B5B96186 /* QuickSessionsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D61692253E54486B5B96186 /* QuickSessionsSection.swift */; };
 		2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */; };
 		22CE09543F47353743C5813D /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */; };
 		AB1234567890ABCDEF1234567890ABCDEF1235 /* FocusSessionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1234567890ABCDEF1234567890ABCDEF1234 /* FocusSessionComponents.swift */; };
@@ -135,12 +137,14 @@
 		1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyUITests.swift; sourceTree = "<group>"; };
 		18DF61381E873FA5E6F36707 /* FocusScoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusScoreCard.swift; sourceTree = "<group>"; };
 		18DF9DEEC76304DC26DB445F /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		18A991BF9C7249E696B9A5BE /* CalendarStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarStatusCard.swift; sourceTree = "<group>"; };
 		191E59EB17B55941B8BE4DFC /* TimerPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerPage.swift; sourceTree = "<group>"; };
 		1AEE7F3695EF4097CA9CAA33 /* TimerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControlsView.swift; sourceTree = "<group>"; };
 		1BFD2714D8AA41F25ECEE551 /* DesignSystem */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DesignSystem; path = Focally/DesignSystem; sourceTree = SOURCE_ROOT; };
 		1C18F5B206E8657516539F2E /* SimpleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTests.swift; sourceTree = "<group>"; };
 		1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusIntegrationService.swift; sourceTree = "<group>"; };
 		1D447524B8FAB7156D08A9B4 /* CreateFocusBlockSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFocusBlockSheet.swift; sourceTree = "<group>"; };
+		1D61692253E54486B5B96186 /* QuickSessionsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSessionsSection.swift; sourceTree = "<group>"; };
 		1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutDropHandler.swift; sourceTree = "<group>"; };
 		27F8F15DF606273DE32B3B14 /* Tasks */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Tasks; path = Focally/Views/Tasks; sourceTree = SOURCE_ROOT; };
@@ -254,10 +258,20 @@
 			path = Navigation;
 			sourceTree = "<group>";
 		};
+		11579714A0114769854F2D83 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				18A991BF9C7249E696B9A5BE /* CalendarStatusCard.swift */,
+				1D61692253E54486B5B96186 /* QuickSessionsSection.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
 		122010126CD7EFB3D8B2BF85 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */,
+				11579714A0114769854F2D83 /* Calendar */,
 				6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */,
 				AB1234567890ABCDEF1234567890ABCDEF1234 /* FocusSessionComponents.swift */,
 				F4546DFFE30B32483B8C72A5 /* ShortcutOnboardingView.swift */,
@@ -652,6 +666,7 @@
 				77FD86A23B5E36658A3E7A2A /* HistoryService.swift in Sources */,
 				502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */,
 				2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */,
+				18A991C09C7249E696B9A5BE /* CalendarStatusCard.swift in Sources */,
 				8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */,
 				D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */,
 				F94CE01D65F077489B5FCEC0 /* MenuBarDropdownView.swift in Sources */,
@@ -683,6 +698,7 @@
 				151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */,
 				4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */,
 				B51CB69C4C2F2E4EB0DAA3FC /* WeekCalendarView.swift in Sources */,
+				1D61692353E54486B5B96186 /* QuickSessionsSection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
