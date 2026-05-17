@@ -154,10 +154,10 @@ final class ManagedFocusShortcutsService: ObservableObject {
                 try stageBundledShortcut(from: bundledURL, to: stagedURL)
             }
 
-            logger.info("Staged bundled managed Focus shortcuts in \(self.stagedShortcutsDirectory.path, privacy: .public)")
+            logger.info("Staged bundled managed Focus shortcuts in \(self.stagedShortcutsDirectory.path")
         } catch {
             lastError = error.localizedDescription
-            logger.error("Failed to stage managed shortcuts: \(error.localizedDescription, privacy: .public)")
+            logger.error("Failed to stage managed shortcuts: \(error.localizedDescription")
         }
     }
 
@@ -211,7 +211,7 @@ final class ManagedFocusShortcutsService: ObservableObject {
         } catch {
             installedShortcutNames = []
             lastError = error.localizedDescription
-            logger.error("Failed to verify installed shortcuts: \(error.localizedDescription, privacy: .public)")
+            logger.error("Failed to verify installed shortcuts: \(error.localizedDescription")
         }
     }
 
