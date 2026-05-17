@@ -1,0 +1,123 @@
+# SwiftLint Configuration for Focally
+# Basado en docs/architecture/LAYER_RULES.md
+
+# Disable default rules que no aplican
+disabled_rules:
+  - trailing_whitespace  # Permitir trailing whitespace en markdown
+
+# Enable custom rules
+custom_rules:
+  # No imports circulares
+  no_circular_imports:
+    name: "No Circular Imports"
+    regex: '(?m)^import .+'
+    match_kinds:
+      - identifier
+    message: "Verificar que no hay imports circulares"
+    severity: warning
+
+  # File size limit (500 líneas)
+  file_size_limit:
+    name: "File Size Limit"
+    regex: '.*'
+    match_kinds:
+      - comment
+      - identifier
+    message: "El archivo excede 500 líneas. Split en archivos más pequeños."
+    severity: warning
+    # NOTA: Esta regla se implementa via script externo, no regex
+
+  # Structured logging
+  structured_logging:
+    name: "Structured Logging"
+    regex: '\bprint\(.*\)'
+    message: "Usar structured logging (logger.info/debug/error) en lugar de print()"
+    severity: warning
+
+  # No hardcoded colors
+  no_hardcoded_colors:
+    name: "No Hardcoded Colors"
+    regex: '\.color\(red:\s*[\d.]+\s*,\s*green:\s*[\d.]+\s*,\s*blue:\s*[\d.]+\s*\)'
+    message: "Usar Color.focallyXxx en lugar de colores hardcodeados"
+    severity: error
+
+  # No hardcoded fonts
+  no_hardcoded_fonts:
+    name: "No Hardcoded Fonts"
+    regex: '\.font\(\.system\(size:\s*[\d.]+\s*(,\s*weight:\s*.+)?\)\)'
+    message: "Usar .font(.focallyXxx) en lugar de fonts hardcodeados"
+    severity: error
+
+  # Weak self en closures
+  weak_self_in_closures:
+    name: "Weak Self in Closures"
+    regex: '\.sink\s*\{[^}]*self\.'
+    message: "Usar [weak self] en closures para evitar retain cycles"
+    severity: error
+
+# Opt-in rules (habilitar explícitamente)
+opt_in_rules:
+  - explicit_type_interface  # Type hints explícitos en closures
+  - empty_count  # Usar isEmpty en lugar de count == 0
+  - fatal_error_message  # fatalError() debe tener mensaje
+  - force_unwrapping  # Evitar force unwrapping
+  - implicitly_unwrapped_optional  # Evitar implicitly unwrapped optionals
+  - overridden_super_call  # Llamar super en overrides
+  - redundant_nil_coalescing  # Evitar nil coalescing redundante
+  - sorted_first_last  # Usar min()/max() en lugar de sorted().first/last
+
+# Line length (relaxado para legibilidad)
+line_length:
+  warning: 120
+  error: 200
+  ignores_function_declarations: true
+  ignores_comments: true
+
+# File length (500 líneas máximo)
+file_length:
+  warning: 500
+  error: 700
+  ignore_comment_only_lines: true
+
+# Function body length
+function_body_length:
+  warning: 50
+  error: 100
+
+# Type body length
+type_body_length:
+  warning: 300
+  error: 500
+
+# Cyclomatic complexity
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+
+# Nesting depth
+nesting:
+  type_level:
+    warning: 2
+  statement_level:
+    warning: 5
+
+# Reporter (formato de output)
+reporter: "xcode"  # Xcode-compatible para integración con CI
+
+# Paths a excluir
+excluded:
+  - Pods
+  - Carthage
+  - .build
+  - DerivedData
+  - FocallyTests
+  - FocallyUITests
+
+# Paths a incluir
+included:
+  - Focally
+
+# Configuración específica por regla
+explicit_type_interface:
+  excluded:
+    - "Tests/**"  # NO requerir type hints en tests

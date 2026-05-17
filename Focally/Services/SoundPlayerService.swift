@@ -35,6 +35,18 @@ final class SoundPlayerService: ObservableObject {
 
     let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass", "Basso", "Blow", "Bottle", "Frog", "Funk", "Sosumi", CompletionSoundVariant.primary.rawValue, CompletionSoundVariant.soft.rawValue, CompletionSoundVariant.alt.rawValue]
 
+    /// Returns the app bundle (not the test bundle)
+    /// In unit tests, Bundle.main points to the test bundle.
+    /// Use Bundle(identifier:) to get the main app bundle where resources are located.
+    private var appBundle: Bundle {
+        // Try to get the app bundle by its bundle identifier
+        if let bundle = Bundle(identifier: "app.focally.mac") {
+            return bundle
+        }
+        // Fallback to Bundle.main (runtime case)
+        return Bundle.main
+    }
+
     enum SoundType {
         case workEnd
         case breakEnd
@@ -77,12 +89,12 @@ final class SoundPlayerService: ObservableObject {
         ]
 
         if soundName == "Bell",
-           let bundledURL = Bundle.main.url(forResource: "bell", withExtension: "aiff") {
+           let bundledURL = appBundle.url(forResource: "bell", withExtension: "aiff") {
             return bundledURL
         }
 
         for (name, ext) in candidates {
-            if let bundledURL = Bundle.main.url(forResource: name, withExtension: ext) {
+            if let bundledURL = appBundle.url(forResource: name, withExtension: ext) {
                 return bundledURL
             }
         }
