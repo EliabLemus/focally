@@ -66,6 +66,11 @@ targets:
     platform: macOS
     sources:
       - FocallyTests
+    resources:
+      - path: Focally/Resources/bell.aiff
+      - path: Focally/Resources/confirmation_003.aiff
+      - path: Focally/Resources/glass_005.aiff
+      - path: Focally/Resources/pluck_002.aiff
     dependencies:
       - target: Focally
       - sdk: XCTest.framework

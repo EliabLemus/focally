@@ -4,14 +4,36 @@ final class FocallyUITests: XCTestCase {
 
     var app: XCUIApplication!
 
+    // MARK: - Constants
+    private enum Timeouts {
+        static let startup: TimeInterval = 15.0
+        static let interaction: TimeInterval = 5.0
+        static let fetch: TimeInterval = 10.0
+        static let short: TimeInterval = 2.0
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
+
+        // Create fresh app instance for each test
         app = XCUIApplication()
+
+        // Set launch arguments for UI testing
         app.launchArguments = ["UI-TESTING"]
+
+        // Launch and wait for app to be ready
         app.launch()
+        XCTAssertTrue(app.waitForState(.runningForeground, timeout: Timeouts.startup),
+                     "App should launch and be in foreground within \(Timeouts.startup)s")
     }
 
     override func tearDownWithError() throws {
+        // Clean up app state
+        app.terminate()
+
+        // Wait for app to fully terminate
+        _ = app.waitForState(.notRunning, timeout: Timeouts.short)
+
         app = nil
     }
 
@@ -20,36 +42,45 @@ final class FocallyUITests: XCTestCase {
     private func openFocallyPopover() {
         // Try to find and click the status bar item
         // Note: Menu bar items are tricky in macOS XCUITest
-        // We'll try multiple approaches
+        // We'll try multiple approaches with proper waiting
 
         // Approach 1: Try to find by title/label
         let menuBarButton = app.statusItems["Focally"]
-        if menuBarButton.exists {
+        if menuBarButton.waitForExistence(timeout: Timeouts.interaction) {
             menuBarButton.click()
             return
         }
 
         // Approach 2: Try to find status items directly
         let statusItem = app.statusItems.firstMatch
-        if statusItem.exists {
+        if statusItem.waitForExistence(timeout: Timeouts.interaction) {
             statusItem.click()
             return
         }
 
         // Approach 3: Use menu bar query
         let menuBar = app.menuBars.firstMatch
-        if menuBar.exists {
+        if menuBar.waitForExistence(timeout: Timeouts.interaction) {
             menuBar.click()
         }
-
-        // Wait for potential popover to appear
-        sleep(1)
     }
 
     private func closeAllWindows() {
         // Try to close any open windows with Escape
         app.typeKey(XCUIKeyboardKey.escape, modifierFlags: [])
-        sleep(1)
+
+        // Wait a moment for windows to close
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _ in
+                self.app.windows.count == 0
+            },
+            object: nil
+        )
+        _ = XCTWaiter.wait(for: [expectation], timeout: Timeouts.interaction)
+    }
+
+    private func waitForElementToExist(_ element: XCUIElement, timeout: TimeInterval = Timeouts.interaction) -> Bool {
+        return element.waitForExistence(timeout: timeout)
     }
 
     // MARK: - Timer Flow Tests
@@ -82,7 +113,7 @@ final class FocallyUITests: XCTestCase {
 
         var foundElements = false
         for window in windows {
-            if window.exists {
+            if window.waitForExistence(timeout: Timeouts.interaction) {
                 // Buscar elementos de accesibilidad dentro de las ventanas
                 let headerText = window.staticTexts["headerFocusText"]
                 let settingsButton = window.buttons["settingsButton"]
@@ -128,7 +159,14 @@ final class FocallyUITests: XCTestCase {
         XCTAssertTrue(app.state == .runningForeground)
 
         // Esperar un momento para verificar estabilidad
-        sleep(2)
+        // Usamos expectation en vez de sleep
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _ in
+                self.app.state == .runningForeground
+            },
+            object: nil
+        )
+        _ = XCTWaiter.wait(for: [expectation], timeout: Timeouts.short)
 
         // Verificar que la app sigue corriendo
         XCTAssertTrue(app.state == .runningForeground)
@@ -138,12 +176,12 @@ final class FocallyUITests: XCTestCase {
         // Verificar que la app tiene al menos algún elemento de UI
         XCTAssertTrue(app.state == .runningForeground)
 
-        // Buscar ventanas o elementos de menú bar
-        let hasWindows = app.windows.count > 0
-        let hasStatusItems = app.statusItems.count > 0
+        // Esperar a que windows/status items existan
+        let windowsExist = app.windows.waitForExistence(timeout: Timeouts.interaction)
+        let statusItemsExist = app.statusItems.waitForExistence(timeout: Timeouts.interaction)
 
         // Al menos uno debería existir (status bar o ventana)
-        XCTAssertTrue(hasWindows || hasStatusItems,
+        XCTAssertTrue(windowsExist || statusItemsExist,
                      "App should have either windows or status bar items")
     }
 
@@ -159,7 +197,14 @@ final class FocallyUITests: XCTestCase {
         // Verificar que la app sigue corriendo
         XCTAssertTrue(app.state == .runningForeground)
 
-        sleep(1)
+        // Esperar un momento para verificar estabilidad
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _ in
+                self.app.state == .runningForeground
+            },
+            object: nil
+        )
+        _ = XCTWaiter.wait(for: [expectation], timeout: Timeouts.short)
         XCTAssertTrue(app.state == .runningForeground)
     }
 
@@ -171,8 +216,8 @@ final class FocallyUITests: XCTestCase {
         app.terminate()
 
         // Verificar que la app ya no está corriendo
-        sleep(1)
-        XCTAssertFalse(app.state == .runningForeground)
+        XCTAssertTrue(app.waitForState(.notRunning, timeout: Timeouts.interaction),
+                     "App should terminate cleanly within \(Timeouts.interaction)s")
     }
 
     func testLaunchArgumentsAreSet() throws {
@@ -182,7 +227,14 @@ final class FocallyUITests: XCTestCase {
 
         // Los servicios podrían usar estos arguments para comportamiento de testing
         // Por ejemplo, deshabilitar notificaciones reales
-        sleep(1)
+        // Esperar un momento para verificar que la app sigue corriendo
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _ in
+                self.app.state == .runningForeground
+            },
+            object: nil
+        )
+        _ = XCTWaiter.wait(for: [expectation], timeout: Timeouts.short)
         XCTAssertTrue(app.state == .runningForeground)
     }
 }
