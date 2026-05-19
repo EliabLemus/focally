@@ -17,8 +17,7 @@ print("Checking for shortcuts at: \(shortcutsDir.path)")
 let focusOnURL = shortcutsDir.appendingPathComponent("Focally Focus On.shortcut")
 let focusOffURL = shortcutsDir.appendingPathComponent("Focally Focus Off.shortcut")
 
-var allExist = true
-
+var allExist: Bool = true
 if fileManager.fileExists(atPath: focusOnURL.path) {
     print("✅ Focally Focus On.shortcut exists")
     if let attributes = try? fileManager.attributesOfItem(atPath: focusOnURL.path) {

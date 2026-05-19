@@ -1,4 +1,0 @@
-Target dependency graph (2 targets)
-Target 'FocallyUITests' in project 'Focally'
-➜ Explicit dependency on target 'Focally' in project 'Focally'
-Target 'Focally' in project 'Focally' (no dependencies)

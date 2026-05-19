@@ -172,7 +172,7 @@ extension GoogleCalendarService {
 
 // MARK: - ASWebAuthenticationPresentationContextProviding
 
-extension GoogleCalendarService {
+extension GoogleCalendarService: ASWebAuthenticationPresentationContextProviding {
     public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         NSApp.keyWindow ?? NSApp.windows.first ?? ASPresentationAnchor()
     }

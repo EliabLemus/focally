@@ -65,7 +65,7 @@ enum GoogleCalendarServiceError: LocalizedError {
     }
 }
 
-final class GoogleCalendarService: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
+final class GoogleCalendarService: NSObject, ObservableObject {
     static let calendarReadonlyScope: String = "https://www.googleapis.com/auth/calendar.readonly"
     private static let enabledDefaultsKey: String = "googleCalendarEnabled"
     private static let tokenExpirationDefaultsKey: String = "googleCalendarTokenExpiration"
@@ -482,11 +482,11 @@ final class GoogleCalendarService: NSObject, ObservableObject, ASWebAuthenticati
         let isAllDay = item.start.date != nil
 
         let eventTitle: String = {
-            guard let summary = item.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !summary.isEmpty else {
+            let trimmed = item.summary?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            guard !trimmed.isEmpty else {
                 return "Untitled Event"
             }
-            return summary
+            return trimmed
         }()
 
         return CalendarEvent(
