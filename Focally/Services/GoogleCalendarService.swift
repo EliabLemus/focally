@@ -482,11 +482,11 @@ final class GoogleCalendarService: NSObject, ObservableObject {
         let isAllDay = item.start.date != nil
 
         let eventTitle: String = {
-            let trimmed = item.summary?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            guard !trimmed.isEmpty else {
+            guard let summary = item.summary?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !summary.isEmpty else {
                 return "Untitled Event"
             }
-            return trimmed
+            return summary
         }()
 
         return CalendarEvent(
