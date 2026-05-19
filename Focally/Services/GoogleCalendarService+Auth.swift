@@ -1,6 +1,7 @@
 import AppKit
 import AuthenticationServices
 import Foundation
+import GoogleCalendarModels
 
 // MARK: - Authentication
 
