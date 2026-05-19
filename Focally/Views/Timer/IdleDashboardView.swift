@@ -160,7 +160,7 @@ struct IdleDashboardView: View {
         .background(heroBackground)
         .overlay {
             RoundedRectangle(cornerRadius: 24)
-                .stroke(Color.focallyCardBorder.opacity(0.9), lineWidth: 0.75)
+                .stroke(Color.focallyOutline.opacity(0.9), lineWidth: 0.75)
         }
         .clipShape(RoundedRectangle(cornerRadius: 24))
     }
@@ -233,7 +233,7 @@ struct IdleDashboardView: View {
 
     private func startSession() {
         let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let activity = trimmed.isEmpty ? "Focus Session" : trimmed
+        let activity: String = trimmed.isEmpty ? "Focus Session" : trimmed
         timerService.updateWorkDuration(minutes: selectedDuration)
         timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration)
     }
@@ -245,7 +245,7 @@ struct IdleDashboardView: View {
 
     private func startPomodoro() {
         let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let activity = trimmed.isEmpty ? "Pomodoro" : trimmed
+        let activity: String = trimmed.isEmpty ? "Pomodoro" : trimmed
         timerService.startPomodoroSession(activity: activity, emoji: selectedEmoji)
     }
 
@@ -430,7 +430,7 @@ private extension IdleDashboardView {
                 }
 
                 Divider()
-                    .overlay(Color.focallyCardBorder)
+                    .overlay(Color.focallyOutline)
 
                 Text(timerService.isAutoStartEnabled
                      ? "Breaks restart automatically, so the flow stays uninterrupted until you finish the session."
@@ -483,8 +483,7 @@ private extension View {
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .overlay {
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.focallyCardBorder, lineWidth: 0.75)
+                    .stroke(Color.focallyOutline, lineWidth: 0.75)
             }
     }
 }
-

@@ -49,8 +49,8 @@ final class AnalyticsService: ObservableObject {
     }
 
     var trendData: [TrendPoint] {
-        let mins = [120, 150, 90, 180, 120, 45, 60]
-        let days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+        let mins: [Int] = [120, 150, 90, 180, 120, 45, 60]
+        let days: [String] = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
         return zip(days, mins).map { TrendPoint(label: $0, minutes: $1) }
     }
 
@@ -59,7 +59,7 @@ final class AnalyticsService: ObservableObject {
             Category(name: "Development", hours: 12.5, percentage: 42, color: Color.focallyPrimary),
             Category(name: "Meetings", hours: 6.2, percentage: 21, color: Color.focallySecondary),
             Category(name: "Research", hours: 4.8, percentage: 16, color: Color.focallyTertiary),
-            Category(name: "Planning", hours: 3.5, percentage: 12, color: Color.focallySurfaceContainerHigh),
+            Category(name: "Planning", hours: 3.5, percentage: 12, color: Color.focallySurfaceContainerHigh)
         ]
     }
 
@@ -72,7 +72,7 @@ final class AnalyticsService: ObservableObject {
             RecentSession(activity: "Bug Triage", category: "Development", date: cal.date(byAdding: .day, value: -1, to: today)!, durationMinutes: 60, rating: 4),
             RecentSession(activity: "Documentation Sprint", category: "Research", date: cal.date(byAdding: .day, value: -2, to: today)!, durationMinutes: 75, rating: 3),
             RecentSession(activity: "Team Retrospective", category: "Meetings", date: cal.date(byAdding: .day, value: -2, to: today)!, durationMinutes: 30, rating: 3),
-            RecentSession(activity: "Feature Implementation", category: "Development", date: cal.date(byAdding: .day, value: -3, to: today)!, durationMinutes: 120, rating: 5),
+            RecentSession(activity: "Feature Implementation", category: "Development", date: cal.date(byAdding: .day, value: -3, to: today)!, durationMinutes: 120, rating: 5)
         ]
     }
 }

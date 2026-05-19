@@ -9,7 +9,7 @@ struct FocallyCardModifier: ViewModifier {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.focallyCardBorder, lineWidth: 0.5)
+                    .stroke(Color.focallyOutline, lineWidth: 0.5)
             )
             .shadow(color: cardShadowColor, radius: 2, x: 0, y: 1)
     }

@@ -35,8 +35,7 @@ class HistoryServiceTests: XCTestCase {
 
     func testRecordAndLoad() {
         let service = HistoryService.shared
-        let activity = "UnitTest-\(UUID().uuidString.prefix(8))"
-
+        let activity: String = "UnitTest-\(UUID().uuidString.prefix(8))"
         service.recordWorkSession(
             activity: activity,
             emoji: "🧪",

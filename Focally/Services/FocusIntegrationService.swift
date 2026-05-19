@@ -63,7 +63,7 @@ final class FocusIntegrationService: ObservableObject {
     static let startActionName = "Start Focus"
     static let endActionName = "End Focus"
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "FocusIntegrationService")
+    private let logger = Logger.slack
     private let defaults = UserDefaults.standard
     private let managedShortcutsService = ManagedFocusShortcutsService.shared
     private let directDNDService: DNDService
@@ -120,7 +120,7 @@ final class FocusIntegrationService: ObservableObject {
         slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             let success = self.slackService.connectionError == nil
-            let message = self.slackService.lastActionMessage ?? (success ? "Slack focus integration succeeded" : (self.slackService.connectionError ?? "Slack focus integration failed"))
+            let message: String = self.slackService.lastActionMessage ?? (success ? "Slack focus integration succeeded" : (self.slackService.connectionError ?? "Slack focus integration failed"))
             completion?(success, message)
         }
     }
@@ -156,8 +156,8 @@ final class FocusIntegrationService: ObservableObject {
     }
 
     private func performCombinedFocusAction(_ action: FocusIntegrationAction) {
-        let slackEnabled = self.slackService.isEnabled
-        logger.info("performCombinedFocusAction called. action=\(action, privacy: .public), slackEnabled=\(slackEnabled, privacy: .public)")
+        let slackEnabled: Bool = self.slackService.isEnabled
+        logger.info("performCombinedFocusAction called. action=\(action), slackEnabled=\(slackEnabled)")
         lastError = nil
         lastShortcutIssue = nil
 
@@ -171,29 +171,29 @@ final class FocusIntegrationService: ObservableObject {
         case .start:
             directDNDService.activateDND()
             isFocusActive = directDNDService.isDNDActive
-            logger.info("Focus activated via \(source, privacy: .public)")
+            logger.info("Focus activated via \(source)")
         case .end:
             directDNDService.deactivateDND()
             isFocusActive = directDNDService.isDNDActive
-            logger.info("Focus deactivated via \(source, privacy: .public)")
+            logger.info("Focus deactivated via \(source)")
         }
     }
 
     private func attemptManagedShortcutAction(_ action: FocusIntegrationAction) {
         do {
             try managedShortcutsService.runShortcut(for: action)
-            logger.info("Managed shortcut backup succeeded for \(action == .start ? "start" : "end", privacy: .public)")
+            logger.info("Managed shortcut backup succeeded for \(action == .start ? "start" : "end")")
         } catch {
             let message = error.localizedDescription
             lastShortcutIssue = message
-            logger.error("Managed shortcut backup failed: \(message, privacy: .public)")
+            logger.error("Managed shortcut backup failed: \(message)")
         }
     }
 
     private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil) {
-        let slackEnabled = self.slackService.isEnabled
-        let durationDescription = durationMinutes?.description ?? "nil"
-        logger.info("performSlackFocusAction called. action=\(action, privacy: .public), durationMinutes=\(durationDescription, privacy: .public), slackEnabled=\(slackEnabled, privacy: .public)")
+        let slackEnabled: Bool = self.slackService.isEnabled
+        let durationDescription: String = durationMinutes?.description ?? "nil"
+        logger.info("performSlackFocusAction called. action=\(action), durationMinutes=\(durationDescription), slackEnabled=\(slackEnabled)")
         guard slackEnabled else {
             logger.info("Skipping performSlackFocusAction: Slack is disabled")
             return
@@ -201,7 +201,7 @@ final class FocusIntegrationService: ObservableObject {
         switch action {
         case .start:
             let duration = durationMinutes ?? 25
-            logger.info("Starting Slack focus actions for \(duration, privacy: .public) minutes")
+            logger.info("Starting Slack focus actions for \(duration) minutes")
             slackService.setSlackDNDSnooze(minutes: duration)
             slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
         case .end:

@@ -48,7 +48,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 
 @MainActor
 final class ShortcutOnboardingViewModel: ObservableObject {
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "ShortcutOnboardingViewModel")
+    private let logger = Logger.ui
     private let focusIntegrationService: FocusIntegrationService
     let managedShortcutsService: ManagedFocusShortcutsService
 
@@ -183,7 +183,6 @@ final class ShortcutOnboardingViewModel: ObservableObject {
 
     static func resetOnboarding() {
         UserDefaults.standard.removeObject(forKey: "FocallyShortcutOnboardingCompleted")
-        let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "ShortcutOnboardingViewModel")
-        logger.info("Onboarding reset - will show on next launch")
+        Logger.ui.info("Onboarding reset - will show on next launch")
     }
 }

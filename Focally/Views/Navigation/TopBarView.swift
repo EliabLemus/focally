@@ -27,7 +27,7 @@ struct TopBarView<LeftContent: View, RightContent: View>: View {
         .overlay(alignment: .bottom) {
             Rectangle()
                 .frame(height: 0.5)
-                .foregroundStyle(Color.focallyCardBorder)
+                .foregroundStyle(Color.focallyOutline)
         }
     }
 }

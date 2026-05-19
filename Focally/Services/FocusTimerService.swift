@@ -21,10 +21,10 @@ class FocusTimerService: ObservableObject {
     }
 
     // Existing properties for UI compatibility
-    @Published var isActive = false
-    @Published var isPaused = false
-    @Published var currentActivity = ""
-    @Published var currentEmoji = "📝"
+    @Published var isActive: Bool = false
+    @Published var isPaused: Bool = false
+    @Published var currentActivity: String = ""
+    @Published var currentEmoji: String = "📝"
     @Published var remainingSeconds: Int = 0
     @Published var durationMinutes: Int = 25
 
@@ -49,9 +49,8 @@ class FocusTimerService: ObservableObject {
     private var currentPhaseDuration: Int = 0
     private var sessionStartTime: Date = Date()
 
-    let defaults = UserDefaults.standard
-
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "FocusTimerService")
+    private let defaults = UserDefaults.standard
+    private let logger = Logger.timer
 
     // MARK: - Lifecycle
 
@@ -99,10 +98,9 @@ class FocusTimerService: ObservableObject {
     // MARK: - Persistence
 
     private func loadLastSession() {
-        let lastActivity = defaults.string(forKey: "lastActivity") ?? ""
-        let lastEmoji = defaults.string(forKey: "lastEmoji") ?? "📝"
-        let lastDuration = storedDuration(forKey: "lastDuration", defaultValue: workDurationMinutes)
-
+        let lastActivity: String = defaults.string(forKey: "lastActivity") ?? ""
+        let lastEmoji: String = defaults.string(forKey: "lastEmoji") ?? "📝"
+        let lastDuration: Int = storedDuration(forKey: "lastDuration", defaultValue: workDurationMinutes)
         currentActivity = lastActivity
         currentEmoji = lastEmoji
         durationMinutes = lastDuration

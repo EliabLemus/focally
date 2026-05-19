@@ -68,7 +68,7 @@ final class EmojiUsageTrackerTests: XCTestCase {
         tracker.recordUsage(":coding:")
         tracker.recordUsage(":invalid_emoji:")
 
-        let workspaceEmojis = [":deep_work:", ":coding:"]
+        let workspaceEmojis: [String] = [":deep_work:", ":coding:"]
         let filtered = tracker.getRecentEmojis(forWorkspace: workspaceEmojis)
 
         // Verify filtered contains only workspace emojis

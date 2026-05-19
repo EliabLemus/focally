@@ -33,7 +33,7 @@ final class ScheduleService: ObservableObject {
                 startDate: cal.date(bySettingHour: 14, minute: 0, second: 0, of: today)!,
                 endDate: cal.date(bySettingHour: 15, minute: 0, second: 0, of: today)!,
                 color: .secondary
-            ),
+            )
         ]
     }
 }

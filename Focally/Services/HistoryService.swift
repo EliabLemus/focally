@@ -4,13 +4,12 @@ import os.log
 class HistoryService: ObservableObject {
     static let shared = HistoryService()
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "HistoryService")
+    private let logger = Logger.timer
 
     private let historyDirectory: URL = {
         let supportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let focallyDir = supportDir.appendingPathComponent("Focally", isDirectory: true)
-        let historyDir = focallyDir.appendingPathComponent("history", isDirectory: true)
-
+        let focallyDir: URL = supportDir.appendingPathComponent("Focally", isDirectory: true)
+        let historyDir: URL = focallyDir.appendingPathComponent("history", isDirectory: true)
         if !FileManager.default.fileExists(atPath: historyDir.path) {
             try? FileManager.default.createDirectory(at: historyDir, withIntermediateDirectories: true)
         }
@@ -47,8 +46,7 @@ class HistoryService: ObservableObject {
         formatter.dateFormat = "yyyy-MM-dd"
         let dateKey = formatter.string(from: today)
 
-        let historyFile = historyDirectory.appendingPathComponent("\(dateKey).json")
-
+        let historyFile: URL = historyDirectory.appendingPathComponent("\(dateKey).json")
         var history: [SessionEntry] = []
 
         if let data = try? Data(contentsOf: historyFile),
@@ -71,9 +69,9 @@ class HistoryService: ObservableObject {
         if let encoded = try? JSONEncoder().encode(history) {
             do {
                 try encoded.write(to: historyFile)
-                logger.info("Recorded work session: \(activity, privacy: .public) (\(durationMinutes) min)")
+                logger.info("Recorded work session: \(activity) (\(durationMinutes) min)")
             } catch {
-                logger.error("Failed to write history: \(error.localizedDescription, privacy: .public)")
+                logger.error("Failed to write history: \(error.localizedDescription)")
             }
         }
     }
@@ -83,8 +81,7 @@ class HistoryService: ObservableObject {
         formatter.dateFormat = "yyyy-MM-dd"
         let dateKey = formatter.string(from: date)
 
-        let historyFile = historyDirectory.appendingPathComponent("\(dateKey).json")
-
+        let historyFile: URL = historyDirectory.appendingPathComponent("\(dateKey).json")
         guard let data = try? Data(contentsOf: historyFile),
               let decoded = try? JSONDecoder().decode([SessionEntry].self, from: data) else {
             return []

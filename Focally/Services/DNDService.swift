@@ -6,10 +6,9 @@ final class DNDService: ObservableObject {
 
     private static let notificationCenterAppId = "com.apple.notificationcenterui" as CFString
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "DNDService")
+    private let logger = Logger.dnd
 
-    @Published var isDNDActive = false
-
+    @Published var isDNDActive: Bool = false
     init() {
         isDNDActive = Self.checkDNDStatus()
     }
@@ -26,7 +25,7 @@ final class DNDService: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
             self.isDNDActive = Self.checkDNDStatus()
-            self.logger.info("DND activation result: \(self.isDNDActive, privacy: .public)")
+            self.logger.info("DND activation result: \(self.isDNDActive)")
         }
 
         isDNDActive = true
@@ -45,7 +44,7 @@ final class DNDService: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
             self.isDNDActive = Self.checkDNDStatus()
-            self.logger.info("DND deactivation result: \(self.isDNDActive, privacy: .public)")
+            self.logger.info("DND deactivation result: \(self.isDNDActive)")
         }
 
         isDNDActive = false

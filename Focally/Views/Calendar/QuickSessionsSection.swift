@@ -120,7 +120,7 @@ struct QuickSessionsSection: View {
     }
 
     private var borderColor: Color {
-        Color.focallyCardBorder.opacity(0.5)
+        Color.focallyOutline.opacity(0.5)
     }
 
     private var sectionBackground: Color {
@@ -137,7 +137,7 @@ struct QuickSessionsSection: View {
 
     private func startSession() {
         let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let activity = trimmed.isEmpty ? "Focus Session" : trimmed
+        let activity: String = trimmed.isEmpty ? "Focus Session" : trimmed
         timerService.updateWorkDuration(minutes: selectedDuration)
         timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration)
         taskInput = ""
@@ -145,7 +145,7 @@ struct QuickSessionsSection: View {
 
     private func startPomodoro() {
         let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let activity = trimmed.isEmpty ? "Pomodoro" : trimmed
+        let activity: String = trimmed.isEmpty ? "Pomodoro" : trimmed
         timerService.startPomodoroSession(activity: activity, emoji: selectedEmoji)
         taskInput = ""
     }

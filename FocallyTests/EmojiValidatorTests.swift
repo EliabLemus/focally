@@ -3,19 +3,19 @@ import XCTest
 
 final class EmojiValidatorTests: XCTestCase {
     func testValidateUnicodeEmoji() {
-        let workspaceEmojis = [":deep_work:", ":coding:", ":writing:"]
+        let workspaceEmojis: [String] = [":deep_work:", ":coding:", ":writing:"]
         XCTAssertTrue(EmojiValidator.isValidForSlack("🧠", workspaceEmojis: workspaceEmojis))
         XCTAssertTrue(EmojiValidator.isValidForSlack("💻", workspaceEmojis: workspaceEmojis))
     }
 
     func testValidateSlackShortcode() {
-        let workspaceEmojis = [":deep_work:", ":coding:", ":writing:"]
+        let workspaceEmojis: [String] = [":deep_work:", ":coding:", ":writing:"]
         XCTAssertTrue(EmojiValidator.isValidForSlack(":deep_work:", workspaceEmojis: workspaceEmojis))
         XCTAssertFalse(EmojiValidator.isValidForSlack(":invalid:", workspaceEmojis: workspaceEmojis))
     }
 
     func testConvertUnicodeToShortcode() {
-        let workspaceEmojis = [":brain:", ":computer:", ":memo:"]
+        let workspaceEmojis: [String] = [":brain:", ":computer:", ":memo:"]
         XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("🧠", workspaceEmojis: workspaceEmojis), ":brain:")
         XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("💻", workspaceEmojis: workspaceEmojis), ":computer:")
         XCTAssertNil(EmojiValidator.convertUnicodeToShortcode("🍅", workspaceEmojis: workspaceEmojis))

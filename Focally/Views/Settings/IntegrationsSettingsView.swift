@@ -370,12 +370,12 @@ struct IntegrationsSettingsView: View {
         slackService.refreshEmojiCatalogIfPossible()
     }
 
-    private func testSlackConnection() {
+    func testSlackConnection() {
         saveSlackToken()
         slackService.testConnection()
     }
 
-    private func testSlackFocusIntegration() {
+    func testSlackFocusIntegration() {
         saveSlackToken()
         focusIntegrationService.runSlackTest { success, message in
             slackTestFeedback = message

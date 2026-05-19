@@ -44,7 +44,7 @@ struct SidebarView: View {
         .overlay(
             Rectangle()
                 .frame(width: 0.5)
-                .foregroundStyle(Color.focallyCardBorder),
+                .foregroundStyle(Color.focallyOutline),
             alignment: .trailing
         )
     }

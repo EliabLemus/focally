@@ -86,7 +86,7 @@ public struct CompactStatusEmojiButton: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay {
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(hasValidationError ? Color.focallyError : Color.focallyCardBorder, lineWidth: hasValidationError ? 1.5 : 0.75)
+                    .stroke(hasValidationError ? Color.focallyError : Color.focallyOutline, lineWidth: hasValidationError ? 1.5 : 0.75)
             }
         }
         .buttonStyle(.plain)
@@ -374,4 +374,3 @@ public struct PredefinedTaskQuickButton: View {
         .buttonStyle(.plain)
     }
 }
-

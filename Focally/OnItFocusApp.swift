@@ -16,7 +16,7 @@ struct FocallyApp: App {
 
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "AppDelegate")
+    private let logger = Logger.app
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var eventMonitor: Any?
@@ -188,14 +188,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         if timerService.hasSession {
-            let pauseTitle = timerService.isPaused ? "Resume Session" : "Pause Session"
-            let pauseImage = timerService.isPaused ? "play.fill" : "pause.fill"
-            let pauseItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
+            let pauseTitle: String = timerService.isPaused ? "Resume Session" : "Pause Session"
+            let pauseImage: String = timerService.isPaused ? "play.fill" : "pause.fill"
+            let pauseItem: NSMenuItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
             pauseItem.image = NSImage(systemSymbolName: pauseImage, accessibilityDescription: pauseTitle)
             pauseItem.target = self
             menu.addItem(pauseItem)
 
-            let endItem = NSMenuItem(title: "End Session", action: #selector(endSession), keyEquivalent: "")
+            let endItem: NSMenuItem = NSMenuItem(title: "End Session", action: #selector(endSession), keyEquivalent: "")
             endItem.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: "End")
             endItem.target = self
             menu.addItem(endItem)
@@ -304,10 +304,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem?.button else { return }
 
         if timerService.hasSession {
-            let imageName = timerService.isPaused ? "play.fill" : "pause.fill"
-            let description = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
+            let imageName: String = timerService.isPaused ? "play.fill" : "pause.fill"
+            let description: String = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
             button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: description)
-            let newText = " \(timerService.currentEmoji) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
+            let newText: String = " \(timerService.currentEmoji) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
             if button.title != newText {
                 button.title = newText
             }
@@ -358,8 +358,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var aboutMenuTitle: String {
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
-        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        let version: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        let build: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
         return "About Focally (v\(version), build \(build))"
     }
 

@@ -7,7 +7,7 @@ class SlackService: ObservableObject {
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
     static let emojiListURL = URL(string: "https://slack.com/api/emoji.list")!
 
-    @Published var isEnabled = false {
+    @Published var isEnabled: Bool = false {
         didSet {
             UserDefaults.standard.set(isEnabled, forKey: "slackEnabled")
             if isEnabled && token != nil {
@@ -15,14 +15,14 @@ class SlackService: ObservableObject {
             }
         }
     }
-    @Published var isConnected = false
+    @Published var isConnected: Bool = false
     @Published var connectionError: String?
     @Published var lastStatusText: String?
     @Published var workspaceEmojiCodes: [String] = []
     @Published var lastActionMessage: String?
 
     private let keychainKey = "slack-token"
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "SlackService")
+    private let logger = Logger.slack
     private let profileSetURL = URL(string: "https://slack.com/api/users.profile.set")!
     private let authTestURL = URL(string: "https://slack.com/api/auth.test")!
     private let endDndURL = URL(string: "https://slack.com/api/dnd.endDnd")!
@@ -42,14 +42,14 @@ class SlackService: ObservableObject {
     // MARK: - Public API
 
     func savedStatusEmoji() -> String {
-        let rawValue = UserDefaults.standard.string(forKey: Self.statusEmojiDefaultsKey) ?? Self.defaultStatusEmoji
+        let rawValue: String = UserDefaults.standard.string(forKey: Self.statusEmojiDefaultsKey) ?? Self.defaultStatusEmoji
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
     }
 
     func disableSlackDND() {
         let maskedToken = maskedToken(token)
-        logger.info("disableSlackDND called. isEnabled=\(self.isEnabled, privacy: .public), token=\(maskedToken, privacy: .public)")
+        logger.info("disableSlackDND called. isEnabled=\(self.isEnabled), token=\(maskedToken)")
         guard isEnabled else {
             logger.info("Skipping disableSlackDND because Slack integration is disabled")
             return
@@ -70,7 +70,7 @@ class SlackService: ObservableObject {
                 if let error = error {
                     self?.connectionError = error.localizedDescription
                     self?.lastActionMessage = "Slack DND request failed"
-                    self?.logger.error("Slack disableSlackDND request failed: \(error.localizedDescription, privacy: .public)")
+                    self?.logger.error("Slack disableSlackDND request failed: \(error.localizedDescription)")
                     return
                 }
 
@@ -82,16 +82,16 @@ class SlackService: ObservableObject {
                     return
                 }
 
-                let ok = json["ok"] as? Bool ?? false
-                if ok && (200...299).contains(statusCode) {
+                let responseOK: Bool = json["ok"] as? Bool ?? false
+                if responseOK && (200...299).contains(statusCode) {
                     self?.connectionError = nil
                     self?.lastActionMessage = "Slack DND disabled"
                 } else {
-                    let errorMsg = json["error"] as? String ?? "Unknown error"
+                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
                     self?.lastActionMessage = "Slack DND request failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack disableSlackDND failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                    self?.logger.error("Slack disableSlackDND failed. httpStatus=\(statusCode), error=\(errorMsg)")
                 }
             }
         }
@@ -99,7 +99,11 @@ class SlackService: ObservableObject {
 
     func setSlackFocusStatus(text: String = "In focus", emoji: String = "🎯", expirationTimestamp: Int? = nil) {
         let maskedToken = maskedToken(token)
-        logger.info("setSlackFocusStatus called. isEnabled=\(self.isEnabled, privacy: .public), token=\(maskedToken, privacy: .public), text=\(text, privacy: .public), emoji=\(emoji, privacy: .public), workspaceEmojisLoaded=\(self.workspaceEmojiCodes.count, privacy: .public)")
+        logger.info(
+            "setSlackFocusStatus called. isEnabled=\(self.isEnabled), " +
+                "token=\(maskedToken), text=\(text), " +
+                "emoji=\(emoji), workspaceEmojisLoaded=\(self.workspaceEmojiCodes.count)"
+        )
         guard isEnabled else {
             logger.info("Skipping setSlackFocusStatus because Slack integration is disabled")
             return
@@ -131,7 +135,7 @@ class SlackService: ObservableObject {
                     self?.connectionError = error.localizedDescription
                     self?.lastActionMessage = "Slack status request failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackFocusStatus request failed: \(error.localizedDescription, privacy: .public)")
+                    self?.logger.error("Slack setSlackFocusStatus request failed: \(error.localizedDescription)")
                     return
                 }
 
@@ -143,18 +147,18 @@ class SlackService: ObservableObject {
                     return
                 }
 
-                let ok = json["ok"] as? Bool ?? false
-                if ok && (200...299).contains(statusCode) {
+                let responseOK: Bool = json["ok"] as? Bool ?? false
+                if responseOK && (200...299).contains(statusCode) {
                     self?.isConnected = true
                     self?.connectionError = nil
                     self?.lastStatusText = text
                     self?.lastActionMessage = "Slack focus status updated"
                 } else {
-                    let errorMsg = json["error"] as? String ?? "Unknown error"
+                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
                     self?.lastActionMessage = "Slack status request failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackFocusStatus failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                    self?.logger.error("Slack setSlackFocusStatus failed. httpStatus=\(statusCode), error=\(errorMsg)")
                 }
             }
         }
@@ -162,7 +166,7 @@ class SlackService: ObservableObject {
 
     func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String? = nil, fallbackEmoji: String? = nil) {
         let maskedToken = maskedToken(token)
-        logger.info("setStatus called. isEnabled=\(self.isEnabled, privacy: .public), token=\(maskedToken, privacy: .public), text=\(text, privacy: .public), taskEmoji=\(taskEmoji ?? "nil"), fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp, privacy: .public)")
+        logger.info("setStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), text=\(text), taskEmoji=\(taskEmoji ?? "nil"), fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp)")
         guard isEnabled else {
             logger.info("Skipping setStatus because Slack integration is disabled")
             return
@@ -197,12 +201,12 @@ class SlackService: ObservableObject {
                 if let error = error {
                     self?.connectionError = error.localizedDescription
                     self?.isConnected = false
-                    self?.logger.error("Slack setStatus request failed: \(error.localizedDescription, privacy: .public)")
+                    self?.logger.error("Slack setStatus request failed: \(error.localizedDescription)")
                     return
                 }
 
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-                self?.logger.info("Slack setStatus HTTP status code: \(statusCode, privacy: .public)")
+                self?.logger.info("Slack setStatus HTTP status code: \(statusCode)")
 
                 guard let json = self?.decodeSlackResponseBody(data) else {
                     self?.connectionError = "Invalid response from Slack"
@@ -210,17 +214,17 @@ class SlackService: ObservableObject {
                     return
                 }
 
-                let ok = json["ok"] as? Bool ?? false
-                if ok && (200...299).contains(statusCode) {
+                let responseOK: Bool = json["ok"] as? Bool ?? false
+                if responseOK && (200...299).contains(statusCode) {
                     self?.isConnected = true
                     self?.connectionError = nil
                     self?.lastStatusText = text
-                    self?.logger.info("Slack status set successfully: \(statusEmoji, privacy: .public) \(text, privacy: .public)")
+                    self?.logger.info("Slack status set successfully: \(statusEmoji) \(text)")
                 } else {
-                    let errorMsg = json["error"] as? String ?? "Unknown error"
+                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
                     self?.isConnected = false
-                    self?.logger.error("Slack setStatus failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                    self?.logger.error("Slack setStatus failed. httpStatus=\(statusCode), error=\(errorMsg)")
                 }
             }
         }
@@ -228,7 +232,7 @@ class SlackService: ObservableObject {
 
     func clearStatus() {
         let maskedToken = maskedToken(token)
-        logger.info("clearStatus called. isEnabled=\(self.isEnabled, privacy: .public), token=\(maskedToken, privacy: .public)")
+        logger.info("clearStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken)")
         guard isEnabled else {
             logger.info("Skipping clearStatus because Slack integration is disabled")
             return
@@ -253,31 +257,31 @@ class SlackService: ObservableObject {
         performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self?.logger.error("Slack clearStatus request failed: \(error.localizedDescription, privacy: .public)")
+                    self?.logger.error("Slack clearStatus request failed: \(error.localizedDescription)")
                     return
                 }
 
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-                self?.logger.info("Slack clearStatus HTTP status code: \(statusCode, privacy: .public)")
+                self?.logger.info("Slack clearStatus HTTP status code: \(statusCode)")
 
                 guard let json = self?.decodeSlackResponseBody(data) else {
                     return
                 }
 
-                let ok = json["ok"] as? Bool ?? false
-                if ok {
+                let responseOK: Bool = json["ok"] as? Bool ?? false
+                if responseOK {
                     self?.lastStatusText = nil
                     self?.logger.info("Slack status cleared")
                 } else {
-                    let errorMsg = json["error"] as? String ?? "Unknown error"
-                    self?.logger.error("Slack clearStatus failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
+                    self?.logger.error("Slack clearStatus failed. httpStatus=\(statusCode), error=\(errorMsg)")
                 }
             }
         }
     }
 
     func testConnection() {
-        logger.info("testConnection called. isEnabled=\(self.isEnabled, privacy: .public), token=\(self.maskedToken(self.token), privacy: .public)")
+        logger.info("testConnection called. isEnabled=\(self.isEnabled), token=\(self.maskedToken(self.token))")
         guard token != nil else {
             connectionError = "No token configured"
             isConnected = false
@@ -315,7 +319,7 @@ class SlackService: ObservableObject {
             return
         }
 
-        logger.info("Refreshing Slack emoji catalog (enabled=\(self.isEnabled, privacy: .public), token length=\(token.count, privacy: .public))...")
+        logger.info("Refreshing Slack emoji catalog (enabled=\(self.isEnabled), token length=\(token.count))...")
 
         guard let request = makeSlackRequest(url: Self.emojiListURL, token: token, formFields: [:]) else {
             logger.error("Failed to prepare Slack emoji.list request")
@@ -329,7 +333,7 @@ class SlackService: ObservableObject {
             guard let self else { return }
 
             if let error {
-                self.logger.error("Slack emoji.list request failed: \(error.localizedDescription, privacy: .public)")
+                self.logger.error("Slack emoji.list request failed: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self.connectionError = "Emoji catalog load failed: \(error.localizedDescription)"
                 }
@@ -344,9 +348,9 @@ class SlackService: ObservableObject {
                 return
             }
 
-            guard let ok = json["ok"] as? Bool, ok else {
-                let errorDetail = json["error"] as? String ?? "Unknown error"
-                self.logger.error("Slack emoji.list returned not ok: \(errorDetail, privacy: .public)")
+            guard let responseOK = json["ok"] as? Bool, responseOK else {
+                let errorDetail: String = json["error"] as? String ?? "Unknown error"
+                self.logger.error("Slack emoji.list returned not ok: \(errorDetail)")
                 DispatchQueue.main.async {
                     self.connectionError = "Emoji catalog failed: \(errorDetail)"
                 }
@@ -368,7 +372,7 @@ class SlackService: ObservableObject {
             DispatchQueue.main.async {
                 self.workspaceEmojiCodes = codes
                 self.connectionError = nil
-                self.logger.info("Loaded \(codes.count, privacy: .public) Slack workspace emojis successfully")
+                self.logger.info("Loaded \(codes.count) Slack workspace emojis successfully")
             }
         }
     }
@@ -384,7 +388,7 @@ class SlackService: ObservableObject {
     /// - Parameter minutes: Duración en minutos para pausar notificaciones
     func setSlackDNDSnooze(minutes: Int) {
         guard self.isEnabled else {
-            logger.warning("Skipping setSlackDNDSnooze: Slack is disabled (isEnabled=\(self.isEnabled, privacy: .public))")
+            logger.warning("Skipping setSlackDNDSnooze: Slack is disabled (isEnabled=\(self.isEnabled))")
             return
         }
         
@@ -394,7 +398,7 @@ class SlackService: ObservableObject {
         }
 
         let numMinutes = max(1, minutes)
-        logger.info("Setting Slack DND snooze for \(numMinutes, privacy: .public) minutes (token length: \(token.count, privacy: .public))")
+        logger.info("Setting Slack DND snooze for \(numMinutes) minutes (token length: \(token.count))")
 
         guard let request = makeSlackRequest(url: dndSetSnoozeURL, token: token, formFields: [
             "num_minutes": "\(numMinutes)"
@@ -410,7 +414,7 @@ class SlackService: ObservableObject {
                     self?.connectionError = error.localizedDescription
                     self?.lastActionMessage = "Slack DND snooze failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackDNDSnooze request failed: \(error.localizedDescription, privacy: .public)")
+                    self?.logger.error("Slack setSlackDNDSnooze request failed: \(error.localizedDescription)")
                     return
                 }
 
@@ -422,17 +426,17 @@ class SlackService: ObservableObject {
                     return
                 }
 
-                let ok = json["ok"] as? Bool ?? false
-                if ok && (200...299).contains(statusCode) {
+                let responseOK: Bool = json["ok"] as? Bool ?? false
+                if responseOK && (200...299).contains(statusCode) {
                     self?.connectionError = nil
                     self?.lastActionMessage = "Slack notifications paused"
-                    self?.logger.info("Slack DND snooze set successfully for \(numMinutes, privacy: .public) minutes")
+                    self?.logger.info("Slack DND snooze set successfully for \(numMinutes) minutes")
                 } else {
-                    let errorMsg = json["error"] as? String ?? "Unknown error"
+                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
                     self?.lastActionMessage = "Slack DND snooze failed: \(errorMsg)"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackDNDSnooze failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                    self?.logger.error("Slack setSlackDNDSnooze failed. httpStatus=\(statusCode), error=\(errorMsg)")
                 }
             }
         }
@@ -446,7 +450,7 @@ class SlackService: ObservableObject {
             return
         }
 
-        logger.info("validateToken called. token=\(self.maskedToken(token), privacy: .public)")
+        logger.info("validateToken called. token=\(self.maskedToken(token))")
 
         guard let request = makeSlackRequest(url: authTestURL, token: token, formFields: [:]) else {
             connectionError = "Failed to prepare Slack auth.test request"
@@ -459,12 +463,12 @@ class SlackService: ObservableObject {
                 if let error = error {
                     self?.connectionError = error.localizedDescription
                     self?.isConnected = false
-                    self?.logger.error("Slack auth.test request failed: \(error.localizedDescription, privacy: .public)")
+                    self?.logger.error("Slack auth.test request failed: \(error.localizedDescription)")
                     return
                 }
 
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-                self?.logger.info("Slack auth.test HTTP status code: \(statusCode, privacy: .public)")
+                self?.logger.info("Slack auth.test HTTP status code: \(statusCode)")
 
                 guard let json = self?.decodeSlackResponseBody(data) else {
                     self?.connectionError = "Invalid response from Slack"
@@ -472,8 +476,8 @@ class SlackService: ObservableObject {
                     return
                 }
 
-                let ok = json["ok"] as? Bool ?? false
-                if ok && (200...299).contains(statusCode) {
+                let responseOK: Bool = json["ok"] as? Bool ?? false
+                if responseOK && (200...299).contains(statusCode) {
                     if token.hasPrefix("xoxp-") {
                         self?.isConnected = true
                         self?.connectionError = nil
@@ -485,10 +489,10 @@ class SlackService: ObservableObject {
                         self?.logger.error("Slack auth.test succeeded but token type is not a user token")
                     }
                 } else {
-                    let errorMsg = json["error"] as? String ?? "Unknown error"
+                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
                     self?.connectionError = errorMsg
                     self?.isConnected = false
-                    self?.logger.error("Slack auth.test failed. httpStatus=\(statusCode, privacy: .public), error=\(errorMsg, privacy: .public)")
+                    self?.logger.error("Slack auth.test failed. httpStatus=\(statusCode), error=\(errorMsg)")
                 }
             }
         }
@@ -499,12 +503,12 @@ class SlackService: ObservableObject {
             return normalizeEmojiForSlack(inlineEmoji)
         }
 
-        let taskValue = taskEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let taskValue: String = taskEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !taskValue.isEmpty {
             return normalizeEmojiForSlack(taskValue)
         }
 
-        let fallbackValue = fallbackEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let fallbackValue: String = fallbackEmoji?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !fallbackValue.isEmpty {
             return normalizeEmojiForSlack(fallbackValue)
         }
@@ -539,8 +543,7 @@ class SlackService: ObservableObject {
     }
 
     private func firstSlackEmojiCode(in text: String) -> String? {
-        let pattern = #":[a-z0-9_+\-]+:"#
-
+        let pattern: String = #":[a-z0-9_+\-]+:"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else {
             return nil
         }
@@ -570,17 +573,17 @@ class SlackService: ObservableObject {
     }
 
     private func performSlackRequest(_ request: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
-        logger.info("Slack request URL: \(request.url?.absoluteString ?? "nil", privacy: .public)")
-        logger.info("Slack request headers: \(self.maskedHeaders(for: request), privacy: .public)")
+        logger.info("Slack request URL: \(request.url?.absoluteString ?? "nil")")
+        logger.info("Slack request headers: \(self.maskedHeaders(for: request))")
         if let body = request.httpBody, let bodyString = String(data: body, encoding: .utf8) {
-            logger.info("Slack request body: \(bodyString, privacy: .public)")
+            logger.info("Slack request body: \(bodyString)")
         }
 
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-            let responseBody = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-            self?.logger.info("Slack response status: \(statusCode, privacy: .public)")
-            self?.logger.info("Slack response body: \(responseBody, privacy: .public)")
+            let responseBody: String = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+            self?.logger.info("Slack response status: \(statusCode)")
+            self?.logger.info("Slack response body: \(responseBody)")
             completion(data, response, error)
         }.resume()
     }
@@ -686,7 +689,7 @@ public struct EmojiValidator {
         // Buscar en workspace por similitud de nombre
         // (esto requeriría metadata de Slack API que incluye nombres)
         // Por ahora, intentamos match directo si el shortcode tiene formato :emoji:
-        let potentialShortcode = ":\(emojiName(emoji)):"
+        let potentialShortcode: String = ":\(emojiName(emoji)):"
         if workspaceEmojis.contains(potentialShortcode) {
             return potentialShortcode
         }

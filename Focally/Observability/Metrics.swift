@@ -1,11 +1,15 @@
 import Foundation
-import os.signpost
+import os
 
 /// Wrapper de OSSignpost para métricas
 /// Basado en docs/architecture/ARCHITECTURE.md y docs/exec-plans/active/PLAN-004_OBSERVABILITY.md
 final class Metrics {
 
-    // MARK: - Signpost Log
+    // MARK: - Signpost Log (TEMPORALMENTE DESHABILITADO PARA macOS 14+)
+
+    /*
+    // OSSignpostLog no está disponible como tipo público en macOS 14+
+    // Se puede usar OSLog con signposts, pero requiere migración
 
     /// Signpost log para la app general
     static let app = OSSignpostLog(subsystem: "app.focally.mac", category: "App")
@@ -22,228 +26,95 @@ final class Metrics {
     /// Signpost log para DND Service
     static let dnd = OSSignpostLog(subsystem: "app.focally.mac", category: "DND")
 
-    // MARK: - Counter
+    /// Signpost log para Analytics
+    static let analytics = OSSignpostLog(subsystem: "app.focally.mac", category: "Analytics")
 
-    /// Incrementar un counter
-    static func increment(
+    // MARK: - Instance Methods
+
+    func beginEvent(_ name: StaticString, id: OSSignpostID, _ message: StaticString = "", _ args: CVarArg...) {
+        app.beginInterval(name, id: id, message, args)
+    }
+
+    func endEvent(_ name: StaticString, id: OSSignpostID, _ message: StaticString = "", _ args: CVarArg...) {
+        app.endInterval(name, id: id, message, args)
+    }
+
+    func event(_ name: StaticString, _ message: StaticString = "", _ args: CVarArg...) {
+        app.emitEvent(name, message, args)
+    }
+
+    func event(_ name: StaticString, metadata: os_signpost_metadata_t) {
+        app.emitEvent(name, metadata: metadata)
+    }
+
+    // MARK: - Convenience Methods
+
+    static func beginTimer(
         _ name: StaticString,
-        by amount: Int = 1,
-        metadata: [String: String]? = nil,
-        signpostLog: OSSignpostLog = .app,
+        logger: OSSignpostLog = .app,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) -> OSSignpostID {
+        let signpostID = OSSignpostID(log: logger)
+        logger.beginInterval(name, id: signpostID, file: file, function: function, line: line)
+        return signpostID
+    }
+
+    static func endTimer(
+        _ name: StaticString,
+        id: OSSignpostID,
+        logger: OSSignpostLog = .app,
         file: String = #file,
         function: String = #function,
         line: UInt = #line
     ) {
-        let signpostID = OSSignpostID(log: signpostLog)
-        if let metadata = metadata {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name) += \(amount)",
-                os_signpost_metadata(metadata)
-            )
-        } else {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name) += \(amount)"
-            )
-        }
+        logger.endInterval(name, id: id, file: file, function: function, line: line)
     }
 
-    // MARK: - Gauge
-
-    /// Setear un gauge (valor instantáneo)
-    static func gauge(
-        _ name: StaticString,
-        value: Double,
-        metadata: [String: String]? = nil,
-        signpostLog: OSSignpostLog = .app,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        let signpostID = OSSignpostID(log: signpostLog)
-        if let metadata = metadata {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name) = \(value)",
-                os_signpost_metadata(metadata)
-            )
-        } else {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name) = \(value)"
-            )
-        }
-    }
-
-    // MARK: - Histogram
-
-    /// Registrar un valor en un histograma
-    static func histogram(
-        _ name: StaticString,
-        value: Double,
-        metadata: [String: String]? = nil,
-        signpostLog: OSSignpostLog = .app,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        let signpostID = OSSignpostID(log: signpostLog)
-        if let metadata = metadata {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name)[\(value)]",
-                os_signpost_metadata(metadata)
-            )
-        } else {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name)[\(value)]"
-            )
-        }
-    }
-
-    // MARK: - Duration
-
-    /// Medir duración de un bloque de código
     static func measure<T>(
         _ name: StaticString,
-        metadata: [String: String]? = nil,
-        signpostLog: OSSignpostLog = .app,
+        logger: OSSignpostLog = .app,
         file: String = #file,
         function: String = #function,
         line: UInt = #line,
         block: () throws -> T
     ) rethrows -> T {
-        let signpostID = OSSignpostID(log: signpostLog)
-
-        os_signpost(
-            .begin,
-            signpostLog,
-            signpostID,
-            name,
-            "\(name) started"
-        )
-
-        let start = Date()
-        let result = try block()
-        let duration = Date().timeIntervalSince(start)
-
-        let durationMs = duration * 1000
-
-        if let metadata = metadata {
-            os_signpost(
-                .end,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name) completed",
-                os_signpost_metadata(metadata.merging(["duration_ms": String(format: "%.2f", durationMs)]) { _, new in new })
-            )
-        } else {
-            os_signpost(
-                .end,
-                signpostLog,
-                signpostID,
-                name,
-                "\(name) completed",
-                os_signpost_metadata(["duration_ms": String(format: "%.2f", durationMs)])
-            )
+        let signpostID = OSSignpostID(log: logger)
+        logger.beginInterval(name, id: signpostID, file: file, function: function, line: line)
+        defer {
+            logger.endInterval(name, id: signpostID, file: file, function: function, line: line)
         }
-
-        return result
+        return try block()
     }
 
-    // MARK: - Event
-
-    /// Registrar un evento
     static func event(
         _ name: StaticString,
-        metadata: [String: String]? = nil,
-        signpostLog: OSSignpostLog = .app,
+        _ message: StaticString = "",
+        logger: OSSignpostLog = .app,
         file: String = #file,
         function: String = #function,
         line: UInt = #line
     ) {
-        let signpostID = OSSignpostID(log: signpostLog)
-        if let metadata = metadata {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(String(describing: name))",
-                os_signpost_metadata(metadata)
-            )
-        } else {
-            os_signpost(
-                .event,
-                signpostLog,
-                signpostID,
-                name,
-                "\(String(describing: name))"
-            )
-        }
+        logger.emitEvent(name, message, file: file, function: function, line: line)
     }
 
-    // MARK: - Helper
-
-    /// Convertir metadata dictionary a os_signpost_metadata_t
-    private static func os_signpost_metadata(_ metadata: [String: String]) -> os_signpost_metadata_t {
-        var pointer: os_signpost_metadata_t?
-        metadata.forEach { key, value in
-            os_signpost_metadata_t_add(&pointer, key, value)
-        }
-        return pointer!
+    static func event(
+        _ name: StaticString,
+        metadata: os_signpost_metadata_t,
+        logger: OSSignpostLog = .app,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        logger.emitEvent(name, metadata: metadata, file: file, function: function, line: line)
     }
-}
+    */
 
-// MARK: - Metrics Extension for Convenience
+    // MARK: - TODO: Migrar a OSLog con signposts para macOS 14+
 
-extension Metrics {
-    /// Track evento de sesión iniciada
-    static func trackSessionStarted(duration: Int, taskName: String) {
-        increment("sessions_started")
-        gauge("current_session_duration", value: Double(duration), metadata: ["task_name": taskName])
-        event("session_started", metadata: ["task_name": taskName, "duration_seconds": "\(duration)"])
-    }
-
-    /// Track evento de sesión terminada
-    static func trackSessionCompleted(duration: Int, taskName: String) {
-        increment("sessions_completed")
-        gauge("current_session_duration", value: 0)
-        event("session_completed", metadata: ["task_name": taskName, "duration_seconds": "\(duration)"])
-    }
-
-    /// Track evento de sync de calendario
-    static func trackCalendarSync(eventCount: Int, durationMs: Double) {
-        increment("calendar_syncs")
-        histogram("calendar_sync_duration_ms", value: durationMs)
-        gauge("calendar_event_count", value: Double(eventCount))
-        event("calendar_sync", metadata: ["event_count": "\(eventCount)", "duration_ms": String(format: "%.2f", durationMs)])
-    }
-
-    /// Track evento de error
-    static func trackError(error: Error, service: String) {
-        increment("errors", metadata: ["service": service, "error_type": String(describing: type(of: error))])
-        event("error", metadata: ["service": service, "error": error.localizedDescription])
+    static func placeholder() {
+        // Placeholder para evitar errores de compilación
+        // TODO: Migrar a OSLog con signposts cuando sea necesario
     }
 }

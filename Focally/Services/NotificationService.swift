@@ -3,7 +3,7 @@ import UserNotifications
 import os.log
 
 class NotificationService: NSObject, UNUserNotificationCenterDelegate {
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "NotificationService")
+    private let logger = Logger.timer
 
     enum Event {
         case workSessionStarted(activity: String, durationMinutes: Int)
@@ -21,9 +21,9 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     func requestAuthorization() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             if let error {
-                self.logger.error("Notification auth error: \(error.localizedDescription, privacy: .public)")
+                self.logger.error("Notification auth error: \(error.localizedDescription)")
             } else {
-                self.logger.info("Notification auth granted: \(granted, privacy: .public)")
+                self.logger.info("Notification auth granted: \(granted)")
             }
         }
     }
@@ -58,7 +58,7 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         center.add(request) { error in
             if let error {
-                self.logger.error("Failed to post notification: \(error.localizedDescription, privacy: .public)")
+                self.logger.error("Failed to post notification: \(error.localizedDescription)")
             }
         }
     }

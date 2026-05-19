@@ -2,69 +2,64 @@ import SwiftUI
 
 extension Color {
     // Primary
-    static let focallyPrimary = Color("focallyPrimary")
-    static let focallyOnPrimary = Color("focallyOnPrimary")
-    static let focallyPrimaryContainer = Color("focallyPrimaryContainer")
-    static let focallyPrimaryFixed = Color("focallyPrimaryFixed")
-    static let focallyPrimaryFixedDim = Color("focallyPrimaryFixedDim")
-    static let focallyOnPrimaryFixed = Color("focallyOnPrimaryFixed")
-    static let focallyOnPrimaryFixedVariant = Color("focallyOnPrimaryFixedVariant")
-    static let focallyOnPrimaryContainer = Color("focallyOnPrimaryContainer")
+    static let focallyPrimary: Color = Color("focallyPrimary")
+    static let focallyOnPrimary: Color = Color("focallyOnPrimary")
+    static let focallyPrimaryContainer: Color = Color("focallyPrimaryContainer")
+    static let focallyPrimaryFixed: Color = Color("focallyPrimaryFixed")
+    static let focallyPrimaryFixedDim: Color = Color("focallyPrimaryFixedDim")
+    static let focallyOnPrimaryFixed: Color = Color("focallyOnPrimaryFixed")
+    static let focallyOnPrimaryFixedVariant: Color = Color("focallyOnPrimaryFixedVariant")
+    static let focallyOnPrimaryContainer: Color = Color("focallyOnPrimaryContainer")
 
     // Tertiary
-    static let focallyTertiary = Color("focallyTertiary")
-    static let focallyTertiaryContainer = Color("focallyTertiaryContainer")
-    static let focallyTertiaryFixed = Color("focallyTertiaryFixed")
-    static let focallyTertiaryFixedDim = Color("focallyTertiaryFixedDim")
-    static let focallyOnTertiary = Color("focallyOnTertiary")
-    static let focallyOnTertiaryContainer = Color("focallyOnTertiaryContainer")
+    static let focallyTertiary: Color = Color("focallyTertiary")
+    static let focallyTertiaryContainer: Color = Color("focallyTertiaryContainer")
+    static let focallyTertiaryFixed: Color = Color("focallyTertiaryFixed")
+    static let focallyTertiaryFixedDim: Color = Color("focallyTertiaryFixedDim")
+    static let focallyOnTertiary: Color = Color("focallyOnTertiary")
+    static let focallyOnTertiaryContainer: Color = Color("focallyOnTertiaryContainer")
 
     // Secondary
-    static let focallySecondary = Color("focallySecondary")
-    static let focallyOnSecondary = Color("focallyOnSecondary")
-    static let focallySecondaryContainer = Color("focallySecondaryContainer")
-    static let focallySecondaryFixed = Color("focallySecondaryFixed")
-    static let focallySecondaryFixedDim = Color("focallySecondaryFixedDim")
-    static let focallyOnSecondaryContainer = Color("focallyOnSecondaryContainer")
-    static let focallyOnSecondaryFixed = Color("focallyOnSecondaryFixed")
-    static let focallyOnSecondaryFixedVariant = Color("focallyOnSecondaryFixedVariant")
+    static let focallySecondary: Color = Color("focallySecondary")
+    static let focallyOnSecondary: Color = Color("focallyOnSecondary")
+    static let focallySecondaryContainer: Color = Color("focallySecondaryContainer")
+    static let focallySecondaryFixed: Color = Color("focallySecondaryFixed")
+    static let focallySecondaryFixedDim: Color = Color("focallySecondaryFixedDim")
+    static let focallyOnSecondaryContainer: Color = Color("focallyOnSecondaryContainer")
+    static let focallyOnSecondaryFixed: Color = Color("focallyOnSecondaryFixed")
+    static let focallyOnSecondaryFixedVariant: Color = Color("focallyOnSecondaryFixedVariant")
 
     // Surface
-    static let focallyOnSurface = Color("focallyOnSurface")
-    static let focallyOnSurfaceVariant = Color("focallyOnSurfaceVariant")
-    static let focallyOutline = Color("focallyOutline")
-    static let focallyOutlineVariant = Color("focallyOutlineVariant")
-    static let focallySurface = Color("focallySurface")
-    static let focallySurfaceBright = Color("focallySurfaceBright")
-    static let focallySurfaceDim = Color("focallySurfaceDim")
-    static let focallySurfaceContainerLowest = Color("focallySurfaceContainerLowest")
-    static let focallySurfaceContainerLow = Color("focallySurfaceContainerLow")
-    static let focallySurfaceContainer = Color("focallySurfaceContainer")
-    static let focallySurfaceContainerHigh = Color("focallySurfaceContainerHigh")
-    static let focallySurfaceContainerHighest = Color("focallySurfaceContainerHighest")
-    static let focallySurfaceVariant = Color("focallySurfaceVariant")
-    static let focallySurfaceTint = Color("focallySurfaceTint")
-    static let focallyBackground = Color("focallyBackground")
-    static let focallyOnBackground = Color("focallyOnBackground")
+    static let focallyOnSurface: Color = Color("focallyOnSurface")
+    static let focallyOnSurfaceVariant: Color = Color("focallyOnSurfaceVariant")
+    static let focallyOutline: Color = Color("focallyOutline")
+    static let focallyOutlineVariant: Color = Color("focallyOutlineVariant")
+    static let focallySurface: Color = Color("focallySurface")
+    static let focallySurfaceBright: Color = Color("focallySurfaceBright")
+    static let focallySurfaceDim: Color = Color("focallySurfaceDim")
+    static let focallySurfaceContainerLowest: Color = Color("focallySurfaceContainerLowest")
+    static let focallySurfaceContainerLow: Color = Color("focallySurfaceContainerLow")
+    static let focallySurfaceContainer: Color = Color("focallySurfaceContainer")
+    static let focallySurfaceContainerHigh: Color = Color("focallySurfaceContainerHigh")
+    static let focallySurfaceContainerHighest: Color = Color("focallySurfaceContainerHighest")
+    static let focallySurfaceVariant: Color = Color("focallySurfaceVariant")
+    static let focallySurfaceTint: Color = Color("focallySurfaceTint")
+    static let focallyBackground: Color = Color("focallyBackground")
+    static let focallyOnBackground: Color = Color("focallyOnBackground")
 
     // Inverse
-    static let focallyInverseSurface = Color("focallyInverseSurface")
-    static let focallyInverseOnSurface = Color("focallyInverseOnSurface")
-    static let focallyInversePrimary = Color("focallyInversePrimary")
+    static let focallyInverseSurface: Color = Color("focallyInverseSurface")
+    static let focallyInverseOnSurface: Color = Color("focallyInverseOnSurface")
+    static let focallyInversePrimary: Color = Color("focallyInversePrimary")
 
     // Error
-    static let focallyError = Color("focallyError")
-    static let focallyErrorContainer = Color("focallyErrorContainer")
-    static let focallyOnError = Color("focallyOnError")
-    static let focallyOnErrorContainer = Color("focallyOnErrorContainer")
+    static let focallyError: Color = Color("focallyError")
+    static let focallyErrorContainer: Color = Color("focallyErrorContainer")
+    static let focallyOnError: Color = Color("focallyOnError")
+    static let focallyOnErrorContainer: Color = Color("focallyOnErrorContainer")
 
-    static let focallyCardBorder = Color("focallyCardBorder")
-}
-
-// Helper extension for hex colors
-extension Color {
     init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        let hex: String = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
         let a, r, g, b: UInt64
@@ -76,7 +71,7 @@ extension Color {
         case 8: // ARGB (32-bit)
             (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default:
-            (a, r, g, b) = (255, 0, 0, 0)
+            (a, r, g, b) = (1, 1, 1, 0)
         }
 
         self.init(

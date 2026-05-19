@@ -114,7 +114,7 @@ struct ActiveFocusView: View {
         .background(heroBackground)
         .overlay {
             RoundedRectangle(cornerRadius: 28)
-                .stroke(Color.focallyCardBorder, lineWidth: 0.75)
+                .stroke(Color.focallyOutline, lineWidth: 0.75)
         }
         .clipShape(RoundedRectangle(cornerRadius: 28))
     }
@@ -324,7 +324,7 @@ struct SupportCard<Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.focallyCardBorder, lineWidth: 0.75)
+                .stroke(Color.focallyOutline, lineWidth: 0.75)
         }
     }
 }

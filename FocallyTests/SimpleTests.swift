@@ -20,14 +20,14 @@ class SimpleFrameworkTests: XCTestCase {
     }
 
     func testStringOperations() {
-        let text = "Hello, XCTest!"
+        let text: String = "Hello, XCTest!"
         XCTAssertEqual(text, "Hello, XCTest!")
         XCTAssertTrue(text.contains("XCTest"))
         XCTAssertEqual(text.count, 14)
     }
 
     func testArrayOperations() {
-        let array = [1, 2, 3]
+        let array: [Int] = [1, 2, 3]
         XCTAssertEqual(array.count, 3)
         XCTAssertEqual(array.first, 1)
         XCTAssertEqual(array.last, 3)

@@ -30,11 +30,16 @@ final class SoundPlayerService: ObservableObject {
     @Published var soundVolume: Double = 1.0
     @Published var soundRepeatCount: Int = 2
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "SoundPlayer")
+    private let logger = Logger.timer
     private var activeSounds: [NSSound] = []
 
-    let sounds = ["Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine", "Glass", "Basso", "Blow", "Bottle", "Frog", "Funk", "Sosumi", CompletionSoundVariant.primary.rawValue, CompletionSoundVariant.soft.rawValue, CompletionSoundVariant.alt.rawValue]
-
+    let sounds: [String] = [
+        "Bell", "Ping", "Tink", "Pop", "Purr", "Hero", "Morse", "Submarine",
+        "Glass", "Basso", "Blow", "Bottle", "Frog", "Funk", "Sosumi",
+        CompletionSoundVariant.primary.rawValue,
+        CompletionSoundVariant.soft.rawValue,
+        CompletionSoundVariant.alt.rawValue
+    ]
     /// Returns the app bundle (not the test bundle)
     /// In unit tests, Bundle.main points to the test bundle.
     /// Use Bundle(identifier:) to get the main app bundle where resources are located.
@@ -61,8 +66,12 @@ final class SoundPlayerService: ObservableObject {
     func play(_ soundType: SoundType) {
         guard isEnabled else { return }
         let soundName = resolveSoundName(for: soundType)
-        let repeatCount = soundType == .sessionComplete ? 3 : max(soundRepeatCount, 1)
-        playSound(named: soundName, repeatCount: repeatCount, interSoundDelay: 1.2)
+        let repeatCount: Int = soundType == .sessionComplete ? 3 : max(soundRepeatCount, 1)
+        playSound(
+            named: soundName,
+            repeatCount: repeatCount,
+            interSoundDelay: 1.2
+        )
     }
 
     func playCompletionSound() {
@@ -89,7 +98,7 @@ final class SoundPlayerService: ObservableObject {
         ]
 
         if soundName == "Bell",
-           let bundledURL = appBundle.url(forResource: "bell", withExtension: "aiff") {
+           let bundledURL: URL = appBundle.url(forResource: "bell", withExtension: "aiff") {
             return bundledURL
         }
 
@@ -99,7 +108,7 @@ final class SoundPlayerService: ObservableObject {
             }
         }
 
-        let systemSoundURL = URL(fileURLWithPath: "/System/Library/Sounds")
+        let systemSoundURL: URL = URL(fileURLWithPath: "/System/Library/Sounds")
             .appendingPathComponent(soundName)
             .appendingPathExtension("aiff")
         if FileManager.default.fileExists(atPath: systemSoundURL.path) {
@@ -109,7 +118,7 @@ final class SoundPlayerService: ObservableObject {
     }
 
     func loadSettings() {
-        let defaults = UserDefaults.standard
+        let defaults: UserDefaults = UserDefaults.standard
         isEnabled = storedBool(forKey: DefaultsKey.isEnabled, defaultValue: true)
         workSoundName = defaults.string(forKey: DefaultsKey.workSoundName) ?? "Bell"
         breakSoundName = defaults.string(forKey: DefaultsKey.breakSoundName) ?? "Ping"
@@ -120,7 +129,7 @@ final class SoundPlayerService: ObservableObject {
     }
 
     func saveSettings() {
-        let defaults = UserDefaults.standard
+        let defaults: UserDefaults = UserDefaults.standard
         defaults.set(isEnabled, forKey: DefaultsKey.isEnabled)
         defaults.set(workSoundName, forKey: DefaultsKey.workSoundName)
         defaults.set(breakSoundName, forKey: DefaultsKey.breakSoundName)
@@ -163,8 +172,8 @@ final class SoundPlayerService: ObservableObject {
     private func playSound(named soundName: String, repeatCount: Int, interSoundDelay: TimeInterval) {
         guard isEnabled else { return }
 
-        for i in 0..<repeatCount {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * interSoundDelay) { [weak self] in
+        for index in 0..<repeatCount {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * interSoundDelay) { [weak self] in
                 guard let self else { return }
                 guard let sound = self.makeSound(named: soundName) else { return }
                 sound.volume = Float(self.soundVolume)
@@ -176,12 +185,12 @@ final class SoundPlayerService: ObservableObject {
 
     private func makeSound(named soundName: String) -> NSSound? {
         guard let url = soundURL(for: soundName) else {
-            logger.warning("Sound not found: \(soundName, privacy: .public)")
+            logger.warning("Sound not found: \(soundName)")
             return nil
         }
 
         guard let sound = NSSound(contentsOf: url, byReference: true) else {
-            logger.warning("Failed to load sound at URL: \(url.path, privacy: .public)")
+            logger.warning("Failed to load sound at URL: \(url.path)")
             return nil
         }
 

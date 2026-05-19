@@ -67,6 +67,6 @@ struct FocallyFocusScoreCard: View {
     }
 
     private var borderColor: Color {
-        Color.focallyCardBorder
+        Color.focallyOutline
     }
 }

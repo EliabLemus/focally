@@ -2,8 +2,7 @@ import Foundation
 import SwiftUI
 
 struct PredefinedTask: Identifiable, Codable, Equatable {
-    static let defaultsKey = "predefinedTasks"
-
+    static let defaultsKey: String = "predefinedTasks"
     var id: UUID = UUID()
     var name: String
     var emoji: String

@@ -6,7 +6,7 @@ import AppKit
 // MARK: - Shortcut Drop Handler
 
 class ShortcutDropHandler: ObservableObject {
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app.focally.mac", category: "ShortcutDropHandler")
+    private let logger = Logger.ui
     private let fileManager = FileManager.default
 
     // Published state
@@ -49,14 +49,14 @@ class ShortcutDropHandler: ObservableObject {
                 let destinationURL = self.shortcutsLibraryURL.appendingPathComponent(url.lastPathComponent)
                 try self.fileManager.copyItem(at: url, to: destinationURL)
 
-                self.logger.info("Copied shortcut to: \(destinationURL.path, privacy: .public)")
+                self.logger.info("Copied shortcut to: \(destinationURL.path)")
 
                 // Build deep link URL
                 guard let deeplinkURL = self.buildImportDeepLink(for: destinationURL) else {
                     throw ShortcutDropError.invalidDeepLink
                 }
 
-                self.logger.info("Opening deep link: \(deeplinkURL.absoluteString, privacy: .public)")
+                self.logger.info("Opening deep link: \(deeplinkURL.absoluteString)")
 
                 // Open deep link
                 self.openDeepLink(deeplinkURL)
@@ -88,7 +88,7 @@ class ShortcutDropHandler: ObservableObject {
 
         if !fileManager.fileExists(atPath: shortcutsLibraryURL.path, isDirectory: &isDirectory) {
             try fileManager.createDirectory(at: shortcutsLibraryURL, withIntermediateDirectories: true)
-            logger.info("Created Shortcuts directory at: \(self.shortcutsLibraryURL.path, privacy: .public)")
+            logger.info("Created Shortcuts directory at: \(self.shortcutsLibraryURL.path)")
         } else if !isDirectory.boolValue {
             throw ShortcutDropError.directoryNotDirectory
         }
@@ -102,8 +102,7 @@ class ShortcutDropHandler: ObservableObject {
 
         // Build file URL with triple slash
         let filePath = url.path
-        let fileURLString = "file:///\(filePath)"
-
+        let fileURLString: String = "file:///\(filePath)"
         components?.queryItems = [
             URLQueryItem(name: "url", value: fileURLString),
             URLQueryItem(name: "name", value: url.deletingPathExtension().lastPathComponent),
@@ -118,7 +117,7 @@ class ShortcutDropHandler: ObservableObject {
     }
 
     private func handleError(_ message: String) {
-        logger.error("Shortcut import failed: \(message, privacy: .public)")
+        logger.error("Shortcut import failed: \(message)")
 
         DispatchQueue.main.async { [weak self] in
             self?.lastError = message

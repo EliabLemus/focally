@@ -17,15 +17,17 @@ custom_rules:
     severity: warning
 
   # File size limit (500 líneas)
-  file_size_limit:
-    name: "File Size Limit"
-    regex: '.*'
-    match_kinds:
-      - comment
-      - identifier
-    message: "El archivo excede 500 líneas. Split en archivos más pequeños."
-    severity: warning
-    # NOTA: Esta regla se implementa via script externo, no regex
+  # DESACTIVADO: La regla usa regex '.*' que genera falsas violaciones en modo strict.
+  # La regla estándar 'file_length' ya maneja esto correctamente.
+  # file_size_limit:
+  #   name: "File Size Limit"
+  #   regex: '.*'
+  #   match_kinds:
+  #     - comment
+  #     - identifier
+  #   message: "El archivo excede 500 líneas. Split en archivos más pequeños."
+  #   severity: warning
+  #   # NOTA: Esta regla se implementa via script externo, no regex
 
   # Structured logging
   structured_logging:

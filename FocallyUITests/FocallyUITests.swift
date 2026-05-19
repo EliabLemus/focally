@@ -72,7 +72,7 @@ final class FocallyUITests: XCTestCase {
         // Wait a moment for windows to close
         let expectation = XCTNSPredicateExpectation(
             predicate: NSPredicate { _ in
-                self.app.windows.count == 0
+                self.app.windows.isEmpty
             },
             object: nil
         )
@@ -111,14 +111,12 @@ final class FocallyUITests: XCTestCase {
         // Buscar elementos de accesibilidad en cualquier ventana abierta
         let windows = app.windows.allElementsBoundByIndex
 
-        var foundElements = false
-        for window in windows {
+        var foundElements: Bool = false        for window in windows {
             if window.waitForExistence(timeout: Timeouts.interaction) {
                 // Buscar elementos de accesibilidad dentro de las ventanas
                 let headerText = window.staticTexts["headerFocusText"]
                 let settingsButton = window.buttons["settingsButton"]
                 let moreButton = window.buttons["moreButton"]
-
                 if headerText.exists || settingsButton.exists || moreButton.exists {
                     foundElements = true
                     break
