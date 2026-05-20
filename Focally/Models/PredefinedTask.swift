@@ -13,11 +13,51 @@ struct PredefinedTask: Identifiable, Codable, Equatable {
     var cycles: Int
 
     static let defaultTasks: [PredefinedTask] = [
-        PredefinedTask(name: "Pomodoro", emoji: "🍅", icon: "timer", iconBgColor: "FFE4E6", iconFgColor: "E11D48", durationMinutes: 25, cycles: 4),
-        PredefinedTask(name: "Deep Coding", emoji: "💻", icon: "chevron.left.forwardslash.chevron.right", iconBgColor: "DBEAFE", iconFgColor: "2563EB", durationMinutes: 25, cycles: 4),
-        PredefinedTask(name: "Technical Documentation", emoji: "📚", icon: "doc.text", iconBgColor: "FFEDD5", iconFgColor: "EA580C", durationMinutes: 50, cycles: 2),
-        PredefinedTask(name: "Inbox Clearing", emoji: "📧", icon: "envelope", iconBgColor: "F3E8FF", iconFgColor: "9333EA", durationMinutes: 15, cycles: 1),
-        PredefinedTask(name: "Quick Workout", emoji: "💪", icon: "figure.strengthtraining.traditional", iconBgColor: "DCFCE7", iconFgColor: "16A34A", durationMinutes: 10, cycles: 1)
+        PredefinedTask(
+            name: "Pomodoro",
+            emoji: "🍅",
+            icon: "timer",
+            iconBgColor: "FFE4E6",
+            iconFgColor: "E11D48",
+            durationMinutes: 25,
+            cycles: 4
+        ),
+        PredefinedTask(
+            name: "Deep Coding",
+            emoji: "💻",
+            icon: "chevron.left.forwardslash.chevron.right",
+            iconBgColor: "DBEAFE",
+            iconFgColor: "2563EB",
+            durationMinutes: 25,
+            cycles: 4
+        ),
+        PredefinedTask(
+            name: "Technical Documentation",
+            emoji: "📚",
+            icon: "doc.text",
+            iconBgColor: "FFEDD5",
+            iconFgColor: "EA580C",
+            durationMinutes: 50,
+            cycles: 2
+        ),
+        PredefinedTask(
+            name: "Inbox Clearing",
+            emoji: "📧",
+            icon: "envelope",
+            iconBgColor: "F3E8FF",
+            iconFgColor: "9333EA",
+            durationMinutes: 15,
+            cycles: 1
+        ),
+        PredefinedTask(
+            name: "Quick Workout",
+            emoji: "💪",
+            icon: "figure.strengthtraining.traditional",
+            iconBgColor: "DCFCE7",
+            iconFgColor: "16A34A",
+            durationMinutes: 10,
+            cycles: 1
+        )
     ]
 }
 
