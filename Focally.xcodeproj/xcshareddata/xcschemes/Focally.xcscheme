@@ -35,20 +35,6 @@
                ReferencedContainer = "container:Focally.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "94362290CFDEA1E1D0588B06"
-               BuildableName = "FocallyUITests.bundle"
-               BlueprintName = "FocallyUITests"
-               ReferencedContainer = "container:Focally.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -75,17 +61,6 @@
                BlueprintIdentifier = "421C378FD351C0B40085048E"
                BuildableName = "FocallyTests.xctest"
                BlueprintName = "FocallyTests"
-               ReferencedContainer = "container:Focally.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "94362290CFDEA1E1D0588B06"
-               BuildableName = "FocallyUITests.bundle"
-               BlueprintName = "FocallyUITests"
                ReferencedContainer = "container:Focally.xcodeproj">
             </BuildableReference>
          </TestableReference>

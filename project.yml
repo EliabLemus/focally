@@ -108,14 +108,12 @@ schemes:
       targets:
         Focally: all
         FocallyTests: [test, analyze]
-        FocallyUITests: [test, analyze]
     run:
       config: Debug
     test:
       config: Debug
       targets:
         - FocallyTests
-        - FocallyUITests
     profile:
       config: Release
     analyze:
