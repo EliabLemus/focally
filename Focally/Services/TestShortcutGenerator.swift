@@ -284,8 +284,8 @@ final class ManagedFocusShortcutsService: ObservableObject {
         let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
 
         return ManagedShortcutCommandResult(
-            stdout: String(decoding: stdoutData, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines),
-            stderr: String(decoding: stderrData, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines),
+            stdout: String(bytes: stdoutData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "",
+            stderr: String(bytes: stderrData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "",
             terminationStatus: process.terminationStatus
         )
     }

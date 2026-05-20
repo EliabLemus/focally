@@ -8,7 +8,7 @@ struct PredefinedTasksList: View {
     @State private var editingTask: PredefinedTask?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.md) {
+        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
             HStack {
                 Image(systemName: "checklist")
                     .font(.system(size: 18))
@@ -26,11 +26,11 @@ struct PredefinedTasksList: View {
                         Text("Add New")
                             .font(.focallyCaption)
                     }
-                    .padding(.horizontal, FocallySpacing.md)
-                    .padding(.vertical, FocallySpacing.sm)
+                    .padding(.horizontal, FocallySpacing.medium)
+                    .padding(.vertical, FocallySpacing.small)
                     .background(Color.focallyPrimary)
                     .foregroundStyle(Color.focallyOnPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.sm))
+                    .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.small))
                 }
                 .buttonStyle(.plain)
             }
@@ -44,9 +44,9 @@ struct PredefinedTasksList: View {
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, FocallySpacing.md)
+                    .padding(.vertical, FocallySpacing.medium)
             } else {
-                VStack(spacing: FocallySpacing.sm) {
+                VStack(spacing: FocallySpacing.small) {
                     ForEach(predefinedTaskStore.tasks) { task in
                         TaskRowView(
                             task: task,
@@ -58,7 +58,7 @@ struct PredefinedTasksList: View {
                 }
             }
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .focallyCard()
         .sheet(isPresented: $showingEditor) {
             PredefinedTaskEditorSheet(task: editingTask) { task in

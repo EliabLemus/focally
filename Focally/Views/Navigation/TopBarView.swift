@@ -15,12 +15,12 @@ struct TopBarView<LeftContent: View, RightContent: View>: View {
     var body: some View {
         HStack(spacing: 0) {
             leftContent
-                .padding(.leading, FocallySpacing.md)
+                .padding(.leading, FocallySpacing.medium)
 
             Spacer()
 
             rightContent
-            .padding(.trailing, FocallySpacing.md)
+            .padding(.trailing, FocallySpacing.medium)
         }
         .frame(height: 48)
         .background(Color.focallySurfaceContainerLowest.opacity(0.8))

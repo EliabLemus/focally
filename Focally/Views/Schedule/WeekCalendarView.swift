@@ -77,9 +77,9 @@ struct DayColumn: View {
     let isCurrent: Bool
 
     private static let weekdayFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "EEE"
-        return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter
     }()
 
     var body: some View {

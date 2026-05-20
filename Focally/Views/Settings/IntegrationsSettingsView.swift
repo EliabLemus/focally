@@ -13,7 +13,7 @@ struct IntegrationsSettingsView: View {
     @State private var slackTestFeedback: String?
 
     var body: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             slackCard
             calendarCard
             focusIntegrationCard
@@ -22,8 +22,8 @@ struct IntegrationsSettingsView: View {
     }
 
     private var slackCard: some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.md) {
-            HStack(spacing: FocallySpacing.md) {
+        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+            HStack(spacing: FocallySpacing.medium) {
                 iconTile(systemImage: "message.fill", color: Color.focallyPrimary)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -44,7 +44,7 @@ struct IntegrationsSettingsView: View {
 
             credentialField(title: "User Token", prompt: "xoxp-...", text: $slackToken, isSecure: true)
 
-            HStack(spacing: FocallySpacing.sm) {
+            HStack(spacing: FocallySpacing.small) {
                 primaryButton("Save Token", action: saveSlackToken)
                 secondaryButton("Test Connection", action: testSlackConnection)
                     .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -64,7 +64,7 @@ struct IntegrationsSettingsView: View {
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 } else {
-                    HStack(spacing: FocallySpacing.xs) {
+                    HStack(spacing: FocallySpacing.extraSmall) {
                         Text("Slack emoji catalog: \(slackService.workspaceEmojiCodes.count) emojis loaded")
                             .font(.focallyCaption)
                             .foregroundStyle(Color.focallyTertiary)
@@ -84,13 +84,13 @@ struct IntegrationsSettingsView: View {
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .focallyCard()
     }
 
     private var calendarCard: some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.md) {
-            HStack(spacing: FocallySpacing.md) {
+        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+            HStack(spacing: FocallySpacing.medium) {
                 iconTile(systemImage: "calendar", color: Color.focallyTertiary)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -112,7 +112,7 @@ struct IntegrationsSettingsView: View {
             credentialField(title: "Client ID", prompt: "Google OAuth client ID", text: $googleClientID)
             credentialField(title: "Client Secret", prompt: "Google OAuth client secret", text: $googleClientSecret, isSecure: true)
 
-            HStack(spacing: FocallySpacing.sm) {
+            HStack(spacing: FocallySpacing.small) {
                 primaryButton("Save Credentials", action: saveGoogleCredentials)
                 secondaryButton(calendarService.isSignedIn ? "Disconnect" : "Connect", action: toggleGoogleConnection)
             }
@@ -123,13 +123,13 @@ struct IntegrationsSettingsView: View {
                     .foregroundStyle(Color.focallyError)
             }
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .focallyCard()
     }
 
     private var focusIntegrationCard: some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.md) {
-            HStack(spacing: FocallySpacing.md) {
+        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+            HStack(spacing: FocallySpacing.medium) {
                 iconTile(systemImage: "moon.circle.fill", color: .purple)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -169,7 +169,7 @@ struct IntegrationsSettingsView: View {
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
 
-                HStack(spacing: FocallySpacing.sm) {
+                HStack(spacing: FocallySpacing.small) {
                     primaryButton("Stage Shortcut Files") {
                         managedShortcutsService.prepareAndOpenForImport()
                     }
@@ -183,19 +183,19 @@ struct IntegrationsSettingsView: View {
                     .font(.focallyCaption)
                     .foregroundStyle(focusIntegrationService.lastError == nil ? Color.focallyOnSurfaceVariant : Color.focallyError)
             }
-            .padding(FocallySpacing.md)
+            .padding(FocallySpacing.medium)
             .background(
-                RoundedRectangle(cornerRadius: FocallyRadius.md)
+                RoundedRectangle(cornerRadius: FocallyRadius.medium)
                     .fill(Color.focallySurfaceContainerLow)
             )
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .focallyCard()
     }
 
     private func iconTile(systemImage: String, color: Color) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: FocallyRadius.sm)
+            RoundedRectangle(cornerRadius: FocallyRadius.small)
                 .fill(color.opacity(0.1))
                 .frame(width: 40, height: 40)
             Image(systemName: systemImage)
@@ -225,7 +225,7 @@ struct IntegrationsSettingsView: View {
     private var soundPreviewSection: some View {
         let soundPlayer = SoundPlayerService.shared
 
-        return VStack(alignment: .leading, spacing: FocallySpacing.sm) {
+        return VStack(alignment: .leading, spacing: FocallySpacing.small) {
             Text("Completion Sound Preview")
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
@@ -234,7 +234,7 @@ struct IntegrationsSettingsView: View {
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
 
-            HStack(spacing: FocallySpacing.sm) {
+            HStack(spacing: FocallySpacing.small) {
                 Picker("Completion Sound", selection: completionSoundBinding(for: soundPlayer)) {
                     ForEach(SoundPlayerService.CompletionSoundVariant.allCases) { variant in
                         Text(variant.rawValue).tag(variant.rawValue)
@@ -249,9 +249,9 @@ struct IntegrationsSettingsView: View {
                 .buttonStyle(.borderedProminent)
             }
         }
-        .padding(FocallySpacing.md)
+        .padding(FocallySpacing.medium)
         .background(
-            RoundedRectangle(cornerRadius: FocallyRadius.md)
+            RoundedRectangle(cornerRadius: FocallyRadius.medium)
                 .fill(Color.focallySurfaceContainerLow)
         )
     }
@@ -276,16 +276,16 @@ struct IntegrationsSettingsView: View {
                 .font(.focallyCaption)
                 .foregroundStyle(connected ? Color.focallyPrimary : Color.focallyOutline)
         }
-        .padding(.horizontal, FocallySpacing.sm)
+        .padding(.horizontal, FocallySpacing.small)
         .padding(.vertical, 4)
         .background(
-            RoundedRectangle(cornerRadius: FocallyRadius.xs)
+            RoundedRectangle(cornerRadius: FocallyRadius.extraSmall)
                 .fill(connected ? Color.focallyPrimary.opacity(0.1) : Color.focallySurfaceContainer)
         )
     }
 
     private func credentialField(title: String, prompt: String, text: Binding<String>, isSecure: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.xs) {
+        VStack(alignment: .leading, spacing: FocallySpacing.extraSmall) {
             Text(title)
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
@@ -300,14 +300,14 @@ struct IntegrationsSettingsView: View {
             }
             .font(.focallyBody)
             .foregroundStyle(Color.focallyOnSurface)
-            .padding(.horizontal, FocallySpacing.md)
+            .padding(.horizontal, FocallySpacing.medium)
             .padding(.vertical, 10)
             .background(
-                RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                RoundedRectangle(cornerRadius: FocallyRadius.small)
                     .fill(Color.focallySurfaceContainerLowest.opacity(0.6))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                RoundedRectangle(cornerRadius: FocallyRadius.small)
                     .stroke(Color.focallyOutline.opacity(0.2), lineWidth: 1)
             )
         }
@@ -318,10 +318,10 @@ struct IntegrationsSettingsView: View {
             Text(title)
                 .font(.focallyButton)
                 .foregroundStyle(Color.focallyOnPrimary)
-                .padding(.horizontal, FocallySpacing.md)
+                .padding(.horizontal, FocallySpacing.medium)
                 .padding(.vertical, 8)
                 .background(
-                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                    RoundedRectangle(cornerRadius: FocallyRadius.small)
                         .fill(Color.focallyPrimary)
                 )
         }
@@ -333,10 +333,10 @@ struct IntegrationsSettingsView: View {
             Text(title)
                 .font(.focallyButton)
                 .foregroundStyle(Color.focallyOnSurface)
-                .padding(.horizontal, FocallySpacing.md)
+                .padding(.horizontal, FocallySpacing.medium)
                 .padding(.vertical, 8)
                 .background(
-                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                    RoundedRectangle(cornerRadius: FocallyRadius.small)
                         .fill(Color.focallySurfaceContainerHigh)
                 )
         }

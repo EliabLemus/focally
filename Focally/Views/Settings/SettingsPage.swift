@@ -33,7 +33,7 @@ struct SettingsPage: View {
                         Button(action: {
                             selectedSubpage = subpage
                         }) {
-                            HStack(spacing: FocallySpacing.sm) {
+                            HStack(spacing: FocallySpacing.small) {
                                 Image(systemName: subpage.icon)
                                     .font(.system(size: 13))
                                     .frame(width: 18)
@@ -42,11 +42,11 @@ struct SettingsPage: View {
                                     .font(selectedSubpage == subpage ? .focallyBodyBold : .focallyBody)
                             }
                             .foregroundStyle(selectedSubpage == subpage ? Color.focallyOnSurface : Color.focallyOutline)
-                            .padding(.horizontal, FocallySpacing.sm)
-                            .padding(.vertical, FocallySpacing.sm)
+                            .padding(.horizontal, FocallySpacing.small)
+                            .padding(.vertical, FocallySpacing.small)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(
-                                RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                                RoundedRectangle(cornerRadius: FocallyRadius.small)
                                     .fill(selectedSubpage == subpage ? Color.focallySurfaceContainerHigh : Color.clear)
                             )
                         }
@@ -55,7 +55,7 @@ struct SettingsPage: View {
 
                     Spacer()
                 }
-                .padding(FocallySpacing.sm)
+                .padding(FocallySpacing.small)
                 .frame(width: 160)
                 .background(Color.focallySurfaceContainerLow)
 
@@ -73,15 +73,15 @@ struct SettingsPage: View {
                             .font(.focallyCaption)
                             .foregroundStyle(Color.focallyOnSurfaceVariant)
                     }
-                    .padding(.horizontal, FocallySpacing.lg)
-                    .padding(.top, FocallySpacing.md)
-                    .padding(.bottom, FocallySpacing.sm)
+                    .padding(.horizontal, FocallySpacing.large)
+                    .padding(.top, FocallySpacing.medium)
+                    .padding(.bottom, FocallySpacing.small)
 
                     // Content
                     ScrollView {
                         subpageContent
-                            .padding(.horizontal, FocallySpacing.lg)
-                            .padding(.bottom, FocallySpacing.lg)
+                            .padding(.horizontal, FocallySpacing.large)
+                            .padding(.bottom, FocallySpacing.large)
                     }
                     .scrollContentBackground(.hidden)
 
@@ -97,18 +97,18 @@ struct SettingsPage: View {
                             Text("Manage Focus Integration")
                                 .font(.focallyButton)
                                 .foregroundStyle(Color.focallyOnPrimary)
-                                .padding(.horizontal, FocallySpacing.md)
+                                .padding(.horizontal, FocallySpacing.medium)
                                 .padding(.vertical, 6)
                                 .background(
-                                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                                    RoundedRectangle(cornerRadius: FocallyRadius.small)
                                         .fill(Color.focallyPrimary)
                                 )
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Manage Focus Integration")
                     }
-                    .padding(.horizontal, FocallySpacing.lg)
-                    .padding(.vertical, FocallySpacing.md)
+                    .padding(.horizontal, FocallySpacing.large)
+                    .padding(.vertical, FocallySpacing.medium)
                     .overlay(alignment: .top) {
                         Rectangle()
                             .frame(height: 0.5)

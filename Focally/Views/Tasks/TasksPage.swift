@@ -18,19 +18,19 @@ struct TasksPage: View {
 
                     Spacer()
                 }
-                .padding(.horizontal, FocallySpacing.lg)
-                .padding(.top, FocallySpacing.lg)
+                .padding(.horizontal, FocallySpacing.large)
+                .padding(.top, FocallySpacing.large)
 
                 Text("Manage free-form focus sessions, Pomodoro defaults, and saved activities.")
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOutline)
-                    .padding(.horizontal, FocallySpacing.lg)
-                    .padding(.bottom, FocallySpacing.lg)
+                    .padding(.horizontal, FocallySpacing.large)
+                    .padding(.bottom, FocallySpacing.large)
 
                 ScrollView {
-                    VStack(spacing: FocallySpacing.lg) {
-                        HStack(alignment: .top, spacing: FocallySpacing.lg) {
-                            VStack(spacing: FocallySpacing.lg) {
+                    VStack(spacing: FocallySpacing.large) {
+                        HStack(alignment: .top, spacing: FocallySpacing.large) {
+                            VStack(spacing: FocallySpacing.large) {
                                 TimerSettingsCard()
                                 FocusModeCard()
                             }
@@ -44,8 +44,8 @@ struct TasksPage: View {
 
                         TasksFooter()
                     }
-                    .padding(.horizontal, FocallySpacing.lg)
-                    .padding(.bottom, FocallySpacing.lg)
+                    .padding(.horizontal, FocallySpacing.large)
+                    .padding(.bottom, FocallySpacing.large)
                 }
                 .scrollContentBackground(.hidden)
             }
@@ -64,7 +64,7 @@ private struct TasksFooter: View {
 
             Spacer()
         }
-        .padding(.horizontal, FocallySpacing.md)
-        .padding(.vertical, FocallySpacing.sm)
+        .padding(.horizontal, FocallySpacing.medium)
+        .padding(.vertical, FocallySpacing.small)
     }
 }

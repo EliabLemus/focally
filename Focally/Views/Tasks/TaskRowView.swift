@@ -61,7 +61,7 @@ struct TaskRowView: View {
             .opacity(isHovered ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: isHovered)
         }
-        .padding(FocallySpacing.md)
+        .padding(FocallySpacing.medium)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.focallySurfaceContainerLowest.opacity(0.5))

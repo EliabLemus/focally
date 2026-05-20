@@ -10,9 +10,9 @@ struct AboutSettingsView: View {
     }
 
     var body: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             // App icon placeholder
-            RoundedRectangle(cornerRadius: FocallyRadius.lg)
+            RoundedRectangle(cornerRadius: FocallyRadius.large)
                 .fill(
                     LinearGradient(
                         colors: [Color.focallyPrimary, Color.focallyPrimaryContainer],
@@ -27,12 +27,12 @@ struct AboutSettingsView: View {
                         .foregroundStyle(Color.focallyOnPrimary)
                 )
 
-            VStack(spacing: FocallySpacing.xs) {
+            VStack(spacing: FocallySpacing.extraSmall) {
                 Text("Focally")
                     .font(.focallyH1)
                     .foregroundStyle(Color.focallyOnSurface)
 
-                HStack(spacing: FocallySpacing.xs) {
+                HStack(spacing: FocallySpacing.extraSmall) {
                     Text("Version \(appVersion)")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
@@ -49,9 +49,9 @@ struct AboutSettingsView: View {
 
             Divider()
                 .background(Color.focallyOutlineVariant)
-                .padding(.vertical, FocallySpacing.sm)
+                .padding(.vertical, FocallySpacing.small)
 
-            VStack(spacing: FocallySpacing.xs) {
+            VStack(spacing: FocallySpacing.extraSmall) {
                 Text("Developed with ❤️ using SwiftUI")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOutline)
@@ -62,6 +62,6 @@ struct AboutSettingsView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, FocallySpacing.xl)
+        .padding(.vertical, FocallySpacing.extraLarge)
     }
 }

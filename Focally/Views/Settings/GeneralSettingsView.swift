@@ -26,7 +26,7 @@ struct GeneralSettingsView: View {
             )
 
             if soundEnabled {
-                HStack(spacing: FocallySpacing.sm) {
+                HStack(spacing: FocallySpacing.small) {
                     Spacer()
                     Menu {
                         ForEach(soundOptions, id: \.self) { sound in
@@ -42,7 +42,7 @@ struct GeneralSettingsView: View {
                             }
                         }
                     } label: {
-                        HStack(spacing: FocallySpacing.xs) {
+                        HStack(spacing: FocallySpacing.extraSmall) {
                             Text(selectedSound)
                                 .font(.focallyCaption)
                                 .foregroundStyle(Color.focallyOutline)
@@ -50,18 +50,18 @@ struct GeneralSettingsView: View {
                                 .font(.system(size: 9, weight: .semibold))
                                 .foregroundStyle(Color.focallyOutline)
                         }
-                        .padding(.horizontal, FocallySpacing.sm)
+                        .padding(.horizontal, FocallySpacing.small)
                         .padding(.vertical, 5)
                         .background(
-                            RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                            RoundedRectangle(cornerRadius: FocallyRadius.small)
                                 .fill(Color.focallySurfaceContainer)
                         )
                     }
                     .menuStyle(.borderlessButton)
                     .fixedSize()
                 }
-                .padding(.horizontal, FocallySpacing.lg)
-                .padding(.bottom, FocallySpacing.md)
+                .padding(.horizontal, FocallySpacing.large)
+                .padding(.bottom, FocallySpacing.medium)
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
@@ -74,13 +74,13 @@ struct GeneralSettingsView: View {
                 toggle: $showInMenuBar
             )
         }
-        .padding(.top, FocallySpacing.xs)
-        .padding(.bottom, FocallySpacing.xs)
+        .padding(.top, FocallySpacing.extraSmall)
+        .padding(.bottom, FocallySpacing.extraSmall)
         .animation(.easeInOut(duration: 0.2), value: soundEnabled)
     }
 
     private func settingsRow(icon: String, label: String, toggle: Binding<Bool>) -> some View {
-        HStack(spacing: FocallySpacing.md) {
+        HStack(spacing: FocallySpacing.medium) {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
@@ -94,7 +94,7 @@ struct GeneralSettingsView: View {
 
             FocallyToggleButton(isOn: toggle)
         }
-        .padding(.horizontal, FocallySpacing.lg)
-        .padding(.vertical, FocallySpacing.md)
+        .padding(.horizontal, FocallySpacing.large)
+        .padding(.vertical, FocallySpacing.medium)
     }
 }

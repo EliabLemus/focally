@@ -17,6 +17,8 @@ struct KeychainHelper {
 
         let status = SecItemAdd(query as CFDictionary, nil)
         if status != errSecSuccess {
+            // TODO: Migrar a Logger (structured logging) cuando KeychainHelper tenga acceso
+            // logger.error("Failed to save to keychain: \(status)")
             print("[Focally] Keychain save error: \(status)")
         }
     }

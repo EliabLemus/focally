@@ -5,8 +5,8 @@ import os.log
 // MARK: - Focus Integration Mode
 
 enum FocusIntegrationMode: String, CaseIterable, Identifiable {
-    case directDND = "directDND"
-    case appShortcuts = "appShortcuts"
+    case directDND
+    case appShortcuts
 
     var id: String { rawValue }
 

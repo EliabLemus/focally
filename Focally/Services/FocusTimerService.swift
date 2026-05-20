@@ -295,7 +295,11 @@ class FocusTimerService: ObservableObject {
     }
 
     func togglePause() {
-        isPaused ? resumeSession() : pauseSession()
+        if isPaused {
+            resumeSession()
+        } else {
+            pauseSession()
+        }
     }
 
     func resetToIdle() {

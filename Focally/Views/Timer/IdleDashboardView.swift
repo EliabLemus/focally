@@ -13,22 +13,22 @@ struct IdleDashboardView: View {
     var body: some View {
         GeometryReader { geometry in
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: FocallySpacing.lg) {
+                VStack(alignment: .leading, spacing: FocallySpacing.large) {
                     headerRow
 
                     if geometry.size.width >= 920 {
-                        HStack(alignment: .top, spacing: FocallySpacing.md) {
+                        HStack(alignment: .top, spacing: FocallySpacing.medium) {
                             heroCard
                                 .frame(maxWidth: .infinity, minHeight: 360)
 
-                            VStack(spacing: FocallySpacing.md) {
+                            VStack(spacing: FocallySpacing.medium) {
                                 UpNextCard()
                                 FocusStatusCard()
                             }
                             .frame(width: min(340, geometry.size.width * 0.32))
                         }
                     } else {
-                        VStack(spacing: FocallySpacing.md) {
+                        VStack(spacing: FocallySpacing.medium) {
                             heroCard
                             UpNextCard()
                             FocusStatusCard()
@@ -37,9 +37,9 @@ struct IdleDashboardView: View {
 
                     TodayFlowCard()
                 }
-                .padding(.horizontal, FocallySpacing.lg)
-                .padding(.top, FocallySpacing.lg)
-                .padding(.bottom, FocallySpacing.lg)
+                .padding(.horizontal, FocallySpacing.large)
+                .padding(.top, FocallySpacing.large)
+                .padding(.bottom, FocallySpacing.large)
             }
         }
         .background(Color.focallyBackground)

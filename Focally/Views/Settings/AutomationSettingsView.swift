@@ -4,11 +4,11 @@ struct AutomationSettingsView: View {
     @State private var focusModeEnabled: Bool = false
 
     var body: some View {
-        VStack(spacing: FocallySpacing.lg) {
-            VStack(alignment: .leading, spacing: FocallySpacing.md) {
-                HStack(spacing: FocallySpacing.md) {
+        VStack(spacing: FocallySpacing.large) {
+            VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+                HStack(spacing: FocallySpacing.medium) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                        RoundedRectangle(cornerRadius: FocallyRadius.small)
                             .fill(Color.focallyPrimary.opacity(0.1))
                             .frame(width: 40, height: 40)
                         Image(systemName: "moon.circle.fill")
@@ -32,7 +32,7 @@ struct AutomationSettingsView: View {
                     FocallyToggleButton(isOn: $focusModeEnabled)
                 }
             }
-            .padding(FocallySpacing.lg)
+            .padding(FocallySpacing.large)
             .focallyCard()
         }
     }
