@@ -100,8 +100,8 @@ cyclomatic_complexity:
 nesting:
   type_level:
     warning: 2
-  statement_level:
-    warning: 5
+    statement_level:
+    - warning: 5
 
 # Reporter (formato de output)
 reporter: "xcode"  # Xcode-compatible para integración con CI
@@ -123,3 +123,5 @@ included:
 explicit_type_interface:
   excluded:
     - "Tests/**"  # NO requerir type hints en tests
+    - "Focally/**"  # No requerir type hints en la app principal (SwiftUI style)
+  allow_redundancy: true  # Permitir redundancia en type hints
