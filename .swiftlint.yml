@@ -59,7 +59,6 @@ custom_rules:
 
 # Opt-in rules (habilitar explícitamente)
 opt_in_rules:
-  - explicit_type_interface  # Type hints explícitos en closures
   - empty_count  # Usar isEmpty en lugar de count == 0
   - fatal_error_message  # fatalError() debe tener mensaje
   - force_unwrapping  # Evitar force unwrapping
