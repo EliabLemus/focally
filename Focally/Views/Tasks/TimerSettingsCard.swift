@@ -170,7 +170,11 @@ struct FocusModeCard: View {
                 Text("Quick Session stays custom. Pomodoro keeps a predictable cadence.")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
-                Text("\(timerService.workDurationMinutes)m focus · \(timerService.shortBreakDurationMinutes)m short break · \(timerService.roundsUntilLongBreak) rounds")
+                Text(
+                    "\(timerService.workDurationMinutes)m focus · " +
+                    "\(timerService.shortBreakDurationMinutes)m short break · " +
+                    "\(timerService.roundsUntilLongBreak) rounds"
+                )
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white.opacity(0.9))
 
