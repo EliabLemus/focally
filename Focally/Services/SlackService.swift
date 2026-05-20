@@ -533,10 +533,8 @@ class SlackService: ObservableObject {
             return shortcode
         }
 
-        for character in text {
-            if isEmoji(character) {
-                return String(character)
-            }
+        for character in text where isEmoji(character) {
+            return String(character)
         }
 
         return nil
