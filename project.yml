@@ -101,3 +101,24 @@ targets:
         PRODUCT_BUNDLE_NAME: FocallyUITests
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: false
+
+schemes:
+  Focally:
+    build:
+      targets:
+        Focally: all
+        FocallyTests: [test, analyze]
+        FocallyUITests: [test, analyze]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - FocallyTests
+        - FocallyUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
