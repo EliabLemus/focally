@@ -25,9 +25,13 @@
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
 		39A248BCEF89B6D08450BB25 /* TasksPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455AC520CE3339E97869E3F3 /* TasksPage.swift */; };
 		39A58C6BC3D6F565DE7134F3 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844B4C6DBE9625A6C4CAD3B6 /* GoogleCalendarService.swift */; };
+		B4AF7B2280BE4C0BAE881326 /* GoogleCalendarService+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F19157C65D4B4E8424987C /* GoogleCalendarService+API.swift */; };
+		F96213B405E041CA8C1AAD61 /* GoogleCalendarService+Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19E9444779449FDA06B9FAB /* GoogleCalendarService+Formatters.swift */; };
+		FCC99605A6074E29AC1589DC /* GoogleCalendarService+Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE27B1FEFAD64033BDABCB83 /* GoogleCalendarService+Events.swift */; };
+		31915DCDAE65418690A10DB5 /* GoogleCalendarService+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2D43D4060B4889BD0C6CD7 /* GoogleCalendarService+Auth.swift */; };
+		D65DF9004E3F4BBBA35F1A67 /* GoogleCalendarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94BF7A629A794304A4270957 /* GoogleCalendarModels.swift */; };
 		3FFC3DE7EF5D8190CFE92A60 /* PredefinedTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */; };
 		4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */; };
-		45910A2451545466CC894386 /* GoogleCalendarService+Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F73097E1393CA27A8E3159 /* GoogleCalendarService+Formatters.swift */; };
 		4A4E5523F0A4CFF73FE53D60 /* FocallyFocusScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9102C13F0BCCC126E86559F /* FocallyFocusScoreCard.swift */; };
 		4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */; };
 		4DA6D3EC99C075CD80C09883 /* confirmation_003.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */; };
@@ -49,7 +53,6 @@
 		72C50B6FF38D05A2E9F440C5 /* FocallySpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */; };
 		75AE11EE54E0E7089F054303 /* FocusScoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DF61381E873FA5E6F36707 /* FocusScoreCard.swift */; };
 		77FD86A23B5E36658A3E7A2A /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */; };
-		795BB014986641F90D9101C9 /* GoogleCalendarService+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796183A9D95C97D70DD883C1 /* GoogleCalendarService+API.swift */; };
 		796BBCC6BC73846D9E297E11 /* ShortcutOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E6C8304B13DCAD83B1CFB /* ShortcutOnboardingViewModel.swift */; };
 		7C262F088F990DED923716C5 /* DNDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E3F6355136EFD90EE198C8 /* DNDService.swift */; };
 		803039DD967F5D993EC45A02 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */; };
@@ -70,7 +73,6 @@
 		ADAA439E664426F93640E1CC /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */; };
 		ADF6E6ACAE531242A66946CB /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = B7294FD9B10CC42662103B9B /* AppIcon.icns */; };
 		B089356893019F08B27B5734 /* SimpleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C18F5B206E8657516539F2E /* SimpleTests.swift */; };
-		B13A6ABDB278AE3B33CDC839 /* GoogleCalendarService+Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E5FD58E7971D5329D329B1 /* GoogleCalendarService+Events.swift */; };
 		B1C0B5E975F1DD15F1EEA2A6 /* AutomationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB16BD2F3E3AA2EE81EAAB3 /* AutomationSettingsView.swift */; };
 		B3683A382B1B2A7F5F62CDC3 /* TimerSettingsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90F068B7D2A7CEED482B916 /* TimerSettingsCard.swift */; };
 		B451FACCAC9DBC96264B7812 /* Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92387AD9F889C1D3B3C1E65 /* Metrics.swift */; };
@@ -91,14 +93,12 @@
 		D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */; };
 		D9CA31F63FDF043AE3F4D10C /* FocusIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */; };
 		DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80AE26497177767F58D61D45 /* SettingsPage.swift */; };
-		DDA2147F3D05DAA77BAE7850 /* GoogleCalendarService+Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398FC519B287797B7B187AC4 /* GoogleCalendarService+Auth.swift */; };
 		E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */; };
 		E95208F3D30D1AE78A138D47 /* SmartTemplatesCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810114785EFF92E93469DBC9 /* SmartTemplatesCard.swift */; };
 		EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1032F662E9204A6D804DD2EF /* FocusTimerService.swift */; };
 		EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B872379B2018EE66D478415E /* Assets.xcassets */; };
 		F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */; };
 		F2B8CBD723F1F53867939192 /* FocallyTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126D47EF69130589A232D146 /* FocallyTypography.swift */; };
-		F65287D851E0111F365FCC61 /* GoogleCalendarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2640DC9E6CBE30586B39C7 /* GoogleCalendarModels.swift */; };
 		F94CE01D65F077489B5FCEC0 /* MenuBarDropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */; };
 		FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */; };
 		FEB794232080603BE2B0EE0F /* CreateFocusBlockSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D447524B8FAB7156D08A9B4 /* CreateFocusBlockSheet.swift */; };
@@ -131,7 +131,6 @@
 		09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTheme.swift; sourceTree = "<group>"; };
 		0A137F191E257CDE7AD2ABAE /* PredefinedTasksList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredefinedTasksList.swift; sourceTree = "<group>"; };
 		0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredefinedTask.swift; sourceTree = "<group>"; };
-		0C2640DC9E6CBE30586B39C7 /* GoogleCalendarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarModels.swift; sourceTree = "<group>"; };
 		0CA587C51B99E375193E7B89 /* WeekCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekCalendarView.swift; sourceTree = "<group>"; };
 		0CDF86C485BBCBEA26892F4B /* ScheduleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleService.swift; sourceTree = "<group>"; };
 		0DEA92C31BB1683C614672E5 /* focally-focus-off-signed.shortcut */ = {isa = PBXFileReference; path = "focally-focus-off-signed.shortcut"; sourceTree = "<group>"; };
@@ -155,14 +154,12 @@
 		331C1508C6DEFD18C01D52EA /* QuickSessionsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSessionsSection.swift; sourceTree = "<group>"; };
 		333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
-		398FC519B287797B7B187AC4 /* GoogleCalendarService+Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoogleCalendarService+Auth.swift"; sourceTree = "<group>"; };
 		3BB16BD2F3E3AA2EE81EAAB3 /* AutomationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationSettingsView.swift; sourceTree = "<group>"; };
 		3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroStateTests.swift; sourceTree = "<group>"; };
 		440DA683BDD9156AD84D322C /* FocallyColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyColors.swift; sourceTree = "<group>"; };
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnItFocusApp.swift; sourceTree = "<group>"; };
 		455AC520CE3339E97869E3F3 /* TasksPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksPage.swift; sourceTree = "<group>"; };
-		46E5FD58E7971D5329D329B1 /* GoogleCalendarService+Events.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoogleCalendarService+Events.swift"; sourceTree = "<group>"; };
 		494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerServiceTests.swift; sourceTree = "<group>"; };
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4B9E6C8304B13DCAD83B1CFB /* ShortcutOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutOnboardingViewModel.swift; sourceTree = "<group>"; };
@@ -181,7 +178,6 @@
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
 		7329B648E3CF152B279F34FE /* RecentSessionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSessionsList.swift; sourceTree = "<group>"; };
 		794A82117FA1A6FB2CD6947D /* CalendarStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarStatusCard.swift; sourceTree = "<group>"; };
-		796183A9D95C97D70DD883C1 /* GoogleCalendarService+API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoogleCalendarService+API.swift"; sourceTree = "<group>"; };
 		798F580A999292FEF45A0C39 /* glass_005.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = glass_005.aiff; sourceTree = "<group>"; };
 		7E5DB55686DFAEB6AAB22D07 /* LayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerTests.swift; sourceTree = "<group>"; };
 		80AE26497177767F58D61D45 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
@@ -195,7 +191,6 @@
 		8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
 		8C2677CB56C06B2FD04DCAF2 /* DesignSystemTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTestView.swift; sourceTree = "<group>"; };
 		8E5322A16B3B60603C5509F9 /* Focally.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Focally.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		97F73097E1393CA27A8E3159 /* GoogleCalendarService+Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GoogleCalendarService+Formatters.swift"; sourceTree = "<group>"; };
 		9ACE0919D2BAEFCCC24A8A9C /* FocusAllocationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusAllocationCard.swift; sourceTree = "<group>"; };
 		9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedTimeCard.swift; sourceTree = "<group>"; };
 		A6B424719CB23B5544233E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -225,6 +220,11 @@
 		F98B9F6D1FC104C15E36969C /* FocusSessionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionComponents.swift; sourceTree = "<group>"; };
 		FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		FF9300C00888F0B7546C94C7 /* FocusTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTrendChart.swift; sourceTree = "<group>"; };
+		94BF7A629A794304A4270957 /* GoogleCalendarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarModels.swift; sourceTree = "<group>"; };
+		BD2D43D4060B4889BD0C6CD7 /* GoogleCalendarService+Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService+Auth.swift; sourceTree = "<group>"; };
+		CE27B1FEFAD64033BDABCB83 /* GoogleCalendarService+Events.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService+Events.swift; sourceTree = "<group>"; };
+		C19E9444779449FDA06B9FAB /* GoogleCalendarService+Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService+Formatters.swift; sourceTree = "<group>"; };
+		85F19157C65D4B4E8424987C /* GoogleCalendarService+API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService+API.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -358,8 +358,8 @@
 			isa = PBXGroup;
 			children = (
 				4F1929A30482E8B887E4AD37 /* CalendarEvent.swift */,
+			94BF7A629A794304A4270957 /* GoogleCalendarModels.swift */,
 				2D087C179B816CA86B0EA42F /* FocusBlock.swift */,
-				0C2640DC9E6CBE30586B39C7 /* GoogleCalendarModels.swift */,
 				C17386F3788F2D2F1263DBDD /* PomodoroState.swift */,
 				0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */,
 			);
@@ -493,10 +493,10 @@
 				1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */,
 				1032F662E9204A6D804DD2EF /* FocusTimerService.swift */,
 				844B4C6DBE9625A6C4CAD3B6 /* GoogleCalendarService.swift */,
-				796183A9D95C97D70DD883C1 /* GoogleCalendarService+API.swift */,
-				398FC519B287797B7B187AC4 /* GoogleCalendarService+Auth.swift */,
-				46E5FD58E7971D5329D329B1 /* GoogleCalendarService+Events.swift */,
-				97F73097E1393CA27A8E3159 /* GoogleCalendarService+Formatters.swift */,
+			85F19157C65D4B4E8424987C /* GoogleCalendarService+API.swift */,
+			C19E9444779449FDA06B9FAB /* GoogleCalendarService+Formatters.swift */,
+			CE27B1FEFAD64033BDABCB83 /* GoogleCalendarService+Events.swift */,
+			BD2D43D4060B4889BD0C6CD7 /* GoogleCalendarService+Auth.swift */,
 				8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */,
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
@@ -697,12 +697,12 @@
 				EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */,
 				AA16BD229B8EB201F5F47D52 /* FocusTrendChart.swift in Sources */,
 				ADAA439E664426F93640E1CC /* GeneralSettingsView.swift in Sources */,
-				F65287D851E0111F365FCC61 /* GoogleCalendarModels.swift in Sources */,
-				795BB014986641F90D9101C9 /* GoogleCalendarService+API.swift in Sources */,
-				DDA2147F3D05DAA77BAE7850 /* GoogleCalendarService+Auth.swift in Sources */,
-				B13A6ABDB278AE3B33CDC839 /* GoogleCalendarService+Events.swift in Sources */,
-				45910A2451545466CC894386 /* GoogleCalendarService+Formatters.swift in Sources */,
 				39A58C6BC3D6F565DE7134F3 /* GoogleCalendarService.swift in Sources */,
+			B4AF7B2280BE4C0BAE881326 /* GoogleCalendarService+API.swift in Sources */,
+			F96213B405E041CA8C1AAD61 /* GoogleCalendarService+Formatters.swift in Sources */,
+			FCC99605A6074E29AC1589DC /* GoogleCalendarService+Events.swift in Sources */,
+			31915DCDAE65418690A10DB5 /* GoogleCalendarService+Auth.swift in Sources */,
+			D65DF9004E3F4BBBA35F1A67 /* GoogleCalendarModels.swift in Sources */,
 				77FD86A23B5E36658A3E7A2A /* HistoryService.swift in Sources */,
 				502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */,
 				2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */,
