@@ -100,7 +100,10 @@ struct ActiveFocusView: View {
 
                     HStack(spacing: 18) {
                         heroMeta(title: "Elapsed", value: elapsedTimeString)
-                        heroMeta(title: "Current round", value: "\(timerService.currentRound + 1) / \(timerService.roundsUntilLongBreak)")
+                        heroMeta(
+                            title: "Current round",
+                            value: "\(timerService.currentRound + 1) / \(timerService.roundsUntilLongBreak)"
+                        )
                         heroMeta(title: "Next", value: nextPhaseLabel)
                     }
                 }
@@ -158,8 +161,18 @@ struct ActiveFocusView: View {
             tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallySecondary
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                supportMetric(title: "System status", value: dndService.isDNDActive ? "Do Not Disturb is active" : "Do Not Disturb is off")
-                supportMetric(title: "Session state", value: timerService.isPaused ? "Paused · notifications are back" : "Running")
+                supportMetric(
+                    title: "System status",
+                    value: dndService.isDNDActive
+                        ? "Do Not Disturb is active"
+                        : "Do Not Disturb is off"
+                )
+                supportMetric(
+                    title: "Session state",
+                    value: timerService.isPaused
+                        ? "Paused · notifications are back"
+                        : "Running"
+                )
                 supportMetric(title: "When this ends", value: nextBreakSummary)
             }
         }
