@@ -46,7 +46,7 @@ extension GoogleCalendarService {
     }
 
     private func buildTodayEventsURL() -> URL? {
-        let components: URLComponents? = URLComponents(
+        var components: URLComponents? = URLComponents(
             string: "https://www.googleapis.com/calendar/v3/calendars/primary/events"
         )
         components?.queryItems = [

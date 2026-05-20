@@ -3,7 +3,7 @@ import Foundation
 // MARK: - API Requests
 
 extension GoogleCalendarService {
-    private func sendTokenRequest<T: Decodable>(parameters: [String: String]) async throws -> T {
+    func sendTokenRequest<T: Decodable>(parameters: [String: String]) async throws -> T {
         guard let url = URL(string: Self.tokenURLString) else {
             throw GoogleCalendarServiceError.invalidRequest
         }

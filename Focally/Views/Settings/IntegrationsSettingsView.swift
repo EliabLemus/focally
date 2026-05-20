@@ -390,10 +390,11 @@ struct IntegrationsSettingsView: View {
 
     private func toggleGoogleConnection() {
         saveGoogleCredentials()
-        if calendarService.isSignedIn {
-            calendarService.signOut()
+        let service = _calendarService.wrappedValue
+        if service.isSignedIn {
+            service.signOut()
         } else {
-            calendarService.signIn()
+            service.signIn()
         }
     }
 }

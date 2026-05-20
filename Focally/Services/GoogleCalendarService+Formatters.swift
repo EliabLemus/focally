@@ -3,21 +3,21 @@ import Foundation
 // MARK: - Formatters and Helpers
 
 extension GoogleCalendarService {
-    private static let googleDateTimeFormatter: ISO8601DateFormatter = {
+    static let googleDateTimeFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         formatter.timeZone = .current
         return formatter
     }()
 
-    private static let googleDateTimeFallbackFormatter: ISO8601DateFormatter = {
+    fileprivate static let googleDateTimeFallbackFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         formatter.timeZone = .current
         return formatter
     }()
 
-    private static let googleDayFormatter: DateFormatter = {
+    fileprivate static let googleDayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -25,7 +25,7 @@ extension GoogleCalendarService {
         return formatter
     }()
 
-    private static func makeCalendarEvent(from item: GoogleCalendarItem) -> CalendarEvent? {
+    static func makeCalendarEvent(from item: GoogleCalendarItem) -> CalendarEvent? {
         guard let start = parseEventDate(from: item.start) else {
             return nil
         }
@@ -54,7 +54,7 @@ extension GoogleCalendarService {
         )
     }
 
-    private static func parseEventDate(from value: GoogleCalendarDateValue) -> Date? {
+    fileprivate static func parseEventDate(from value: GoogleCalendarDateValue) -> Date? {
         if let dateTime = value.dateTime {
             return googleDateTimeFormatter.date(from: dateTime) ?? googleDateTimeFallbackFormatter.date(from: dateTime)
         }
@@ -66,13 +66,13 @@ extension GoogleCalendarService {
         return Calendar.current.startOfDay(for: date)
     }
 
-    private static let formURLEncodedAllowedCharacters: CharacterSet = {
+    fileprivate static let formURLEncodedAllowedCharacters: CharacterSet = {
         var allowed = CharacterSet.alphanumerics
         allowed.insert(charactersIn: "-._*")
         return allowed
     }()
 
-    private static func formURLEncodedValue(for string: String) -> String {
+    static func formURLEncodedValue(for string: String) -> String {
         let escaped = string.addingPercentEncoding(withAllowedCharacters: formURLEncodedAllowedCharacters) ?? string
         return escaped.replacingOccurrences(of: " ", with: "+")
     }

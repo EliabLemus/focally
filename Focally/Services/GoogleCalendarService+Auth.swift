@@ -1,7 +1,6 @@
 import AppKit
 import AuthenticationServices
 import Foundation
-import GoogleCalendarModels
 
 // MARK: - Authentication
 
@@ -41,7 +40,7 @@ extension GoogleCalendarService {
     }
 
     private func buildAuthURL(clientID: String) -> URL? {
-        let components: URLComponents? = URLComponents(string: Self.authURLString)
+        var components: URLComponents? = URLComponents(string: Self.authURLString)
         components?.queryItems = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: Self.redirectURI),
@@ -123,7 +122,7 @@ extension GoogleCalendarService {
         }
     }
 
-    private func refreshAccessTokenIfNeeded() async -> Bool {
+    func refreshAccessTokenIfNeeded() async -> Bool {
         let tokenIsValid: Bool = {
             guard let tokenExpirationDate, tokenExpirationDate > Date().addingTimeInterval(60), accessToken != nil else {
                 return false
