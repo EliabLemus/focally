@@ -26,7 +26,7 @@ final class Logger {
     static let analytics = Logger(subsystem: "app.focally.mac", category: "Analytics")
 
     /// Logger para UI
-    static let ui = Logger(subsystem: "app.focally.mac", category: "UI")
+    static let uiLogger = Logger(subsystem: "app.focally.mac", category: "UI")
 
     // MARK: - Properties
 

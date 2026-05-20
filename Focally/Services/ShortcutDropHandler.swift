@@ -6,7 +6,7 @@ import AppKit
 // MARK: - Shortcut Drop Handler
 
 class ShortcutDropHandler: ObservableObject {
-    private let logger = Logger.ui
+    private let logger = Logger.uiLogger
     private let fileManager = FileManager.default
 
     // Published state

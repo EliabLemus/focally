@@ -48,7 +48,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 
 @MainActor
 final class ShortcutOnboardingViewModel: ObservableObject {
-    private let logger = Logger.ui
+    private let logger = Logger.uiLogger
     private let focusIntegrationService: FocusIntegrationService
     let managedShortcutsService: ManagedFocusShortcutsService
 
@@ -183,6 +183,6 @@ final class ShortcutOnboardingViewModel: ObservableObject {
 
     static func resetOnboarding() {
         UserDefaults.standard.removeObject(forKey: "FocallyShortcutOnboardingCompleted")
-        Logger.ui.info("Onboarding reset - will show on next launch")
+        Logger.uiLogger.info("Onboarding reset - will show on next launch")
     }
 }
