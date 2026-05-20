@@ -4,11 +4,11 @@ struct AppearanceSettingsView: View {
     @AppStorage("appTheme") private var selectedTheme: ThemeChoice = .system
 
     var body: some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.lg) {
+        VStack(alignment: .leading, spacing: FocallySpacing.large) {
             Text("Appearance")
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
-                .padding(.bottom, FocallySpacing.xs)
+                .padding(.bottom, FocallySpacing.extraSmall)
 
             VStack(spacing: 0) {
                 ForEach(ThemeChoice.allCases) { theme in
@@ -28,7 +28,7 @@ struct AppearanceSettingsView: View {
         Button(action: {
             selectedTheme = theme
         }) {
-            HStack(spacing: FocallySpacing.md) {
+            HStack(spacing: FocallySpacing.medium) {
                 Image(systemName: theme.icon)
                     .font(.system(size: 16))
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
@@ -53,8 +53,8 @@ struct AppearanceSettingsView: View {
                     }
                 }
             }
-            .padding(.horizontal, FocallySpacing.lg)
-            .padding(.vertical, FocallySpacing.md)
+            .padding(.horizontal, FocallySpacing.large)
+            .padding(.vertical, FocallySpacing.medium)
         }
         .buttonStyle(.plain)
     }

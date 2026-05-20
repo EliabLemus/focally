@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SmartTemplatesCard: View {
     var body: some View {
-        HStack(spacing: FocallySpacing.md) {
+        HStack(spacing: FocallySpacing.medium) {
             Image(systemName: "sparkles")
                 .font(.system(size: 24))
                 .foregroundStyle(Color.focallySecondary)
@@ -27,7 +27,7 @@ struct SmartTemplatesCard: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .background(Color.focallySecondaryFixed)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .focallyCard()

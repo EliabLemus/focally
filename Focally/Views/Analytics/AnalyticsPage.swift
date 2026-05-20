@@ -27,17 +27,17 @@ struct AnalyticsPage: View {
                     // Time range toggle
                     FocallySegmentedControl(selection: $selectedRangeIndex, options: ["Weekly", "Monthly"])
                 }
-                .padding(.horizontal, FocallySpacing.lg)
-                .padding(.top, FocallySpacing.lg)
+                .padding(.horizontal, FocallySpacing.large)
+                .padding(.top, FocallySpacing.large)
 
                 Text("Detailed insights into your deep work performance.")
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOutline)
-                    .padding(.horizontal, FocallySpacing.lg)
-                    .padding(.bottom, FocallySpacing.lg)
+                    .padding(.horizontal, FocallySpacing.large)
+                    .padding(.bottom, FocallySpacing.large)
 
                 ScrollView {
-                    VStack(spacing: FocallySpacing.lg) {
+                    VStack(spacing: FocallySpacing.large) {
                         // Row 1: Focus Score + Avg Session Depth
                         HStack(alignment: .top, spacing: FocallySpacing.gutter) {
                             FocusScoreCard(scoreData: analyticsService.focusScore, score: analyticsService.focusScore.value)
@@ -59,8 +59,8 @@ struct AnalyticsPage: View {
                         // Row 3: Recent Sessions
                         RecentSessionsList(sessions: analyticsService.recentSessions, onExportTap: { showingExportSheet = true })
                     }
-                    .padding(.horizontal, FocallySpacing.lg)
-                    .padding(.bottom, FocallySpacing.lg)
+                    .padding(.horizontal, FocallySpacing.large)
+                    .padding(.bottom, FocallySpacing.large)
                 }
                 .scrollContentBackground(.hidden)
             }
@@ -78,7 +78,7 @@ struct AnalyticsPage: View {
                         .buttonStyle(.borderedProminent)
                         .tint(Color.focallyPrimary)
                 }
-                .padding(FocallySpacing.xl)
+                .padding(FocallySpacing.extraLarge)
                 .frame(width: 400)
             }
         }
@@ -134,7 +134,7 @@ private struct AvgSessionDepthCard: View {
                 .font(.focallyMicro)
                 .foregroundStyle(Color.focallyOutline.opacity(0.7))
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .focallyCard()
     }
 }

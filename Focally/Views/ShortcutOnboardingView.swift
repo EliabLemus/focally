@@ -18,12 +18,12 @@ struct ShortcutOnboardingView: View {
             headerView
 
             ScrollView {
-                VStack(spacing: FocallySpacing.lg) {
+                VStack(spacing: FocallySpacing.large) {
                     stepIndicator
                     stepContent
-                    Spacer(minLength: FocallySpacing.xl)
+                    Spacer(minLength: FocallySpacing.extraLarge)
                 }
-                .padding(FocallySpacing.xl)
+                .padding(FocallySpacing.extraLarge)
             }
 
             footerView
@@ -55,12 +55,12 @@ struct ShortcutOnboardingView: View {
                 Text("Skip")
                     .font(.focallyButton)
                     .foregroundStyle(Color.focallyOutline)
-                    .padding(.horizontal, FocallySpacing.md)
+                    .padding(.horizontal, FocallySpacing.medium)
                     .padding(.vertical, 6)
             }
             .buttonStyle(.plain)
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .background(Color.focallySurfaceContainerLowest)
     }
 
@@ -76,9 +76,9 @@ struct ShortcutOnboardingView: View {
                     )
             }
         }
-        .padding(FocallySpacing.sm)
+        .padding(FocallySpacing.small)
         .background(
-            RoundedRectangle(cornerRadius: FocallyRadius.md)
+            RoundedRectangle(cornerRadius: FocallyRadius.medium)
                 .fill(Color.focallySurfaceContainerLow)
         )
     }
@@ -100,14 +100,14 @@ struct ShortcutOnboardingView: View {
     }
 
     private var welcomeStep: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             heroCard(
                 icon: "moon.circle.fill",
                 title: "Quiet Mode On by Default",
                 subtitle: "Install Focally, enable Focus Integration, and it can toggle macOS Do Not Disturb right away — no extra setup for the main path."
             )
 
-            VStack(alignment: .leading, spacing: FocallySpacing.md) {
+            VStack(alignment: .leading, spacing: FocallySpacing.medium) {
                 benefitItem(
                     icon: "moon.zzz.fill",
                     title: "Direct System DND",
@@ -130,35 +130,35 @@ struct ShortcutOnboardingView: View {
     }
 
     private var explanationStep: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             heroCard(
                 icon: "bolt.badge.clock",
                 title: "Quiet mode, handled automatically",
                 subtitle: "Focally turns on Do Not Disturb directly. The bundled shortcut files are only there if Apple needs the visual Add step."
             )
 
-            VStack(alignment: .leading, spacing: FocallySpacing.md) {
+            VStack(alignment: .leading, spacing: FocallySpacing.medium) {
                 infoRow(number: "1", text: "Focally uses direct Do Not Disturb first as soon as Focus Integration is enabled.")
                 infoRow(number: "2", text: "If Apple needs the visual Add step, Focally stages the bundled signed shortcut files and opens them for you.")
                 infoRow(number: "3", text: "After that one visual confirmation, Focally can use the shortcut backup automatically without manual editing.")
             }
-            .padding(FocallySpacing.lg)
+            .padding(FocallySpacing.large)
             .background(
-                RoundedRectangle(cornerRadius: FocallyRadius.md)
+                RoundedRectangle(cornerRadius: FocallyRadius.medium)
                     .fill(Color.focallySurfaceContainerLow)
             )
         }
     }
 
     private var installationStep: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             heroCard(
                 icon: "square.and.arrow.down.on.square",
                 title: "Shortcut files for Apple’s Add step",
                 subtitle: viewModel.managedShortcutsService.setupSummary
             )
 
-            VStack(alignment: .leading, spacing: FocallySpacing.md) {
+            VStack(alignment: .leading, spacing: FocallySpacing.medium) {
                 statusRow(
                     title: "Signed files ready",
                     isComplete: viewModel.managedShortcutsService.allSignedShortcutsExist,
@@ -171,13 +171,13 @@ struct ShortcutOnboardingView: View {
                     detail: "After Apple shows the Add dialog once for each shortcut and you press Add, Focally can run the backup automatically."
                 )
             }
-            .padding(FocallySpacing.lg)
+            .padding(FocallySpacing.large)
             .background(
-                RoundedRectangle(cornerRadius: FocallyRadius.md)
+                RoundedRectangle(cornerRadius: FocallyRadius.medium)
                     .fill(Color.focallySurfaceContainerLow)
             )
 
-            HStack(spacing: FocallySpacing.sm) {
+            HStack(spacing: FocallySpacing.small) {
                 Button(action: viewModel.prepareManagedShortcuts) {
                     primaryButtonLabel("Stage Files", icon: "wand.and.stars")
                 }
@@ -195,7 +195,7 @@ struct ShortcutOnboardingView: View {
                 icon: "sparkles"
             )
 
-            HStack(spacing: FocallySpacing.sm) {
+            HStack(spacing: FocallySpacing.small) {
                 Button(action: viewModel.openManagedShortcuts) {
                     secondaryButtonLabel("Open Files", icon: "square.and.arrow.up")
                 }
@@ -220,21 +220,21 @@ struct ShortcutOnboardingView: View {
     }
 
     private var verificationStep: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             heroCard(
                 icon: viewModel.allShortcutsVerified ? "checkmark.seal.fill" : "checkmark.shield",
                 title: viewModel.allShortcutsVerified ? "Quiet mode verified" : "Verify the setup",
                 subtitle: "Direct DND should pass immediately. The shortcut backup only shows ready after the visual Add step happened once per file."
             )
 
-            VStack(alignment: .leading, spacing: FocallySpacing.sm) {
+            VStack(alignment: .leading, spacing: FocallySpacing.small) {
                 ForEach(Array(viewModel.verificationResults.keys.sorted()), id: \.self) { key in
                     verificationResultRow(name: key, verified: viewModel.verificationResults[key] ?? false)
                 }
             }
-            .padding(FocallySpacing.lg)
+            .padding(FocallySpacing.large)
             .background(
-                RoundedRectangle(cornerRadius: FocallyRadius.md)
+                RoundedRectangle(cornerRadius: FocallyRadius.medium)
                     .fill(Color.focallySurfaceContainerLow)
             )
 
@@ -263,14 +263,14 @@ struct ShortcutOnboardingView: View {
     }
 
     private var completionStep: some View {
-        VStack(spacing: FocallySpacing.lg) {
+        VStack(spacing: FocallySpacing.large) {
             heroCard(
                 icon: "checkmark.seal.fill",
                 title: "You’re all set",
                 subtitle: "Use direct Do Not Disturb by default. The shortcut backup only matters later if you want the Apple visual Add step for the bundled files."
             )
 
-            VStack(alignment: .leading, spacing: FocallySpacing.md) {
+            VStack(alignment: .leading, spacing: FocallySpacing.medium) {
                 nextStepItem(step: "1", title: "Keep direct Do Not Disturb enabled", description: "That remains the fastest, recommended path.")
                 nextStepItem(step: "2", title: "Only stage the shortcut backup if you need it", description: "Focally can stage its bundled signed files and open the Apple visual Add screens from Settings > Integrations.")
                 nextStepItem(step: "3", title: "Press Add once, then verify", description: "After each shortcut is added in Shortcuts, use Verify to confirm Focally can run the backup automatically.")
@@ -279,16 +279,16 @@ struct ShortcutOnboardingView: View {
     }
 
     private var footerView: some View {
-        HStack(spacing: FocallySpacing.md) {
+        HStack(spacing: FocallySpacing.medium) {
             if viewModel.currentStep.rawValue > 0 {
                 Button(action: viewModel.previousStep) {
                     Text("Back")
                         .font(.focallyButton)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
-                        .padding(.horizontal, FocallySpacing.lg)
+                        .padding(.horizontal, FocallySpacing.large)
                         .padding(.vertical, 10)
                         .background(
-                            RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                            RoundedRectangle(cornerRadius: FocallyRadius.small)
                                 .fill(Color.focallySurfaceContainerHigh)
                         )
                 }
@@ -303,23 +303,23 @@ struct ShortcutOnboardingView: View {
                 Text(isLastStep ? "Finish" : "Continue")
                     .font(.focallyButton)
                     .foregroundStyle(Color.focallyOnPrimary)
-                    .padding(.horizontal, FocallySpacing.lg)
+                    .padding(.horizontal, FocallySpacing.large)
                     .padding(.vertical, 10)
                     .background(
-                        RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                        RoundedRectangle(cornerRadius: FocallyRadius.small)
                             .fill(Color.focallyPrimary)
                     )
             }
             .buttonStyle(.plain)
             .disabled(viewModel.isPreparingIntegration || viewModel.isVerifying || viewModel.managedShortcutsService.isPreparing)
         }
-        .padding(FocallySpacing.lg)
+        .padding(FocallySpacing.large)
         .background(Color.focallySurfaceContainerLowest)
     }
 
     private func heroCard(icon: String, title: String, subtitle: String) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: FocallyRadius.lg)
+            RoundedRectangle(cornerRadius: FocallyRadius.large)
                 .fill(
                     LinearGradient(
                         colors: [Color.focallyPrimary.opacity(0.2), Color.focallyTertiary.opacity(0.2)],
@@ -329,7 +329,7 @@ struct ShortcutOnboardingView: View {
                 )
                 .frame(height: 190)
 
-            VStack(spacing: FocallySpacing.md) {
+            VStack(spacing: FocallySpacing.medium) {
                 Image(systemName: icon)
                     .font(.system(size: 42))
                     .foregroundStyle(Color.focallyPrimary)
@@ -342,15 +342,15 @@ struct ShortcutOnboardingView: View {
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, FocallySpacing.xl)
+                    .padding(.horizontal, FocallySpacing.extraLarge)
             }
         }
     }
 
     private func benefitItem(icon: String, title: String, description: String) -> some View {
-        HStack(spacing: FocallySpacing.md) {
+        HStack(spacing: FocallySpacing.medium) {
             ZStack {
-                RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                RoundedRectangle(cornerRadius: FocallyRadius.small)
                     .fill(Color.focallyPrimary.opacity(0.1))
                     .frame(width: 40, height: 40)
 
@@ -391,7 +391,7 @@ struct ShortcutOnboardingView: View {
     }
 
     private func statusRow(title: String, isComplete: Bool, detail: String) -> some View {
-        HStack(alignment: .top, spacing: FocallySpacing.sm) {
+        HStack(alignment: .top, spacing: FocallySpacing.small) {
             Image(systemName: isComplete ? "checkmark.circle.fill" : "circle")
                 .foregroundStyle(isComplete ? Color.focallyPrimary : Color.focallyOutline)
 
@@ -410,7 +410,7 @@ struct ShortcutOnboardingView: View {
     }
 
     private func verificationResultRow(name: String, verified: Bool) -> some View {
-        HStack(spacing: FocallySpacing.sm) {
+        HStack(spacing: FocallySpacing.small) {
             Circle()
                 .fill(verified ? Color.focallyPrimary : Color.focallyOutline)
                 .frame(width: 8, height: 8)
@@ -428,7 +428,7 @@ struct ShortcutOnboardingView: View {
     }
 
     private func nextStepItem(step: String, title: String, description: String) -> some View {
-        HStack(alignment: .top, spacing: FocallySpacing.md) {
+        HStack(alignment: .top, spacing: FocallySpacing.medium) {
             ZStack {
                 Circle()
                     .fill(Color.focallyPrimary)
@@ -454,7 +454,7 @@ struct ShortcutOnboardingView: View {
     }
 
     private func messageCard(text: String, color: Color, icon: String) -> some View {
-        HStack(alignment: .top, spacing: FocallySpacing.sm) {
+        HStack(alignment: .top, spacing: FocallySpacing.small) {
             Image(systemName: icon)
                 .foregroundStyle(color)
 
@@ -464,9 +464,9 @@ struct ShortcutOnboardingView: View {
 
             Spacer()
         }
-        .padding(FocallySpacing.md)
+        .padding(FocallySpacing.medium)
         .background(
-            RoundedRectangle(cornerRadius: FocallyRadius.md)
+            RoundedRectangle(cornerRadius: FocallyRadius.medium)
                 .fill(color.opacity(0.08))
         )
     }
@@ -479,10 +479,10 @@ struct ShortcutOnboardingView: View {
                 .font(.focallyButton)
         }
         .foregroundStyle(Color.focallyOnPrimary)
-        .padding(.horizontal, FocallySpacing.md)
+        .padding(.horizontal, FocallySpacing.medium)
         .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: FocallyRadius.sm)
+            RoundedRectangle(cornerRadius: FocallyRadius.small)
                 .fill(Color.focallyPrimary)
         )
     }
@@ -495,10 +495,10 @@ struct ShortcutOnboardingView: View {
                 .font(.focallyButton)
         }
         .foregroundStyle(Color.focallyOnSurface)
-        .padding(.horizontal, FocallySpacing.md)
+        .padding(.horizontal, FocallySpacing.medium)
         .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: FocallyRadius.sm)
+            RoundedRectangle(cornerRadius: FocallyRadius.small)
                 .fill(Color.focallySurfaceContainerHigh)
         )
     }

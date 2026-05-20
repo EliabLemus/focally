@@ -25,7 +25,7 @@ struct SidebarItemView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(
-                RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                RoundedRectangle(cornerRadius: FocallyRadius.small)
                     .fill(isActive ? Color.focallySurfaceContainerHigh : Color.clear)
             )
         }

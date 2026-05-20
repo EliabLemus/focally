@@ -17,12 +17,12 @@ struct SidebarView: View {
                     .tracking(3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, FocallySpacing.md)
-            .padding(.top, FocallySpacing.lg)
-            .padding(.bottom, FocallySpacing.lg)
+            .padding(.horizontal, FocallySpacing.medium)
+            .padding(.top, FocallySpacing.large)
+            .padding(.bottom, FocallySpacing.large)
 
             Divider()
-                .padding(.horizontal, FocallySpacing.sm)
+                .padding(.horizontal, FocallySpacing.small)
 
             VStack(spacing: 2) {
                 ForEach(FocallyTab.visibleTabs) { tab in
@@ -34,8 +34,8 @@ struct SidebarView: View {
                     )
                 }
             }
-            .padding(.horizontal, FocallySpacing.sm)
-            .padding(.top, FocallySpacing.sm)
+            .padding(.horizontal, FocallySpacing.small)
+            .padding(.top, FocallySpacing.small)
 
             Spacer()
         }
