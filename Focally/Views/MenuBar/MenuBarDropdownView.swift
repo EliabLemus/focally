@@ -96,7 +96,11 @@ struct MenuBarDropdownView: View {
                         .foregroundStyle(Color.focallyOnSurface)
                         .lineLimit(1)
 
-                    Text(timerService.isPaused ? "Paused · Notifications are back" : (timerService.isBreak ? "Break" : "Deep Focus Mode"))
+                    Text(
+                        timerService.isPaused
+                            ? "Paused · Notifications are back"
+                            : (timerService.isBreak ? "Break" : "Deep Focus Mode")
+                    )
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
 
@@ -198,11 +202,23 @@ struct MenuBarDropdownView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "moon.fill")
                         .font(.system(size: 12))
-                        .foregroundStyle(timerService.isPaused ? Color.focallySecondary : (dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant))
+                        .foregroundStyle(
+                            timerService.isPaused
+                                ? Color.focallySecondary
+                                : (dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
+                        )
 
-                    Text(timerService.isPaused ? "Paused · notifications live" : (dndService.isDNDActive ? "Quiet mode on" : "Quiet mode ready"))
+                    Text(
+                        timerService.isPaused
+                            ? "Paused · notifications live"
+                            : (dndService.isDNDActive ? "Quiet mode on" : "Quiet mode ready")
+                    )
                         .font(.focallyCaption)
-                        .foregroundStyle(timerService.isPaused ? Color.focallySecondary : (dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant))
+                        .foregroundStyle(
+                            timerService.isPaused
+                                ? Color.focallySecondary
+                                : (dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
+                        )
                 }
             }
             .padding(.horizontal, 16)
