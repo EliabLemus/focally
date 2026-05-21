@@ -67,12 +67,48 @@ final class AnalyticsService: ObservableObject {
         let cal = Calendar.current
         let today = Date()
         return [
-            RecentSession(activity: "Deep Work — Focally", category: "Development", date: today, durationMinutes: 90, rating: 5),
-            RecentSession(activity: "API Design Review", category: "Planning", date: cal.date(byAdding: .day, value: -1, to: today)!, durationMinutes: 45, rating: 4),
-            RecentSession(activity: "Bug Triage", category: "Development", date: cal.date(byAdding: .day, value: -1, to: today)!, durationMinutes: 60, rating: 4),
-            RecentSession(activity: "Documentation Sprint", category: "Research", date: cal.date(byAdding: .day, value: -2, to: today)!, durationMinutes: 75, rating: 3),
-            RecentSession(activity: "Team Retrospective", category: "Meetings", date: cal.date(byAdding: .day, value: -2, to: today)!, durationMinutes: 30, rating: 3),
-            RecentSession(activity: "Feature Implementation", category: "Development", date: cal.date(byAdding: .day, value: -3, to: today)!, durationMinutes: 120, rating: 5)
+            RecentSession(
+                activity: "Deep Work — Focally",
+                category: "Development",
+                date: today,
+                durationMinutes: 90,
+                rating: 5
+            ),
+            RecentSession(
+                activity: "API Design Review",
+                category: "Planning",
+                date: cal.date(byAdding: .day, value: -1, to: today)!,
+                durationMinutes: 45,
+                rating: 4
+            ),
+            RecentSession(
+                activity: "Bug Triage",
+                category: "Development",
+                date: cal.date(byAdding: .day, value: -1, to: today)!,
+                durationMinutes: 60,
+                rating: 4
+            ),
+            RecentSession(
+                activity: "Documentation Sprint",
+                category: "Research",
+                date: cal.date(byAdding: .day, value: -2, to: today)!,
+                durationMinutes: 75,
+                rating: 3
+            ),
+            RecentSession(
+                activity: "Team Retrospective",
+                category: "Meetings",
+                date: cal.date(byAdding: .day, value: -2, to: today)!,
+                durationMinutes: 30,
+                rating: 3
+            ),
+            RecentSession(
+                activity: "Feature Implementation",
+                category: "Development",
+                date: cal.date(byAdding: .day, value: -3, to: today)!,
+                durationMinutes: 120,
+                rating: 5
+            )
         ]
     }
 }
