@@ -76,7 +76,10 @@ struct IdleDashboardView: View {
                         .foregroundStyle(Color.focallyOnSurface)
                         .lineLimit(2)
 
-                    Text("This starts with your chosen duration and the same quiet-mode automation the timer uses everywhere else.")
+                    Text(
+                        "This starts with your chosen duration and the same " +
+                        "quiet-mode automation the timer uses everywhere else."
+                    )
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                         .fixedSize(horizontal: false, vertical: true)
@@ -103,9 +106,21 @@ struct IdleDashboardView: View {
             }
 
             HStack(spacing: 12) {
-                metricPill(systemImage: "timer", title: "Work", value: "\(selectedDuration)m")
-                metricPill(systemImage: "cup.and.saucer.fill", title: "Break", value: "\(timerService.shortBreakDurationMinutes)m")
-                metricPill(systemImage: "repeat", title: "Cycle", value: "\(timerService.roundsUntilLongBreak) rounds")
+                metricPill(
+                    systemImage: "timer",
+                    title: "Work",
+                    value: "\(selectedDuration)m"
+                )
+                metricPill(
+                    systemImage: "cup.and.saucer.fill",
+                    title: "Break",
+                    value: "\(timerService.shortBreakDurationMinutes)m"
+                )
+                metricPill(
+                    systemImage: "repeat",
+                    title: "Cycle",
+                    value: "\(timerService.roundsUntilLongBreak) rounds"
+                )
             }
 
             VStack(alignment: .leading, spacing: 10) {
@@ -371,19 +386,27 @@ private extension IdleDashboardView {
                 VStack(spacing: 12) {
                     statusRow(
                         title: "Do Not Disturb",
-                        value: timerService.isPaused ? "Paused, notifications can come through" : (dndService.isDNDActive ? "Currently on" : "Will activate on start"),
-                        icon: timerService.isPaused ? "bell.badge" : (dndService.isDNDActive ? "moon.fill" : "moon.zzz.fill")
+                        value: timerService.isPaused
+                            ? "Paused, notifications can come through"
+                            : (dndService.isDNDActive ? "Currently on" : "Will activate on start"),
+                        icon: timerService.isPaused
+                            ? "bell.badge"
+                            : (dndService.isDNDActive ? "moon.fill" : "moon.zzz.fill")
                     )
 
                     statusRow(
                         title: "Break handoff",
                         value: timerService.isAutoStartEnabled ? "Automatic" : "Manual confirmation",
-                        icon: timerService.isAutoStartEnabled ? "arrow.triangle.2.circlepath" : "hand.tap"
+                        icon: timerService.isAutoStartEnabled
+                            ? "arrow.triangle.2.circlepath"
+                            : "hand.tap"
                     )
 
                     statusRow(
                         title: "Saved activity",
-                        value: timerService.currentActivity.isEmpty ? "Default focus session" : timerService.currentActivity,
+                        value: timerService.currentActivity.isEmpty
+                            ? "Default focus session"
+                            : timerService.currentActivity,
                         icon: "list.bullet.rectangle.portrait"
                     )
                 }
@@ -424,9 +447,21 @@ private extension IdleDashboardView {
                 SectionHeader(title: "Today’s flow", subtitle: "A sober summary of your configured cadence")
 
                 HStack(spacing: 14) {
-                    summaryColumn(title: "Deep work", value: "\(timerService.workDurationMinutes)m", detail: "per round")
-                    summaryColumn(title: "Short break", value: "\(timerService.shortBreakDurationMinutes)m", detail: "between rounds")
-                    summaryColumn(title: "Long break", value: "\(timerService.longBreakDurationMinutes)m", detail: "after \(timerService.roundsUntilLongBreak) rounds")
+                    summaryColumn(
+                        title: "Deep work",
+                        value: "\(timerService.workDurationMinutes)m",
+                        detail: "per round"
+                    )
+                    summaryColumn(
+                        title: "Short break",
+                        value: "\(timerService.shortBreakDurationMinutes)m",
+                        detail: "between rounds"
+                    )
+                    summaryColumn(
+                        title: "Long break",
+                        value: "\(timerService.longBreakDurationMinutes)m",
+                        detail: "after \(timerService.roundsUntilLongBreak) rounds"
+                    )
                 }
 
                 Divider()
