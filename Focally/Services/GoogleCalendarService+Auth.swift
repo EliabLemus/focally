@@ -124,7 +124,10 @@ extension GoogleCalendarService {
 
     func refreshAccessTokenIfNeeded() async -> Bool {
         let tokenIsValid: Bool = {
-            guard let tokenExpirationDate, tokenExpirationDate > Date().addingTimeInterval(60), accessToken != nil else {
+            guard let tokenExpirationDate,
+                  tokenExpirationDate > Date().addingTimeInterval(60),
+                  accessToken != nil
+            else {
                 return false
             }
             return true

@@ -28,7 +28,11 @@ struct FocusScoreCard: View {
                     }
                     Text("\(scoreData.delta > 0 ? "+" : "")\(scoreData.delta)%")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(scoreData.delta > 0 ? Color.focallyTertiaryContainer : Color.focallyErrorContainer)
+                        .foregroundStyle(
+                            scoreData.delta > 0
+                                ? Color.focallyTertiaryContainer
+                                : Color.focallyErrorContainer
+                        )
 
                     Text("vs last period")
                         .font(.system(size: 12))

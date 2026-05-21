@@ -28,7 +28,11 @@ struct TimerControlsView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(timerService.isPaused ? "Resume Session" : "Pause Session")
-            .accessibilityHint(timerService.isPaused ? "Double tap to resume the paused session" : "Double tap to pause the current session")
+            .accessibilityHint(
+                timerService.isPaused
+                    ? "Double tap to resume the paused session"
+                    : "Double tap to pause the current session"
+            )
 
             // Finish Button
             Button(action: onFinish) {
