@@ -109,8 +109,17 @@ struct IntegrationsSettingsView: View {
                 FocallyToggleButton(isOn: calendarEnabledBinding)
             }
 
-            credentialField(title: "Client ID", prompt: "Google OAuth client ID", text: $googleClientID)
-            credentialField(title: "Client Secret", prompt: "Google OAuth client secret", text: $googleClientSecret, isSecure: true)
+            credentialField(
+                title: "Client ID",
+                prompt: "Google OAuth client ID",
+                text: $googleClientID
+            )
+            credentialField(
+                title: "Client Secret",
+                prompt: "Google OAuth client secret",
+                text: $googleClientSecret,
+                isSecure: true
+            )
 
             HStack(spacing: FocallySpacing.small) {
                 primaryButton("Save Credentials", action: saveGoogleCredentials)
@@ -137,7 +146,10 @@ struct IntegrationsSettingsView: View {
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text("Focally handles quiet mode automatically. It turns on Do Not Disturb first and only uses the bundled shortcuts as a backup detail if needed.")
+                    Text(
+                        "Focally handles quiet mode automatically. It turns on Do Not Disturb " +
+                        "first and only uses the bundled shortcuts as a backup detail if needed."
+                    )
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                         .fixedSize(horizontal: false, vertical: true)
@@ -181,7 +193,11 @@ struct IntegrationsSettingsView: View {
 
                 Text(focusIntegrationService.statusText)
                     .font(.focallyCaption)
-                    .foregroundStyle(focusIntegrationService.lastError == nil ? Color.focallyOnSurfaceVariant : Color.focallyError)
+                    .foregroundStyle(
+                        focusIntegrationService.lastError == nil
+                            ? Color.focallyOnSurfaceVariant
+                            : Color.focallyError
+                    )
             }
             .padding(FocallySpacing.medium)
             .background(
