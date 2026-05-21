@@ -109,7 +109,9 @@ private struct PredefinedTaskEditorSheet: View {
         _emoji = State(initialValue: task?.emoji ?? "📝")
         _durationMinutes = State(initialValue: task?.durationMinutes ?? 25)
         _cycles = State(initialValue: task?.cycles ?? 1)
-        let defaultColor = TaskColorOption.all.first { $0.backgroundHex == task?.iconBgColor && $0.foregroundHex == task?.iconFgColor } ?? TaskColorOption.all[0]
+        let defaultColor = TaskColorOption.all.first {
+            $0.backgroundHex == task?.iconBgColor && $0.foregroundHex == task?.iconFgColor
+        } ?? TaskColorOption.all[0]
         _selectedColorID = State(initialValue: defaultColor.id)
     }
 
@@ -175,11 +177,20 @@ private struct PredefinedTaskEditorSheet: View {
                             .foregroundStyle(Color.focallyOnSurface)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(selectedColorID == option.id ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                            .background(
+                                selectedColorID == option.id
+                                    ? Color.focallyPrimary.opacity(0.14)
+                                    : Color.focallySurfaceContainerLow
+                            )
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .overlay {
                                 RoundedRectangle(cornerRadius: 10)
-                                    .stroke(selectedColorID == option.id ? Color.focallyPrimary : Color.clear, lineWidth: 1.5)
+                                    .stroke(
+                                        selectedColorID == option.id
+                                            ? Color.focallyPrimary
+                                            : Color.clear,
+                                        lineWidth: 1.5
+                                    )
                             }
                         }
                         .buttonStyle(.plain)
@@ -232,11 +243,18 @@ private struct PredefinedTaskEditorSheet: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay {
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color(hex: color.foregroundHex).opacity(0.28), lineWidth: 1)
+                        .stroke(
+                            Color(hex: color.foregroundHex).opacity(0.28),
+                            lineWidth: 1
+                        )
                 }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Task preview" : name.trimmingCharacters(in: .whitespacesAndNewlines))
+                Text(
+                    name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        ? "Task preview"
+                        : name.trimmingCharacters(in: .whitespacesAndNewlines)
+                )
                     .font(.focallyBodyBold)
                     .foregroundStyle(Color.focallyOnSurface)
                 Text("\(durationMinutes)m • \(cycles) cycle\(cycles == 1 ? "" : "s")")
