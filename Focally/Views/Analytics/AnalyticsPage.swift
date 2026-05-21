@@ -40,10 +40,16 @@ struct AnalyticsPage: View {
                     VStack(spacing: FocallySpacing.large) {
                         // Row 1: Focus Score + Avg Session Depth
                         HStack(alignment: .top, spacing: FocallySpacing.gutter) {
-                            FocusScoreCard(scoreData: analyticsService.focusScore, score: analyticsService.focusScore.value)
+                            FocusScoreCard(
+                                scoreData: analyticsService.focusScore,
+                                score: analyticsService.focusScore.value
+                            )
                                 .frame(maxWidth: .infinity)
 
-                            AvgSessionDepthCard(hours: analyticsService.avgSessionDepth.hours, minutes: analyticsService.avgSessionDepth.minutes)
+                            AvgSessionDepthCard(
+                                hours: analyticsService.avgSessionDepth.hours,
+                                minutes: analyticsService.avgSessionDepth.minutes
+                            )
                                 .frame(maxWidth: .infinity)
                         }
 
@@ -52,12 +58,17 @@ struct AnalyticsPage: View {
                             FocusTrendChart(data: analyticsService.trendData)
                                 .frame(maxWidth: .infinity)
 
-                            FocusAllocationCard(allocation: analyticsService.categories)
+                            FocusAllocationCard(
+                                allocation: analyticsService.categories
+                            )
                                 .frame(maxWidth: .infinity)
                         }
 
                         // Row 3: Recent Sessions
-                        RecentSessionsList(sessions: analyticsService.recentSessions, onExportTap: { showingExportSheet = true })
+                        RecentSessionsList(
+                            sessions: analyticsService.recentSessions,
+                            onExportTap: { showingExportSheet = true }
+                        )
                     }
                     .padding(.horizontal, FocallySpacing.large)
                     .padding(.bottom, FocallySpacing.large)
