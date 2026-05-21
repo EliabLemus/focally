@@ -48,7 +48,10 @@ public struct CompactStatusEmojiButton: View {
 
     /// Determina si el emoji actual tiene problemas de validación
     private var hasValidationError: Bool {
-        slackService.isConnected && !EmojiValidator.isValidForSlack(selection, workspaceEmojis: slackService.workspaceEmojiCodes)
+        slackService.isConnected && !EmojiValidator.isValidForSlack(
+            selection,
+            workspaceEmojis: slackService.workspaceEmojiCodes
+        )
     }
 
     public var body: some View {
@@ -86,7 +89,10 @@ public struct CompactStatusEmojiButton: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay {
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(hasValidationError ? Color.focallyError : Color.focallyOutline, lineWidth: hasValidationError ? 1.5 : 0.75)
+                    .stroke(
+                        hasValidationError ? Color.focallyError : Color.focallyOutline,
+                        lineWidth: hasValidationError ? 1.5 : 0.75
+                    )
             }
         }
         .buttonStyle(.plain)
@@ -205,7 +211,11 @@ private struct EmojiSelectionPopover: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 8)
-                            .background(Self.matches(selection, against: option) ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                            .background(
+                                Self.matches(selection, against: option)
+                                    ? Color.focallyPrimary.opacity(0.14)
+                                    : Color.focallySurfaceContainerLow
+                            )
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                         .buttonStyle(.plain)
@@ -231,7 +241,11 @@ private struct EmojiSelectionPopover: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                    .background(
+                        selection == code
+                            ? Color.focallyPrimary.opacity(0.14)
+                            : Color.focallySurfaceContainerLow
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             } else {
                 Text(code)
@@ -240,7 +254,11 @@ private struct EmojiSelectionPopover: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
-                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                    .background(
+                        selection == code
+                            ? Color.focallyPrimary.opacity(0.14)
+                            : Color.focallySurfaceContainerLow
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
