@@ -120,7 +120,11 @@ final class FocusIntegrationService: ObservableObject {
         slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             let success = self.slackService.connectionError == nil
-            let message: String = self.slackService.lastActionMessage ?? (success ? "Slack focus integration succeeded" : (self.slackService.connectionError ?? "Slack focus integration failed"))
+            let message: String = self.slackService.lastActionMessage ?? (
+                success
+                    ? "Slack focus integration succeeded"
+                    : (self.slackService.connectionError ?? "Slack focus integration failed")
+            )
             completion?(success, message)
         }
     }
@@ -193,7 +197,10 @@ final class FocusIntegrationService: ObservableObject {
     private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil) {
         let slackEnabled: Bool = self.slackService.isEnabled
         let durationDescription: String = durationMinutes?.description ?? "nil"
-        logger.info("performSlackFocusAction called. action=\(action), durationMinutes=\(durationDescription), slackEnabled=\(slackEnabled)")
+        logger.info(
+            "performSlackFocusAction called. action=\(action), " +
+            "durationMinutes=\(durationDescription), slackEnabled=\(slackEnabled)"
+        )
         guard slackEnabled else {
             logger.info("Skipping performSlackFocusAction: Slack is disabled")
             return
@@ -217,7 +224,10 @@ final class FocusIntegrationService: ObservableObject {
 @available(macOS 14.0, *)
 struct StartFocusAppIntent: AppIntent {
     static var title: LocalizedStringResource = "Start Focus"
-    static var description = IntentDescription("Optional automation action that turns on Focally's direct system Do Not Disturb integration from the Shortcuts app.")
+    static var description = IntentDescription(
+        "Optional automation action that turns on Focally's direct system " +
+        "Do Not Disturb integration from the Shortcuts app."
+    )
     static var openAppWhenRun: Bool = false
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
@@ -229,7 +239,10 @@ struct StartFocusAppIntent: AppIntent {
 @available(macOS 14.0, *)
 struct EndFocusAppIntent: AppIntent {
     static var title: LocalizedStringResource = "End Focus"
-    static var description = IntentDescription("Optional automation action that turns off Focally's direct system Do Not Disturb integration from the Shortcuts app.")
+    static var description = IntentDescription(
+        "Optional automation action that turns off Focally's direct system " +
+        "Do Not Disturb integration from the Shortcuts app."
+    )
     static var openAppWhenRun: Bool = false
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
