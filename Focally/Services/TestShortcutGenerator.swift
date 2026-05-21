@@ -128,7 +128,10 @@ final class ManagedFocusShortcutsService: ObservableObject {
             return resourceURL
         }
 
-        throw ManagedShortcutError.bundledShortcutMissing("Focally couldn't find the bundled \(kind.displayName) shortcut inside the app resources.")
+        throw ManagedShortcutError.bundledShortcutMissing(
+            "Focally couldn't find the bundled \(kind.displayName) " +
+            "shortcut inside the app resources."
+        )
     }
 
     func isInstalled(_ kind: ShortcutKind) -> Bool {
@@ -163,7 +166,9 @@ final class ManagedFocusShortcutsService: ObservableObject {
 
     func openSignedShortcutsForImport() {
         guard allSignedShortcutsExist else {
-            lastError = ManagedShortcutError.shortcutNotPrepared("Stage the bundled signed shortcuts before opening them in Shortcuts.").localizedDescription
+            lastError = ManagedShortcutError.shortcutNotPrepared(
+                "Stage the bundled signed shortcuts before opening them in Shortcuts."
+            ).localizedDescription
             return
         }
 
@@ -172,15 +177,17 @@ final class ManagedFocusShortcutsService: ObservableObject {
 
         for (index, url) in urls.enumerated() {
             let delay = DispatchTime.now() + .milliseconds(index * 350)
-            DispatchQueue.main.asyncAfter(deadline: delay) {
-                NSWorkspace.shared.open(url)
+            DispatchQueue.main.asyncAfter(deadline: delay) { [weak self] in
+                self?.revealSignedShortcutsInFinder()
             }
         }
     }
 
     func revealSignedShortcutsInFinder() {
         guard allSignedShortcutsExist else {
-            lastError = ManagedShortcutError.shortcutNotPrepared("Stage the bundled signed shortcuts before revealing them in Finder.").localizedDescription
+            lastError = ManagedShortcutError.shortcutNotPrepared(
+                "Stage the bundled signed shortcuts before revealing them in Finder."
+            ).localizedDescription
             return
         }
 
@@ -223,13 +230,20 @@ final class ManagedFocusShortcutsService: ObservableObject {
         }
 
         guard isInstalled(kind) else {
-            throw ManagedShortcutError.notInstalled("\(kind.displayName) shortcut is not installed yet. Stage the bundled file, open it in Shortcuts, and press Add first.")
+            throw ManagedShortcutError.notInstalled(
+                "\(kind.displayName) shortcut is not installed yet. Stage the bundled " +
+                "file, open it in Shortcuts, and press Add first."
+            )
         }
 
         let result = try runShortcutsCommand(arguments: ["run", kind.installedShortcutName])
 
         guard result.terminationStatus == 0 else {
-            throw ManagedShortcutError.executionFailed(result.combinedOutput.isEmpty ? "shortcuts run failed for \(kind.installedShortcutName)." : result.combinedOutput)
+            throw ManagedShortcutError.executionFailed(
+                result.combinedOutput.isEmpty
+                    ? "shortcuts run failed for \(kind.installedShortcutName)."
+                    : result.combinedOutput
+            )
         }
 
         let warningText = result.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -263,7 +277,10 @@ final class ManagedFocusShortcutsService: ObservableObject {
         do {
             try fileManager.copyItem(at: sourceURL, to: destinationURL)
         } catch {
-            throw ManagedShortcutError.stagingFailed("Focally couldn't stage the bundled shortcut files for import: \(error.localizedDescription)")
+            throw ManagedShortcutError.stagingFailed(
+                "Focally couldn't stage the bundled shortcut files for import: " +
+                "\(error.localizedDescription)"
+            )
         }
     }
 
