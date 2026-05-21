@@ -42,7 +42,9 @@ class SlackService: ObservableObject {
     // MARK: - Public API
 
     func savedStatusEmoji() -> String {
-        let rawValue: String = UserDefaults.standard.string(forKey: Self.statusEmojiDefaultsKey) ?? Self.defaultStatusEmoji
+        let rawValue: String = UserDefaults.standard.string(
+            forKey: Self.statusEmojiDefaultsKey
+        ) ?? Self.defaultStatusEmoji
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
     }
@@ -166,7 +168,11 @@ class SlackService: ObservableObject {
 
     func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String? = nil, fallbackEmoji: String? = nil) {
         let maskedToken = maskedToken(token)
-        logger.info("setStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), text=\(text), taskEmoji=\(taskEmoji ?? "nil"), fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp)")
+        logger.info(
+            "setStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), " +
+            "text=\(text), taskEmoji=\(taskEmoji ?? "nil"), " +
+            "fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp)"
+        )
         guard isEnabled else {
             logger.info("Skipping setStatus because Slack integration is disabled")
             return
@@ -485,7 +491,10 @@ class SlackService: ObservableObject {
                         self?.logger.info("Slack auth.test succeeded for a user token")
                     } else {
                         self?.isConnected = false
-                        self?.connectionError = "Slack status updates require a user token (xoxp-) with users.profile:write"
+                        self?.connectionError = """
+                        Slack status updates require a user token (xoxp-) \
+                        with users.profile:write
+                        """
                         self?.logger.error("Slack auth.test succeeded but token type is not a user token")
                     }
                 } else {
@@ -614,7 +623,11 @@ class SlackService: ObservableObject {
     }
 
     private func percentEncode(_ value: String) -> String {
-        value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed.subtracting(CharacterSet(charactersIn: "&+=?"))) ?? value
+        value.addingPercentEncoding(
+            withAllowedCharacters: .urlQueryAllowed.subtracting(
+                CharacterSet(charactersIn: "&+=?")
+            )
+        ) ?? value
     }
 
     private func maskedHeaders(for request: URLRequest) -> String {
