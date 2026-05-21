@@ -76,13 +76,30 @@ class FocusTimerService: ObservableObject {
     // MARK: - Settings
 
     private func loadSettings() {
-        pomodoroState = PomodoroState(rawValue: defaults.string(forKey: "pomodoroState") ?? "idle") ?? .idle
+        pomodoroState = PomodoroState(
+            rawValue: defaults.string(forKey: "pomodoroState") ?? "idle"
+        ) ?? .idle
         currentRound = defaults.integer(forKey: "currentRound")
-        roundsUntilLongBreak = storedInteger(forKey: "roundsUntilLongBreak", defaultValue: TimerDefaults.roundsUntilLongBreak)
-        isAutoStartEnabled = storedBool(forKey: "isAutoStartEnabled", defaultValue: TimerDefaults.autoStartBreaks)
-        workDurationMinutes = storedDuration(forKey: "workDurationMinutes", defaultValue: TimerDefaults.workDuration)
-        shortBreakDurationMinutes = storedDuration(forKey: "shortBreakDurationMinutes", defaultValue: TimerDefaults.shortBreakDuration)
-        longBreakDurationMinutes = storedDuration(forKey: "longBreakDurationMinutes", defaultValue: TimerDefaults.longBreakDuration)
+        roundsUntilLongBreak = storedInteger(
+            forKey: "roundsUntilLongBreak",
+            defaultValue: TimerDefaults.roundsUntilLongBreak
+        )
+        isAutoStartEnabled = storedBool(
+            forKey: "isAutoStartEnabled",
+            defaultValue: TimerDefaults.autoStartBreaks
+        )
+        workDurationMinutes = storedDuration(
+            forKey: "workDurationMinutes",
+            defaultValue: TimerDefaults.workDuration
+        )
+        shortBreakDurationMinutes = storedDuration(
+            forKey: "shortBreakDurationMinutes",
+            defaultValue: TimerDefaults.shortBreakDuration
+        )
+        longBreakDurationMinutes = storedDuration(
+            forKey: "longBreakDurationMinutes",
+            defaultValue: TimerDefaults.longBreakDuration
+        )
     }
 
     private func saveSettings() {
