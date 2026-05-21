@@ -190,7 +190,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if timerService.hasSession {
             let pauseTitle: String = timerService.isPaused ? "Resume Session" : "Pause Session"
             let pauseImage: String = timerService.isPaused ? "play.fill" : "pause.fill"
-            let pauseItem: NSMenuItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
+            let pauseItem: NSMenuItem = NSMenuItem(
+                title: pauseTitle,
+                action: #selector(togglePauseSession),
+                keyEquivalent: ""
+            )
             pauseItem.image = NSImage(systemSymbolName: pauseImage, accessibilityDescription: pauseTitle)
             pauseItem.target = self
             menu.addItem(pauseItem)
@@ -214,12 +218,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit Focally", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(
+            title: "Quit Focally",
+            action: #selector(quitApp),
+            keyEquivalent: "q"
+        )
         quitItem.target = self
         menu.addItem(quitItem)
 
-        let buttonOrigin = button.window?.convertToScreen(NSRect(origin: button.frame.origin, size: button.frame.size)).origin ?? .zero
-        menu.popUp(positioning: nil, at: NSPoint(x: buttonOrigin.x, y: buttonOrigin.y - 2), in: nil)
+        let buttonOrigin = button.window?
+            .convertToScreen(
+                NSRect(origin: button.frame.origin, size: button.frame.size)
+            ).origin ?? .zero
+        menu.popUp(
+            positioning: nil,
+            at: NSPoint(x: buttonOrigin.x, y: buttonOrigin.y - 2),
+            in: nil
+        )
     }
 
     @objc func togglePauseSession() {
@@ -305,9 +320,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if timerService.hasSession {
             let imageName: String = timerService.isPaused ? "play.fill" : "pause.fill"
-            let description: String = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
+            let description: String = timerService.isPaused
+                ? "Resume Focus Session"
+                : "Pause Focus Session"
             button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: description)
-            let newText: String = " \(timerService.currentEmoji) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
+            let newText: String = """
+             \(timerService.currentEmoji) \
+             \(timerService.remainingMinutesString) — \
+             \(timerService.currentActivity)
+            """
             if button.title != newText {
                 button.title = newText
             }
