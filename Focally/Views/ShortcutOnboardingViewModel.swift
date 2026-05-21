@@ -31,15 +31,27 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .welcome:
-            return "Let’s turn on quiet mode the easy way."
+            return "Let's turn on quiet mode the easy way."
         case .explanation:
-            return "Focally turns on Do Not Disturb directly by default. The bundled shortcut backup only exists if Apple needs the visual Add step."
+            return """
+            Focally turns on Do Not Disturb directly by default. The bundled \
+            shortcut backup only exists if Apple needs the visual Add step.
+            """
         case .installation:
-            return "Focally can stage its bundled signed Focus shortcut files for you, then Apple asks for one visual Add confirmation per file."
+            return """
+            Focally can stage its bundled signed Focus shortcut files for you, \
+            then Apple asks for one visual Add confirmation per file.
+            """
         case .verification:
-            return "We’ll confirm direct quiet mode and optionally check whether the shortcut backup was added after that visual step."
+            return """
+            We'll confirm direct quiet mode and optionally check whether the \
+            shortcut backup was added after that visual step.
+            """
         case .completion:
-            return "You’re ready to use direct Do Not Disturb now, with the shortcut backup available whenever you finish Apple’s one-time Add step."
+            return """
+            You're ready to use direct Do Not Disturb now, with the shortcut \
+            backup available whenever you finish Apple's one-time Add step.
+            """
         }
     }
 }
@@ -145,7 +157,8 @@ final class ShortcutOnboardingViewModel: ObservableObject {
         let startSucceeded = focusIntegrationService.lastError == nil && focusIntegrationService.isFocusActive
 
         focusIntegrationService.runNativeShortcutTest(.end)
-        let endSucceeded = focusIntegrationService.lastError == nil && !focusIntegrationService.isFocusActive
+        let endSucceeded = focusIntegrationService.lastError == nil
+            && !focusIntegrationService.isFocusActive
 
         managedShortcutsService.refreshInstallationState()
         let managedInstalled = managedShortcutsService.allManagedShortcutsInstalled
