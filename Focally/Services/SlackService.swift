@@ -5,11 +5,16 @@ import os.log
 // MARK: - Slack Emoji Model
 
 struct SlackEmoji: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()  // var para permitir decoding
     let shortcode: String
     let name: String
     let imageURL: String?
     let isStandard: Bool
+
+    // Excluir id del decoding para evitar crash
+    enum CodingKeys: String, CodingKey {
+        case shortcode, name, imageURL, isStandard
+    }
 }
 
 // MARK: - Slack Service
