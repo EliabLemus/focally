@@ -101,8 +101,8 @@ final class FocusIntegrationService: ObservableObject {
         }
     }
 
-    func activateFocus() {
-        performCombinedFocusAction(.start)
+    func activateFocus(emoji: String? = nil) {
+        performCombinedFocusAction(.start, emoji: emoji)
     }
 
     func deactivateFocus() {
@@ -117,7 +117,7 @@ final class FocusIntegrationService: ObservableObject {
 
     func runSlackTest(completion: ((Bool, String) -> Void)? = nil) {
         slackService.disableSlackDND()
-        slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
+        slackService.setSlackFocusStatus(text: "In focus", emoji: slackService.savedStatusEmoji())
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             let success = self.slackService.connectionError == nil
             let message: String = self.slackService.lastActionMessage ?? (
@@ -159,7 +159,7 @@ final class FocusIntegrationService: ObservableObject {
         return "Ready. Focally will turn on quiet mode directly and then try the bundled shortcuts."
     }
 
-    private func performCombinedFocusAction(_ action: FocusIntegrationAction) {
+    private func performCombinedFocusAction(_ action: FocusIntegrationAction, emoji: String? = nil) {
         let slackEnabled: Bool = self.slackService.isEnabled
         logger.info("performCombinedFocusAction called. action=\(action), slackEnabled=\(slackEnabled)")
         lastError = nil
@@ -167,7 +167,7 @@ final class FocusIntegrationService: ObservableObject {
 
         performDirectFocusAction(action, source: "direct system DND")
         attemptManagedShortcutAction(action)
-        performSlackFocusAction(action, durationMinutes: action == .start ? 25 : nil)
+        performSlackFocusAction(action, durationMinutes: action == .start ? 25 : nil, emoji: emoji)
     }
 
     private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String) {
@@ -194,7 +194,7 @@ final class FocusIntegrationService: ObservableObject {
         }
     }
 
-    private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil) {
+    private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil, emoji: String? = nil) {
         let slackEnabled: Bool = self.slackService.isEnabled
         let durationDescription: String = durationMinutes?.description ?? "nil"
         logger.info(
@@ -208,9 +208,10 @@ final class FocusIntegrationService: ObservableObject {
         switch action {
         case .start:
             let duration = durationMinutes ?? 25
+            let focusEmoji = emoji ?? slackService.savedStatusEmoji()
             logger.info("Starting Slack focus actions for \(duration) minutes")
             slackService.setSlackDNDSnooze(minutes: duration)
-            slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
+            slackService.setSlackFocusStatus(text: "In focus", emoji: focusEmoji)
         case .end:
             logger.info("Ending Slack focus actions")
             slackService.clearStatus()
@@ -225,8 +226,7 @@ final class FocusIntegrationService: ObservableObject {
 struct StartFocusAppIntent: AppIntent {
     static var title: LocalizedStringResource = "Start Focus"
     static var description = IntentDescription(
-        "Optional automation action that turns on Focally's direct system " +
-        "Do Not Disturb integration from the Shortcuts app."
+        "Optional automation action that turns on Focally's direct system Do Not Disturb integration from the Shortcuts app."
     )
     static var openAppWhenRun: Bool = false
 
@@ -240,8 +240,7 @@ struct StartFocusAppIntent: AppIntent {
 struct EndFocusAppIntent: AppIntent {
     static var title: LocalizedStringResource = "End Focus"
     static var description = IntentDescription(
-        "Optional automation action that turns off Focally's direct system " +
-        "Do Not Disturb integration from the Shortcuts app."
+        "Optional automation action that turns off Focally's direct system Do Not Disturb integration from the Shortcuts app."
     )
     static var openAppWhenRun: Bool = false
 

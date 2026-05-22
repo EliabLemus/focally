@@ -512,7 +512,7 @@ class FocusTimerService: ObservableObject {
 
     @MainActor
     private func activateFocusIntegration() {
-        focusIntegrationService.activateFocus()
+        focusIntegrationService.activateFocus(emoji: currentEmoji)
     }
 
     @MainActor

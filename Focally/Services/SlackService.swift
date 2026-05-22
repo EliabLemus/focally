@@ -2,6 +2,18 @@ import Foundation
 import Combine
 import os.log
 
+// MARK: - Slack Emoji Model
+
+struct SlackEmoji: Identifiable, Codable {
+    let id = UUID()
+    let shortcode: String
+    let name: String
+    let imageURL: String?
+    let isStandard: Bool
+}
+
+// MARK: - Slack Service
+
 class SlackService: ObservableObject {
     static let defaultStatusEmoji = ":hourglass_flowing_sand:"
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
@@ -19,6 +31,7 @@ class SlackService: ObservableObject {
     @Published var connectionError: String?
     @Published var lastStatusText: String?
     @Published var workspaceEmojiCodes: [String] = []
+    @Published var workspaceEmojis: [SlackEmoji] = []
     @Published var lastActionMessage: String?
 
     private let keychainKey = "slack-token"
@@ -371,14 +384,26 @@ class SlackService: ObservableObject {
                 return
             }
 
-            let codes = emojiMap.keys
-                .map { ":\($0):" }
-                .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+            let emojis = emojiMap.keys.map { name -> SlackEmoji in
+                let value = emojiMap[name]!
+                let isAlias = value.starts(with: "alias:")
+                let imageURL: String? = isAlias ? nil : value
+
+                return SlackEmoji(
+                    shortcode: ":\(name):",
+                    name: name,
+                    imageURL: imageURL,
+                    isStandard: isAlias
+                )
+            }.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+
+            let codes = emojis.map { $0.shortcode }
 
             DispatchQueue.main.async {
+                self.workspaceEmojis = emojis
                 self.workspaceEmojiCodes = codes
                 self.connectionError = nil
-                self.logger.info("Loaded \(codes.count) Slack workspace emojis successfully")
+                self.logger.info("Loaded \(emojis.count) Slack workspace emojis successfully")
             }
         }
     }

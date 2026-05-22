@@ -59,21 +59,32 @@ struct IntegrationsSettingsView: View {
             }
 
             if slackService.isEnabled {
-                if slackService.workspaceEmojiCodes.isEmpty {
+                if slackService.workspaceEmojis.isEmpty {
                     Text("Slack emoji catalog: Loading...")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 } else {
-                    HStack(spacing: FocallySpacing.extraSmall) {
-                        Text("Slack emoji catalog: \(slackService.workspaceEmojiCodes.count) emojis loaded")
+                    VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+                        HStack(spacing: FocallySpacing.extraSmall) {
+                            Text("Slack emoji catalog: \(slackService.workspaceEmojis.count) emojis loaded")
+                                .font(.focallyCaption)
+                                .foregroundStyle(Color.focallyTertiary)
+                            Button("Reload") {
+                                slackService.refreshEmojiCatalogIfPossible()
+                            }
                             .font(.focallyCaption)
-                            .foregroundStyle(Color.focallyTertiary)
-                        Button("Reload") {
-                            slackService.refreshEmojiCatalogIfPossible()
+                            .buttonStyle(.plain)
+                            .foregroundStyle(Color.focallyPrimary)
                         }
-                        .font(.focallyCaption)
-                        .buttonStyle(.plain)
-                        .foregroundStyle(Color.focallyPrimary)
+
+                        ScrollView {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))], spacing: FocallySpacing.small) {
+                                ForEach(slackService.workspaceEmojis.prefix(48)) { emoji in
+                                    EmojiPreviewCell(emoji: emoji)
+                                }
+                            }
+                        }
+                        .frame(height: 200)
                     }
                 }
             }
@@ -412,5 +423,57 @@ struct IntegrationsSettingsView: View {
         } else {
             service.signIn()
         }
+    }
+}
+
+// MARK: - Emoji Preview Cell
+
+struct EmojiPreviewCell: View {
+    let emoji: SlackEmoji
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ZStack {
+                if let imageURL = emoji.imageURL,
+                   let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 32, height: 32)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                        case .failure:
+                            Text(emoji.shortcode)
+                                .font(.title3)
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                    .frame(width: 40, height: 40)
+                    .background(Color.focallySurfaceVariant)
+                    .cornerRadius(8)
+                } else {
+                    Text(emoji.name)
+                        .font(.title2)
+                        .frame(width: 40, height: 40)
+                        .background(Color.focallySurfaceVariant)
+                        .cornerRadius(8)
+                }
+            }
+            .onTapGesture {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(emoji.shortcode, forType: .string)
+            }
+
+            Text(emoji.name)
+                .font(.caption2)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+                .lineLimit(1)
+        }
+        .padding(4)
     }
 }
