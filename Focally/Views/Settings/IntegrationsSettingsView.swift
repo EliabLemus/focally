@@ -318,10 +318,10 @@ struct IntegrationsSettingsView: View {
             Text(title)
                 .font(.focallyButton)
                 .foregroundStyle(Color.focallyOnPrimary)
-                .padding(.horizontal, FocallySpacing.md)
+                .padding(.horizontal, FocallySpacing.medium)
                 .padding(.vertical, 8)
                 .background(
-                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                    RoundedRectangle(cornerRadius: FocallyRadius.small)
                         .fill(Color.focallyPrimary)
                 )
         }
@@ -333,10 +333,10 @@ struct IntegrationsSettingsView: View {
             Text(title)
                 .font(.focallyButton)
                 .foregroundStyle(Color.focallyOnSurface)
-                .padding(.horizontal, FocallySpacing.md)
+                .padding(.horizontal, FocallySpacing.medium)
                 .padding(.vertical, 8)
                 .background(
-                    RoundedRectangle(cornerRadius: FocallyRadius.sm)
+                    RoundedRectangle(cornerRadius: FocallyRadius.small)
                         .fill(Color.focallySurfaceContainerHigh)
                 )
         }
