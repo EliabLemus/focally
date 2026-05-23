@@ -25,6 +25,7 @@
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
 		39A248BCEF89B6D08450BB25 /* TasksPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455AC520CE3339E97869E3F3 /* TasksPage.swift */; };
 		39A58C6BC3D6F565DE7134F3 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844B4C6DBE9625A6C4CAD3B6 /* GoogleCalendarService.swift */; };
+		3CC347CA3B86E21F7D0947E8 /* FocallyGlassModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */; };
 		3FFC3DE7EF5D8190CFE92A60 /* PredefinedTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ADA48D3EB4AAD3C4F2BB0A6 /* PredefinedTask.swift */; };
 		4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */; };
 		45910A2451545466CC894386 /* GoogleCalendarService+Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F73097E1393CA27A8E3159 /* GoogleCalendarService+Formatters.swift */; };
@@ -214,6 +215,7 @@
 		D9525B861215559EF5E9D021 /* HistoryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceTests.swift; sourceTree = "<group>"; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
+		EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyGlassModifier.swift; sourceTree = "<group>"; };
 		F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
 		F2E3F6355136EFD90EE198C8 /* DNDService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDService.swift; sourceTree = "<group>"; };
 		F4546DFFE30B32483B8C72A5 /* ShortcutOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutOnboardingView.swift; sourceTree = "<group>"; };
@@ -432,6 +434,7 @@
 				C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */,
 				8C2677CB56C06B2FD04DCAF2 /* DesignSystemTestView.swift */,
 				440DA683BDD9156AD84D322C /* FocallyColors.swift */,
+				EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */,
 				633E55854AB377DA4F68B1CC /* FocallyRadius.swift */,
 				887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */,
 				09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */,
@@ -452,7 +455,6 @@
 				C570E45183822E3ECE9C3158 /* Observability */,
 				5AF2FE4BCEA66A832CB8637D /* Resources */,
 				F00A4423B12F413F1474634A /* Services */,
-				E9F34FF51F0D066322EEF1FD /* Utils */,
 				122010126CD7EFB3D8B2BF85 /* Views */,
 			);
 			path = Focally;
@@ -476,13 +478,6 @@
 				0CA587C51B99E375193E7B89 /* WeekCalendarView.swift */,
 			);
 			path = Schedule;
-			sourceTree = "<group>";
-		};
-		E9F34FF51F0D066322EEF1FD /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 		F00A4423B12F413F1474634A /* Services */ = {
@@ -683,6 +678,7 @@
 				97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */,
 				5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */,
 				4A4E5523F0A4CFF73FE53D60 /* FocallyFocusScoreCard.swift in Sources */,
+				3CC347CA3B86E21F7D0947E8 /* FocallyGlassModifier.swift in Sources */,
 				D626EF73E0ACD103321976D9 /* FocallyRadius.swift in Sources */,
 				72C50B6FF38D05A2E9F440C5 /* FocallySpacing.swift in Sources */,
 				4E171CBDCAE413F2F4D0F49F /* FocallyTab.swift in Sources */,
@@ -927,7 +923,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 35;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -940,7 +936,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.7.19;
+				MARKETING_VERSION = 0.7.22;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.mac;
@@ -986,7 +982,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 35;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1005,7 +1001,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.7.19;
+				MARKETING_VERSION = 0.7.22;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

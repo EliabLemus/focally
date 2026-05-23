@@ -90,6 +90,7 @@ public struct CompactStatusEmojiButton: View {
             }
         }
         .buttonStyle(.plain)
+        .help("Click to change status emoji")
         .popover(isPresented: $isPopoverPresented, arrowEdge: .bottom) {
             EmojiSelectionPopover(selection: $selection, options: options)
                 .environmentObject(slackService)
