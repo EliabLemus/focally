@@ -76,7 +76,7 @@ struct IdleDashboardView: View {
                         .foregroundStyle(Color.focallyOnSurface)
                         .lineLimit(2)
 
-                    Text("This starts with your chosen duration and the same quiet-mode automation the timer uses everywhere else.")
+                    Text("Your duration + quiet-mode automation")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                         .fixedSize(horizontal: false, vertical: true)

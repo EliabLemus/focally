@@ -44,6 +44,14 @@ struct IntegrationsSettingsView: View {
 
             credentialField(title: "User Token", prompt: "xoxp-...", text: $slackToken, isSecure: true)
 
+            // Inline validation for Slack token format
+            if !slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+               !slackToken.hasPrefix("xoxp-") && !slackToken.hasPrefix("xoxb-") {
+                Text("Invalid format. Slack tokens should start with xoxp- or xoxb-")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyError)
+            }
+
             HStack(spacing: FocallySpacing.small) {
                 primaryButton("Save Token", action: saveSlackToken)
                 secondaryButton("Test Connection", action: testSlackConnection)
