@@ -2,23 +2,6 @@ import Foundation
 import Combine
 import os.log
 
-// MARK: - Slack Emoji Model
-
-struct SlackEmoji: Identifiable, Codable {
-    var id = UUID()  // var para permitir decoding
-    let shortcode: String
-    let name: String
-    let imageURL: String?
-    let isStandard: Bool
-
-    // Excluir id del decoding para evitar crash
-    enum CodingKeys: String, CodingKey {
-        case shortcode, name, imageURL, isStandard
-    }
-}
-
-// MARK: - Slack Service
-
 class SlackService: ObservableObject {
     static let defaultStatusEmoji = ":hourglass_flowing_sand:"
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
@@ -36,7 +19,6 @@ class SlackService: ObservableObject {
     @Published var connectionError: String?
     @Published var lastStatusText: String?
     @Published var workspaceEmojiCodes: [String] = []
-    @Published var workspaceEmojis: [SlackEmoji] = []
     @Published var lastActionMessage: String?
 
     private let keychainKey = "slack-token"
@@ -60,9 +42,7 @@ class SlackService: ObservableObject {
     // MARK: - Public API
 
     func savedStatusEmoji() -> String {
-        let rawValue: String = UserDefaults.standard.string(
-            forKey: Self.statusEmojiDefaultsKey
-        ) ?? Self.defaultStatusEmoji
+        let rawValue: String = UserDefaults.standard.string(forKey: Self.statusEmojiDefaultsKey) ?? Self.defaultStatusEmoji
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
     }
@@ -186,11 +166,7 @@ class SlackService: ObservableObject {
 
     func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String? = nil, fallbackEmoji: String? = nil) {
         let maskedToken = maskedToken(token)
-        logger.info(
-            "setStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), " +
-            "text=\(text), taskEmoji=\(taskEmoji ?? "nil"), " +
-            "fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp)"
-        )
+        logger.info("setStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), text=\(text), taskEmoji=\(taskEmoji ?? "nil"), fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp)")
         guard isEnabled else {
             logger.info("Skipping setStatus because Slack integration is disabled")
             return
@@ -389,26 +365,14 @@ class SlackService: ObservableObject {
                 return
             }
 
-            let emojis = emojiMap.keys.map { name -> SlackEmoji in
-                let value = emojiMap[name]!
-                let isAlias = value.starts(with: "alias:")
-                let imageURL: String? = isAlias ? nil : value
-
-                return SlackEmoji(
-                    shortcode: ":\(name):",
-                    name: name,
-                    imageURL: imageURL,
-                    isStandard: isAlias
-                )
-            }.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-
-            let codes = emojis.map { $0.shortcode }
+            let codes = emojiMap.keys
+                .map { ":\($0):" }
+                .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
 
             DispatchQueue.main.async {
-                self.workspaceEmojis = emojis
                 self.workspaceEmojiCodes = codes
                 self.connectionError = nil
-                self.logger.info("Loaded \(emojis.count) Slack workspace emojis successfully")
+                self.logger.info("Loaded \(codes.count) Slack workspace emojis successfully")
             }
         }
     }
@@ -521,10 +485,7 @@ class SlackService: ObservableObject {
                         self?.logger.info("Slack auth.test succeeded for a user token")
                     } else {
                         self?.isConnected = false
-                        self?.connectionError = """
-                        Slack status updates require a user token (xoxp-) \
-                        with users.profile:write
-                        """
+                        self?.connectionError = "Slack status updates require a user token (xoxp-) with users.profile:write"
                         self?.logger.error("Slack auth.test succeeded but token type is not a user token")
                     }
                 } else {
@@ -572,8 +533,10 @@ class SlackService: ObservableObject {
             return shortcode
         }
 
-        for character in text where isEmoji(character) {
-            return String(character)
+        for character in text {
+            if isEmoji(character) {
+                return String(character)
+            }
         }
 
         return nil
@@ -653,11 +616,7 @@ class SlackService: ObservableObject {
     }
 
     private func percentEncode(_ value: String) -> String {
-        value.addingPercentEncoding(
-            withAllowedCharacters: .urlQueryAllowed.subtracting(
-                CharacterSet(charactersIn: "&+=?")
-            )
-        ) ?? value
+        value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed.subtracting(CharacterSet(charactersIn: "&+=?"))) ?? value
     }
 
     private func maskedHeaders(for request: URLRequest) -> String {
@@ -679,6 +638,30 @@ class SlackService: ObservableObject {
         let prefix = token.prefix(4)
         let suffix = token.suffix(4)
         return "\(prefix)…\(suffix)"
+    }
+
+    // MARK: - Emoji Conversion
+
+    /// Convierte un shortcode de Slack a emoji unicode (si está en el map)
+    /// - Parameter shortcode: Slack shortcode (e.g., :deep_work:)
+    /// - Returns: Unicode emoji or nil if not found
+    public static func convertShortcodeToUnicode(_ shortcode: String) -> String? {
+        // Invertir el emojiMap existente
+        let emojiMap: [String: String] = [
+            "🧠": ":brain:",
+            "💻": ":computer:",
+            "📝": ":memo:",
+            "📚": ":books:",
+            "🎯": ":dart:",
+            "⚡️": ":zap:",
+            "☕️": ":coffee:",
+            "🍅": ":tomato:"
+        ]
+
+        // Crear mapa invertido (shortcode -> unicode)
+        let invertedMap = Dictionary(uniqueKeysWithValues: emojiMap.map { ($1, $0) })
+
+        return invertedMap[shortcode]
     }
 }
 
