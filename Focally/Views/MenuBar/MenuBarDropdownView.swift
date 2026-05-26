@@ -39,14 +39,9 @@ struct MenuBarDropdownView: View {
 
     private var headerRow: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Focus")
-                    .font(.focallyH2)
-                    .foregroundStyle(Color.focallyOnSurface)
-                Text("Start fast, stay quiet.")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-            }
+            Text("Focus")
+                .font(.focallyH2)
+                .foregroundStyle(Color.focallyOnSurface)
 
             Spacer()
         }
@@ -62,7 +57,7 @@ struct MenuBarDropdownView: View {
     private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Predefined tasks")
+                Text("Your Presets")
                     .font(.focallyBodyBold)
                     .foregroundStyle(Color.focallyOnSurface)
                 Spacer()
@@ -72,7 +67,7 @@ struct MenuBarDropdownView: View {
             }
 
             if predefinedTaskStore.tasks.isEmpty {
-                Text("Create presets from Task Configuration.")
+                Text("Create presets")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             } else {
@@ -105,9 +100,6 @@ struct MenuBarDropdownView: View {
                             Circle()
                                 .fill(Color.focallySecondary)
                                 .frame(width: 6, height: 6)
-                            Text("Notifications live")
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(Color.focallySecondary)
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
@@ -198,11 +190,11 @@ struct MenuBarDropdownView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "moon.fill")
                         .font(.system(size: 12))
-                        .foregroundStyle(timerService.isPaused ? Color.focallySecondary : (dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant))
+                        .foregroundStyle(dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
 
-                    Text(timerService.isPaused ? "Paused · notifications live" : (dndService.isDNDActive ? "Quiet mode on" : "Quiet mode ready"))
+                    Text(dndService.isDNDActive ? "DND Active" : "DND Off")
                         .font(.focallyCaption)
-                        .foregroundStyle(timerService.isPaused ? Color.focallySecondary : (dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant))
+                        .foregroundStyle(dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
                 }
             }
             .padding(.horizontal, 16)
