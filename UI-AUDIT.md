@@ -434,10 +434,13 @@ Text(formatFocusTime())
 
 ---
 
-### 11. ⚠️ "Quiet mode on" vs "Quiet mode ready" - confuso
+### 11. ✅ "Quiet mode on" vs "Quiet mode ready" - confuso
 **Severity:** Medium
 **Framework:** Auto-evidencia + Omisión de palabras
 **Location:** `MenuBarDropdownView.swift:203`
+**Status:** ✅ RESOLVED (Batch 2 - 2026-05-26)
+**Resolution:** Simplified to "DND Active" / "DND Off"
+**Commit:** (pending commit)
 
 **Description:**
 ```swift
