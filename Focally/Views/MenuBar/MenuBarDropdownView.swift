@@ -180,7 +180,7 @@ struct MenuBarDropdownView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
 
-                    Text("Today: \(formatFocusTime())")
+                    Text("Focus today: \(formatFocusTime())")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }

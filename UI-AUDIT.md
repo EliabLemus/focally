@@ -408,10 +408,13 @@ GeometryReader { geometry in
 
 ---
 
-### 10. ⚠️ Footer stats "Today:" - ¿qué es today?
+### 10. ✅ Footer stats "Today:" - ¿qué es today?
 **Severity:** Low
 **Framework:** Auto-evidencia
 **Location:** `MenuBarDropdownView.swift:191`
+**Status:** ✅ RESOLVED (Batch 5 - 2026-05-26)
+**Resolution:** Changed "Today:" → "Focus today:"
+**Commit:** (pending commit)
 
 **Description:**
 ```swift
