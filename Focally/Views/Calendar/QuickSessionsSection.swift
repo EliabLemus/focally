@@ -3,16 +3,17 @@ import SwiftUI
 struct QuickSessionsSection: View {
     @EnvironmentObject private var calendarService: GoogleCalendarService
     @EnvironmentObject private var timerService: FocusTimerService
+    @EnvironmentObject private var slackService: SlackService
 
     @State private var taskInput = ""
     @State private var selectedEmoji = "🎯"
     @State private var selectedDuration = 25
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
             sectionHeader
 
-            VStack(spacing: 10) {
+            VStack(spacing: FocallySpacing.small) {
                 if calendarService.isEnabled {
                     CalendarStatusCard()
                 }
@@ -22,9 +23,9 @@ struct QuickSessionsSection: View {
                 }
             }
         }
-        .padding(14)
+        .padding(FocallySpacing.medium)
         .background(sectionBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.large))
         .onAppear(perform: syncFromService)
     }
 
@@ -35,13 +36,13 @@ struct QuickSessionsSection: View {
     }
 
     private var quickStartControls: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: FocallySpacing.small) {
             emojiSelector
             taskNameInput
             slackStatusPreview
 
             DurationControl(minutes: $selectedDuration, range: 5...180, step: 5)
-                .padding(.horizontal, 2)
+                .padding(.horizontal, FocallySpacing.extraSmall)
 
             actionButtons
         }
@@ -57,12 +58,12 @@ struct QuickSessionsSection: View {
             .font(.focallyBody)
             .foregroundStyle(Color.focallyOnSurface)
             .textFieldStyle(.plain)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, FocallySpacing.medium)
             .padding(.vertical, 10)
             .background(Color.focallySurfaceContainerLow)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.medium))
             .overlay {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: FocallyRadius.medium)
                     .stroke(borderColor, lineWidth: 0.5)
             }
             .onSubmit(startSession)
@@ -70,15 +71,28 @@ struct QuickSessionsSection: View {
     }
 
     private var slackStatusPreview: some View {
-        Text("Slack status: \(selectedEmoji)")
+        let displayEmoji = emojiDisplayString(for: selectedEmoji)
+        return Text("Slack status: \(displayEmoji)")
             .font(.system(size: 11, weight: .medium))
             .foregroundStyle(Color.focallyOnSurfaceVariant)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityLabel("Slack status preview \(selectedEmoji)")
+            .accessibilityLabel("Slack status preview \(displayEmoji)")
+    }
+
+    /// Convierte un shortcode o unicode a su representación de display
+    private func emojiDisplayString(for emoji: String) -> String {
+        if Self.isSlackShortcode(emoji) {
+            return EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
+        }
+        return emoji
+    }
+
+    private static func isSlackShortcode(_ value: String) -> Bool {
+        value.hasPrefix(":") && value.hasSuffix(":") && value.count > 2
     }
 
     private var actionButtons: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: FocallySpacing.medium) {
             Button(action: startSession) {
                 HStack {
                     Label("Start focus", systemImage: "play.fill")
@@ -88,17 +102,17 @@ struct QuickSessionsSection: View {
                         .font(.focallyCaption)
                 }
                 .foregroundStyle(Color.focallyOnPrimary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
+                .padding(.horizontal, FocallySpacing.medium)
+                .padding(.vertical, FocallySpacing.small)
                 .background(Color.focallySecondary)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.medium))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Start focus session")
             .accessibilityHint("Starts a quick focus session for \(selectedDuration) minutes")
 
             Button(action: startPomodoro) {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: FocallySpacing.extraSmall) {
                     Text("Start Pomodoro")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurface)
@@ -108,10 +122,10 @@ struct QuickSessionsSection: View {
                         .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, FocallySpacing.medium)
+                .padding(.vertical, FocallySpacing.small)
                 .background(Color.focallySurfaceContainerLowest.opacity(0.72))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.medium))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Start Pomodoro")

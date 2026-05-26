@@ -58,15 +58,9 @@ public struct CompactStatusEmojiButton: View {
         } label: {
             HStack(spacing: 6) {
                 Group {
-                    if Self.isSlackShortcode(selection) {
-                        Text(selection)
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                    } else {
-                        Text(selection.isEmpty ? "🙂" : selection)
-                            .font(.system(size: 18))
-                    }
+                    let displayEmoji = emojiDisplayString(for: selection)
+                    Text(displayEmoji.isEmpty ? "🙂" : displayEmoji)
+                        .font(.system(size: 18))
                 }
                 .foregroundStyle(Color.focallyOnSurface)
 
@@ -83,9 +77,9 @@ public struct CompactStatusEmojiButton: View {
             .padding(.horizontal, 10)
             .frame(minWidth: 54, minHeight: 40)
             .background(Color.focallySurfaceContainerLow)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.medium))
             .overlay {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: FocallyRadius.medium)
                     .stroke(hasValidationError ? Color.focallyError : Color.focallyOutline, lineWidth: hasValidationError ? 1.5 : 0.75)
             }
         }
@@ -95,6 +89,14 @@ public struct CompactStatusEmojiButton: View {
             EmojiSelectionPopover(selection: $selection, options: options)
                 .environmentObject(slackService)
         }
+    }
+
+    /// Convierte un shortcode o unicode a su representación de display
+    private func emojiDisplayString(for emoji: String) -> String {
+        if Self.isSlackShortcode(emoji) {
+            return EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
+        }
+        return emoji
     }
 
     static func isSlackShortcode(_ value: String) -> Bool {
