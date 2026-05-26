@@ -96,7 +96,7 @@ struct MenuBarDropdownView: View {
                         .foregroundStyle(Color.focallyOnSurface)
                         .lineLimit(1)
 
-                    Text(timerService.isPaused ? "Paused · Notifications are back" : (timerService.isBreak ? "Break" : "Deep Focus Mode"))
+                    Text(timerService.isPaused ? "Paused" : (timerService.isBreak ? "Break" : "Deep Focus"))
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
 

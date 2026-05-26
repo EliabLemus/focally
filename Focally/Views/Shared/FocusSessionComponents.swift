@@ -345,6 +345,7 @@ public struct DurationControl: View {
 public struct PredefinedTaskQuickButton: View {
     let task: PredefinedTask
     let action: () -> Void
+    @State private var isHovering = false
 
     public var body: some View {
         Button(action: action) {
@@ -366,12 +367,27 @@ public struct PredefinedTaskQuickButton: View {
                 }
 
                 Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.focallyPrimary)
+                    .opacity(isHovering ? 1 : 0)
+                    .offset(x: isHovering ? 0 : -4)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(Color.focallySurfaceContainerLowest.opacity(0.72))
+            .background(Color.focallySurfaceContainerLowest.opacity(isHovering ? 0.9 : 0.72))
             .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isHovering ? Color.focallyPrimary.opacity(0.3) : Color.clear, lineWidth: 1)
+            }
         }
         .buttonStyle(.plain)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovering = hovering
+            }
+        }
     }
 }
