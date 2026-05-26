@@ -117,7 +117,7 @@ final class FocusIntegrationService: ObservableObject {
 
     func runSlackTest(completion: ((Bool, String) -> Void)? = nil) {
         slackService.disableSlackDND()
-        slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
+        slackService.setSlackFocusStatus(text: "In focus", emoji: "🧠")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             let success = self.slackService.connectionError == nil
             let message: String = self.slackService.lastActionMessage ?? (success ? "Slack focus integration succeeded" : (self.slackService.connectionError ?? "Slack focus integration failed"))
@@ -203,7 +203,7 @@ final class FocusIntegrationService: ObservableObject {
             let duration = durationMinutes ?? 25
             logger.info("Starting Slack focus actions for \(duration) minutes")
             slackService.setSlackDNDSnooze(minutes: duration)
-            slackService.setSlackFocusStatus(text: "In focus", emoji: "🎯")
+            slackService.setSlackFocusStatus(text: "In focus", emoji: "🧠")
         case .end:
             logger.info("Ending Slack focus actions")
             slackService.clearStatus()

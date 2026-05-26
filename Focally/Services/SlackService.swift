@@ -695,6 +695,62 @@ public struct EmojiValidator {
         return nil
     }
 
+    /// Intenta convertir un shortcode de Slack a emoji unicode
+    /// - Parameters:
+    ///   - shortcode: Shortcode de Slack (ej. :brain:)
+    ///   - workspaceEmojis: Lista de shortcodes del workspace (para validación)
+    /// - Returns: Emoji unicode si es conocido, nil si no
+    public static func convertShortcodeToUnicode(_ shortcode: String, workspaceEmojis: [String]) -> String? {
+        // Validar formato de shortcode
+        guard isSlackShortcode(shortcode) else { return nil }
+
+        // Map inverso de shortcodes conocidos a unicode
+        let shortcodeMap: [String: String] = [
+            ":brain:": "🧠",
+            ":computer:": "💻",
+            ":memo:": "📝",
+            ":books:": "📚",
+            ":dart:": "🎯",
+            ":zap:": "⚡",
+            ":coffee:": "☕",
+            ":tomato:": "🍅",
+            ":hourglass_flowing_sand:": "⏳",
+            ":star:": "⭐",
+            ":fire:": "🔥",
+            ":rocket:": "🚀",
+            ":check:": "✅",
+            ":white_check_mark:": "✅",
+            ":heavy_check_mark:": "✅",
+            ":x:": "❌",
+            ":heavy_multiplication_x:": "❌"
+        ]
+
+        // Buscar match exacto en map
+        if let emoji = shortcodeMap[shortcode] {
+            return emoji
+        }
+
+        // Intentar extraer el nombre y buscar en un map extendido
+        let name = shortcode.dropFirst().dropLast().lowercased()
+        let commonEmojis: [String: String] = [
+            "smile": "😊",
+            "thumbsup": "👍",
+            "thumbs_up": "👍",
+            "heart": "❤️",
+            "plus": "➕",
+            "warning": "⚠️",
+            "information_source": "ℹ️"
+        ]
+
+        if let emoji = commonEmojis[name] {
+            return emoji
+        }
+
+        // Si el shortcode está en el workspace pero no lo conocemos, devolver nil
+        // (la UI mostrará el shortcode como fallback)
+        return nil
+    }
+
     /// Verifica si un string es un shortcode de Slack
     public static func isSlackShortcode(_ value: String) -> Bool {
         value.hasPrefix(":") && value.hasSuffix(":") && value.count > 2

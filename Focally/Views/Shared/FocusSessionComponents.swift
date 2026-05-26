@@ -224,28 +224,26 @@ private struct EmojiSelectionPopover: View {
         Button {
             apply(code)
         } label: {
-            if Self.isSlackShortcode(code) {
-                Text(code)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color.focallyOnSurface)
-                    .lineLimit(1)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            } else {
-                Text(code)
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.focallyOnSurface)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            }
+            let displayEmoji = emojiDisplayString(for: code)
+            Text(displayEmoji)
+                .font(.system(size: 18))
+                .foregroundStyle(Color.focallyOnSurface)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(selection == code ? Color.focallyPrimary.opacity(0.14) : Color.focallySurfaceContainerLow)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
+    }
+
+    /// Convierte un shortcode o unicode a su representación de display
+    private func emojiDisplayString(for code: String) -> String {
+        if Self.isSlackShortcode(code) {
+            // Intentar convertir shortcode a unicode
+            return EmojiValidator.convertShortcodeToUnicode(code, workspaceEmojis: slackService.workspaceEmojiCodes) ?? code
+        }
+        return code
     }
 
     private func commitDraft() {

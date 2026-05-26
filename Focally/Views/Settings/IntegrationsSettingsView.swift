@@ -44,6 +44,10 @@ struct IntegrationsSettingsView: View {
 
             credentialField(title: "User Token", prompt: "xoxp-...", text: $slackToken, isSecure: true)
 
+            Text("Token requires emoji:read scope for emoji catalog")
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyTertiary)
+
             // Inline validation for Slack token format
             if !slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
                !slackToken.hasPrefix("xoxp-") && !slackToken.hasPrefix("xoxb-") {
