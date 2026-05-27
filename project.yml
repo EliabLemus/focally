@@ -13,8 +13,8 @@ options:
     base:
       SWIFT_VERSION: "5.9"
       PRODUCT_BUNDLE_IDENTIFIER: app.focally.mac
-      MARKETING_VERSION: "0.7.26"
-      CURRENT_PROJECT_VERSION: "41"
+      MARKETING_VERSION: "0.7.27"
+      CURRENT_PROJECT_VERSION: "42"
 
 targets:
   Focally:
