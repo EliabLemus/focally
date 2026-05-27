@@ -243,7 +243,22 @@ private struct EmojiSelectionPopover: View {
     private func emojiDisplayString(for code: String) -> String {
         if Self.isSlackShortcode(code) {
             // Intentar convertir shortcode a unicode
-            return EmojiValidator.convertShortcodeToUnicode(code, workspaceEmojis: slackService.workspaceEmojiCodes) ?? code
+            if let emoji = EmojiValidator.convertShortcodeToUnicode(code, workspaceEmojis: slackService.workspaceEmojiCodes) {
+                return emoji
+            }
+
+            // Fallback: mostrar nombre legible en lugar de shortcode técnico
+            let name = code.dropFirst().dropLast()  // Remover los dos puntos
+            let displayName = name
+                .replacingOccurrences(of: "_", with: " ")
+                .capitalized
+
+            // Truncar a 15 caracteres máximo para botones pequeños
+            if displayName.count > 15 {
+                let index = displayName.index(displayName.startIndex, offsetBy: 15)
+                return String(displayName[..<index]) + "…"
+            }
+            return displayName
         }
         return code
     }
