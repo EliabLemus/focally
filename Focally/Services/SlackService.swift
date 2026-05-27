@@ -706,13 +706,13 @@ public struct EmojiValidator {
 
         // Map inverso de shortcodes conocidos a unicode
         let shortcodeMap: [String: String] = [
+            // Standard Slack emojis (official names)
             ":brain:": "🧠",
             ":computer:": "💻",
             ":memo:": "📝",
             ":books:": "📚",
             ":dart:": "🎯",
             ":zap:": "⚡",
-            ":coffee:": "☕",
             ":tomato:": "🍅",
             ":hourglass_flowing_sand:": "⏳",
             ":star:": "⭐",
@@ -722,7 +722,18 @@ public struct EmojiValidator {
             ":white_check_mark:": "✅",
             ":heavy_check_mark:": "✅",
             ":x:": "❌",
-            ":heavy_multiplication_x:": "❌"
+            ":heavy_multiplication_x:": "❌",
+
+            // Focally custom shortcodes (from FocusStatusOption.common)
+            ":deep_work:": "🧠",
+            ":coding:": "💻",
+            ":writing:": "📝",
+            ":reading:": "📚",
+            ":priority:": "🎯",
+            ":sprint:": "⚡️",
+            ":quiet:": "🔕",
+            ":coffee:": "☕️",
+            ":pomodoro:": "🍅"
         ]
 
         // Buscar match exacto en map
