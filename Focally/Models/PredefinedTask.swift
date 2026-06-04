@@ -149,6 +149,7 @@ final class PredefinedTaskStore: ObservableObject {
     }
 
     private let defaults: UserDefaults
+    private let logger = Logger.app
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -185,6 +186,13 @@ final class PredefinedTaskStore: ObservableObject {
     }
 
     private func migrateTasksIfNeeded() {
+        logger.info("Task migration started")
+        logger.info("Existing tasks: \(tasks.map { $0.name }.joined(separator: ", "))")
+
+        let existingTaskNames = tasks.map { $0.name }
+        let hasMeetingTask = existingTaskNames.contains { $0.localizedCaseInsensitiveContains("meeting") }
+        logger.info("Meeting task found in existing tasks: \(hasMeetingTask)")
+
         var didChange = false
         var migratedTasks = tasks.map { task -> PredefinedTask in
             let normalizedDurations = PredefinedTask.normalizeDurations(
@@ -194,6 +202,7 @@ final class PredefinedTaskStore: ObservableObject {
             )
             if normalizedDurations != task.availableDurations {
                 didChange = true
+                logger.info("Task '\(task.name)' durations normalized: \(task.availableDurations) -> \(normalizedDurations)")
             }
             return PredefinedTask(
                 id: task.id,
@@ -210,6 +219,7 @@ final class PredefinedTaskStore: ObservableObject {
         }
 
         if migratedTasks.first(where: { $0.taskType == .meeting }) == nil {
+            logger.info("Adding Meeting task to predefined tasks")
             migratedTasks.append(
                 PredefinedTask(
                     name: "Meeting",
@@ -224,10 +234,16 @@ final class PredefinedTaskStore: ObservableObject {
                 )
             )
             didChange = true
+            logger.info("Meeting task added with durations: \(PredefinedTask.meetingDurations)")
+        } else {
+            logger.info("Meeting task already exists, skipping addition")
         }
 
         if didChange {
             tasks = migratedTasks
+            logger.info("Migration completed: tasks updated to \(tasks.count) tasks")
+        } else {
+            logger.info("Migration completed: no changes needed")
         }
     }
 }

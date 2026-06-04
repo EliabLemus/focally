@@ -247,35 +247,49 @@ final class FocusIntegrationService: ObservableObject {
         case .start:
             let duration = durationMinutes ?? 25
             logger.info("Starting Slack focus actions for \(duration) minutes")
+            logger.info("Task type: \(taskType.rawValue), activity: \(activity ?? "nil"), emoji: \(emoji ?? "nil")")
+
+            // Activate Slack DND snooze
+            logger.info("Calling slackService.setSlackDNDSnooze(minutes: \(duration))")
             slackService.setSlackDNDSnooze(minutes: duration)
+            logger.info("Slack DND snooze call completed - check logs for result")
+
             let expiration = Int(Date().addingTimeInterval(TimeInterval(duration * 60)).timeIntervalSince1970)
 
             switch taskType {
             case .meeting:
+                logger.info("Setting meeting status with emoji :google-meet:")
                 slackService.setStatus(
                     text: "En meeting",
                     expirationTimestamp: expiration,
                     taskEmoji: ":google-meet:"
                 )
+                logger.info("Meeting status call completed - check logs for result")
             case .deepWork:
+                logger.info("Setting deep work status with emoji \(emoji ?? "🧠")")
                 slackService.setStatus(
                     text: activity?.isEmpty == false ? activity ?? "Deep work" : "Deep work",
                     expirationTimestamp: expiration,
                     taskEmoji: emoji ?? "🧠",
                     fallbackEmoji: slackService.savedStatusEmoji()
                 )
+                logger.info("Deep work status call completed - check logs for result")
             case .pomodoro:
+                logger.info("Setting pomodoro status with emoji \(emoji ?? "🍅")")
                 slackService.setStatus(
                     text: activity?.isEmpty == false ? activity ?? "Focus time" : "Focus time",
                     expirationTimestamp: expiration,
                     taskEmoji: emoji ?? "🍅",
                     fallbackEmoji: slackService.savedStatusEmoji()
                 )
+                logger.info("Pomodoro status call completed - check logs for result")
             }
         case .end:
-            logger.info("Ending Slack focus actions")
+            logger.info("Ending Slack focus actions - clearing status and disabling DND")
             slackService.clearStatus()
+            logger.info("Slack status clear call completed")
             slackService.disableSlackDND()
+            logger.info("Slack DND disable call completed")
         }
     }
 }
