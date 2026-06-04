@@ -56,6 +56,8 @@ class SlackService: ObservableObject {
         }
         guard let token else {
             logger.error("Skipping disableSlackDND because no Slack token is configured")
+            connectionError = "No Slack token configured"
+            isConnected = false
             return
         }
 
@@ -68,9 +70,10 @@ class SlackService: ObservableObject {
         performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self?.connectionError = error.localizedDescription
+                    let errorType = SlackService.categorizeNetworkError(error)
+                    self?.connectionError = errorType
                     self?.lastActionMessage = "Slack DND request failed"
-                    self?.logger.error("Slack disableSlackDND request failed: \(error.localizedDescription)")
+                    self?.logger.error("Slack disableSlackDND request failed: \(error.localizedDescription), categorized as: \(errorType)")
                     return
                 }
 
@@ -88,10 +91,11 @@ class SlackService: ObservableObject {
                     self?.lastActionMessage = "Slack DND disabled"
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
-                    self?.connectionError = errorMsg
+                    let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
+                    self?.connectionError = userFriendlyError
                     self?.lastActionMessage = "Slack DND request failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack disableSlackDND failed. httpStatus=\(statusCode), error=\(errorMsg)")
+                    self?.logger.error("Slack disableSlackDND failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
                 }
             }
         }
@@ -110,6 +114,8 @@ class SlackService: ObservableObject {
         }
         guard let token else {
             logger.error("Skipping setSlackFocusStatus because no Slack token is configured")
+            connectionError = "No Slack token configured"
+            isConnected = false
             return
         }
 
@@ -132,10 +138,11 @@ class SlackService: ObservableObject {
         performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self?.connectionError = error.localizedDescription
+                    let errorType = SlackService.categorizeNetworkError(error)
+                    self?.connectionError = errorType
                     self?.lastActionMessage = "Slack status request failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackFocusStatus request failed: \(error.localizedDescription)")
+                    self?.logger.error("Slack setSlackFocusStatus request failed: \(error.localizedDescription), categorized as: \(errorType)")
                     return
                 }
 
@@ -155,10 +162,11 @@ class SlackService: ObservableObject {
                     self?.lastActionMessage = "Slack focus status updated"
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
-                    self?.connectionError = errorMsg
+                    let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
+                    self?.connectionError = userFriendlyError
                     self?.lastActionMessage = "Slack status request failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackFocusStatus failed. httpStatus=\(statusCode), error=\(errorMsg)")
+                    self?.logger.error("Slack setSlackFocusStatus failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
                 }
             }
         }
@@ -173,6 +181,8 @@ class SlackService: ObservableObject {
         }
         guard let token else {
             logger.error("Skipping setStatus because no Slack token is configured")
+            connectionError = "No Slack token configured"
+            isConnected = false
             return
         }
         let statusEmoji = normalizedStatusEmoji(in: text, taskEmoji: taskEmoji, fallbackEmoji: fallbackEmoji)
@@ -199,9 +209,10 @@ class SlackService: ObservableObject {
         performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self?.connectionError = error.localizedDescription
+                    let errorType = SlackService.categorizeNetworkError(error)
+                    self?.connectionError = errorType
                     self?.isConnected = false
-                    self?.logger.error("Slack setStatus request failed: \(error.localizedDescription)")
+                    self?.logger.error("Slack setStatus request failed: \(error.localizedDescription), categorized as: \(errorType)")
                     return
                 }
 
@@ -222,9 +233,10 @@ class SlackService: ObservableObject {
                     self?.logger.info("Slack status set successfully: \(statusEmoji) \(text)")
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
-                    self?.connectionError = errorMsg
+                    let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
+                    self?.connectionError = userFriendlyError
                     self?.isConnected = false
-                    self?.logger.error("Slack setStatus failed. httpStatus=\(statusCode), error=\(errorMsg)")
+                    self?.logger.error("Slack setStatus failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
                 }
             }
         }
@@ -333,9 +345,10 @@ class SlackService: ObservableObject {
             guard let self else { return }
 
             if let error {
-                self.logger.error("Slack emoji.list request failed: \(error.localizedDescription)")
+                let errorType = SlackService.categorizeNetworkError(error)
+                self.logger.error("Slack emoji.list request failed: \(error.localizedDescription), categorized as: \(errorType)")
                 DispatchQueue.main.async {
-                    self.connectionError = "Emoji catalog load failed: \(error.localizedDescription)"
+                    self.connectionError = errorType
                 }
                 return
             }
@@ -350,9 +363,11 @@ class SlackService: ObservableObject {
 
             guard let responseOK = json["ok"] as? Bool, responseOK else {
                 let errorDetail: String = json["error"] as? String ?? "Unknown error"
-                self.logger.error("Slack emoji.list returned not ok: \(errorDetail)")
+                let statusCode = 200 // Assuming 200 since we got a response
+                let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorDetail)
+                self.logger.error("Slack emoji.list returned not ok: \(errorDetail), userMessage: \(userFriendlyError)")
                 DispatchQueue.main.async {
-                    self.connectionError = "Emoji catalog failed: \(errorDetail)"
+                    self.connectionError = userFriendlyError
                 }
                 return
             }
@@ -394,6 +409,8 @@ class SlackService: ObservableObject {
         
         guard let token = self.token, !token.isEmpty else {
             logger.warning("Skipping setSlackDNDSnooze: No token available")
+            connectionError = "No Slack token configured"
+            isConnected = false
             return
         }
 
@@ -411,10 +428,11 @@ class SlackService: ObservableObject {
         performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self?.connectionError = error.localizedDescription
+                    let errorType = SlackService.categorizeNetworkError(error)
+                    self?.connectionError = errorType
                     self?.lastActionMessage = "Slack DND snooze failed"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackDNDSnooze request failed: \(error.localizedDescription)")
+                    self?.logger.error("Slack setSlackDNDSnooze request failed: \(error.localizedDescription), categorized as: \(errorType)")
                     return
                 }
 
@@ -433,10 +451,11 @@ class SlackService: ObservableObject {
                     self?.logger.info("Slack DND snooze set successfully for \(numMinutes) minutes")
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
-                    self?.connectionError = errorMsg
-                    self?.lastActionMessage = "Slack DND snooze failed: \(errorMsg)"
+                    let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
+                    self?.connectionError = userFriendlyError
+                    self?.lastActionMessage = "Slack DND snooze failed: \(userFriendlyError)"
                     self?.isConnected = false
-                    self?.logger.error("Slack setSlackDNDSnooze failed. httpStatus=\(statusCode), error=\(errorMsg)")
+                    self?.logger.error("Slack setSlackDNDSnooze failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
                 }
             }
         }
@@ -461,9 +480,10 @@ class SlackService: ObservableObject {
         performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self?.connectionError = error.localizedDescription
+                    let errorType = SlackService.categorizeNetworkError(error)
+                    self?.connectionError = errorType
                     self?.isConnected = false
-                    self?.logger.error("Slack auth.test request failed: \(error.localizedDescription)")
+                    self?.logger.error("Slack auth.test request failed: \(error.localizedDescription), categorized as: \(errorType)")
                     return
                 }
 
@@ -490,9 +510,10 @@ class SlackService: ObservableObject {
                     }
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
-                    self?.connectionError = errorMsg
+                    let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
+                    self?.connectionError = userFriendlyError
                     self?.isConnected = false
-                    self?.logger.error("Slack auth.test failed. httpStatus=\(statusCode), error=\(errorMsg)")
+                    self?.logger.error("Slack auth.test failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
                 }
             }
         }
@@ -636,6 +657,79 @@ class SlackService: ObservableObject {
         let prefix = token.prefix(4)
         let suffix = token.suffix(4)
         return "\(prefix)…\(suffix)"
+    }
+
+    // MARK: - Error Helpers
+
+    /// Categoriza errores de red en mensajes amigables
+    private static func categorizeNetworkError(_ error: Error) -> String {
+        let nsError = error as NSError
+
+        // Network unavailable
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorNotConnectedToInternet {
+            return "No internet connection"
+        }
+
+        // Timeout
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorTimedOut {
+            return "Network request timed out"
+        }
+
+        // Connection refused
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCannotConnectToHost {
+            return "Cannot connect to Slack server"
+        }
+
+        // DNS lookup failed
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCannotFindHost {
+            return "Cannot find Slack server"
+        }
+
+        // Generic network error
+        if nsError.domain == NSURLErrorDomain {
+            return "Network error: \(error.localizedDescription)"
+        }
+
+        return error.localizedDescription
+    }
+
+    /// Convierte errores de Slack en mensajes amigables para el usuario
+    private static func userFriendlyError(for statusCode: Int, slackError: String) -> String {
+        // HTTP 401: Invalid token
+        if statusCode == 401 || slackError == "invalid_auth" {
+            return "Invalid Slack token. Please check your token and try again."
+        }
+
+        // HTTP 403: Forbidden
+        if statusCode == 403 || slackError == "not_authed" {
+            return "Access denied. Your token may not have the required permissions."
+        }
+
+        // HTTP 429: Rate limited
+        if statusCode == 429 || slackError == "rate_limited" {
+            return "Too many requests. Please wait a moment and try again."
+        }
+
+        // Permission errors
+        if slackError == "missing_scope" {
+            return "Your token is missing required permissions."
+        }
+
+        // Account errors
+        if slackError == "account_inactive" {
+            return "Your Slack account is inactive."
+        }
+
+        if slackError == "token_revoked" {
+            return "Your Slack token has been revoked."
+        }
+
+        if slackError == "org_login_required" {
+            return "Your Slack workspace requires login."
+        }
+
+        // Generic errors
+        return "Slack API error: \(slackError)"
     }
 }
 

@@ -9,6 +9,7 @@ final class DNDService: ObservableObject {
     private let logger = Logger.dnd
 
     @Published var isDNDActive: Bool = false
+    @Published var lastError: String?
     init() {
         isDNDActive = Self.checkDNDStatus()
     }
@@ -16,38 +17,84 @@ final class DNDService: ObservableObject {
     func activateDND() {
         guard !isDNDActive else { return }
         logger.info("Activating Do Not Disturb via CFPreferences")
+        lastError = nil
 
+        // Attempt to set preferences
         Self.setPreference("doNotDisturb", value: true as CFPropertyList)
         Self.setPreference("doNotDisturbDate", value: Date() as CFPropertyList)
-        Self.commitChanges()
-        Self.restartNotificationCenter()
+
+        // Commit and check if successful
+        let commitSuccess = Self.commitChanges()
+        if !commitSuccess {
+            let errorMsg = "Failed to commit DND preferences"
+            logger.error(errorMsg)
+            lastError = errorMsg
+            return
+        }
+
+        let restartSuccess = Self.restartNotificationCenter()
+        if !restartSuccess {
+            let errorMsg = "Failed to restart Notification Center"
+            logger.error(errorMsg)
+            lastError = errorMsg
+            return
+        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
-            self.isDNDActive = Self.checkDNDStatus()
-            self.logger.info("DND activation result: \(self.isDNDActive)")
+            let actuallyActive = Self.checkDNDStatus()
+            if !actuallyActive {
+                let errorMsg = "DND activation failed - status still inactive"
+                self.logger.error(errorMsg)
+                self.lastError = errorMsg
+                self.isDNDActive = false
+            } else {
+                self.logger.info("DND activation successful")
+                self.lastError = nil
+                self.isDNDActive = true
+            }
         }
-
-        isDNDActive = true
     }
 
     func deactivateDND() {
         guard isDNDActive else { return }
         logger.info("Deactivating Do Not Disturb via CFPreferences")
+        lastError = nil
 
         Self.setPreference("doNotDisturb", value: false as CFPropertyList)
         Self.setPreference("doNotDisturbDate", value: nil)
-        Self.commitChanges()
+
+        let commitSuccess = Self.commitChanges()
+        if !commitSuccess {
+            let errorMsg = "Failed to commit DND deactivation"
+            logger.error(errorMsg)
+            lastError = errorMsg
+            return
+        }
+
         Self.restoreMenubarIcon()
-        Self.restartNotificationCenter()
+        let restartSuccess = Self.restartNotificationCenter()
+        if !restartSuccess {
+            let errorMsg = "Failed to restart Notification Center after deactivation"
+            logger.error(errorMsg)
+            lastError = errorMsg
+            return
+        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
-            self.isDNDActive = Self.checkDNDStatus()
-            self.logger.info("DND deactivation result: \(self.isDNDActive)")
+            let actuallyInactive = !Self.checkDNDStatus()
+            if !actuallyInactive {
+                let errorMsg = "DND deactivation failed - status still active"
+                self.logger.error(errorMsg)
+                self.lastError = errorMsg
+                self.isDNDActive = true
+            } else {
+                self.logger.info("DND deactivation successful")
+                self.lastError = nil
+                self.isDNDActive = false
+            }
         }
-
-        isDNDActive = false
     }
 
     private static func setPreference(_ key: String, value: CFPropertyList?) {
@@ -60,27 +107,34 @@ final class DNDService: ObservableObject {
         )
     }
 
-    private static func commitChanges() {
-        CFPreferencesSynchronize(
+    private static func commitChanges() -> Bool {
+        let syncSuccess = CFPreferencesSynchronize(
             notificationCenterAppId,
             kCFPreferencesCurrentUser,
             kCFPreferencesCurrentHost
         )
+
+        if !syncSuccess {
+            Logger.dnd.error("CFPreferencesSynchronize failed")
+        }
 
         DistributedNotificationCenter.default().postNotificationName(
             Notification.Name("com.apple.notificationcenterui.dndprefs_changed"),
             object: nil,
             deliverImmediately: true
         )
+
+        return syncSuccess
     }
 
-    private static func restartNotificationCenter() {
+    private static func restartNotificationCenter() -> Bool {
         DistributedNotificationCenter.default().postNotificationName(
             Notification.Name("com.apple.notificationcenterui.dndprefs_changed"),
             object: nil,
             deliverImmediately: true
         )
         Thread.sleep(forTimeInterval: 0.2)
+        return true
     }
 
     private static func restoreMenubarIcon() {
