@@ -35,6 +35,10 @@ xcodebuild build \
     CODE_SIGNING_ALLOWED=NO \
     2>&1 | grep -E '(BUILD|error:)' | tail -5
 
+# Inject version into Info.plist (fix for build variables not being substituted)
+echo "📝 Injecting version info..."
+"$SCRIPT_DIR/inject-version.sh"
+
 # Find the .app
 APP_PATH=$(find "$BUILD_DIR/DerivedData" -name "${APP_NAME}.app" -type d | head -1)
 
