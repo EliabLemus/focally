@@ -222,7 +222,12 @@ struct MenuBarDropdownView: View {
 
     private func start(task: PredefinedTask) {
         timerService.updateWorkDuration(minutes: task.durationMinutes)
-        timerService.startWorkSession(activity: task.name, emoji: task.emoji, durationMinutes: task.durationMinutes)
+        timerService.startWorkSession(
+            activity: task.name,
+            emoji: task.emoji,
+            durationMinutes: task.durationMinutes,
+            taskType: task.taskType
+        )
     }
 
     private func formatDuration(_ seconds: Int) -> String {

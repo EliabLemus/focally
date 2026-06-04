@@ -62,7 +62,7 @@
 		91403EE941CCFB17EA5AD082 /* TimerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191E59EB17B55941B8BE4DFC /* TimerPage.swift */; };
 		93BF8041B02840C835DC9371 /* FocusAllocationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ACE0919D2BAEFCCC24A8A9C /* FocusAllocationCard.swift */; };
 		94CA8983EC82C9ABFBDDE7E3 /* FocusSessionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98B9F6D1FC104C15E36969C /* FocusSessionComponents.swift */; };
-		0123456789ABCDEF0123456789 /* MeetingDurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDCBA9876543210FEDCBA9876 /* MeetingDurationPicker.swift */; };
+		0123456789ABCDEF0123456789 /* MeetingDurationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = MEETINGDURATIONPICKER_FILE_UUID /* MeetingDurationPicker.swift */; };
 		970D3C8AD2A7D59A0BB95DCC /* FocallyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */; };
 		97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */; };
 		9D003B67FFA09D45E6CE18BD /* HistoryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9525B861215559EF5E9D021 /* HistoryServiceTests.swift */; };
@@ -228,7 +228,7 @@
 		F92387AD9F889C1D3B3C1E65 /* Metrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metrics.swift; sourceTree = "<group>"; };
 		F93CAAC808829D5F520CC656 /* SchedulePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulePage.swift; sourceTree = "<group>"; };
 		F98B9F6D1FC104C15E36969C /* FocusSessionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionComponents.swift; sourceTree = "<group>"; };
-		FEDCBA9876543210FEDCBA9876 /* MeetingDurationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingDurationPicker.swift; sourceTree = "<group>"; };
+		MEETINGDURATIONPICKER_FILE_UUID /* MeetingDurationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingDurationPicker.swift; sourceTree = "<group>"; };
 		FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		FF9300C00888F0B7546C94C7 /* FocusTrendChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTrendChart.swift; sourceTree = "<group>"; };
 		94BF7A629A794304A4270957 /* GoogleCalendarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarModels.swift; sourceTree = "<group>"; };
@@ -430,7 +430,7 @@
 			isa = PBXGroup;
 			children = (
 				F98B9F6D1FC104C15E36969C /* FocusSessionComponents.swift */,
-			FEDCBA9876543210FEDCBA9876 /* MeetingDurationPicker.swift */,
+			MEETINGDURATIONPICKER_FILE_UUID /* MeetingDurationPicker.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";

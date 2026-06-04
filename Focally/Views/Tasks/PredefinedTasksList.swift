@@ -50,7 +50,7 @@ struct PredefinedTasksList: View {
                     ForEach(predefinedTaskStore.tasks) { task in
                         TaskRowView(
                             task: task,
-                            onStart: { start(task) },
+                            onStart: { duration in start(task, duration: duration) },
                             onEdit: { edit(task) },
                             onDelete: { predefinedTaskStore.remove(task) }
                         )
@@ -83,9 +83,14 @@ struct PredefinedTasksList: View {
         showingEditor = true
     }
 
-    private func start(_ task: PredefinedTask) {
-        timerService.updateWorkDuration(minutes: task.durationMinutes)
-        timerService.startWorkSession(activity: task.name, emoji: task.emoji, durationMinutes: task.durationMinutes)
+    private func start(_ task: PredefinedTask, duration: Int) {
+        timerService.updateWorkDuration(minutes: duration)
+        timerService.startWorkSession(
+            activity: task.name,
+            emoji: task.emoji,
+            durationMinutes: duration,
+            taskType: task.taskType
+        )
     }
 }
 
@@ -101,6 +106,7 @@ private struct PredefinedTaskEditorSheet: View {
     @State private var durationMinutes: Int
     @State private var cycles: Int
     @State private var selectedColorID: String
+    @State private var taskType: TaskType
 
     init(task: PredefinedTask?, onSave: @escaping (PredefinedTask) -> Void) {
         self.task = task
@@ -109,6 +115,7 @@ private struct PredefinedTaskEditorSheet: View {
         _emoji = State(initialValue: task?.emoji ?? "📝")
         _durationMinutes = State(initialValue: task?.durationMinutes ?? 25)
         _cycles = State(initialValue: task?.cycles ?? 1)
+        _taskType = State(initialValue: task?.taskType ?? .deepWork)
         let defaultColor = TaskColorOption.all.first { $0.backgroundHex == task?.iconBgColor && $0.foregroundHex == task?.iconFgColor } ?? TaskColorOption.all[0]
         _selectedColorID = State(initialValue: defaultColor.id)
     }
@@ -128,6 +135,18 @@ private struct PredefinedTaskEditorSheet: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
+                Text("Task type")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+                Picker("Task type", selection: $taskType) {
+                    ForEach(TaskType.allCases, id: \.self) { type in
+                        Text(type.displayName).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Status emoji")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
@@ -138,7 +157,16 @@ private struct PredefinedTaskEditorSheet: View {
                 }
             }
 
-            DurationControl(minutes: $durationMinutes, range: 5...180, step: 5)
+            if taskType == .meeting {
+                MeetingDurationPicker(
+                    selectedDuration: $durationMinutes,
+                    availableDurations: PredefinedTask.meetingDurations
+                ) { duration in
+                    durationMinutes = duration
+                }
+            } else {
+                DurationControl(minutes: $durationMinutes, range: 5...180, step: 5)
+            }
 
             Stepper(value: $cycles, in: 1...8) {
                 VStack(alignment: .leading, spacing: 2) {
@@ -217,7 +245,9 @@ private struct PredefinedTaskEditorSheet: View {
             iconBgColor: color.backgroundHex,
             iconFgColor: color.foregroundHex,
             durationMinutes: durationMinutes,
-            cycles: cycles
+            cycles: taskType == .meeting ? 1 : cycles,
+            taskType: taskType,
+            availableDurations: taskType == .meeting ? PredefinedTask.meetingDurations : [durationMinutes]
         )
     }
 
@@ -239,7 +269,7 @@ private struct PredefinedTaskEditorSheet: View {
                 Text(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Task preview" : name.trimmingCharacters(in: .whitespacesAndNewlines))
                     .font(.focallyBodyBold)
                     .foregroundStyle(Color.focallyOnSurface)
-                Text("\(durationMinutes)m • \(cycles) cycle\(cycles == 1 ? "" : "s")")
+                Text(previewMetadata)
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }
@@ -249,5 +279,12 @@ private struct PredefinedTaskEditorSheet: View {
         .padding(12)
         .background(Color.focallySurfaceContainerLowest.opacity(0.65))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var previewMetadata: String {
+        if taskType == .meeting {
+            return "\(durationMinutes)m • Meeting"
+        }
+        return "\(durationMinutes)m • \(cycles) cycle\(cycles == 1 ? "" : "s")"
     }
 }

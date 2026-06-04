@@ -235,12 +235,17 @@ struct IdleDashboardView: View {
         let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
         let activity: String = trimmed.isEmpty ? "Focus Session" : trimmed
         timerService.updateWorkDuration(minutes: selectedDuration)
-        timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration)
+        timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration, taskType: .deepWork)
     }
 
     private func start(task: PredefinedTask) {
         timerService.updateWorkDuration(minutes: task.durationMinutes)
-        timerService.startWorkSession(activity: task.name, emoji: task.emoji, durationMinutes: task.durationMinutes)
+        timerService.startWorkSession(
+            activity: task.name,
+            emoji: task.emoji,
+            durationMinutes: task.durationMinutes,
+            taskType: task.taskType
+        )
     }
 
     private func startPomodoro() {

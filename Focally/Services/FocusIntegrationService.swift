@@ -84,6 +84,10 @@ final class FocusIntegrationService: ObservableObject {
     @Published var isFocusActive: Bool = false
     @Published var lastShortcutIssue: String?
 
+    private var activeTaskType: TaskType?
+    private var meetingActivatedDND = false
+    private var dndWasActiveBeforeMeeting = false
+
     private init(dndService: DNDService = .shared, slackService: SlackService = SlackService()) {
         self.directDNDService = dndService
         self.slackService = slackService
@@ -101,12 +105,29 @@ final class FocusIntegrationService: ObservableObject {
         }
     }
 
-    func activateFocus() {
-        performCombinedFocusAction(.start)
+    func activateFocus(for taskType: TaskType = .deepWork,
+                       activity: String,
+                       durationMinutes: Int,
+                       emoji: String) {
+        activeTaskType = taskType
+        performCombinedFocusAction(
+            .start,
+            taskType: taskType,
+            activity: activity,
+            durationMinutes: durationMinutes,
+            emoji: emoji
+        )
     }
 
     func deactivateFocus() {
-        performCombinedFocusAction(.end)
+        performCombinedFocusAction(
+            .end,
+            taskType: activeTaskType ?? .deepWork,
+            activity: nil,
+            durationMinutes: nil,
+            emoji: nil
+        )
+        activeTaskType = nil
     }
 
     func runNativeShortcutTest(_ action: FocusIntegrationAction) {
@@ -155,26 +176,46 @@ final class FocusIntegrationService: ObservableObject {
         return "Ready. Focally will turn on quiet mode directly and then try the bundled shortcuts."
     }
 
-    private func performCombinedFocusAction(_ action: FocusIntegrationAction) {
+    private func performCombinedFocusAction(_ action: FocusIntegrationAction,
+                                            taskType: TaskType,
+                                            activity: String?,
+                                            durationMinutes: Int?,
+                                            emoji: String?) {
         let slackEnabled: Bool = self.slackService.isEnabled
         logger.info("performCombinedFocusAction called. action=\(action), slackEnabled=\(slackEnabled)")
         lastError = nil
         lastShortcutIssue = nil
 
-        performDirectFocusAction(action, source: "direct system DND")
+        performDirectFocusAction(action, source: "direct system DND", taskType: taskType)
         attemptManagedShortcutAction(action)
-        performSlackFocusAction(action, durationMinutes: action == .start ? 25 : nil)
+        performSlackFocusAction(
+            action,
+            taskType: taskType,
+            activity: activity,
+            durationMinutes: durationMinutes,
+            emoji: emoji
+        )
     }
 
-    private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String) {
+    private func performDirectFocusAction(_ action: FocusIntegrationAction, source: String, taskType: TaskType = .deepWork) {
         switch action {
         case .start:
+            if taskType == .meeting {
+                dndWasActiveBeforeMeeting = directDNDService.isDNDActive
+                meetingActivatedDND = !dndWasActiveBeforeMeeting
+            }
             directDNDService.activateDND()
             isFocusActive = directDNDService.isDNDActive
             logger.info("Focus activated via \(source)")
         case .end:
-            directDNDService.deactivateDND()
+            if taskType == .meeting && dndWasActiveBeforeMeeting && !meetingActivatedDND {
+                logger.info("Meeting ended; preserving user's existing DND state")
+            } else {
+                directDNDService.deactivateDND()
+            }
             isFocusActive = directDNDService.isDNDActive
+            meetingActivatedDND = false
+            dndWasActiveBeforeMeeting = false
             logger.info("Focus deactivated via \(source)")
         }
     }
@@ -190,7 +231,11 @@ final class FocusIntegrationService: ObservableObject {
         }
     }
 
-    private func performSlackFocusAction(_ action: FocusIntegrationAction, durationMinutes: Int? = nil) {
+    private func performSlackFocusAction(_ action: FocusIntegrationAction,
+                                         taskType: TaskType,
+                                         activity: String?,
+                                         durationMinutes: Int?,
+                                         emoji: String?) {
         let slackEnabled: Bool = self.slackService.isEnabled
         let durationDescription: String = durationMinutes?.description ?? "nil"
         logger.info("performSlackFocusAction called. action=\(action), durationMinutes=\(durationDescription), slackEnabled=\(slackEnabled)")
@@ -203,7 +248,30 @@ final class FocusIntegrationService: ObservableObject {
             let duration = durationMinutes ?? 25
             logger.info("Starting Slack focus actions for \(duration) minutes")
             slackService.setSlackDNDSnooze(minutes: duration)
-            slackService.setSlackFocusStatus(text: "In focus", emoji: "🧠")
+            let expiration = Int(Date().addingTimeInterval(TimeInterval(duration * 60)).timeIntervalSince1970)
+
+            switch taskType {
+            case .meeting:
+                slackService.setStatus(
+                    text: "En meeting",
+                    expirationTimestamp: expiration,
+                    taskEmoji: ":google-meet:"
+                )
+            case .deepWork:
+                slackService.setStatus(
+                    text: activity?.isEmpty == false ? activity ?? "Deep work" : "Deep work",
+                    expirationTimestamp: expiration,
+                    taskEmoji: emoji ?? "🧠",
+                    fallbackEmoji: slackService.savedStatusEmoji()
+                )
+            case .pomodoro:
+                slackService.setStatus(
+                    text: activity?.isEmpty == false ? activity ?? "Focus time" : "Focus time",
+                    expirationTimestamp: expiration,
+                    taskEmoji: emoji ?? "🍅",
+                    fallbackEmoji: slackService.savedStatusEmoji()
+                )
+            }
         case .end:
             logger.info("Ending Slack focus actions")
             slackService.clearStatus()

@@ -153,7 +153,7 @@ struct QuickSessionsSection: View {
         let trimmed = taskInput.trimmingCharacters(in: .whitespacesAndNewlines)
         let activity: String = trimmed.isEmpty ? "Focus Session" : trimmed
         timerService.updateWorkDuration(minutes: selectedDuration)
-        timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration)
+        timerService.startWorkSession(activity: activity, emoji: selectedEmoji, durationMinutes: selectedDuration, taskType: .deepWork)
         taskInput = ""
     }
 

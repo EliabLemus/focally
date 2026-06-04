@@ -25,6 +25,7 @@ class FocusTimerService: ObservableObject {
     @Published var isPaused: Bool = false
     @Published var currentActivity: String = ""
     @Published var currentEmoji: String = "📝"
+    @Published var currentTaskType: TaskType = .deepWork
     @Published var remainingSeconds: Int = 0
     @Published var durationMinutes: Int = 25
 
@@ -168,7 +169,7 @@ class FocusTimerService: ObservableObject {
     }
 
     func startPomodoroSession(activity: String, emoji: String = "🍅") {
-        startWorkSession(activity: activity, emoji: emoji, durationMinutes: workDurationMinutes)
+        startWorkSession(activity: activity, emoji: emoji, durationMinutes: workDurationMinutes, taskType: .pomodoro)
     }
 
     private func saveLastUsed(activity: String, emoji: String, duration: Int) {
@@ -187,9 +188,10 @@ class FocusTimerService: ObservableObject {
 
     // MARK: - Session Control
 
-    func startWorkSession(activity: String, emoji: String, durationMinutes workMins: Int) {
+    func startWorkSession(activity: String, emoji: String, durationMinutes workMins: Int, taskType: TaskType = .deepWork) {
         currentActivity = activity
         currentEmoji = emoji
+        currentTaskType = taskType
         durationMinutes = workMins
         workDurationMinutes = workMins
 
@@ -246,6 +248,7 @@ class FocusTimerService: ObservableObject {
         isPaused = false
         currentActivity = ""
         currentEmoji = "📝"
+        currentTaskType = .deepWork
 
         if playCompletionSound {
             soundPlayer.playCompletionSound()
@@ -265,7 +268,7 @@ class FocusTimerService: ObservableObject {
                 startShortBreak()
             }
         case .shortBreak, .longBreak:
-            startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes)
+                startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes, taskType: currentTaskType)
         case .idle, .completed:
             break
         }
@@ -276,7 +279,7 @@ class FocusTimerService: ObservableObject {
             isPaused = false
             startTimer()
         } else {
-            startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes)
+            startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes, taskType: currentTaskType)
         }
     }
 
@@ -310,6 +313,7 @@ class FocusTimerService: ObservableObject {
         remainingSeconds = 0
         isActive = false
         isPaused = false
+        currentTaskType = .deepWork
         notificationService.notify(.sessionEnded)
         NotificationCenter.default.post(name: .focusSessionEnded, object: nil)
     }
@@ -351,6 +355,11 @@ class FocusTimerService: ObservableObject {
 
         switch pomodoroState {
         case .work:
+            if currentTaskType == .meeting {
+                endSession()
+                return
+            }
+
             // Record completed work session
                 historyService.recordWorkSession(
                 activity: currentActivity,
@@ -374,7 +383,7 @@ class FocusTimerService: ObservableObject {
         case .shortBreak:
             if isAutoStartEnabled {
                 soundPlayer.play(.breakEnd)
-                startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes)
+                startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes, taskType: currentTaskType)
             } else {
                 endSession()
             }
@@ -382,7 +391,7 @@ class FocusTimerService: ObservableObject {
         case .longBreak:
             if isAutoStartEnabled {
                 soundPlayer.play(.longBreakEnd)
-                startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes)
+                startWorkSession(activity: currentActivity, emoji: currentEmoji, durationMinutes: workDurationMinutes, taskType: currentTaskType)
             } else {
                 endSession()
             }
@@ -495,7 +504,12 @@ class FocusTimerService: ObservableObject {
 
     @MainActor
     private func activateFocusIntegration() {
-        focusIntegrationService.activateFocus()
+        focusIntegrationService.activateFocus(
+            for: currentTaskType,
+            activity: currentActivity,
+            durationMinutes: workDurationMinutes,
+            emoji: currentEmoji
+        )
     }
 
     @MainActor
