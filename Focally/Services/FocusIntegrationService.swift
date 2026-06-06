@@ -257,9 +257,9 @@ final class FocusIntegrationService: ObservableObject {
             // Check if Slack API call failed and show toast notification
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 if let error = self?.slackService.connectionError {
-                    self?.logger.error("Slack DND snooze failed: \(error\)")
+                    self?.logger.error("Slack DND snooze failed: \(error)")
                     // TODO: Show toast notification when NotificationService supports it
-                    self?.lastError = FocusIntegrationError.processError("Slack pause failed: \(error\)")
+                    self?.lastError = FocusIntegrationError.processError("Slack pause failed: \(error)")
                 }
             }
 
@@ -304,9 +304,9 @@ final class FocusIntegrationService: ObservableObject {
             // Check if Slack disable DND failed and show toast notification
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 if let error = self?.slackService.connectionError {
-                    self?.logger.error("Slack disable DND failed: \(error\)")
+                    self?.logger.error("Slack disable DND failed: \(error)")
                     // TODO: Show toast notification when NotificationService supports it
-                    self?.lastError = FocusIntegrationError.processError("Slack resume failed: \(error\)")
+                    self?.lastError = FocusIntegrationError.processError("Slack resume failed: \(error)")
                 }
             }
 
