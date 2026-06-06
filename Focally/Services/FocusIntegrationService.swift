@@ -254,6 +254,16 @@ final class FocusIntegrationService: ObservableObject {
             slackService.setSlackDNDSnooze(minutes: duration)
             logger.info("Slack DND snooze call completed - check logs for result")
 
+            // Check if Slack API call failed and show toast notification
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                if let error = self?.slackService.connectionError {
+                    self?.logger.error("Slack DND snooze failed: \(error\)")
+                    // TODO: Show toast notification when NotificationService supports it
+                    self?.lastError = FocusIntegrationError.processError("Slack pause failed: \(error\)")
+                }
+            }
+
+
             let expiration = Int(Date().addingTimeInterval(TimeInterval(duration * 60)).timeIntervalSince1970)
 
             switch taskType {
@@ -290,6 +300,16 @@ final class FocusIntegrationService: ObservableObject {
             logger.info("Slack status clear call completed")
             slackService.disableSlackDND()
             logger.info("Slack DND disable call completed")
+
+            // Check if Slack disable DND failed and show toast notification
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                if let error = self?.slackService.connectionError {
+                    self?.logger.error("Slack disable DND failed: \(error\)")
+                    // TODO: Show toast notification when NotificationService supports it
+                    self?.lastError = FocusIntegrationError.processError("Slack resume failed: \(error\)")
+                }
+            }
+
         }
     }
 }

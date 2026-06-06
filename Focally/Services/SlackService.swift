@@ -25,7 +25,7 @@ class SlackService: ObservableObject {
     private let logger = Logger.slack
     private let profileSetURL = URL(string: "https://slack.com/api/users.profile.set")!
     private let authTestURL = URL(string: "https://slack.com/api/auth.test")!
-    private let endDndURL = URL(string: "https://slack.com/api/dnd.endDnd")!
+    private let endDndURL = URL(string: "https://slack.com/api/dnd.endSnooze")!
     private let dndSetSnoozeURL = URL(string: "https://slack.com/api/dnd.setSnooze")!
 
     var token: String? {
