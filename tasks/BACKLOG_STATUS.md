@@ -1,39 +1,58 @@
 # Focally Backlog Status
 
-## 1. Baseline actual
+> **Última actualización**: 2026-07-07
+> **Release actual**: v0.7.34
+> **HEAD**: `15a33ec` (main)
 
-- `main == origin/main`
-- `HEAD`: `c2cac11`
-- Tag/release actual: `v0.6.4`
-- `project.yml`: `MARKETING_VERSION = 0.6.4`, `CURRENT_PROJECT_VERSION = 13`
-- El baseline publicado va por delante de parte de la documentación: `README.md` todavía muestra `0.4.1`
+## 1. Backlog Real (Pendiente)
 
-## 2. Prioridad actual: testing first
+### TASK-016: Migración a @Observable 🔴
+- **Estado**: PENDIENTE
+- **Scope**: 14 clases migrar de `ObservableObject` → `@Observable`
+- **Estimación**: 2-3 días
+- **Bloquea**: TASK-021
+- **Prioridad**: P2 (tech debt fundacional)
 
-La prioridad inmediata del repo es consolidar testing antes de más trabajo estructural. Ya existen artefactos locales de pruebas que no forman parte de `HEAD` (`FocallyTests/`, `FocallyUITests/`, `tests/`, además de specs/reportes asociados), así que primero conviene decidir qué entra al baseline y validarlo.
+### TASK-021: SettingsStore Centralizado 🔴
+- **Estado**: PENDIENTE (bloqueado por TASK-016)
+- **Scope**: Unificar settings dispersas en `@AppStorage`, `UserDefaults`, properties
+- **Estimación**: 1-2 días
+- **Depende de**: TASK-016
+- **Prioridad**: P2
 
-Orden recomendado:
+### Compliance Stitch / Liquid Glass ⚠️
+- **Estado**: PARCIAL
+- **Detalle**: `FocallyGlassModifier.swift` existe con 3 modifiers pero **0 vistas los usan**
+- **Acción**: Migrar `.focallyCard()` → `.focallyGlassCard()` en ~13 vistas
+- **Prioridad**: P3 (cosmético, evaluar si es relevante para macOS 26)
 
-1. `TASK-023` — unit tests
-2. `TASK-027` — batería básica XCUITest
-3. `TASK-028` — E2E UI tests
-4. `TASK-021` — `SettingsStore` / source of truth
-5. `TASK-016` — migración a `@Observable`
+## 2. Tasks Completadas (en tasks/done/)
 
-## 3. Tasks activas
+TASK-030, TASK-036, TASK-038 (×2 specs), TASK-039 (×2 specs), TASK-040 (×3 specs), TASK-041 (×2 specs), TASK-042, TASK-043, TASK-044.
 
-- `TASK-023`: agrega la red base de unit tests; hoy existe trabajo local, pero no está integrado al baseline publicado.
-- `TASK-027`: define la capa mínima de XCUITest; el spec local ya documenta bloqueos y alcance real.
-- `TASK-028-UI-AUTOMATED-TESTS`: expande hacia flujos E2E completos, pero depende de aclarar primero qué parte del testing local se integra de verdad.
-- `TASK-021`: sigue vigente como refactor estructural para unificar settings, pero debe ir después de estabilizar pruebas.
-- `TASK-016`: sigue vigente como modernización arquitectónica, pero no debería adelantarse a la red de testing.
+> ⚠️ Los IDs TASK-038 a TASK-041 tenían specs duplicadas con nombres diferentes. Todas están resueltas.
 
-## 4. Tasks históricas / superseded
+## 3. Planes de Ejecución
 
-Buena parte de las tasks previas ya quedó absorbida por releases posteriores hasta `v0.6.4`. Algunas specs antiguas son históricas o fueron refinadas/reemplazadas por specs más nuevas, por lo que no conviene usarlas como backlog operativo principal sin revisar su relación con el estado actual del código.
+### Activo
+| Plan | Estado | Nota |
+|------|--------|------|
+| PLAN-003: Invariantes Arquitectónicos | Paused | Sin avance. Re-evaluar después de TASK-016 |
 
-## 5. Working tree local de tests
+### Completados
+| Plan | Nota |
+|------|------|
+| PLAN-007: Tests Flaky Fix | Completado |
+| PLAN-008: SwiftLint Fix | Completado (sustituido por refactorización incremental) |
+| fix-emoji-shortcode-mapping | Completado (commit `1a40c9e`) |
 
-- Existen cambios locales y no integrados en `FocallyTests/`, `FocallyUITests/` y `tests/`.
-- También existen archivos locales de soporte y reporte ligados a testing, incluyendo `COMPLETED_SPECS_TEST_REPORT.md`, `TEST_RESULTS_FINAL.md`, `tasks/TASK-027.md` y `tasks/TASK-028-UI-AUTOMATED-TESTS.md`.
-- Mientras esos artefactos no entren a `HEAD`, el backlog debe asumir que la prioridad es decidir, limpiar e integrar testing antes de abrir más trabajo estructural.
+## 4. Branches
+
+Solo `main`. Stale branches eliminadas:
+- `feature/fase2-refactorizacion` — eliminada
+- `feature/tests-flaky-fix` — eliminada
+
+## 5. Notas
+
+- `README.md` puede estar desactualizado (mostraba versión antigua)
+- `docs/AUDIT_REPORT_TASKS.md` contiene el reporte detallado de la auditoría de código (Jul 2026)

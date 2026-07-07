@@ -1,7 +1,7 @@
 # PLAN-003: Implementación de Invariantes Arquitectónicos (Lints)
 
 ## Estado
-in_progress
+paused (sin avance — priorizar TASK-016 primero)
 
 ## Objetivo
 Implementar invariantes mecánicos (lints) para aplicar las reglas de arquitectura automáticamente.
