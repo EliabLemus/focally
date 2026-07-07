@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct IdleDashboardView: View {
-    @EnvironmentObject private var timerService: FocusTimerService
-    @EnvironmentObject private var dndService: DNDService
-    @EnvironmentObject private var predefinedTaskStore: PredefinedTaskStore
-    @EnvironmentObject private var slackService: SlackService
+    @Environment(FocusTimerService.self) private var timerService
+    @Environment(DNDService.self) private var dndService
+    @Environment(PredefinedTaskStore.self) private var predefinedTaskStore
+    @Environment(SlackService.self) private var slackService
 
     @State private var taskInput: String = ""
     @State private var selectedEmoji: String = "🎯"
@@ -302,7 +302,7 @@ struct IdleDashboardView: View {
 
 private extension IdleDashboardView {
     struct UpNextCard: View {
-        @EnvironmentObject var timerService: FocusTimerService
+        @Environment(FocusTimerService.self) private var timerService
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -366,8 +366,8 @@ private extension IdleDashboardView {
     }
 
     struct FocusStatusCard: View {
-        @EnvironmentObject var timerService: FocusTimerService
-        @EnvironmentObject var dndService: DNDService
+        @Environment(FocusTimerService.self) private var timerService
+        @Environment(DNDService.self) private var dndService
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -422,7 +422,7 @@ private extension IdleDashboardView {
     }
 
     struct TodayFlowCard: View {
-        @EnvironmentObject var timerService: FocusTimerService
+        @Environment(FocusTimerService.self) private var timerService
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {

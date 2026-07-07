@@ -1,13 +1,14 @@
 import Foundation
 import SwiftUI
-import Combine
+import Observation
 
-final class AnalyticsService: ObservableObject {
+@Observable
+final class AnalyticsService {
     enum TimeRange: String, CaseIterable {
         case weekly, monthly
     }
 
-    @Published var selectedRange: TimeRange = .weekly
+    var selectedRange: TimeRange = .weekly
 
     // MARK: - Mock Data
 

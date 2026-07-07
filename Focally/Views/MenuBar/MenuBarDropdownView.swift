@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct MenuBarDropdownView: View {
-    @EnvironmentObject private var timerService: FocusTimerService
-    @EnvironmentObject private var dndService: DNDService
-    @EnvironmentObject private var historyService: HistoryService
-    @EnvironmentObject private var predefinedTaskStore: PredefinedTaskStore
-    @EnvironmentObject private var slackService: SlackService
-    @EnvironmentObject private var calendarService: GoogleCalendarService
+    @Environment(FocusTimerService.self) private var timerService
+    @Environment(DNDService.self) private var dndService
+    @Environment(HistoryService.self) private var historyService
+    @Environment(PredefinedTaskStore.self) private var predefinedTaskStore
+    @Environment(SlackService.self) private var slackService
+    @Environment(GoogleCalendarService.self) private var calendarService
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {

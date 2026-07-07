@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TimerSettingsCard: View {
-    @EnvironmentObject private var timerService: FocusTimerService
+    @Environment(FocusTimerService.self) private var timerService
     @State private var focusDuration = "25"
     @State private var shortBreak = "5"
     @State private var longBreak = "15"
@@ -149,7 +149,7 @@ struct TimerInputRow: View {
 }
 
 struct FocusModeCard: View {
-    @EnvironmentObject private var timerService: FocusTimerService
+    @Environment(FocusTimerService.self) private var timerService
 
     var body: some View {
         VStack(spacing: 0) {

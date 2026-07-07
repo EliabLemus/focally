@@ -21,8 +21,6 @@ enum SettingsSubpage: String, CaseIterable, Identifiable {
 }
 
 struct SettingsPage: View {
-    @EnvironmentObject var shortcutDropHandler: ShortcutDropHandler
-    @EnvironmentObject var focusIntegrationService: FocusIntegrationService
     @State private var selectedSubpage: SettingsSubpage = .general
 
     var body: some View {
@@ -128,7 +126,7 @@ struct SettingsPage: View {
         case .automation:
             AutomationSettingsView()
         case .integrations:
-            IntegrationsSettingsView(shortcutDropHandler: shortcutDropHandler)
+            IntegrationsSettingsView()
         case .appearance:
             AppearanceSettingsView()
         case .about:

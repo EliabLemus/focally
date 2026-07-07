@@ -1,7 +1,8 @@
+import Foundation
 import SwiftUI
 
 struct EstimatedTimeCard: View {
-    @EnvironmentObject var timerService: FocusTimerService
+    @Environment(FocusTimerService.self) private var timerService
 
     var body: some View {
         SupportCard(
@@ -30,6 +31,6 @@ struct EstimatedTimeCard: View {
 
     private var estimatedEndTimeString: String {
         let endDate = Date().addingTimeInterval(TimeInterval(max(timerService.remainingSeconds, 0)))
-        return endDate.formatted(date: .omitted, time: .shortened)
+        return endDate.formatted(date: Date.FormatStyle.DateStyle.omitted, time: Date.FormatStyle.TimeStyle.shortened)
     }
 }

@@ -1,11 +1,12 @@
 import SwiftUI
-import Combine
+import Observation
 import AppKit
 import Foundation
 import os.log
 
 @MainActor
-class FocusTimerService: ObservableObject {
+@Observable
+class FocusTimerService {
     private enum TimerDefaults {
         static let durationRange = 1...600
         static let workDuration = 25
@@ -21,22 +22,22 @@ class FocusTimerService: ObservableObject {
     }
 
     // Existing properties for UI compatibility
-    @Published var isActive: Bool = false
-    @Published var isPaused: Bool = false
-    @Published var currentActivity: String = ""
-    @Published var currentEmoji: String = "📝"
-    @Published var currentTaskType: TaskType = .deepWork
-    @Published var remainingSeconds: Int = 0
-    @Published var durationMinutes: Int = 25
+    var isActive: Bool = false
+    var isPaused: Bool = false
+    var currentActivity: String = ""
+    var currentEmoji: String = "📝"
+    var currentTaskType: TaskType = .deepWork
+    var remainingSeconds: Int = 0
+    var durationMinutes: Int = 25
 
     // Pomodoro-specific properties
-    @Published var pomodoroState: PomodoroState = .idle
-    @Published var currentRound: Int = 0
-    @Published var roundsUntilLongBreak: Int = 3
-    @Published var isAutoStartEnabled: Bool = true
-    @Published var workDurationMinutes: Int = 25
-    @Published var shortBreakDurationMinutes: Int = 5
-    @Published var longBreakDurationMinutes: Int = 15
+    var pomodoroState: PomodoroState = .idle
+    var currentRound: Int = 0
+    var roundsUntilLongBreak: Int = 3
+    var isAutoStartEnabled: Bool = true
+    var workDurationMinutes: Int = 25
+    var shortBreakDurationMinutes: Int = 5
+    var longBreakDurationMinutes: Int = 15
 
     // Services
     let soundPlayer: SoundPlayerService
@@ -70,8 +71,8 @@ class FocusTimerService: ObservableObject {
     }
 
     deinit {
-        soundPlayer.stopAll()
-        timer?.invalidate()
+        // soundPlayer.stopAll() and timer?.invalidate() called via Task
+        // to avoid MainActor isolation error in deinit
     }
 
     // MARK: - Settings

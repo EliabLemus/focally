@@ -1,9 +1,10 @@
 import Foundation
-import Combine
+import Observation
 
-final class ScheduleService: ObservableObject {
-    @Published var focusBlocks: [FocusBlock] = []
-    @Published var currentWeekStart: Date = Date()
+@Observable
+final class ScheduleService {
+    var focusBlocks: [FocusBlock] = []
+    var currentWeekStart: Date = Date()
 
     func loadWeek() {
         focusBlocks = Self.mockBlocks()

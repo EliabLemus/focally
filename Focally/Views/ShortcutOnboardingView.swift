@@ -3,11 +3,11 @@ import SwiftUI
 // MARK: - Shortcut Onboarding View
 
 struct ShortcutOnboardingView: View {
-    @StateObject private var viewModel: ShortcutOnboardingViewModel
+    @State private var viewModel: ShortcutOnboardingViewModel
     @Environment(\.dismiss) private var dismiss
 
     init(managedShortcutsService: ManagedFocusShortcutsService, focusIntegrationService: FocusIntegrationService) {
-        _viewModel = StateObject(wrappedValue: ShortcutOnboardingViewModel(
+        _viewModel = State(initialValue: ShortcutOnboardingViewModel(
             managedShortcutsService: managedShortcutsService,
             focusIntegrationService: focusIntegrationService
         ))

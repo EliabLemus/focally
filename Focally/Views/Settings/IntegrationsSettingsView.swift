@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct IntegrationsSettingsView: View {
-    @EnvironmentObject private var slackService: SlackService
-    @EnvironmentObject private var calendarService: GoogleCalendarService
-    @EnvironmentObject private var focusIntegrationService: FocusIntegrationService
-    @EnvironmentObject private var managedShortcutsService: ManagedFocusShortcutsService
-    @ObservedObject var shortcutDropHandler: ShortcutDropHandler
+    @Environment(SlackService.self) private var slackService
+    @Environment(GoogleCalendarService.self) private var calendarService
+    @Environment(FocusIntegrationService.self) private var focusIntegrationService
+    @Environment(ManagedFocusShortcutsService.self) private var managedShortcutsService
+    @Environment(ShortcutDropHandler.self) private var shortcutDropHandler
 
     @State private var slackToken = ""
     @State private var googleClientID = ""
@@ -402,11 +402,10 @@ struct IntegrationsSettingsView: View {
 
     private func toggleGoogleConnection() {
         saveGoogleCredentials()
-        let service = _calendarService.wrappedValue
-        if service.isSignedIn {
-            service.signOut()
+        if calendarService.isSignedIn {
+            calendarService.signOut()
         } else {
-            service.signIn()
+            calendarService.signIn()
         }
     }
 }

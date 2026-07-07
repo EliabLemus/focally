@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct ActiveFocusView: View {
-    @EnvironmentObject var timerService: FocusTimerService
-    @EnvironmentObject var dndService: DNDService
+    @Environment(FocusTimerService.self) private var timerService
+    @Environment(DNDService.self) private var dndService
 
     @State private var showFinishConfirmation = false
 
@@ -20,7 +20,6 @@ struct ActiveFocusView: View {
                             onPause: { timerService.togglePause() },
                             onFinish: { showFinishConfirmation = true }
                         )
-                        .environmentObject(timerService)
 
                         supportCards(for: geometry.size.width)
                     }

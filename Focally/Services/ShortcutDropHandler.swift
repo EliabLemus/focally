@@ -1,18 +1,19 @@
 import Foundation
-import Combine
+import Observation
 import os.log
 import AppKit
 
 // MARK: - Shortcut Drop Handler
 
-class ShortcutDropHandler: ObservableObject {
+@Observable
+class ShortcutDropHandler {
     private let logger = Logger.uiLogger
     private let fileManager = FileManager.default
 
     // Published state
-    @Published var lastMessage: String = ""
-    @Published var isProcessing: Bool = false
-    @Published var lastError: String?
+    var lastMessage: String = ""
+    var isProcessing: Bool = false
+    var lastError: String?
 
     // URL to Shortcuts library
     private var shortcutsLibraryURL: URL {

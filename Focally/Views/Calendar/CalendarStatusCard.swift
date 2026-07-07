@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CalendarStatusCard: View {
-    @EnvironmentObject private var calendarService: GoogleCalendarService
+    @Environment(GoogleCalendarService.self) private var calendarService
     @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 

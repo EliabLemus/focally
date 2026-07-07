@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SchedulePage: View {
-    @StateObject private var scheduleService = ScheduleService()
+    @State private var scheduleService = ScheduleService()
     @State private var selectedViewIndex = 0
     @State private var currentWeekStart = Date()
 

@@ -1,7 +1,9 @@
 import Foundation
+import Observation
 import os.log
 
-class HistoryService: ObservableObject {
+@Observable
+class HistoryService {
     static let shared = HistoryService()
 
     private let logger = Logger.timer

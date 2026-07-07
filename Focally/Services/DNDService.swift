@@ -1,15 +1,17 @@
 import Cocoa
+import Observation
 import os.log
 
-final class DNDService: ObservableObject {
+@Observable
+final class DNDService {
     static let shared = DNDService()
 
     private static let notificationCenterAppId = "com.apple.notificationcenterui" as CFString
 
     private let logger = Logger.dnd
 
-    @Published var isDNDActive: Bool = false
-    @Published var lastError: String?
+    var isDNDActive: Bool = false
+    var lastError: String?
     init() {
         isDNDActive = Self.checkDNDStatus()
     }
@@ -143,7 +145,7 @@ final class DNDService: ObservableObject {
         Thread.sleep(forTimeInterval: 0.4)
         setPreference("dndStart", value: nil)
         setPreference("dndEnd", value: nil)
-        commitChanges()
+        _ = commitChanges()
     }
 
     private static func checkDNDStatus() -> Bool {

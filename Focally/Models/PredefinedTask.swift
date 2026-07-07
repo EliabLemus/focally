@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import SwiftUI
 
 enum TaskType: String, Codable, CaseIterable {
@@ -143,8 +144,9 @@ struct PredefinedTask: Identifiable, Codable, Equatable {
 }
 
 @MainActor
-final class PredefinedTaskStore: ObservableObject {
-    @Published private(set) var tasks: [PredefinedTask] = [] {
+@Observable
+final class PredefinedTaskStore {
+    private(set) var tasks: [PredefinedTask] = [] {
         didSet { saveTasks() }
     }
 

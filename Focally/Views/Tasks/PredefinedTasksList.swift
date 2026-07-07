@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct PredefinedTasksList: View {
-    @EnvironmentObject private var predefinedTaskStore: PredefinedTaskStore
-    @EnvironmentObject private var timerService: FocusTimerService
+    @Environment(PredefinedTaskStore.self) private var predefinedTaskStore
+    @Environment(FocusTimerService.self) private var timerService
 
     @State private var showingEditor = false
     @State private var editingTask: PredefinedTask?
@@ -95,7 +95,7 @@ struct PredefinedTasksList: View {
 }
 
 private struct PredefinedTaskEditorSheet: View {
-    @EnvironmentObject private var slackService: SlackService
+    @Environment(SlackService.self) private var slackService
     @Environment(\.dismiss) private var dismiss
 
     let task: PredefinedTask?

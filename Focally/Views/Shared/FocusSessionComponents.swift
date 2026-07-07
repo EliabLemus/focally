@@ -43,7 +43,8 @@ public struct CompactStatusEmojiButton: View {
     @Binding var selection: String
     let options: [FocusStatusOption]
 
-    @EnvironmentObject private var slackService: SlackService
+    @Environment(SlackService.self) private var slackService
+    @Environment(EmojiUsageTracker.self) private var usageTracker
     @State private var isPopoverPresented = false
 
     /// Determina si el emoji actual tiene problemas de validación
@@ -87,7 +88,8 @@ public struct CompactStatusEmojiButton: View {
         .help("Click to change status emoji")
         .popover(isPresented: $isPopoverPresented, arrowEdge: .bottom) {
             EmojiSelectionPopover(selection: $selection, options: options)
-                .environmentObject(slackService)
+                .environment(slackService)
+                .environment(usageTracker)
         }
     }
 
@@ -108,8 +110,8 @@ private struct EmojiSelectionPopover: View {
     @Binding var selection: String
     let options: [FocusStatusOption]
 
-    @EnvironmentObject private var slackService: SlackService
-    @EnvironmentObject private var usageTracker: EmojiUsageTracker
+    @Environment(SlackService.self) private var slackService
+    @Environment(EmojiUsageTracker.self) private var usageTracker
 
     @State private var draftValue: String = ""
 

@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import Observation
 import os.log
 
 // MARK: - Focus Integration Mode
@@ -58,7 +59,8 @@ extension FocusIntegrationAction: CustomStringConvertible {
 // MARK: - Focus Integration Service
 
 @MainActor
-final class FocusIntegrationService: ObservableObject {
+@Observable
+final class FocusIntegrationService {
     static let shared = FocusIntegrationService()
     static let startActionName = "Start Focus"
     static let endActionName = "End Focus"
@@ -72,17 +74,17 @@ final class FocusIntegrationService: ObservableObject {
     private static let kMode = "focusIntegrationMode"
     private static let kEnabled = "focusIntegrationEnabled"
 
-    @Published var isEnabled: Bool {
+    var isEnabled: Bool {
         didSet { defaults.set(isEnabled, forKey: Self.kEnabled) }
     }
 
-    @Published var mode: FocusIntegrationMode {
+    var mode: FocusIntegrationMode {
         didSet { defaults.set(mode.rawValue, forKey: Self.kMode) }
     }
 
-    @Published var lastError: FocusIntegrationError?
-    @Published var isFocusActive: Bool = false
-    @Published var lastShortcutIssue: String?
+    var lastError: FocusIntegrationError?
+    var isFocusActive: Bool = false
+    var lastShortcutIssue: String?
 
     private var activeTaskType: TaskType?
     private var meetingActivatedDND = false

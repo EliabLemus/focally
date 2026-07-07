@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import Observation
 import os.log
 
 struct ManagedShortcutCommandResult {
@@ -38,7 +39,8 @@ enum ManagedShortcutError: LocalizedError {
 }
 
 @MainActor
-final class ManagedFocusShortcutsService: ObservableObject {
+@Observable
+final class ManagedFocusShortcutsService {
     static let shared = ManagedFocusShortcutsService()
 
     enum ShortcutKind: String, CaseIterable, Identifiable {
@@ -70,12 +72,12 @@ final class ManagedFocusShortcutsService: ObservableObject {
         }
     }
 
-    @Published private(set) var installedShortcutNames: Set<String> = []
-    @Published private(set) var preparedShortcutURLs: [ShortcutKind: URL] = [:]
-    @Published var isPreparing: Bool = false
-    @Published var isVerifying: Bool = false
-    @Published var lastError: String?
-    @Published var lastWarning: String?
+    private(set) var installedShortcutNames: Set<String> = []
+    private(set) var preparedShortcutURLs: [ShortcutKind: URL] = [:]
+    var isPreparing: Bool = false
+    var isVerifying: Bool = false
+    var lastError: String?
+    var lastWarning: String?
 
     private let logger = Logger.timer
     private let fileManager = FileManager.default

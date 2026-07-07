@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TimerControlsView: View {
-    @EnvironmentObject var timerService: FocusTimerService
+    @Environment(FocusTimerService.self) private var timerService
     @Environment(\.colorScheme) var colorScheme
 
     let onPause: () -> Void

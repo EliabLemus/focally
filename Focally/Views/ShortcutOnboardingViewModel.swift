@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import SwiftUI
 import os.log
 
@@ -47,17 +48,18 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 // MARK: - Onboarding ViewModel
 
 @MainActor
-final class ShortcutOnboardingViewModel: ObservableObject {
+@Observable
+final class ShortcutOnboardingViewModel {
     private let logger = Logger.uiLogger
     private let focusIntegrationService: FocusIntegrationService
     let managedShortcutsService: ManagedFocusShortcutsService
 
-    @Published var currentStep: OnboardingStep = .welcome
-    @Published var isPreparingIntegration: Bool = false
-    @Published var generationError: String?
-    @Published var isVerifying: Bool = false
-    @Published var verificationResults: [String: Bool] = [:]
-    @Published var allShortcutsVerified: Bool = false
+    var currentStep: OnboardingStep = .welcome
+    var isPreparingIntegration: Bool = false
+    var generationError: String?
+    var isVerifying: Bool = false
+    var verificationResults: [String: Bool] = [:]
+    var allShortcutsVerified: Bool = false
 
     var onComplete: (() -> Void)?
 

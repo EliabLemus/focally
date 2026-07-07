@@ -3,7 +3,7 @@ import Charts
 
 struct AnalyticsPage: View {
     @State private var selectedRangeIndex: Int = 0
-    @StateObject private var analyticsService = AnalyticsService()
+    @State private var analyticsService = AnalyticsService()
     @State private var showingExportSheet = false
 
     var body: some View {

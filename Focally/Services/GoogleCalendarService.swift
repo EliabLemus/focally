@@ -1,8 +1,10 @@
 import AppKit
 import AuthenticationServices
 import Foundation
+import Observation
 
-final class GoogleCalendarService: NSObject, ObservableObject {
+@Observable
+final class GoogleCalendarService: NSObject {
     static let shared = GoogleCalendarService()
     static let calendarReadonlyScope: String = "https://www.googleapis.com/auth/calendar.readonly"
     static let enabledDefaultsKey: String = "googleCalendarEnabled"
@@ -15,7 +17,7 @@ final class GoogleCalendarService: NSObject, ObservableObject {
     static let tokenURLString: String = "https://oauth2.googleapis.com/token"
     static let redirectURI: String = "http://localhost"
 
-    @Published var isEnabled: Bool = false {
+    var isEnabled: Bool = false {
         didSet {
             UserDefaults.standard.set(isEnabled, forKey: Self.enabledDefaultsKey)
             if !isEnabled {
@@ -23,9 +25,9 @@ final class GoogleCalendarService: NSObject, ObservableObject {
             }
         }
     }
-    @Published var isSignedIn: Bool = false
-    @Published var events: [CalendarEvent] = []
-    @Published var connectionError: String?
+    var isSignedIn: Bool = false
+    var events: [CalendarEvent] = []
+    var connectionError: String?
 
     var currentMeeting: CalendarEvent? {
         let now = Date()

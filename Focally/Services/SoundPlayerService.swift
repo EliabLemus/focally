@@ -1,7 +1,9 @@
 import AppKit
+import Observation
 import os.log
 
-final class SoundPlayerService: ObservableObject {
+@Observable
+final class SoundPlayerService {
     static let shared = SoundPlayerService()
 
     private enum DefaultsKey {
@@ -22,13 +24,13 @@ final class SoundPlayerService: ObservableObject {
         var id: String { rawValue }
     }
 
-    @Published var isEnabled: Bool = true
-    @Published var workSoundName: String = "Bell"
-    @Published var breakSoundName: String = "Ping"
-    @Published var longBreakSoundName: String = "Glass"
-    @Published var completionSoundName: String = CompletionSoundVariant.primary.rawValue
-    @Published var soundVolume: Double = 1.0
-    @Published var soundRepeatCount: Int = 2
+    var isEnabled: Bool = true
+    var workSoundName: String = "Bell"
+    var breakSoundName: String = "Ping"
+    var longBreakSoundName: String = "Glass"
+    var completionSoundName: String = CompletionSoundVariant.primary.rawValue
+    var soundVolume: Double = 1.0
+    var soundRepeatCount: Int = 2
 
     private let logger = Logger.timer
     private var activeSounds: [NSSound] = []

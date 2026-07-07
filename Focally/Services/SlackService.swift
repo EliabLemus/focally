@@ -1,13 +1,14 @@
 import Foundation
-import Combine
+import Observation
 import os.log
 
-class SlackService: ObservableObject {
+@Observable
+class SlackService {
     static let defaultStatusEmoji = ":hourglass_flowing_sand:"
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
     static let emojiListURL = URL(string: "https://slack.com/api/emoji.list")!
 
-    @Published var isEnabled: Bool = false {
+    var isEnabled: Bool = false {
         didSet {
             UserDefaults.standard.set(isEnabled, forKey: "slackEnabled")
             if isEnabled && token != nil {
@@ -15,11 +16,11 @@ class SlackService: ObservableObject {
             }
         }
     }
-    @Published var isConnected: Bool = false
-    @Published var connectionError: String?
-    @Published var lastStatusText: String?
-    @Published var workspaceEmojiCodes: [String] = []
-    @Published var lastActionMessage: String?
+    var isConnected: Bool = false
+    var connectionError: String?
+    var lastStatusText: String?
+    var workspaceEmojiCodes: [String] = []
+    var lastActionMessage: String?
 
     private let keychainKey = "slack-token"
     private let logger = Logger.slack
@@ -882,13 +883,14 @@ public struct EmojiValidator {
 
 /// Rastrea el uso de emojis para mostrar sugerencias de recientes
 @MainActor
-public final class EmojiUsageTracker: ObservableObject {
+@Observable
+public final class EmojiUsageTracker {
     public static let shared = EmojiUsageTracker()
 
     private static let maxRecentCount = 12
     private static let usageKey = "emojiUsageHistory"
 
-    @Published private(set) public var recentEmojis: [String] = []
+    private(set) public var recentEmojis: [String] = []
 
     private let defaults = UserDefaults.standard
 

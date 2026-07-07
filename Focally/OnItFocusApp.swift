@@ -1,5 +1,5 @@
 import SwiftUI
-import Combine
+import Observation
 import os.log
 
 @main
@@ -41,8 +41,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         focusIntegrationService: focusIntegrationService
     )
     private var timerUpdate: Timer?
-    private var cancellables = Set<AnyCancellable>()
-
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Show onboarding if not completed
         showOnboardingIfNeeded()
@@ -65,39 +63,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
 
         let contentView = MenuBarDropdownView()
-            .environmentObject(timerService)
-            .environmentObject(dndService)
-            .environmentObject(focusIntegrationService)
-            .environmentObject(slackService)
-            .environmentObject(calendarService)
-            .environmentObject(historyService)
-            .environmentObject(shortcutDropHandler)
-            .environmentObject(managedShortcutsService)
-            .environmentObject(predefinedTaskStore)
-            .environmentObject(usageTracker)
+            .environment(timerService)
+            .environment(dndService)
+            .environment(focusIntegrationService)
+            .environment(slackService)
+            .environment(calendarService)
+            .environment(historyService)
+            .environment(shortcutDropHandler)
+            .environment(managedShortcutsService)
+            .environment(predefinedTaskStore)
+            .environment(usageTracker)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
         applySavedTheme()
 
-        // Observe timer changes
-        timerService.objectWillChange.sink { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.updateStatusBar()
-            }
-        }.store(in: &cancellables)
-
-        // Observe pomodoro state to start/stop status bar timer
-        timerService.$pomodoroState
-            .removeDuplicates()
-            .sink { [weak self] (state: PomodoroState) in
-                if state == .idle {
-                    self?.stopStatusBarUpdates()
-                    self?.updateStatusBar()
-                } else if self?.timerUpdate == nil {
-                    self?.startStatusBarUpdates()
-                }
-            }
-            .store(in: &cancellables)
+        observeTimerService()
 
         // Observe session start/end for Slack
         NotificationCenter.default.addObserver(
@@ -135,7 +115,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: UserDefaults.standard,
             queue: .main
         ) { [weak self] _ in
-            self?.applySavedTheme()
+            Task { @MainActor [weak self] in
+                self?.applySavedTheme()
+            }
         }
 
         // Cmd+Shift+F to open main window
@@ -256,16 +238,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let hostingView = MainWindow()
-            .environmentObject(timerService)
-            .environmentObject(dndService)
-            .environmentObject(focusIntegrationService)
-            .environmentObject(slackService)
-            .environmentObject(calendarService)
-            .environmentObject(historyService)
-            .environmentObject(shortcutDropHandler)
-            .environmentObject(managedShortcutsService)
-            .environmentObject(predefinedTaskStore)
-            .environmentObject(usageTracker)
+            .environment(timerService)
+            .environment(dndService)
+            .environment(focusIntegrationService)
+            .environment(slackService)
+            .environment(calendarService)
+            .environment(historyService)
+            .environment(shortcutDropHandler)
+            .environment(managedShortcutsService)
+            .environment(predefinedTaskStore)
+            .environment(usageTracker)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
         let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
@@ -319,10 +301,42 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem?.length = NSStatusItem.variableLength
     }
 
+    private func observeTimerService() {
+        withObservationTracking {
+            _ = timerService.pomodoroState
+            _ = timerService.hasSession
+            _ = timerService.isPaused
+            _ = timerService.currentEmoji
+            _ = timerService.currentActivity
+            _ = timerService.remainingMinutesString
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.handleTimerServiceChange()
+                self.observeTimerService()
+            }
+        }
+
+        handleTimerServiceChange()
+    }
+
+    private func handleTimerServiceChange() {
+        updateStatusBar()
+
+        if timerService.pomodoroState == .idle {
+            stopStatusBarUpdates()
+            updateStatusBar()
+        } else if timerUpdate == nil {
+            startStatusBarUpdates()
+        }
+    }
+
     private func startStatusBarUpdates() {
         guard timerUpdate == nil else { return }
         timerUpdate = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.updateStatusBar()
+            Task { @MainActor [weak self] in
+                self?.updateStatusBar()
+            }
         }
     }
 
