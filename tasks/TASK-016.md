@@ -1,6 +1,6 @@
 # TASK-016: Migrate to @Observable
 
-## Status: TODO
+## Status: DONE (2026-07-07)
 
 ## Date: 2026-05-01
 

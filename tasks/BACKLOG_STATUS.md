@@ -6,18 +6,16 @@
 
 ## 1. Backlog Real (Pendiente)
 
-### TASK-016: Migración a @Observable 🔴
-- **Estado**: PENDIENTE
-- **Scope**: 14 clases migrar de `ObservableObject` → `@Observable`
-- **Estimación**: 2-3 días
-- **Bloquea**: TASK-021
-- **Prioridad**: P2 (tech debt fundacional)
+### TASK-016: Migración a @Observable ✅
+- **Estado**: DONE (2026-07-07)
+- **Branch**: `feature/task-016-observable-migration`
+- **Detalle**: 14 clases migradas, 39 @EnvironmentObject → @Environment, build OK
+- **PR**: https://github.com/EliabLemus/focally/pull/new/feature/task-016-observable-migration
 
-### TASK-021: SettingsStore Centralizado 🔴
-- **Estado**: PENDIENTE (bloqueado por TASK-016)
+### TASK-021: SettingsStore Centralizado 🟡
+- **Estado**: PENDIENTE (desbloqueado — TASK-016 completada)
 - **Scope**: Unificar settings dispersas en `@AppStorage`, `UserDefaults`, properties
 - **Estimación**: 1-2 días
-- **Depende de**: TASK-016
 - **Prioridad**: P2
 
 ### Compliance Stitch / Liquid Glass ⚠️
