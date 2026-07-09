@@ -27,7 +27,7 @@ struct DesignSystemTestView: View {
             Button("Test Card") {
                 // Test the card modifier
             }
-            .focallyCard()
+            .focallyGlassCard()
             .padding()
             .frame(maxWidth: .infinity)
 

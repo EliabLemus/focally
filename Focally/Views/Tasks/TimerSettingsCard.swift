@@ -64,7 +64,7 @@ struct TimerSettingsCard: View {
             }
         }
         .padding(16)
-        .focallyCard()
+        .focallyGlassCard()
         .onAppear(perform: syncFromService)
     }
 
@@ -184,6 +184,6 @@ struct FocusModeCard: View {
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .focallyCard()
+        .focallyGlassCard()
     }
 }

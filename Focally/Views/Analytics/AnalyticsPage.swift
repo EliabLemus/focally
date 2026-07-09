@@ -135,6 +135,6 @@ private struct AvgSessionDepthCard: View {
                 .foregroundStyle(Color.focallyOutline.opacity(0.7))
         }
         .padding(FocallySpacing.large)
-        .focallyCard()
+        .focallyGlassCard()
     }
 }

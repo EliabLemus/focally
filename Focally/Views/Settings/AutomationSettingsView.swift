@@ -33,7 +33,7 @@ struct AutomationSettingsView: View {
                 }
             }
             .padding(FocallySpacing.large)
-            .focallyCard()
+            .focallyGlassCard()
         }
     }
 }

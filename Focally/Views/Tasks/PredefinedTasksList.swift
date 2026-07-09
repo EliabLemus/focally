@@ -59,7 +59,7 @@ struct PredefinedTasksList: View {
             }
         }
         .padding(FocallySpacing.large)
-        .focallyCard()
+        .focallyGlassCard()
         .sheet(isPresented: $showingEditor) {
             PredefinedTaskEditorSheet(task: editingTask) { task in
                 if editingTask == nil {

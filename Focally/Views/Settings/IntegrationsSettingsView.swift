@@ -98,7 +98,7 @@ struct IntegrationsSettingsView: View {
             }
         }
         .padding(FocallySpacing.large)
-        .focallyCard()
+        .focallyGlassCard()
     }
 
     private var calendarCard: some View {
@@ -137,7 +137,7 @@ struct IntegrationsSettingsView: View {
             }
         }
         .padding(FocallySpacing.large)
-        .focallyCard()
+        .focallyGlassCard()
     }
 
     private var focusIntegrationCard: some View {
@@ -203,7 +203,7 @@ struct IntegrationsSettingsView: View {
             )
         }
         .padding(FocallySpacing.large)
-        .focallyCard()
+        .focallyGlassCard()
     }
 
     private func iconTile(systemImage: String, color: Color) -> some View {

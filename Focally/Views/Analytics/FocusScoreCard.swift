@@ -52,7 +52,7 @@ struct FocusScoreCard: View {
             FocusScoreRing(score: score)
         }
         .padding(20)
-        .focallyCard()
+        .focallyGlassCard()
     }
 }
 

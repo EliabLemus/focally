@@ -58,6 +58,6 @@ struct FocusTrendChart: View {
             .padding(.vertical, 8)
         }
         .padding(20)
-        .focallyCard()
+        .focallyGlassCard()
     }
 }

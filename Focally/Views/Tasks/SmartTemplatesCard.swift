@@ -30,6 +30,6 @@ struct SmartTemplatesCard: View {
         .padding(FocallySpacing.large)
         .background(Color.focallySecondaryFixed)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .focallyCard()
+        .focallyGlassCard()
     }
 }

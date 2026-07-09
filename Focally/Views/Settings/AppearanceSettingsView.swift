@@ -20,7 +20,7 @@ struct AppearanceSettingsView: View {
                     }
                 }
             }
-            .focallyCard()
+            .focallyGlassCard()
         }
     }
 

@@ -44,6 +44,6 @@ struct FocusAllocationCard: View {
             }
         }
         .padding(20)
-        .focallyCard()
+        .focallyGlassCard()
     }
 }
