@@ -40,6 +40,7 @@ class FocusTimerService {
     var longBreakDurationMinutes: Int = 15
 
     // Services
+    let settingsStore: SettingsStore
     let soundPlayer: SoundPlayerService
     let notificationService: NotificationService
     let historyService: HistoryService
@@ -56,45 +57,29 @@ class FocusTimerService {
 
     // MARK: - Lifecycle
 
-    init(soundPlayer: SoundPlayerService = .shared,
+    init(settingsStore: SettingsStore,
+         soundPlayer: SoundPlayerService = .shared,
          notificationService: NotificationService = NotificationService(),
          historyService: HistoryService = .shared,
          dndService: DNDService = DNDService(),
          focusIntegrationService: FocusIntegrationService) {
+        self.settingsStore = settingsStore
         self.soundPlayer = soundPlayer
         self.notificationService = notificationService
         self.historyService = historyService
         self.dndService = dndService
         self.focusIntegrationService = focusIntegrationService
-        loadSettings()
+        roundsUntilLongBreak = max(1, settingsStore.roundsUntilLongBreak)
+        isAutoStartEnabled = settingsStore.isAutoStartEnabled
+        workDurationMinutes = clampDuration(settingsStore.workDurationMinutes)
+        shortBreakDurationMinutes = clampDuration(settingsStore.shortBreakDurationMinutes)
+        longBreakDurationMinutes = clampDuration(settingsStore.longBreakDurationMinutes)
         loadLastSession()
     }
 
     deinit {
         // soundPlayer.stopAll() and timer?.invalidate() called via Task
         // to avoid MainActor isolation error in deinit
-    }
-
-    // MARK: - Settings
-
-    private func loadSettings() {
-        pomodoroState = PomodoroState(rawValue: defaults.string(forKey: "pomodoroState") ?? "idle") ?? .idle
-        currentRound = defaults.integer(forKey: "currentRound")
-        roundsUntilLongBreak = storedInteger(forKey: "roundsUntilLongBreak", defaultValue: TimerDefaults.roundsUntilLongBreak)
-        isAutoStartEnabled = storedBool(forKey: "isAutoStartEnabled", defaultValue: TimerDefaults.autoStartBreaks)
-        workDurationMinutes = storedDuration(forKey: "workDurationMinutes", defaultValue: TimerDefaults.workDuration)
-        shortBreakDurationMinutes = storedDuration(forKey: "shortBreakDurationMinutes", defaultValue: TimerDefaults.shortBreakDuration)
-        longBreakDurationMinutes = storedDuration(forKey: "longBreakDurationMinutes", defaultValue: TimerDefaults.longBreakDuration)
-    }
-
-    private func saveSettings() {
-        defaults.set(pomodoroState.rawValue, forKey: "pomodoroState")
-        defaults.set(currentRound, forKey: "currentRound")
-        defaults.set(roundsUntilLongBreak, forKey: "roundsUntilLongBreak")
-        defaults.set(isAutoStartEnabled, forKey: "isAutoStartEnabled")
-        defaults.set(workDurationMinutes, forKey: "workDurationMinutes")
-        defaults.set(shortBreakDurationMinutes, forKey: "shortBreakDurationMinutes")
-        defaults.set(longBreakDurationMinutes, forKey: "longBreakDurationMinutes")
     }
 
     // MARK: - Persistence
@@ -110,34 +95,40 @@ class FocusTimerService {
         // Update work duration if different
         if lastDuration > 0 {
             workDurationMinutes = lastDuration
-            saveSettings()
+            settingsStore.workDurationMinutes = lastDuration
+            settingsStore.saveTimerSettings()
         }
     }
 
     func updateWorkDuration(minutes: Int) {
         workDurationMinutes = clampDuration(minutes)
         durationMinutes = workDurationMinutes
-        saveSettings()
+        settingsStore.workDurationMinutes = workDurationMinutes
+        settingsStore.saveTimerSettings()
     }
 
     func updateShortBreakDuration(minutes: Int) {
         shortBreakDurationMinutes = clampDuration(minutes)
-        saveSettings()
+        settingsStore.shortBreakDurationMinutes = shortBreakDurationMinutes
+        settingsStore.saveTimerSettings()
     }
 
     func updateLongBreakDuration(minutes: Int) {
         longBreakDurationMinutes = clampDuration(minutes)
-        saveSettings()
+        settingsStore.longBreakDurationMinutes = longBreakDurationMinutes
+        settingsStore.saveTimerSettings()
     }
 
     func updateAutoStartEnabled(_ isEnabled: Bool) {
         isAutoStartEnabled = isEnabled
-        saveSettings()
+        settingsStore.isAutoStartEnabled = isEnabled
+        settingsStore.saveTimerSettings()
     }
 
     func updateRoundsUntilLongBreak(_ rounds: Int) {
         roundsUntilLongBreak = max(1, rounds)
-        saveSettings()
+        settingsStore.roundsUntilLongBreak = roundsUntilLongBreak
+        settingsStore.saveTimerSettings()
     }
 
     func configurePomodoroPreset(workMinutes: Int = TimerDefaults.workDuration,
@@ -151,7 +142,12 @@ class FocusTimerService {
         roundsUntilLongBreak = max(1, rounds)
         isAutoStartEnabled = autoStart
         durationMinutes = workDurationMinutes
-        saveSettings()
+        settingsStore.workDurationMinutes = workDurationMinutes
+        settingsStore.shortBreakDurationMinutes = shortBreakDurationMinutes
+        settingsStore.longBreakDurationMinutes = longBreakDurationMinutes
+        settingsStore.roundsUntilLongBreak = roundsUntilLongBreak
+        settingsStore.isAutoStartEnabled = isAutoStartEnabled
+        settingsStore.saveTimerSettings()
     }
 
     func applyPomodoroPreset(_ preset: PomodoroPreset) {
@@ -180,11 +176,11 @@ class FocusTimerService {
     }
 
     private func saveLastSession() {
-        saveSettings()
+        settingsStore.saveTimerSettings()
     }
 
     private func savePomodoroState() {
-        saveSettings()
+        settingsStore.saveTimerSettings()
     }
 
     // MARK: - Session Control
@@ -483,14 +479,6 @@ class FocusTimerService {
         }
 
         return defaults.integer(forKey: key)
-    }
-
-    private func storedBool(forKey key: String, defaultValue: Bool) -> Bool {
-        guard defaults.object(forKey: key) != nil else {
-            return defaultValue
-        }
-
-        return defaults.bool(forKey: key)
     }
 
     private func storedDuration(forKey key: String, defaultValue: Int) -> Int {

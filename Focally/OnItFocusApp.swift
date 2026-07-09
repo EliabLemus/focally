@@ -33,7 +33,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let managedShortcutsService = ManagedFocusShortcutsService.shared
     let predefinedTaskStore = PredefinedTaskStore()
     let usageTracker = EmojiUsageTracker.shared
+    private lazy var settingsStore = SettingsStore()
     private lazy var timerService = FocusTimerService(
+        settingsStore: settingsStore,
         soundPlayer: .shared,
         notificationService: notificationService,
         historyService: historyService,
@@ -42,6 +44,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     )
     private var timerUpdate: Timer?
     func applicationDidFinishLaunching(_ notification: Notification) {
+        SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
+
         // Show onboarding if not completed
         showOnboardingIfNeeded()
 
@@ -63,6 +67,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
 
         let contentView = MenuBarDropdownView()
+            .environment(settingsStore)
+            .environment(SoundPlayerService.shared)
             .environment(timerService)
             .environment(dndService)
             .environment(focusIntegrationService)
@@ -116,6 +122,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
+                self?.settingsStore.loadFromDefaults()
+                if let settingsStore = self?.settingsStore {
+                    SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
+                }
                 self?.applySavedTheme()
             }
         }
@@ -238,6 +248,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let hostingView = MainWindow()
+            .environment(settingsStore)
+            .environment(SoundPlayerService.shared)
             .environment(timerService)
             .environment(dndService)
             .environment(focusIntegrationService)
@@ -346,9 +358,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applySavedTheme() {
-        let theme = ThemeChoice(
-            rawValue: UserDefaults.standard.string(forKey: "appTheme") ?? ThemeChoice.system.rawValue
-        ) ?? .system
+        let theme = settingsStore.appTheme
         let appearance = appearance(for: theme)
 
         NSApp.appearance = appearance

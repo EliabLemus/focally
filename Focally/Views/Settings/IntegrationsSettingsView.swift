@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct IntegrationsSettingsView: View {
+    @Environment(SettingsStore.self) private var settingsStore
     @Environment(SlackService.self) private var slackService
     @Environment(GoogleCalendarService.self) private var calendarService
     @Environment(FocusIntegrationService.self) private var focusIntegrationService
@@ -273,7 +274,8 @@ struct IntegrationsSettingsView: View {
             get: { soundPlayer.completionSoundName },
             set: { newValue in
                 soundPlayer.completionSoundName = newValue
-                soundPlayer.saveSettings()
+                settingsStore.completionSoundName = newValue
+                settingsStore.saveSoundSettings()
             }
         )
     }

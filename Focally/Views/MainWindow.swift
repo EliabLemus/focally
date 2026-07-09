@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainWindow: View {
-    @AppStorage("appTheme") private var selectedTheme: ThemeChoice = .system
+    @Environment(SettingsStore.self) private var settingsStore
     @State private var selectedTab: FocallyTab = .timer
 
     var body: some View {
@@ -39,7 +39,7 @@ struct MainWindow: View {
         .onReceive(NotificationCenter.default.publisher(for: .focusNavigateToSettings)) { _ in
             selectedTab = .settings
         }
-        .preferredColorScheme(selectedTheme.preferredColorScheme)
+        .preferredColorScheme(settingsStore.appTheme.preferredColorScheme)
     }
 
     @ViewBuilder

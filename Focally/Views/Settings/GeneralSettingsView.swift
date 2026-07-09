@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct GeneralSettingsView: View {
-    @State private var launchAtLogin: Bool = false
-    @State private var soundEnabled: Bool = true
-    @State private var selectedSound: String = "Crystal"
-    @State private var showInMenuBar: Bool = true
+    @Environment(SettingsStore.self) private var settingsStore
+    @Environment(FocusTimerService.self) private var timerService
+    @Environment(SoundPlayerService.self) private var soundPlayer
 
-    private let soundOptions = ["Crystal", "Breeze", "Minimal"]
+    @State private var launchAtLogin: Bool = false
+    @State private var showInMenuBar: Bool = true
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,20 +22,20 @@ struct GeneralSettingsView: View {
             settingsRow(
                 icon: "bell.fill",
                 label: "Enable sound notifications",
-                toggle: $soundEnabled
+                toggle: soundEnabledBinding
             )
 
-            if soundEnabled {
+            if soundPlayer.isEnabled {
                 HStack(spacing: FocallySpacing.small) {
                     Spacer()
                     Menu {
                         ForEach(soundOptions, id: \.self) { sound in
                             Button(action: {
-                                selectedSound = sound
+                                selectedSoundBinding.wrappedValue = sound
                             }) {
                                 HStack {
                                     Text(sound)
-                                    if selectedSound == sound {
+                                    if selectedSoundBinding.wrappedValue == sound {
                                         Image(systemName: "checkmark")
                                     }
                                 }
@@ -43,7 +43,7 @@ struct GeneralSettingsView: View {
                         }
                     } label: {
                         HStack(spacing: FocallySpacing.extraSmall) {
-                            Text(selectedSound)
+                            Text(selectedSoundBinding.wrappedValue)
                                 .font(.focallyCaption)
                                 .foregroundStyle(Color.focallyOutline)
                             Image(systemName: "chevron.up.chevron.down")
@@ -76,7 +76,37 @@ struct GeneralSettingsView: View {
         }
         .padding(.top, FocallySpacing.extraSmall)
         .padding(.bottom, FocallySpacing.extraSmall)
-        .animation(.easeInOut(duration: 0.2), value: soundEnabled)
+        .animation(.easeInOut(duration: 0.2), value: soundPlayer.isEnabled)
+    }
+
+    private var soundOptions: [String] {
+        soundPlayer.sounds.filter { soundName in
+            SoundPlayerService.CompletionSoundVariant(rawValue: soundName) == nil
+        }
+    }
+
+    private var soundEnabledBinding: Binding<Bool> {
+        Binding(
+            get: { soundPlayer.isEnabled },
+            set: { newValue in
+                soundPlayer.isEnabled = newValue
+                settingsStore.soundEnabled = newValue
+                soundPlayer.syncFromSettingsStore(settingsStore)
+                settingsStore.saveSoundSettings()
+            }
+        )
+    }
+
+    private var selectedSoundBinding: Binding<String> {
+        Binding(
+            get: { soundPlayer.workSoundName },
+            set: { newValue in
+                soundPlayer.workSoundName = newValue
+                settingsStore.workSoundName = newValue
+                soundPlayer.syncFromSettingsStore(settingsStore)
+                settingsStore.saveSoundSettings()
+            }
+        )
     }
 
     private func settingsRow(icon: String, label: String, toggle: Binding<Bool>) -> some View {

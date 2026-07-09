@@ -60,6 +60,7 @@
 		8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */; };
 		91403EE941CCFB17EA5AD082 /* TimerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191E59EB17B55941B8BE4DFC /* TimerPage.swift */; };
 		93BF8041B02840C835DC9371 /* FocusAllocationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ACE0919D2BAEFCCC24A8A9C /* FocusAllocationCard.swift */; };
+		93EE71221692619CD1E52FB0 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */; };
 		94CA8983EC82C9ABFBDDE7E3 /* FocusSessionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98B9F6D1FC104C15E36969C /* FocusSessionComponents.swift */; };
 		970D3C8AD2A7D59A0BB95DCC /* FocallyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */; };
 		97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */; };
@@ -192,6 +193,7 @@
 		824FFB84C09F608FF1A0E65B /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		844B4C6DBE9625A6C4CAD3B6 /* GoogleCalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService.swift; sourceTree = "<group>"; };
 		867AE7AACA30C0FD8D4ABA7E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiValidatorTests.swift; sourceTree = "<group>"; };
 		887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallySpacing.swift; sourceTree = "<group>"; };
 		8BE50E05EC48280BABFC8AC7 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
@@ -499,6 +501,7 @@
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
 				0CDF86C485BBCBEA26892F4B /* ScheduleService.swift */,
+				86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */,
 				24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */,
 				0179E6DB0D32C6C38E33CE35 /* SlackService.swift */,
 				E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */,
@@ -721,6 +724,7 @@
 				CF4E0D7D8E95689E6B3A9010 /* SchedulePage.swift in Sources */,
 				A9B36E8ADD6E0B6C2B437CE6 /* ScheduleService.swift in Sources */,
 				DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */,
+				93EE71221692619CD1E52FB0 /* SettingsStore.swift in Sources */,
 				22CE09543F47353743C5813D /* SharedComponents.swift in Sources */,
 				E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */,
 				5268929AD485C2D5E2A9E710 /* ShortcutOnboardingView.swift in Sources */,

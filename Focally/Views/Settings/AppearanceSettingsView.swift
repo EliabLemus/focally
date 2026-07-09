@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AppearanceSettingsView: View {
-    @AppStorage("appTheme") private var selectedTheme: ThemeChoice = .system
+    @Environment(SettingsStore.self) private var settingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: FocallySpacing.large) {
@@ -24,9 +24,19 @@ struct AppearanceSettingsView: View {
         }
     }
 
+    private var themeBinding: Binding<ThemeChoice> {
+        Binding(
+            get: { settingsStore.appTheme },
+            set: { newValue in
+                settingsStore.appTheme = newValue
+                settingsStore.saveTheme()
+            }
+        )
+    }
+
     private func themeRow(theme: ThemeChoice) -> some View {
         Button(action: {
-            selectedTheme = theme
+            themeBinding.wrappedValue = theme
         }) {
             HStack(spacing: FocallySpacing.medium) {
                 Image(systemName: theme.icon)
@@ -43,10 +53,10 @@ struct AppearanceSettingsView: View {
                 // Radio button
                 ZStack {
                     Circle()
-                        .stroke(selectedTheme == theme ? Color.focallyPrimary : Color.focallyOutline, lineWidth: 1.5)
+                        .stroke(themeBinding.wrappedValue == theme ? Color.focallyPrimary : Color.focallyOutline, lineWidth: 1.5)
                         .frame(width: 18, height: 18)
 
-                    if selectedTheme == theme {
+                    if themeBinding.wrappedValue == theme {
                         Circle()
                             .fill(Color.focallyPrimary)
                             .frame(width: 10, height: 10)

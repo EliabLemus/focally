@@ -62,7 +62,6 @@ final class SoundPlayerService {
     }
 
     init() {
-        loadSettings()
     }
 
     func play(_ soundType: SoundType) {
@@ -119,26 +118,14 @@ final class SoundPlayerService {
         return nil
     }
 
-    func loadSettings() {
-        let defaults: UserDefaults = UserDefaults.standard
-        isEnabled = storedBool(forKey: DefaultsKey.isEnabled, defaultValue: true)
-        workSoundName = defaults.string(forKey: DefaultsKey.workSoundName) ?? "Bell"
-        breakSoundName = defaults.string(forKey: DefaultsKey.breakSoundName) ?? "Ping"
-        longBreakSoundName = defaults.string(forKey: DefaultsKey.longBreakSoundName) ?? "Glass"
-        completionSoundName = validateCompletionSoundName(defaults.string(forKey: DefaultsKey.completionSoundName))
-        soundVolume = storedDouble(forKey: DefaultsKey.soundVolume, defaultValue: 1.0)
-        soundRepeatCount = max(defaults.object(forKey: DefaultsKey.soundRepeatCount) as? Int ?? 2, 1)
-    }
-
-    func saveSettings() {
-        let defaults: UserDefaults = UserDefaults.standard
-        defaults.set(isEnabled, forKey: DefaultsKey.isEnabled)
-        defaults.set(workSoundName, forKey: DefaultsKey.workSoundName)
-        defaults.set(breakSoundName, forKey: DefaultsKey.breakSoundName)
-        defaults.set(longBreakSoundName, forKey: DefaultsKey.longBreakSoundName)
-        defaults.set(completionSoundName, forKey: DefaultsKey.completionSoundName)
-        defaults.set(soundVolume, forKey: DefaultsKey.soundVolume)
-        defaults.set(soundRepeatCount, forKey: DefaultsKey.soundRepeatCount)
+    func syncFromSettingsStore(_ store: SettingsStore) {
+        isEnabled = store.soundEnabled
+        workSoundName = store.workSoundName
+        breakSoundName = store.breakSoundName
+        longBreakSoundName = store.longBreakSoundName
+        completionSoundName = validateCompletionSoundName(store.completionSoundName)
+        soundVolume = store.soundVolume
+        soundRepeatCount = max(store.soundRepeatCount, 1)
     }
 
     private func resolveSoundName(for soundType: SoundType) -> String {
@@ -155,20 +142,6 @@ final class SoundPlayerService {
             return CompletionSoundVariant.primary.rawValue
         }
         return storedName
-    }
-
-    private func storedBool(forKey key: String, defaultValue: Bool) -> Bool {
-        guard UserDefaults.standard.object(forKey: key) != nil else {
-            return defaultValue
-        }
-        return UserDefaults.standard.bool(forKey: key)
-    }
-
-    private func storedDouble(forKey key: String, defaultValue: Double) -> Double {
-        guard UserDefaults.standard.object(forKey: key) != nil else {
-            return defaultValue
-        }
-        return UserDefaults.standard.double(forKey: key)
     }
 
     private func playSound(named soundName: String, repeatCount: Int, interSoundDelay: TimeInterval) {
