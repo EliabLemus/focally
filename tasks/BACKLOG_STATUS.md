@@ -1,8 +1,8 @@
 # Focally Backlog Status
 
-> **Última actualización**: 2026-07-07
-> **Release actual**: v0.7.34
-> **HEAD**: `15a33ec` (main)
+> **Última actualización**: 2026-07-08
+> **Release actual**: v0.7.35
+> **HEAD**: `7ff332d` (main)
 
 ## 1. Backlog Real (Pendiente)
 
@@ -10,13 +10,10 @@
 - **Estado**: DONE (2026-07-07)
 - **Branch**: `feature/task-016-observable-migration`
 - **Detalle**: 14 clases migradas, 39 @EnvironmentObject → @Environment, build OK
-- **PR**: https://github.com/EliabLemus/focally/pull/new/feature/task-016-observable-migration
 
-### TASK-021: SettingsStore Centralizado 🟡
-- **Estado**: PENDIENTE (desbloqueado — TASK-016 completada)
-- **Scope**: Unificar settings dispersas en `@AppStorage`, `UserDefaults`, properties
-- **Estimación**: 1-2 días
-- **Prioridad**: P2
+### TASK-021: SettingsStore Centralizado ✅
+- **Estado**: DONE (2026-07-08)
+- **Detalle**: SettingsStore @Observable creado, FocusTimerService y SoundPlayerService migrados, cero @AppStorage restante, build OK
 
 ### Compliance Stitch / Liquid Glass ⚠️
 - **Estado**: PARCIAL
