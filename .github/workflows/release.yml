@@ -10,6 +10,8 @@ jobs:
     runs-on: macos-15
     permissions:
       contents: write
+    env:
+      HOMEBREW_NO_REQUIRE_TAP_TRUST: "1"
     steps:
       - uses: actions/checkout@v4
 
