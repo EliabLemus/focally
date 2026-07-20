@@ -46,9 +46,18 @@ struct GeneralSettingsView: View {
 
     private var soundConfiguration: some View {
         VStack(alignment: .leading, spacing: 12) {
-            pickerRow(title: "Work sound", selection: workSoundBinding)
-            pickerRow(title: "Break sound", selection: breakSoundBinding)
-            pickerRow(title: "Completion sound", selection: completionSoundBinding)
+            HStack {
+                pickerRow(title: "Work sound", selection: workSoundBinding)
+                soundPreviewButton(for: soundPlayer.workSoundName)
+            }
+            HStack {
+                pickerRow(title: "Break sound", selection: breakSoundBinding)
+                soundPreviewButton(for: soundPlayer.breakSoundName)
+            }
+            HStack {
+                pickerRow(title: "Completion sound", selection: completionSoundBinding)
+                soundPreviewButton(for: soundPlayer.completionSoundName)
+            }
         }
         .padding(.horizontal, FocallySpacing.large)
         .padding(.vertical, FocallySpacing.medium)
@@ -182,17 +191,23 @@ struct GeneralSettingsView: View {
                 }
             }
             .pickerStyle(.menu)
-            .frame(width: 180)
-            Button {
-                soundPlayer.previewSound(named: selection.wrappedValue)
-            } label: {
-                Image(systemName: "play.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.focallyPrimary)
-            }
-            .buttonStyle(.plain)
-            .help("Preview sound")
+            .frame(width: 160)
         }
+    }
+
+    private func soundPreviewButton(for soundName: String) -> some View {
+        Button {
+            soundPlayer.previewSound(named: soundName)
+        } label: {
+            Image(systemName: "play.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(Color.focallyPrimary)
+                .padding(6)
+                .background(Color.focallySurfaceContainerHighest)
+                .clipShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .help("Preview sound")
     }
 
     private func shortcutRow(title: String) -> some View {
