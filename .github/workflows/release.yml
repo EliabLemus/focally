@@ -10,10 +10,11 @@ jobs:
     runs-on: macos-15
     permissions:
       contents: write
-    env:
-      HOMEBREW_NO_REQUIRE_TAP_TRUST: "1"
     steps:
       - uses: actions/checkout@v4
+
+      - name: Trust pre-installed taps
+        run: brew trust aws/tap 2>/dev/null || true
 
       - name: Install xcodegen
         run: brew install xcodegen
