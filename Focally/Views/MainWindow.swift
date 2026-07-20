@@ -20,18 +20,22 @@ struct MainWindow: View {
                                 .font(.system(size: 14))
                                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                                 .frame(width: 32, height: 32)
-                                .background(
-                                    Circle()
-                                        .fill(Color.focallySurfaceContainer)
-                                )
+                                .background(Circle().fill(Color.focallySurfaceContainer))
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Open Settings")
                     }
                 }
 
-                content
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Group {
+                    switch selectedTab {
+                    case .timer:
+                        TimerPage()
+                    case .settings:
+                        SettingsPage()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.focallyBackground)
@@ -40,20 +44,6 @@ struct MainWindow: View {
             selectedTab = .settings
         }
         .preferredColorScheme(settingsStore.appTheme.preferredColorScheme)
-    }
-
-    @ViewBuilder
-    private var content: some View {
-        switch selectedTab {
-        case .timer:
-            TimerPage()
-        case .tasks:
-            TasksPage()
-        case .settings:
-            SettingsPage()
-        case .schedule, .analytics:
-            TimerPage()
-        }
     }
 
     private func openSettingsTab() {

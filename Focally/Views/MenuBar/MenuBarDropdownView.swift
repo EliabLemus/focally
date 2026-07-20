@@ -1,12 +1,10 @@
 import SwiftUI
 
 struct MenuBarDropdownView: View {
+    @Environment(FocusModeStore.self) private var focusModeStore
     @Environment(FocusTimerService.self) private var timerService
     @Environment(DNDService.self) private var dndService
-    @Environment(HistoryService.self) private var historyService
-    @Environment(PredefinedTaskStore.self) private var predefinedTaskStore
     @Environment(SlackService.self) private var slackService
-    @Environment(GoogleCalendarService.self) private var calendarService
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -19,7 +17,6 @@ struct MenuBarDropdownView: View {
                         activeSessionCard
                     } else {
                         quickStartSection
-                        presetsSection
                     }
 
                     Spacer(minLength: 60)
@@ -28,13 +25,15 @@ struct MenuBarDropdownView: View {
                 .padding(.vertical, 8)
             }
 
-            footerStats
+            footerStatus
         }
         .frame(width: 340)
         .background(backgroundMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(colorScheme == .dark ? 0.4 : 0.1), radius: 30, y: 10)
-        .onAppear(perform: syncFromService)
+        .onAppear {
+            slackService.refreshEmojiCatalogIfPossible()
+        }
     }
 
     private var headerRow: some View {
@@ -42,7 +41,6 @@ struct MenuBarDropdownView: View {
             Text("Focus")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
-
             Spacer()
         }
         .padding(.horizontal, 16)
@@ -51,33 +49,38 @@ struct MenuBarDropdownView: View {
     }
 
     private var quickStartSection: some View {
-        QuickSessionsSection()
-    }
-
-    private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Your Presets")
-                    .font(.focallyBodyBold)
-                    .foregroundStyle(Color.focallyOnSurface)
-                Spacer()
-                Text("\(predefinedTaskStore.tasks.count)")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-            }
+            Text("Quick Start")
+                .font(.focallyBodyBold)
+                .foregroundStyle(Color.focallyOnSurface)
 
-            if predefinedTaskStore.tasks.isEmpty {
-                Text("Create presets")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-            } else {
-                VStack(spacing: 8) {
-                    ForEach(predefinedTaskStore.tasks.prefix(4)) { task in
-                        PredefinedTaskQuickButton(task: task) {
-                            start(task: task)
+            ForEach(focusModeStore.modes) { mode in
+                Button(action: { timerService.startSession(mode: mode) }) {
+                    HStack(spacing: 12) {
+                        Text(mode.displayEmoji)
+                            .font(.system(size: 22))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(mode.name)
+                                .font(.focallyBodyBold)
+                                .foregroundStyle(Color.focallyOnSurface)
+                            Text("\(mode.durationMinutes) min")
+                                .font(.focallyCaption)
+                                .foregroundStyle(Color.focallyOnSurfaceVariant)
+                        }
+
+                        Spacer()
+
+                        if mode.enableDND {
+                            Image(systemName: "moon.fill")
+                                .foregroundStyle(Color.focallyPrimary)
                         }
                     }
+                    .padding(12)
+                    .background(Color.focallySurfaceContainerLow)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -85,38 +88,14 @@ struct MenuBarDropdownView: View {
     private var activeSessionCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(timerService.currentActivity)
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
-                        .lineLimit(1)
 
-                    Text(timerService.isPaused ? "Paused" : (timerService.isBreak ? "Break" : "Deep Focus"))
+                    Text(timerService.isPaused ? "Paused" : timerService.phaseName)
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
-
-                    if timerService.isPaused {
-                        HStack(spacing: 4) {
-                            Circle()
-                                .fill(Color.focallySecondary)
-                                .frame(width: 6, height: 6)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(Color.focallySecondary.opacity(0.12)))
-                    } else if dndService.isDNDActive {
-                        HStack(spacing: 4) {
-                            Circle()
-                                .fill(Color.purple)
-                                .frame(width: 6, height: 6)
-                            Text("DND Active")
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(Color.purple)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(Color.purple.opacity(0.1)))
-                    }
                 }
 
                 Spacer()
@@ -141,21 +120,11 @@ struct MenuBarDropdownView: View {
                 .foregroundStyle(Color.focallyOnSurface)
                 .monospacedDigit()
 
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.focallySurfaceContainerHighest)
+            ProgressView(value: timerService.progress)
+                .progressViewStyle(.linear)
+                .tint(Color.focallyPrimary)
 
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.focallyPrimary)
-                        .frame(width: geometry.size.width * CGFloat(timerService.progress))
-                }
-            }
-            .frame(height: 6)
-
-            let elapsed = formatElapsed()
-            let total = formatDuration(timerService.durationMinutes * 60)
-            Text("\(elapsed) of \(total)")
+            Text(dndService.isDNDActive ? "Do Not Disturb is active" : "Do Not Disturb is off")
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
         }
@@ -169,33 +138,21 @@ struct MenuBarDropdownView: View {
         .padding(.horizontal, 4)
     }
 
-    private var footerStats: some View {
+    private var footerStatus: some View {
         VStack(spacing: 0) {
             Divider()
                 .padding(.horizontal, 16)
 
             HStack(spacing: 12) {
-                HStack(spacing: 6) {
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-
-                    Text("Focus today: \(formatFocusTime())")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                }
+                Label(slackService.isEnabled ? "Slack ready" : "Slack off", systemImage: "message.fill")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
 
                 Spacer()
 
-                HStack(spacing: 6) {
-                    Image(systemName: "moon.fill")
-                        .font(.system(size: 12))
-                        .foregroundStyle(dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
-
-                    Text(dndService.isDNDActive ? "DND Active" : "DND Off")
-                        .font(.focallyCaption)
-                        .foregroundStyle(dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
-                }
+                Label(dndService.isDNDActive ? "DND Active" : "DND Off", systemImage: "moon.fill")
+                    .font(.focallyCaption)
+                    .foregroundStyle(dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -205,47 +162,10 @@ struct MenuBarDropdownView: View {
     private var backgroundMaterial: some View {
         Group {
             if colorScheme == .dark {
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .overlay(Color.black.opacity(0.3))
+                Rectangle().fill(.ultraThinMaterial).overlay(Color.black.opacity(0.3))
             } else {
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .overlay(Color.white.opacity(0.2))
+                Rectangle().fill(.ultraThinMaterial).overlay(Color.white.opacity(0.2))
             }
         }
-    }
-
-    private func syncFromService() {
-        slackService.refreshEmojiCatalogIfPossible()
-    }
-
-    private func start(task: PredefinedTask) {
-        timerService.updateWorkDuration(minutes: task.durationMinutes)
-        timerService.startWorkSession(
-            activity: task.name,
-            emoji: task.emoji,
-            durationMinutes: task.durationMinutes,
-            taskType: task.taskType
-        )
-    }
-
-    private func formatDuration(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainingSeconds = seconds % 60
-        return String(format: "%d:%02d", minutes, remainingSeconds)
-    }
-
-    private func formatElapsed() -> String {
-        let total = timerService.durationMinutes * 60
-        let elapsed = total - timerService.remainingSeconds
-        return formatDuration(elapsed)
-    }
-
-    private func formatFocusTime() -> String {
-        let minutes = historyService.totalFocusMinutesToday()
-        let hours = minutes / 60
-        let mins = minutes % 60
-        return hours > 0 ? "\(hours)h \(mins)m" : "\(mins)m"
     }
 }

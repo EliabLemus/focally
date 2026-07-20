@@ -2,7 +2,6 @@ import SwiftUI
 
 enum SettingsSubpage: String, CaseIterable, Identifiable {
     case general = "General"
-    case automation = "Automation"
     case integrations = "Integrations"
     case appearance = "Appearance"
     case about = "About"
@@ -12,8 +11,7 @@ enum SettingsSubpage: String, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .general: return "gearshape"
-        case .automation: return "wand.and.stars"
-        case .integrations: return "puzzlepiece.extension"
+        case .integrations: return "message.fill"
         case .appearance: return "paintbrush"
         case .about: return "info.circle"
         }
@@ -25,96 +23,62 @@ struct SettingsPage: View {
 
     var body: some View {
         HStack(spacing: 0) {
-                // Sub-navigation sidebar
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(SettingsSubpage.allCases) { subpage in
-                        Button(action: {
-                            selectedSubpage = subpage
-                        }) {
-                            HStack(spacing: FocallySpacing.small) {
-                                Image(systemName: subpage.icon)
-                                    .font(.system(size: 13))
-                                    .frame(width: 18)
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(SettingsSubpage.allCases) { subpage in
+                    Button(action: {
+                        selectedSubpage = subpage
+                    }) {
+                        HStack(spacing: FocallySpacing.small) {
+                            Image(systemName: subpage.icon)
+                                .font(.system(size: 13))
+                                .frame(width: 18)
 
-                                Text(subpage.rawValue)
-                                    .font(selectedSubpage == subpage ? .focallyBodyBold : .focallyBody)
-                            }
-                            .foregroundStyle(selectedSubpage == subpage ? Color.focallyOnSurface : Color.focallyOutline)
-                            .padding(.horizontal, FocallySpacing.small)
-                            .padding(.vertical, FocallySpacing.small)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                RoundedRectangle(cornerRadius: FocallyRadius.small)
-                                    .fill(selectedSubpage == subpage ? Color.focallySurfaceContainerHigh : Color.clear)
-                            )
+                            Text(subpage.rawValue)
+                                .font(selectedSubpage == subpage ? .focallyBodyBold : .focallyBody)
                         }
-                        .buttonStyle(.plain)
+                        .foregroundStyle(selectedSubpage == subpage ? Color.focallyOnSurface : Color.focallyOutline)
+                        .padding(.horizontal, FocallySpacing.small)
+                        .padding(.vertical, FocallySpacing.small)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: FocallyRadius.small)
+                                .fill(selectedSubpage == subpage ? Color.focallySurfaceContainerHigh : Color.clear)
+                        )
                     }
-
-                    Spacer()
+                    .buttonStyle(.plain)
                 }
-                .padding(FocallySpacing.small)
-                .frame(width: 160)
-                .background(Color.focallySurfaceContainerLow)
 
-                // Content area
-                VStack(spacing: 0) {
-                    // Breadcrumb
-                    HStack(spacing: 4) {
-                        Text("Settings")
-                            .font(.focallyCaption)
-                            .foregroundStyle(Color.focallyOutline)
-                        Text("›")
-                            .font(.focallyCaption)
-                            .foregroundStyle(Color.focallyOutline)
-                        Text(selectedSubpage.rawValue)
-                            .font(.focallyCaption)
-                            .foregroundStyle(Color.focallyOnSurfaceVariant)
-                    }
-                    .padding(.horizontal, FocallySpacing.large)
-                    .padding(.top, FocallySpacing.medium)
-                    .padding(.bottom, FocallySpacing.small)
+                Spacer()
+            }
+            .padding(FocallySpacing.small)
+            .frame(width: 160)
+            .background(Color.focallySurfaceContainerLow)
 
-                    // Content
-                    ScrollView {
-                        subpageContent
-                            .padding(.horizontal, FocallySpacing.large)
-                            .padding(.bottom, FocallySpacing.large)
-                    }
-                    .scrollContentBackground(.hidden)
-
-                    // Footer
-                    HStack {
-                        Text("Changes are saved automatically.")
-                            .font(.focallyCaption)
-                            .foregroundStyle(Color.focallyOutline)
-
-                        Spacer()
-
-                        Button(action: openShortcutSetup) {
-                            Text("Manage Focus Integration")
-                                .font(.focallyButton)
-                                .foregroundStyle(Color.focallyOnPrimary)
-                                .padding(.horizontal, FocallySpacing.medium)
-                                .padding(.vertical, 6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: FocallyRadius.small)
-                                        .fill(Color.focallyPrimary)
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Manage Focus Integration")
-                    }
-                    .padding(.horizontal, FocallySpacing.large)
-                    .padding(.vertical, FocallySpacing.medium)
-                    .overlay(alignment: .top) {
-                        Rectangle()
-                            .frame(height: 0.5)
-                            .foregroundStyle(Color.focallyOutlineVariant)
-                    }
+            VStack(spacing: 0) {
+                HStack(spacing: 4) {
+                    Text("Settings")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOutline)
+                    Text("›")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOutline)
+                    Text(selectedSubpage.rawValue)
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.focallyBackground)
+                .padding(.horizontal, FocallySpacing.large)
+                .padding(.top, FocallySpacing.medium)
+                .padding(.bottom, FocallySpacing.small)
+
+                ScrollView {
+                    subpageContent
+                        .padding(.horizontal, FocallySpacing.large)
+                        .padding(.bottom, FocallySpacing.large)
+                }
+                .scrollContentBackground(.hidden)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.focallyBackground)
         }
     }
 
@@ -123,8 +87,6 @@ struct SettingsPage: View {
         switch selectedSubpage {
         case .general:
             GeneralSettingsView()
-        case .automation:
-            AutomationSettingsView()
         case .integrations:
             IntegrationsSettingsView()
         case .appearance:
@@ -132,10 +94,5 @@ struct SettingsPage: View {
         case .about:
             AboutSettingsView()
         }
-    }
-
-    private func openShortcutSetup() {
-        selectedSubpage = .integrations
-        NotificationCenter.default.post(name: .focusOpenShortcutOnboarding, object: nil)
     }
 }

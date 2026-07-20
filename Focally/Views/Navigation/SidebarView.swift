@@ -10,7 +10,7 @@ struct SidebarView: View {
                     .font(.focallyH1)
                     .foregroundStyle(Color.focallyOnSurface)
 
-                Text("Deep Work")
+                Text("Three focus modes")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .textCase(.uppercase)

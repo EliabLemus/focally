@@ -1,5 +1,5 @@
-import SwiftUI
 import Observation
+import SwiftUI
 import os.log
 
 @main
@@ -8,7 +8,6 @@ struct FocallyApp: App {
 
     var body: some Scene {
         Settings {
-            // Redirect system Settings to MainWindow (Settings tab handled via openSettings)
             EmptyView()
         }
     }
@@ -21,51 +20,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover?
     private var eventMonitor: Any?
     private var mainWindow: NSWindow?
-    private var onboardingWindow: NSWindow?
+    private var setupWindow: NSWindow?
     private var themeObserver: NSObjectProtocol?
     let dndService = DNDService.shared
     let focusIntegrationService = FocusIntegrationService.shared
     let slackService = SlackService()
-    let calendarService = GoogleCalendarService()
     let notificationService = NotificationService()
-    let historyService = HistoryService.shared
-    let shortcutDropHandler = ShortcutDropHandler()
-    let managedShortcutsService = ManagedFocusShortcutsService.shared
-    let predefinedTaskStore = PredefinedTaskStore()
+    let focusModeStore = FocusModeStore()
     let usageTracker = EmojiUsageTracker.shared
     private lazy var settingsStore = SettingsStore()
     private lazy var timerService = FocusTimerService(
         settingsStore: settingsStore,
         soundPlayer: .shared,
         notificationService: notificationService,
-        historyService: historyService,
         dndService: dndService,
         focusIntegrationService: focusIntegrationService
     )
     private var timerUpdate: Timer?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
-
-        // Show onboarding if not completed
-        showOnboardingIfNeeded()
-
+        showSetupIfNeeded()
         applySavedTheme()
         notificationService.requestAuthorization()
 
-        // Setup status item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-
         if let button = statusItem?.button {
             button.image = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
             button.action = #selector(togglePopover)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
-        // Setup popover with new MenuBarDropdownView
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 600)
+        popover.contentSize = NSSize(width: 320, height: 520)
         popover.behavior = .transient
-
         let contentView = MenuBarDropdownView()
             .environment(settingsStore)
             .environment(SoundPlayerService.shared)
@@ -73,47 +61,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(dndService)
             .environment(focusIntegrationService)
             .environment(slackService)
-            .environment(calendarService)
-            .environment(historyService)
-            .environment(shortcutDropHandler)
-            .environment(managedShortcutsService)
-            .environment(predefinedTaskStore)
+            .environment(focusModeStore)
             .environment(usageTracker)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
-        applySavedTheme()
-
         observeTimerService()
 
-        // Observe session start/end for Slack
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(onSessionStarted),
-            name: .focusSessionStarted,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(onSessionEnded),
-            name: .focusSessionEnded,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(openShortcutOnboarding),
-            name: .focusOpenShortcutOnboarding,
-            object: nil
-        )
-
-        // Click-outside monitor to close popover
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             if let popover = self?.popover, popover.isShown {
                 popover.performClose(nil)
             }
-        }
-
-        if calendarService.isEnabled {
-            calendarService.fetchTodayEvents()
         }
 
         themeObserver = NotificationCenter.default.addObserver(
@@ -130,7 +87,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        // Cmd+Shift+F to open main window
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if event.modifierFlags.contains([.command, .shift]) && event.characters == "f" {
                 self?.openMainWindow()
@@ -138,25 +94,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             return event
         }
-    }
-
-    @objc private func onSessionStarted() {
-        let expiration = Int(Date().timeIntervalSince1970) + (timerService.durationMinutes * 60)
-        slackService.setStatus(
-            text: timerService.currentActivity,
-            expirationTimestamp: expiration,
-            taskEmoji: timerService.currentEmoji,
-            fallbackEmoji: slackService.savedStatusEmoji()
-        )
-
-        guard calendarService.isEnabled, calendarService.isSignedIn else { return }
-        calendarService.fetchTodayEvents { [weak self] in
-            self?.presentCalendarConflictIfNeeded()
-        }
-    }
-
-    @objc private func onSessionEnded() {
-        slackService.clearStatus()
     }
 
     @objc func togglePopover() {
@@ -180,14 +117,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         if timerService.hasSession {
-            let pauseTitle: String = timerService.isPaused ? "Resume Session" : "Pause Session"
-            let pauseImage: String = timerService.isPaused ? "play.fill" : "pause.fill"
-            let pauseItem: NSMenuItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
+            let pauseTitle = timerService.isPaused ? "Resume Session" : "Pause Session"
+            let pauseImage = timerService.isPaused ? "play.fill" : "pause.fill"
+            let pauseItem = NSMenuItem(title: pauseTitle, action: #selector(togglePauseSession), keyEquivalent: "")
             pauseItem.image = NSImage(systemSymbolName: pauseImage, accessibilityDescription: pauseTitle)
             pauseItem.target = self
             menu.addItem(pauseItem)
 
-            let endItem: NSMenuItem = NSMenuItem(title: "End Session", action: #selector(endSession), keyEquivalent: "")
+            let endItem = NSMenuItem(title: "End Session", action: #selector(endSession), keyEquivalent: "")
             endItem.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: "End")
             endItem.target = self
             menu.addItem(endItem)
@@ -198,6 +135,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         settingsItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: "Settings")
         settingsItem.target = self
         menu.addItem(settingsItem)
+
+        let setupItem = NSMenuItem(title: "Setup…", action: #selector(openSetupWindow), keyEquivalent: "")
+        setupItem.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: "Setup")
+        setupItem.target = self
+        menu.addItem(setupItem)
 
         let aboutItem = NSMenuItem(title: aboutMenuTitle, action: nil, keyEquivalent: "")
         aboutItem.image = NSImage(systemSymbolName: "info.circle", accessibilityDescription: "About Focally")
@@ -226,10 +168,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if popover?.isShown == true {
             popover?.performClose(nil)
         }
-
-        // Open MainWindow on Settings tab
         openMainWindow()
-        // Navigate to settings tab after a brief delay (window needs to be visible)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             NotificationCenter.default.post(name: .focusNavigateToSettings, object: nil)
         }
@@ -254,16 +193,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(dndService)
             .environment(focusIntegrationService)
             .environment(slackService)
-            .environment(calendarService)
-            .environment(historyService)
-            .environment(shortcutDropHandler)
-            .environment(managedShortcutsService)
-            .environment(predefinedTaskStore)
+            .environment(focusModeStore)
             .environment(usageTracker)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
-        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.styleMask = styleMask
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 1200, height: 800))
         window.minSize = NSSize(width: 900, height: 600)
@@ -275,19 +209,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
-    @objc func openShortcutOnboarding() {
+    @objc func openSetupWindow() {
         if popover?.isShown == true {
             popover?.performClose(nil)
         }
-
-        if let onboardingWindow {
-            onboardingWindow.makeKeyAndOrderFront(nil)
-            onboardingWindow.orderFrontRegardless()
-            NSApp.activate(ignoringOtherApps: true)
-            return
-        }
-
-        showOnboardingWindow()
+        showSetupWindow()
     }
 
     @objc func quitApp() {
@@ -298,10 +224,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem?.button else { return }
 
         if timerService.hasSession {
-            let imageName: String = timerService.isPaused ? "play.fill" : "pause.fill"
-            let description: String = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
+            let imageName = timerService.isPaused ? "play.fill" : "pause.fill"
+            let description = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
             button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: description)
-            let newText: String = " \(timerService.currentEmoji) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
+            let emojiDisplay = EmojiValidator.convertShortcodeToUnicode(timerService.currentEmoji, workspaceEmojis: []) ?? timerService.currentEmoji
+            let newText = " \(emojiDisplay) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
             if button.title != newText {
                 button.title = newText
             }
@@ -358,9 +285,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applySavedTheme() {
-        let theme = settingsStore.appTheme
-        let appearance = appearance(for: theme)
-
+        let appearance = appearance(for: settingsStore.appTheme)
         NSApp.appearance = appearance
         statusItem?.button?.appearance = appearance
         popover?.appearance = appearance
@@ -368,103 +293,64 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover?.contentViewController?.view.window?.appearance = appearance
         mainWindow?.appearance = appearance
         mainWindow?.contentViewController?.view.appearance = appearance
+        setupWindow?.appearance = appearance
     }
 
     private func appearance(for theme: ThemeChoice) -> NSAppearance? {
         switch theme {
         case .light:
-            return NSAppearance(named: NSAppearance.Name.aqua)
+            return NSAppearance(named: .aqua)
         case .dark:
-            return NSAppearance(named: NSAppearance.Name.darkAqua)
+            return NSAppearance(named: .darkAqua)
         case .system:
-            return nil as NSAppearance?
+            return nil
         }
     }
 
     private var aboutMenuTitle: String {
-        let version: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
-        let build: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
         return "About Focally (v\(version), build \(build))"
     }
 
-    // MARK: - Onboarding
-
-    @MainActor
-    private func showOnboardingIfNeeded() {
-        guard !ShortcutOnboardingViewModel.isOnboardingCompleted() else {
-            logger.info("Onboarding already completed, skipping")
+    private func showSetupIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: "FocallySimpleSetupCompleted") else {
+            logger.info("Simple setup already completed")
             return
         }
-
-        logger.info("Showing focus integration onboarding")
-
-        // Delay slightly to allow the app to fully launch
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.showOnboardingWindow()
+            self?.showSetupWindow()
         }
     }
 
-    private func showOnboardingWindow() {
-        if let onboardingWindow {
-            onboardingWindow.makeKeyAndOrderFront(nil)
-            onboardingWindow.orderFrontRegardless()
+    private func showSetupWindow() {
+        if let setupWindow {
+            setupWindow.makeKeyAndOrderFront(nil)
+            setupWindow.orderFrontRegardless()
             NSApp.activate(ignoringOtherApps: true)
             return
         }
 
-        let onboardingView = ShortcutOnboardingView(
-            managedShortcutsService: managedShortcutsService,
-            focusIntegrationService: focusIntegrationService
-        )
-
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 500, height: 600),
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: 340),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
-        window.title = "Focally Focus Integration Setup"
+        window.title = "Focally Setup"
         window.isReleasedWhenClosed = false
         window.center()
-
-        let hostingController = NSHostingController(rootView: onboardingView)
-        window.contentViewController = hostingController
-
+        window.contentViewController = NSHostingController(rootView: FocusSetupView())
         window.makeKeyAndOrderFront(nil)
         window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
-
-        onboardingWindow = window
+        setupWindow = window
         applySavedTheme()
-    }
-
-    private func presentCalendarConflictIfNeeded() {
-        guard timerService.isActive else { return }
-
-        let sessionInterval = DateInterval(
-            start: Date(),
-            end: Date().addingTimeInterval(TimeInterval(timerService.remainingSeconds))
-        )
-
-        guard let conflict = calendarService.checkConflict(during: sessionInterval) else {
-            return
-        }
-
-        let alert = NSAlert()
-        alert.messageText = "You have a meeting during this focus session"
-        alert.informativeText = "\(conflict.title) is scheduled for \(conflict.timeRange)."
-        alert.addButton(withTitle: "OK")
-        alert.alertStyle = .warning
-        alert.runModal()
     }
 }
 
 extension AppDelegate: NSMenuDelegate {}
 
-// Notification names for Slack integration
 extension Notification.Name {
-    static let focusSessionStarted = Notification.Name("focusSessionStarted")
-    static let focusSessionEnded = Notification.Name("focusSessionEnded")
     static let focusNavigateToSettings = Notification.Name("focusNavigateToSettings")
-    static let focusOpenShortcutOnboarding = Notification.Name("focusOpenShortcutOnboarding")
 }

@@ -99,7 +99,7 @@ struct ActiveFocusView: View {
 
                     HStack(spacing: 18) {
                         heroMeta(title: "Elapsed", value: elapsedTimeString)
-                        heroMeta(title: "Current round", value: "\(timerService.currentRound + 1) / \(timerService.roundsUntilLongBreak)")
+                        heroMeta(title: "Mode", value: timerService.currentMode?.name ?? "Focus")
                         heroMeta(title: "Next", value: nextPhaseLabel)
                     }
                 }
@@ -143,9 +143,12 @@ struct ActiveFocusView: View {
             tint: Color.focallyPrimary
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                supportMetric(title: "Current block", value: "Round \(timerService.currentRound + 1)")
-                supportMetric(title: "Long break cadence", value: "Every \(timerService.roundsUntilLongBreak) rounds")
-                supportMetric(title: "Auto-start breaks", value: timerService.isAutoStartEnabled ? "Enabled" : "Manual")
+                supportMetric(
+                    title: "Current block",
+                    value: timerService.currentMode?.enablePomodoro == true ? "Round \(timerService.currentRound + 1) of \(timerService.pomodoroRounds)" : "Single session"
+                )
+                supportMetric(title: "Break length", value: "\(timerService.shortBreakDurationMinutes)m")
+                supportMetric(title: "Pomodoro", value: timerService.currentMode?.enablePomodoro == true ? "Enabled" : "Off")
             }
         }
     }
@@ -158,7 +161,7 @@ struct ActiveFocusView: View {
         ) {
             VStack(alignment: .leading, spacing: 10) {
                 supportMetric(title: "System status", value: dndService.isDNDActive ? "Do Not Disturb is active" : "Do Not Disturb is off")
-                supportMetric(title: "Session state", value: timerService.isPaused ? "Paused · notifications are back" : "Running")
+                supportMetric(title: "Slack status", value: timerService.currentStatusText)
                 supportMetric(title: "When this ends", value: nextBreakSummary)
             }
         }
@@ -188,7 +191,6 @@ struct ActiveFocusView: View {
 
                 Button("Finish") {
                     timerService.resetToIdle()
-                    dndService.deactivateDND()
                     showFinishConfirmation = false
                 }
                 .buttonStyle(.borderedProminent)
@@ -264,26 +266,33 @@ struct ActiveFocusView: View {
     }
 
     private var elapsedTimeString: String {
-        let elapsedSeconds = max((timerService.workDurationMinutes * 60) - timerService.remainingSeconds, 0)
+        let elapsedSeconds = max((timerService.durationMinutes * 60) - timerService.remainingSeconds, 0)
         let minutes = elapsedSeconds / 60
         let seconds = elapsedSeconds % 60
         return String(format: "%d:%02d", minutes, seconds)
     }
 
     private var nextBreakSummary: String {
-        if timerService.currentRound + 1 >= timerService.roundsUntilLongBreak {
-            return "Long break next · \(timerService.longBreakDurationMinutes)m"
+        if timerService.isBreak {
+            return "Focus resumes when the break ends"
         }
-
-        return "Short break next · \(timerService.shortBreakDurationMinutes)m"
+        if timerService.currentMode?.enablePomodoro != true {
+            return "Session ends when the timer reaches zero"
+        }
+        if timerService.currentRound + 1 >= timerService.pomodoroRounds {
+            return "Session ends after this round"
+        }
+        return "Break next · \(timerService.shortBreakDurationMinutes)m"
     }
 
     private var nextPhaseLabel: String {
-        if timerService.currentRound + 1 >= timerService.roundsUntilLongBreak {
-            return "Long break"
+        if timerService.isBreak {
+            return "Focus"
         }
-
-        return "Short break"
+        if timerService.currentMode?.enablePomodoro != true || timerService.currentRound + 1 >= timerService.pomodoroRounds {
+            return "Finish"
+        }
+        return "Break"
     }
 }
 
