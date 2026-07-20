@@ -15,10 +15,14 @@ final class EmojiValidatorTests: XCTestCase {
     }
 
     func testConvertUnicodeToShortcode() {
-        let workspaceEmojis: [String] = [":brain:", ":computer:", ":memo:"]
-        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("🧠", workspaceEmojis: workspaceEmojis), ":brain:")
-        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("💻", workspaceEmojis: workspaceEmojis), ":computer:")
-        XCTAssertNil(EmojiValidator.convertUnicodeToShortcode("🍅", workspaceEmojis: workspaceEmojis))
+        // Shortcodes oficiales de Slack siempre se convierten (existen en todos los workspaces)
+        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("🧠", workspaceEmojis: []), ":brain:")
+        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("💻", workspaceEmojis: []), ":computer:")
+        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("📧", workspaceEmojis: []), ":email:")
+        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("💪", workspaceEmojis: []), ":muscle:")
+        XCTAssertEqual(EmojiValidator.convertUnicodeToShortcode("🍅", workspaceEmojis: []), ":tomato:")
+        // Emojis workspace-custom no se convierten si no están en el catálogo
+        XCTAssertNil(EmojiValidator.convertUnicodeToShortcode("🫠", workspaceEmojis: []))
     }
 
     func testIsSlackShortcode() {
