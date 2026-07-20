@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FocusModeEditSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(SlackService.self) private var slackService
 
     @State private var draftMode: FocusMode
     let onSave: (FocusMode) -> Void
@@ -22,6 +23,19 @@ struct FocusModeEditSheet: View {
                     .font(.focallyBodyBold)
                 TextField(":brain:", text: $draftMode.emoji)
                     .textFieldStyle(.roundedBorder)
+                HStack(spacing: 10) {
+                    EmojiView(
+                        draftMode.emoji,
+                        customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
+                        workspaceEmojiCodes: slackService.workspaceEmojiCodes,
+                        font: .system(size: 20),
+                        dimension: 20
+                    )
+                    Text(EmojiValidator.convertShortcodeToUnicode(draftMode.emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? draftMode.emoji)
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+                        .lineLimit(1)
+                }
                 Text("Enter Slack emoji shortcode, e.g. :brain:")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)

@@ -62,6 +62,20 @@ struct FocusMode: Identifiable, Codable, Equatable {
         EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: []) ?? emoji
     }
 
+    var isCustomWorkspaceEmoji: Bool {
+        EmojiValidator.isCustomWorkspaceEmoji(emoji, workspaceEmojiCodes: [])
+    }
+
+    func isCustomWorkspaceEmoji(workspaceEmojiCodes: [String]) -> Bool {
+        EmojiValidator.isCustomWorkspaceEmoji(emoji, workspaceEmojiCodes: workspaceEmojiCodes)
+    }
+
+    func imageURL(workspaceEmojiImageURLs: [String: String], workspaceEmojiCodes: [String]) -> URL? {
+        guard isCustomWorkspaceEmoji(workspaceEmojiCodes: workspaceEmojiCodes) else { return nil }
+        let urlString = workspaceEmojiImageURLs[emoji.trimmingCharacters(in: .whitespacesAndNewlines)]
+        return urlString.flatMap { URL(string: $0) }
+    }
+
     var sanitizedDurationMinutes: Int {
         min(max(durationMinutes, 5), 120)
     }

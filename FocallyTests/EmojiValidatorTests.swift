@@ -32,4 +32,11 @@ final class EmojiValidatorTests: XCTestCase {
         XCTAssertFalse(EmojiValidator.isSlackShortcode("test"))
         XCTAssertFalse(EmojiValidator.isSlackShortcode(":"))
     }
+
+    func testDetectsCustomWorkspaceEmoji() {
+        let workspaceEmojis: [String] = [":deep_work:", ":brain:", ":custom_status:"]
+        XCTAssertTrue(EmojiValidator.isCustomWorkspaceEmoji(":custom_status:", workspaceEmojiCodes: workspaceEmojis))
+        XCTAssertFalse(EmojiValidator.isCustomWorkspaceEmoji(":brain:", workspaceEmojiCodes: workspaceEmojis))
+        XCTAssertFalse(EmojiValidator.isCustomWorkspaceEmoji("🧠", workspaceEmojiCodes: workspaceEmojis))
+    }
 }

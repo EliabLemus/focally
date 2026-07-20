@@ -57,8 +57,13 @@ struct MenuBarDropdownView: View {
             ForEach(focusModeStore.modes) { mode in
                 Button(action: { timerService.startSession(mode: mode) }) {
                     HStack(spacing: 12) {
-                        Text(mode.displayEmoji)
-                            .font(.system(size: 22))
+                        EmojiView(
+                            mode.emoji,
+                            customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
+                            workspaceEmojiCodes: slackService.workspaceEmojiCodes,
+                            font: .system(size: 22),
+                            dimension: 22
+                        )
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(mode.name)
@@ -88,6 +93,14 @@ struct MenuBarDropdownView: View {
     private var activeSessionCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
+                EmojiView(
+                    timerService.currentEmoji,
+                    customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
+                    workspaceEmojiCodes: slackService.workspaceEmojiCodes,
+                    font: .system(size: 20),
+                    dimension: 20
+                )
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(timerService.currentActivity)
                         .font(.focallyBodyBold)

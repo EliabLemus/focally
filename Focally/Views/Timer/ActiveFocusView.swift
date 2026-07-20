@@ -3,6 +3,7 @@ import SwiftUI
 struct ActiveFocusView: View {
     @Environment(FocusTimerService.self) private var timerService
     @Environment(DNDService.self) private var dndService
+    @Environment(SlackService.self) private var slackService
 
     @State private var showFinishConfirmation = false
 
@@ -64,6 +65,14 @@ struct ActiveFocusView: View {
                 Text(timerService.phaseName.uppercased())
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyPrimary)
+
+                EmojiView(
+                    timerService.currentEmoji,
+                    customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
+                    workspaceEmojiCodes: slackService.workspaceEmojiCodes,
+                    font: .system(size: 42),
+                    dimension: 42
+                )
 
                 Text(timerService.currentActivity)
                     .font(.system(size: 34, weight: .semibold, design: .default))

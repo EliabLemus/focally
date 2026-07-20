@@ -20,6 +20,7 @@ class SlackService {
     var connectionError: String?
     var lastStatusText: String?
     var workspaceEmojiCodes: [String] = []
+    var workspaceEmojiImageURLs: [String: String] = [:]
     var lastActionMessage: String?
 
     private let keychainKey = "slack-token"
@@ -329,6 +330,7 @@ class SlackService {
         guard let token, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             logger.info("Skipping emoji catalog refresh: no token available")
             workspaceEmojiCodes = []
+            workspaceEmojiImageURLs = [:]
             return
         }
 
@@ -384,12 +386,38 @@ class SlackService {
             let codes = emojiMap.keys
                 .map { ":\($0):" }
                 .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+            let imageURLs = Self.workspaceEmojiImageURLs(from: emojiMap)
 
             DispatchQueue.main.async {
                 self.workspaceEmojiCodes = codes
+                self.workspaceEmojiImageURLs = imageURLs
                 self.connectionError = nil
-                self.logger.info("Loaded \(codes.count) Slack workspace emojis successfully")
+                self.logger.info("Loaded \(codes.count) Slack workspace emojis successfully (\(imageURLs.count) image URLs)")
             }
+        }
+    }
+
+    static func workspaceEmojiImageURLs(from emojiMap: [String: String]) -> [String: String] {
+        func resolvedURLString(for emojiName: String, visited: Set<String>) -> String? {
+            guard !visited.contains(emojiName), let rawValue = emojiMap[emojiName] else {
+                return nil
+            }
+
+            if rawValue.hasPrefix("alias:") {
+                let aliasedName = String(rawValue.dropFirst("alias:".count))
+                return resolvedURLString(for: aliasedName, visited: visited.union([emojiName]))
+            }
+
+            guard URL(string: rawValue)?.scheme?.lowercased() == "https" else {
+                return nil
+            }
+
+            return rawValue
+        }
+
+        return emojiMap.reduce(into: [:]) { partialResult, entry in
+            guard let urlString = resolvedURLString(for: entry.key, visited: []) else { return }
+            partialResult[":\(entry.key):"] = urlString
         }
     }
 
@@ -1040,6 +1068,12 @@ public struct EmojiValidator {
     /// Verifica si un string es un shortcode de Slack
     public static func isSlackShortcode(_ value: String) -> Bool {
         value.hasPrefix(":") && value.hasSuffix(":") && value.count > 2
+    }
+
+    public static func isCustomWorkspaceEmoji(_ shortcode: String, workspaceEmojiCodes: [String]) -> Bool {
+        let trimmed = shortcode.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard isSlackShortcode(trimmed) else { return false }
+        return workspaceEmojiCodes.contains(trimmed) && convertShortcodeToUnicode(trimmed, workspaceEmojis: []) == nil
     }
 
     /// Extrae el nombre base de un emoji unicode (simplificado)

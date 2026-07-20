@@ -28,6 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let notificationService = NotificationService()
     let focusModeStore = FocusModeStore()
     let usageTracker = EmojiUsageTracker.shared
+    let emojiCacheService = EmojiCacheService.shared
     private lazy var settingsStore = SettingsStore()
     private lazy var timerService = FocusTimerService(
         settingsStore: settingsStore,
@@ -66,6 +67,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
         observeTimerService()
+        observeSlackEmojiCatalog()
+        warmEmojiCacheIfNeeded()
 
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             if let popover = self?.popover, popover.isShown {
@@ -227,7 +230,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let imageName = timerService.isPaused ? "play.fill" : "pause.fill"
             let description = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
             button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: description)
-            let emojiDisplay = EmojiValidator.convertShortcodeToUnicode(timerService.currentEmoji, workspaceEmojis: []) ?? timerService.currentEmoji
+            let currentEmoji = timerService.currentEmoji
+            if EmojiValidator.isCustomWorkspaceEmoji(currentEmoji, workspaceEmojiCodes: slackService.workspaceEmojiCodes) {
+                logger.warning("Custom Slack emoji cannot render in the menu bar title; falling back to shortcode text")
+            }
+            let emojiDisplay = EmojiValidator.convertShortcodeToUnicode(
+                currentEmoji,
+                workspaceEmojis: slackService.workspaceEmojiCodes
+            ) ?? currentEmoji
             let newText = " \(emojiDisplay) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
             if button.title != newText {
                 button.title = newText
@@ -267,6 +277,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             updateStatusBar()
         } else if timerUpdate == nil {
             startStatusBarUpdates()
+        }
+    }
+
+    private func observeSlackEmojiCatalog() {
+        withObservationTracking {
+            _ = slackService.workspaceEmojiImageURLs
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.warmEmojiCacheIfNeeded()
+                self.observeSlackEmojiCatalog()
+            }
+        }
+    }
+
+    private func warmEmojiCacheIfNeeded() {
+        let emojiURLs = slackService.workspaceEmojiImageURLs
+        guard !emojiURLs.isEmpty else { return }
+
+        Task(priority: .utility) {
+            await self.emojiCacheService.warmCache(with: emojiURLs)
         }
     }
 

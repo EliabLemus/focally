@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct FocusModeCard: View {
+    @Environment(SlackService.self) private var slackService
+
     let mode: FocusMode
     let onStart: () -> Void
     let onEdit: () -> Void
@@ -10,8 +12,13 @@ struct FocusModeCard: View {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(mode.displayEmoji)
-                            .font(.system(size: 34))
+                        EmojiView(
+                            mode.emoji,
+                            customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
+                            workspaceEmojiCodes: slackService.workspaceEmojiCodes,
+                            font: .system(size: 34),
+                            dimension: 34
+                        )
 
                         Text(mode.name)
                             .font(.focallyH2)

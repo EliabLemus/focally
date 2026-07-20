@@ -21,4 +21,24 @@ final class SlackServiceEmojiTests: XCTestCase {
         XCTAssertTrue(service.validateEmoji("🧠"))
         XCTAssertTrue(service.validateEmoji("💻"))
     }
+
+    func testWorkspaceEmojiImageURLsResolvesAliases() {
+        let emojiMap: [String: String] = [
+            "custom_status": "https://emoji.slack-edge.com/T123/custom_status/abc123.png",
+            "alias_status": "alias:custom_status",
+            "bad_alias": "alias:missing"
+        ]
+
+        let imageURLs = SlackService.workspaceEmojiImageURLs(from: emojiMap)
+
+        XCTAssertEqual(
+            imageURLs[":custom_status:"],
+            "https://emoji.slack-edge.com/T123/custom_status/abc123.png"
+        )
+        XCTAssertEqual(
+            imageURLs[":alias_status:"],
+            "https://emoji.slack-edge.com/T123/custom_status/abc123.png"
+        )
+        XCTAssertNil(imageURLs[":bad_alias:"])
+    }
 }

@@ -5,6 +5,8 @@ import SwiftUI
 @MainActor
 @Observable
 final class FocusTimerService {
+    static private(set) weak var shared: FocusTimerService?
+
     private enum TimerDefaults {
         static let durationRange = 1...600
     }
@@ -44,6 +46,7 @@ final class FocusTimerService {
         self.notificationService = notificationService
         self.dndService = dndService
         self.focusIntegrationService = focusIntegrationService
+        Self.shared = self
         loadLastSession()
     }
 

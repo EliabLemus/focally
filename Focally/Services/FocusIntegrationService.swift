@@ -171,6 +171,34 @@ struct EndFocusAppIntent: AppIntent {
 }
 
 @available(macOS 14.0, *)
+struct PauseFocusAppIntent: AppIntent {
+    static var title: LocalizedStringResource = "Pause Focus"
+    static var description = IntentDescription("Pauses the current Focally focus session.")
+    static var openAppWhenRun = false
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        await MainActor.run {
+            FocusTimerService.shared?.pauseSession()
+        }
+        return .result(dialog: "Focus paused.")
+    }
+}
+
+@available(macOS 14.0, *)
+struct ResumeFocusAppIntent: AppIntent {
+    static var title: LocalizedStringResource = "Resume Focus"
+    static var description = IntentDescription("Resumes the paused Focally focus session.")
+    static var openAppWhenRun = false
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        await MainActor.run {
+            FocusTimerService.shared?.resumeSession()
+        }
+        return .result(dialog: "Focus resumed.")
+    }
+}
+
+@available(macOS 14.0, *)
 struct FocallyAppShortcutsProvider: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
@@ -178,6 +206,20 @@ struct FocallyAppShortcutsProvider: AppShortcutsProvider {
             phrases: ["Start focus with \(.applicationName)"],
             shortTitle: "Start Focus",
             systemImageName: "moon.circle.fill"
+        )
+
+        AppShortcut(
+            intent: PauseFocusAppIntent(),
+            phrases: ["Pause focus with \(.applicationName)"],
+            shortTitle: "Pause Focus",
+            systemImageName: "pause.circle.fill"
+        )
+
+        AppShortcut(
+            intent: ResumeFocusAppIntent(),
+            phrases: ["Resume focus with \(.applicationName)"],
+            shortTitle: "Resume Focus",
+            systemImageName: "play.circle.fill"
         )
 
         AppShortcut(

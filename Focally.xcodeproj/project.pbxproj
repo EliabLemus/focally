@@ -22,6 +22,8 @@
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
 		3CA50BD80850175F7912AB33 /* FocusMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B309416511CC57079912AFE6 /* FocusMode.swift */; };
 		3CC347CA3B86E21F7D0947E8 /* FocallyGlassModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */; };
+		3F5FE2E3237A4D58B51E0A21 /* EmojiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B79404DC0EF4E31858DCE11 /* EmojiView.swift */; };
+		3FA3A6B1A6E14D0AA6A41001 /* EmojiCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA3A6B1A6E14D0AA6A41000 /* EmojiCacheService.swift */; };
 		4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */; };
 		41890883893A4D5DB94888F7 /* FocusModeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */; };
 		4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */; };
@@ -117,6 +119,7 @@
 		333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
 		3A1B83D3B0FB1DC2793D6ACF /* FocusModeEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeEditSheet.swift; sourceTree = "<group>"; };
+		3FA3A6B1A6E14D0AA6A41000 /* EmojiCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCacheService.swift; sourceTree = "<group>"; };
 		3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroStateTests.swift; sourceTree = "<group>"; };
 		440DA683BDD9156AD84D322C /* FocallyColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyColors.swift; sourceTree = "<group>"; };
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -126,6 +129,7 @@
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		5B79404DC0EF4E31858DCE11 /* EmojiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiView.swift; sourceTree = "<group>"; };
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
 		67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
@@ -352,6 +356,7 @@
 		8B1AC60702DFF14DA17604AB /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				5B79404DC0EF4E31858DCE11 /* EmojiView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -408,6 +413,7 @@
 			isa = PBXGroup;
 			children = (
 				F2E3F6355136EFD90EE198C8 /* DNDService.swift */,
+				3FA3A6B1A6E14D0AA6A41000 /* EmojiCacheService.swift */,
 				1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */,
 				1032F662E9204A6D804DD2EF /* FocusTimerService.swift */,
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
@@ -583,6 +589,8 @@
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
 				B83B768C2CF5BCC948DBD75B /* DesignSystemTestView.swift in Sources */,
 				97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */,
+				3FA3A6B1A6E14D0AA6A41001 /* EmojiCacheService.swift in Sources */,
+				3F5FE2E3237A4D58B51E0A21 /* EmojiView.swift in Sources */,
 				5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */,
 				3CC347CA3B86E21F7D0947E8 /* FocallyGlassModifier.swift in Sources */,
 				D626EF73E0ACD103321976D9 /* FocallyRadius.swift in Sources */,
