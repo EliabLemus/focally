@@ -3,6 +3,7 @@ import SwiftUI
 struct IntegrationsSettingsView: View {
     @Environment(SlackService.self) private var slackService
     @Environment(FocusIntegrationService.self) private var focusIntegrationService
+    @Environment(ManagedFocusShortcutsService.self) private var shortcutsService
 
     @State private var slackToken = ""
     @State private var slackTestFeedback: String?
@@ -103,16 +104,46 @@ struct IntegrationsSettingsView: View {
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text("macOS DND and Slack DND are driven directly from each mode. Focus Time enables both by default.")
+                    Text("macOS DND is driven directly from each mode. Signed shortcuts provide keyboard trigger backup.")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
+            HStack(spacing: FocallySpacing.small) {
+                if focusIntegrationService.areShortcutsInstalled {
+                    Label("Shortcuts installed", systemImage: "checkmark.circle.fill")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyPrimary)
+                } else {
+                    Button {
+                        shortcutsService.installShortcuts()
+                    } label: {
+                        Label("Install Shortcuts", systemImage: "square.and.arrow.down")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                }
+
+                Button {
+                    shortcutsService.refreshInstallationState()
+                } label: {
+                    Text("Refresh")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+
             Text(focusIntegrationService.statusText)
                 .font(.focallyCaption)
                 .foregroundStyle(focusIntegrationService.lastError == nil ? Color.focallyOnSurfaceVariant : Color.focallyError)
+
+            if let error = shortcutsService.lastError, !error.isEmpty {
+                Text(error)
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyError)
+            }
         }
         .padding(FocallySpacing.large)
         .focallyGlassCard()

@@ -70,6 +70,7 @@
 		D9CA31F63FDF043AE3F4D10C /* FocusIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */; };
 		DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80AE26497177767F58D61D45 /* SettingsPage.swift */; };
 		E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */; };
+		652EBCFFB2DF66724E0EC021 /* ManagedFocusShortcutsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CB61C2CADB1CDDEB9ACFF9 /* ManagedFocusShortcutsService.swift */; };
 		EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1032F662E9204A6D804DD2EF /* FocusTimerService.swift */; };
 		EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B872379B2018EE66D478415E /* Assets.xcassets */; };
 		F1D0296A1D2E03E29B5268CB /* FocusSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */; };
@@ -115,6 +116,7 @@
 		1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeTests.swift; sourceTree = "<group>"; };
 		24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutDropHandler.swift; sourceTree = "<group>"; };
+		E6CB61C2CADB1CDDEB9ACFF9 /* ManagedFocusShortcutsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedFocusShortcutsService.swift; sourceTree = "<group>"; };
 		31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationsSettingsView.swift; sourceTree = "<group>"; };
 		333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
@@ -420,6 +422,7 @@
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
 				86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */,
 				24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */,
+				E6CB61C2CADB1CDDEB9ACFF9 /* ManagedFocusShortcutsService.swift */,
 				0179E6DB0D32C6C38E33CE35 /* SlackService.swift */,
 				E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */,
 				F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */,
@@ -619,6 +622,7 @@
 				93EE71221692619CD1E52FB0 /* SettingsStore.swift in Sources */,
 				22CE09543F47353743C5813D /* SharedComponents.swift in Sources */,
 				E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */,
+				652EBCFFB2DF66724E0EC021 /* ManagedFocusShortcutsService.swift in Sources */,
 				28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */,
 				AAB08AFF8D55115118E12B39 /* SidebarView.swift in Sources */,
 				84AC2BAA9F2CCA1495A302B5 /* SlackService.swift in Sources */,

@@ -28,6 +28,7 @@ final class FocusIntegrationService {
     private let defaults = UserDefaults.standard
     private let directDNDService: DNDService
     private let slackService: SlackService
+    private let shortcutsService = ManagedFocusShortcutsService.shared
     private static let enabledKey = "focusIntegrationEnabled"
 
     var isEnabled: Bool {
@@ -81,12 +82,20 @@ final class FocusIntegrationService {
         if let lastError {
             return lastError.localizedDescription
         }
-        return "Focally updates Slack status for every mode and only enables Slack/macOS Do Not Disturb for modes with DND turned on."
+        if shortcutsService.allInstalled {
+            return "DND is controlled directly. Signed shortcuts are installed as backup."
+        }
+        return "DND is controlled directly. Install signed shortcuts for keyboard trigger backup."
+    }
+
+    var areShortcutsInstalled: Bool {
+        shortcutsService.allInstalled
     }
 
     private func performCombinedFocusAction(_ action: FocusIntegrationAction, mode: FocusMode?) {
         lastError = nil
         performDirectFocusAction(action, mode: mode)
+        attemptShortcutBackup(action)
         performSlackFocusAction(action, mode: mode)
     }
 
@@ -111,6 +120,14 @@ final class FocusIntegrationService {
             directDNDService.deactivateDND()
             isFocusActive = directDNDService.isDNDActive
             logger.info("Direct DND disabled")
+        }
+    }
+
+    private func attemptShortcutBackup(_ action: FocusIntegrationAction) {
+        do {
+            try shortcutsService.runShortcut(for: action)
+        } catch {
+            logger.warning("Shortcut backup skipped: \(error.localizedDescription)")
         }
     }
 

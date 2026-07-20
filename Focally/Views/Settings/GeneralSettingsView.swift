@@ -11,7 +11,6 @@ struct GeneralSettingsView: View {
     var body: some View {
         VStack(spacing: FocallySpacing.large) {
             generalSettingsCard
-            keyboardShortcutsCard
         }
         .animation(.easeInOut(duration: 0.2), value: soundPlayer.isEnabled)
     }
@@ -33,11 +32,6 @@ struct GeneralSettingsView: View {
                 .background(Color.focallyOutlineVariant)
 
             settingsRow(icon: "menubar.rectangle", label: "Show timer in Menu Bar", toggle: $showInMenuBar)
-
-            Divider()
-                .background(Color.focallyOutlineVariant)
-
-            actionRow(icon: "keyboard", label: "View keyboard shortcuts", action: openKeyboardShortcuts)
         }
         .padding(.top, FocallySpacing.extraSmall)
         .padding(.bottom, FocallySpacing.extraSmall)
@@ -61,25 +55,6 @@ struct GeneralSettingsView: View {
         }
         .padding(.horizontal, FocallySpacing.large)
         .padding(.vertical, FocallySpacing.medium)
-    }
-
-    private var keyboardShortcutsCard: some View {
-        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
-            Text("Keyboard Shortcuts")
-                .font(.focallyBodyBold)
-                .foregroundStyle(Color.focallyOnSurface)
-
-            Text("Assign shortcuts in System Settings using Focally App Shortcuts.")
-                .font(.focallyCaption)
-                .foregroundStyle(Color.focallyOnSurfaceVariant)
-
-            shortcutRow(title: "Start Focus")
-            shortcutRow(title: "Pause Focus")
-            shortcutRow(title: "Resume Focus")
-            shortcutRow(title: "End Focus")
-        }
-        .padding(FocallySpacing.large)
-        .focallyGlassCard()
     }
 
     private var soundOptions: [String] {
@@ -208,25 +183,5 @@ struct GeneralSettingsView: View {
         }
         .buttonStyle(.plain)
         .help("Preview sound")
-    }
-
-    private func shortcutRow(title: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.focallyBody)
-                .foregroundStyle(Color.focallyOnSurface)
-
-            Spacer()
-
-            Text("Assign in System Settings")
-                .font(.focallyCaption)
-                .foregroundStyle(Color.focallyOnSurfaceVariant)
-        }
-    }
-
-    private func openKeyboardShortcuts() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension?KeyboardShortcuts") {
-            NSWorkspace.shared.open(url)
-        }
     }
 }

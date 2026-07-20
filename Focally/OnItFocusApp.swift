@@ -24,6 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var themeObserver: NSObjectProtocol?
     let dndService = DNDService.shared
     let focusIntegrationService = FocusIntegrationService.shared
+    let shortcutsService = ManagedFocusShortcutsService.shared
     let slackService = SlackService()
     let notificationService = NotificationService()
     let focusModeStore = FocusModeStore()
@@ -61,6 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(timerService)
             .environment(dndService)
             .environment(focusIntegrationService)
+            .environment(shortcutsService)
             .environment(slackService)
             .environment(focusModeStore)
             .environment(usageTracker)
@@ -195,6 +197,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(timerService)
             .environment(dndService)
             .environment(focusIntegrationService)
+            .environment(shortcutsService)
             .environment(slackService)
             .environment(focusModeStore)
             .environment(usageTracker)
