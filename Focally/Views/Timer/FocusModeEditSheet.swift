@@ -9,6 +9,7 @@ struct FocusModeEditSheet: View {
     @State private var localPreviewURL: URL?
     @State private var showEmojiPicker = false
     @State private var recentEmojis: [String] = []
+    @State private var searchResults: [(shortcode: String, emoji: String)] = []
     let onSave: (FocusMode) -> Void
     var onDelete: (() -> Void)?
 
@@ -16,6 +17,14 @@ struct FocusModeEditSheet: View {
         _draftMode = State(initialValue: mode)
         self.onSave = onSave
         self.onDelete = onDelete
+    }
+
+    /// Extrae la query de búsqueda del campo emoji.
+    /// Si es ":" → "" (mostrar recientes). Si es ":tac" → "tac".
+    private var searchQuery: String {
+        let t = draftMode.emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard t.hasPrefix(":"), t.count > 1 else { return "" }
+        return String(t.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
     }
 
     var body: some View {
@@ -34,9 +43,18 @@ struct FocusModeEditSheet: View {
                     .textFieldStyle(.roundedBorder)
                     .onChange(of: draftMode.emoji) { _, newValue in
                         let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                        showEmojiPicker = trimmed == ":"
-                        if showEmojiPicker {
+                        if trimmed == ":" {
+                            showEmojiPicker = true
                             recentEmojis = usageTracker.getRecentEmojis(forWorkspace: slackService.workspaceEmojiCodes)
+                            searchResults = []
+                        } else if trimmed.hasPrefix(":") && trimmed.count > 1 {
+                            showEmojiPicker = true
+                            recentEmojis = []
+                            let q = String(trimmed.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
+                            searchResults = EmojiValidator.searchShortcodes(q, workspaceEmojiCodes: slackService.workspaceEmojiCodes)
+                        } else {
+                            showEmojiPicker = false
+                            searchResults = []
                         }
                     }
                     .task(id: draftMode.emoji) {
@@ -51,24 +69,50 @@ struct FocusModeEditSheet: View {
                         }
                     }
 
-                    if showEmojiPicker && !recentEmojis.isEmpty {
+                    if showEmojiPicker && (!recentEmojis.isEmpty || !searchResults.isEmpty) {
                         VStack(alignment: .leading, spacing: 4) {
                             ScrollView {
-                                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
-                                    ForEach(recentEmojis, id: \.self) { emoji in
-                                        let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
-                                        Button {
-                                            draftMode.emoji = emoji
-                                            showEmojiPicker = false
-                                        } label: {
-                                            Text(display)
-                                                .font(.system(size: 22))
-                                                .frame(width: 36, height: 36)
-                                                .background(Color.focallySurfaceVariant.opacity(0.3))
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                if !searchResults.isEmpty {
+                                    LazyVStack(spacing: 2) {
+                                        ForEach(searchResults, id: \.shortcode) { item in
+                                            Button {
+                                                draftMode.emoji = item.shortcode
+                                                showEmojiPicker = false
+                                                searchResults = []
+                                            } label: {
+                                                HStack(spacing: 8) {
+                                                    Text(item.emoji.isEmpty ? "🔗" : item.emoji)
+                                                        .font(.system(size: 20))
+                                                        .frame(width: 30, alignment: .center)
+                                                    Text(item.shortcode)
+                                                        .font(.focallyBody)
+                                                        .foregroundStyle(Color.focallyOnSurface)
+                                                    Spacer()
+                                                }
+                                                .padding(.horizontal, 8)
+                                                .padding(.vertical, 4)
+                                                .contentShape(Rectangle())
+                                            }
+                                            .buttonStyle(.plain)
                                         }
-                                        .buttonStyle(.plain)
-                                        .help(emoji)
+                                    }
+                                } else {
+                                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
+                                        ForEach(recentEmojis, id: \.self) { emoji in
+                                            let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
+                                            Button {
+                                                draftMode.emoji = emoji
+                                                showEmojiPicker = false
+                                            } label: {
+                                                Text(display)
+                                                    .font(.system(size: 22))
+                                                    .frame(width: 36, height: 36)
+                                                    .background(Color.focallySurfaceVariant.opacity(0.3))
+                                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .help(emoji)
+                                        }
                                     }
                                 }
                             }
@@ -101,7 +145,7 @@ struct FocusModeEditSheet: View {
                     }
                 }
 
-                Text("Type `:` to see recent emojis, or enter a Slack shortcode")
+                Text("Type `:` for recent emojis, `:query` to search (~1900 emojis)")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }

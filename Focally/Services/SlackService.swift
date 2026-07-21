@@ -2690,8 +2690,53 @@ public struct EmojiValidator {
         ":zzz:": "💤",
     ]
 
-    /// Busca shortcodes que coincidan parcialmente con la query.
-    /// Mientras el usuario escribe ":tac" muestra sugerencias como ":taco:", etc.
+    // MARK: - Fuzzy Matching
+
+    /// Fuzzy subsequence match con scoring.
+    /// "brn" matchea "brain" (b-r-...-n), "tco" matchea "taco" (t-...-c-o).
+    /// Retorna el score (>0 = match). Mayor score = mejor match.
+    private static func fuzzyScore(_ pattern: String, target: String) -> Int {
+        let pChars = Array(pattern.lowercased())
+        let tChars = Array(target.lowercased())
+        guard !pChars.isEmpty, pChars.count <= tChars.count + 1 else { return 0 }
+
+        var score = 0
+        var pi = 0
+        var ti = 0
+        var lastMatchTi = -1
+
+        // Split target por separadores para bonus de inicio de palabra
+        let lowerTarget = target.lowercased()
+        var wordStarts = Set<Int>()
+        wordStarts.insert(0)
+        for (i, c) in lowerTarget.enumerated() {
+            if c == "_" { wordStarts.insert(i + 1) }
+        }
+
+        while pi < pChars.count && ti < tChars.count {
+            if pChars[pi] == tChars[ti] {
+                score += (ti == lastMatchTi + 1) ? 3 : 1  // consecutive +3, gap +1
+                if wordStarts.contains(ti) { score += 2 }  // word start bonus
+                lastMatchTi = ti
+                pi += 1
+            }
+            ti += 1
+        }
+
+        // All pattern chars must be consumed for a match
+        guard pi == pChars.count else { return 0 }
+
+        // Prefix bonus
+        if target.lowercased().hasPrefix(pattern.lowercased()) { score += 5 }
+
+        // Penalty for length difference (prefer shorter targets)
+        score -= (tChars.count - pChars.count)
+
+        return score
+    }
+
+    /// Busca shortcodes usando fuzzy matching.
+    /// Escribe ":brn" y encuentra ":brain:", ":tco" encuentra ":taco:", ":taco_b" encuentra ":taco_bell:".
     public static func searchShortcodes(_ query: String, workspaceEmojiCodes: [String]) -> [(shortcode: String, emoji: String)] {
         let trimmed = query.trimmingCharacters(in: CharacterSet(charactersIn: ": "))
         guard !trimmed.isEmpty else { return [] }
@@ -2703,21 +2748,25 @@ public struct EmojiValidator {
 
         let lowerQuery = trimmed.lowercased()
 
-        let matches = searchMap.filter { shortcode, _ in
+        // Fuzzy match: score > 0 means match
+        var scored: [(shortcode: String, emoji: String, score: Int)] = []
+        scored.reserveCapacity(40)
+
+        for (shortcode, emoji) in searchMap {
             let stripped = shortcode.trimmingCharacters(in: CharacterSet(charactersIn: ":")).lowercased()
-            return stripped.contains(lowerQuery)
+            let s = fuzzyScore(lowerQuery, target: stripped)
+            if s > 0 {
+                scored.append((shortcode, emoji, s))
+            }
         }
 
-        let sorted = matches.sorted { a, b in
-            let aS = a.key.trimmingCharacters(in: CharacterSet(charactersIn: ":")).lowercased()
-            let bS = b.key.trimmingCharacters(in: CharacterSet(charactersIn: ":")).lowercased()
-            let aPrefix = aS.hasPrefix(lowerQuery)
-            let bPrefix = bS.hasPrefix(lowerQuery)
-            if aPrefix != bPrefix { return aPrefix }
-            return aS < bS
+        // Sort: higher score first, then alphabetically for ties
+        scored.sort { a, b in
+            if a.score != b.score { return a.score > b.score }
+            return a.shortcode < b.shortcode
         }
 
-        return Array(sorted.prefix(20).map { ($0.key, $0.value) })
+        return Array(scored.prefix(20).map { ($0.shortcode, $0.emoji) })
     }
 
     public static func isValidForSlack(_ emoji: String, workspaceEmojis: [String]) -> Bool {
