@@ -92,6 +92,10 @@ struct FocusMode: Identifiable, Codable, Equatable {
         min(max(pomodoroRounds, 1), 12)
     }
 
+    var isBuiltIn: Bool {
+        id == FocusMode.focusTimeID || id == FocusMode.meetingID || id == FocusMode.inboxID
+    }
+
     func sanitized() -> FocusMode {
         FocusMode(
             id: id,
@@ -125,6 +129,22 @@ final class FocusModeStore {
     func update(_ mode: FocusMode) {
         guard let index = modes.firstIndex(where: { $0.id == mode.id }) else { return }
         modes[index] = mode.sanitized()
+        modes = Self.orderedModes(from: modes)
+    }
+
+    func add(_ mode: FocusMode) {
+        var newMode = mode.sanitized()
+        if newMode.id == UUID() {
+            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroRounds: newMode.pomodoroRounds)
+        }
+        modes.append(newMode)
+        modes = Self.orderedModes(from: modes)
+    }
+
+    func delete(_ mode: FocusMode) {
+        // Cannot delete built-in modes
+        guard !mode.isBuiltIn else { return }
+        modes.removeAll(where: { $0.id == mode.id })
         modes = Self.orderedModes(from: modes)
     }
 

@@ -6,10 +6,12 @@ struct FocusModeEditSheet: View {
 
     @State private var draftMode: FocusMode
     let onSave: (FocusMode) -> Void
+    var onDelete: (() -> Void)?
 
-    init(mode: FocusMode, onSave: @escaping (FocusMode) -> Void) {
+    init(mode: FocusMode, onSave: @escaping (FocusMode) -> Void, onDelete: (() -> Void)? = nil) {
         _draftMode = State(initialValue: mode)
         self.onSave = onSave
+        self.onDelete = onDelete
     }
 
     var body: some View {
@@ -76,7 +78,16 @@ struct FocusModeEditSheet: View {
             Spacer()
 
             HStack {
+                if !draftMode.isBuiltIn {
+                    Button(role: .destructive) {
+                        onDelete?()
+                    } label: {
+                        Label("Delete Mode", systemImage: "trash")
+                    }
+                }
+
                 Spacer()
+
                 Button("Cancel") {
                     dismiss()
                 }

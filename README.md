@@ -8,7 +8,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Version](https://img.shields.io/badge/version-0.8.3-green)](https://github.com/EliabLemus/focally/releases)
+[![Version](https://img.shields.io/badge/version-0.8.5-green)](https://github.com/EliabLemus/focally/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 </div>
@@ -29,9 +29,10 @@ Focally is one thing: **start a timer, get in the zone, let the app handle the r
 
 | Mode | What it does |
 |------|-------------|
-| 🎯 **Focus Time** | Classic timer (25/45/60/custom min) with DND + Slack sync |
+| 🎯 **Focus Time** | Classic timer (25/45/60/custom min) with DND + Pomodoro + Slack sync |
 | 📋 **Meeting** | Fixed-duration session, keeps DND active, syncs Slack |
 | 📥 **Inbox** | Quick triage session with separate sound settings |
+| ➕ **Custom** | Create unlimited custom modes with any emoji, status, duration, and optional Pomodoro |
 
 ### Integrations
 

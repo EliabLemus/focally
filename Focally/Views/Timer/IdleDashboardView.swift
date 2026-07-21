@@ -6,6 +6,7 @@ struct IdleDashboardView: View {
     @Environment(SlackService.self) private var slackService
 
     @State private var editingMode: FocusMode?
+    @State private var isAddingMode = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -20,6 +21,8 @@ struct IdleDashboardView: View {
                             onEdit: { editingMode = mode }
                         )
                     }
+
+                    addModeButton
                 }
 
                 footerCard
@@ -31,9 +34,18 @@ struct IdleDashboardView: View {
             slackService.refreshEmojiCatalogIfPossible()
         }
         .sheet(item: $editingMode) { mode in
-            FocusModeEditSheet(mode: mode) { updatedMode in
+            FocusModeEditSheet(mode: mode, onSave: { updatedMode in
                 focusModeStore.update(updatedMode)
-            }
+            }, onDelete: {
+                focusModeStore.delete(mode)
+                editingMode = nil
+            })
+            .environment(slackService)
+        }
+        .sheet(isPresented: $isAddingMode) {
+            FocusModeEditSheet(mode: FocusMode(id: UUID(), name: "", emoji: ":rocket:", statusText: "", durationMinutes: 25, enableDND: true, enablePomodoro: false, pomodoroWorkMinutes: 25, pomodoroBreakMinutes: 5, pomodoroRounds: 1), onSave: { newMode in
+                focusModeStore.add(newMode)
+            })
             .environment(slackService)
         }
     }
@@ -74,5 +86,27 @@ struct IdleDashboardView: View {
 
     private func start(_ mode: FocusMode) {
         timerService.startSession(mode: mode)
+    }
+
+    private var addModeButton: some View {
+        Button(action: { isAddingMode = true }) {
+            VStack(spacing: 12) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(Color.focallyPrimary.opacity(0.7))
+
+                Text("Add Mode")
+                    .font(.focallyBodyBold)
+                    .foregroundStyle(Color.focallyPrimary.opacity(0.7))
+            }
+            .frame(maxWidth: .infinity, minHeight: 140)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+                    .foregroundStyle(Color.focallyOutline.opacity(0.5))
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+        }
+        .buttonStyle(.plain)
     }
 }
