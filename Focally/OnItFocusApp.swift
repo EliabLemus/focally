@@ -46,17 +46,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applySavedTheme()
         notificationService.requestAuthorization()
 
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
-            button.action = #selector(togglePopover)
-            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
-        }
+        setupStatusBar()
+
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(screenDidChange(_:)),
+            name: NSApplication.didChangeScreenParametersNotification, object: nil
+        )
 
         let popover = NSPopover()
         popover.contentSize = NSSize(width: 320, height: 520)
         popover.behavior = .transient
-        let contentView = MenuBarDropdownView()
+        let contentView = MenuBarDropdownView(onAddMode: { [weak self] in
+            self?.openAddMode()
+        })
             .environment(settingsStore)
             .environment(SoundPlayerService.shared)
             .environment(timerService)
@@ -179,6 +181,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc func openAddMode() {
+        if popover?.isShown == true {
+            popover?.performClose(nil)
+        }
+        openMainWindow()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NotificationCenter.default.post(name: .focusAddMode, object: nil)
+        }
+    }
+
     @objc func openMainWindow() {
         if popover?.isShown == true {
             popover?.performClose(nil)
@@ -226,31 +238,118 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
 
+    private func setupStatusBar() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem?.button {
+            button.image = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
+            button.action = #selector(togglePopover)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        }
+        updateStatusBar()
+    }
+
+    @objc private func screenDidChange(_ notification: Notification) {
+        if statusItem == nil || statusItem?.button == nil {
+            logger.info("Status item lost after screen change, recreating")
+            setupStatusBar()
+        }
+    }
+
     private func updateStatusBar() {
         guard let button = statusItem?.button else { return }
 
         if timerService.hasSession {
-            let imageName = timerService.isPaused ? "play.fill" : "pause.fill"
-            let description = timerService.isPaused ? "Resume Focus Session" : "Pause Focus Session"
-            button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: description)
             let currentEmoji = timerService.currentEmoji
-            if EmojiValidator.isCustomWorkspaceEmoji(currentEmoji, workspaceEmojiCodes: slackService.workspaceEmojiCodes) {
-                logger.warning("Custom Slack emoji cannot render in the menu bar title; falling back to shortcode text")
-            }
-            let emojiDisplay = EmojiValidator.convertShortcodeToUnicode(
+            let emojiString = EmojiValidator.convertShortcodeToUnicode(
                 currentEmoji,
                 workspaceEmojis: slackService.workspaceEmojiCodes
             ) ?? currentEmoji
-            let newText = " \(emojiDisplay) \(timerService.remainingMinutesString) — \(timerService.currentActivity)"
-            if button.title != newText {
-                button.title = newText
+
+            // Try to load custom emoji from cache as NSImage
+            var emojiImage: NSImage? = nil
+            if EmojiValidator.isCustomWorkspaceEmoji(currentEmoji, workspaceEmojiCodes: slackService.workspaceEmojiCodes),
+               let urlString = slackService.workspaceEmojiImageURLs[currentEmoji],
+               let url = URL(string: urlString) {
+                // Synchronous load from cache (already downloaded by EmojiCacheService)
+                if let cached = emojiCacheService.cachedEmojiURL(for: currentEmoji),
+                   let nsImg = NSImage(contentsOf: cached) {
+                    emojiImage = nsImg
+                }
             }
+
+            // Build composite image: emoji + time text
+            let timeText = timerService.remainingMinutesString
+            let composite = Self.renderMenuBarImage(
+                emoji: emojiString,
+                emojiImage: emojiImage,
+                timeText: timeText,
+                isPaused: timerService.isPaused
+            )
+            button.image = composite
+            button.title = " \(timerService.currentActivity)"
         } else {
             button.image = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
             button.title = ""
         }
 
         statusItem?.length = NSStatusItem.variableLength
+    }
+
+    /// Renders a composite NSImage for the menu bar: emoji + time text.
+    private static func renderMenuBarImage(emoji: String, emojiImage: NSImage?, timeText: String, isPaused: Bool) -> NSImage {
+        let emojiSize: CGFloat = 14
+        let fontSize: CGFloat = 12
+        let padding: CGFloat = 2
+        let gap: CGFloat = 3
+
+        // Measure text
+        let textFont = NSFont.systemFont(ofSize: fontSize)
+        let textAttrs: [NSAttributedString.Key: Any] = [
+            .font: textFont,
+            .foregroundColor: NSColor.labelColor
+        ]
+        let textString = NSAttributedString(string: " \(timeText)", attributes: textAttrs)
+        let textSize = textString.size()
+
+        // Emoji dimension
+        let emojiDim = emojiSize
+
+        // Pause/play icon
+        let iconDim: CGFloat = 10
+        let iconFont = NSFont.systemFont(ofSize: iconDim)
+        let iconStr = isPaused ? "▶" : "⏸"
+        let iconAttrs: [NSAttributedString.Key: Any] = [.font: iconFont, .foregroundColor: NSColor.secondaryLabelColor]
+        let iconAttrStr = NSAttributedString(string: iconStr, attributes: iconAttrs)
+        let iconSize = iconAttrStr.size()
+
+        let totalWidth = padding + emojiDim + gap + iconSize.width + gap + textSize.width + padding
+        let totalHeight: CGFloat = max(22, emojiDim + 4)
+
+        let img = NSImage(size: NSSize(width: totalWidth, height: totalHeight))
+        img.lockFocus()
+
+        // Draw emoji
+        let emojiPoint = NSPoint(x: padding, y: (totalHeight - emojiDim) / 2)
+        if let emojiImage {
+            let resized = emojiImage.resized(to: NSSize(width: emojiDim, height: emojiDim))
+            resized.draw(in: NSRect(origin: emojiPoint, size: NSSize(width: emojiDim, height: emojiDim)))
+        } else {
+            let emojiFont = NSFont.systemFont(ofSize: emojiSize)
+            let emojiAttrs: [NSAttributedString.Key: Any] = [.font: emojiFont]
+            let emojiAttrStr = NSAttributedString(string: emoji, attributes: emojiAttrs)
+            emojiAttrStr.draw(at: emojiPoint)
+        }
+
+        // Draw pause/play icon
+        let iconY = (totalHeight - iconSize.height) / 2
+        iconAttrStr.draw(at: NSPoint(x: padding + emojiDim + gap, y: iconY))
+
+        // Draw time text
+        let textY = (totalHeight - textSize.height) / 2
+        textString.draw(at: NSPoint(x: padding + emojiDim + gap + iconSize.width + gap, y: textY))
+
+        img.unlockFocus()
+        return img
     }
 
     private func observeTimerService() {
@@ -387,4 +486,18 @@ extension AppDelegate: NSMenuDelegate {}
 
 extension Notification.Name {
     static let focusNavigateToSettings = Notification.Name("focusNavigateToSettings")
+    static let focusAddMode = Notification.Name("focusAddMode")
+}
+
+private extension NSImage {
+    func resized(to size: NSSize) -> NSImage {
+        let newImage = NSImage(size: size)
+        newImage.lockFocus()
+        self.draw(in: NSRect(origin: .zero, size: size),
+                  from: NSRect(origin: .zero, size: self.size),
+                  operation: .copy,
+                  fraction: 1.0)
+        newImage.unlockFocus()
+        return newImage
+    }
 }

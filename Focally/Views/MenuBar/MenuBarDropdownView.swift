@@ -7,6 +7,8 @@ struct MenuBarDropdownView: View {
     @Environment(SlackService.self) private var slackService
     @Environment(\.colorScheme) private var colorScheme
 
+    var onAddMode: (() -> Void)?
+
     var body: some View {
         VStack(spacing: 0) {
             headerRow
@@ -81,6 +83,23 @@ struct MenuBarDropdownView: View {
                                 .foregroundStyle(Color.focallyPrimary)
                         }
                     }
+                    .padding(12)
+                    .background(Color.focallySurfaceContainerLow)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+            }
+
+            if let onAddMode {
+                Button(action: onAddMode) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle")
+                            .font(.system(size: 16))
+                        Text("Add Mode")
+                            .font(.focallyBody)
+                    }
+                    .foregroundStyle(Color.focallyPrimary)
+                    .frame(maxWidth: .infinity)
                     .padding(12)
                     .background(Color.focallySurfaceContainerLow)
                     .clipShape(RoundedRectangle(cornerRadius: 12))

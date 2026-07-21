@@ -14,6 +14,11 @@ final class EmojiCacheService {
     /// Cached emojis: ":shortcode:" -> local file URL
     private(set) var cachedEmojis: [String: URL] = [:]
 
+    /// Returns cached URL for a shortcode (nil if not cached).
+    func cachedEmojiURL(for shortcode: String) -> URL? {
+        cachedEmojis[shortcode]
+    }
+
     init() {
         ensureCacheDirectory()
         loadCachedEmojis()

@@ -33,6 +33,9 @@ struct IdleDashboardView: View {
         .onAppear {
             slackService.refreshEmojiCatalogIfPossible()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .focusAddMode)) { _ in
+            isAddingMode = true
+        }
         .sheet(item: $editingMode) { mode in
             FocusModeEditSheet(mode: mode, onSave: { updatedMode in
                 focusModeStore.update(updatedMode)
