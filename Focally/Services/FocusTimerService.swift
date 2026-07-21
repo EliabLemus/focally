@@ -25,6 +25,7 @@ final class FocusTimerService {
     var pomodoroRounds = 1
     var workDurationMinutes = 25
     var shortBreakDurationMinutes = 5
+    var longBreakDurationMinutes = 15
 
     let settingsStore: SettingsStore
     let soundPlayer: SoundPlayerService
@@ -66,6 +67,7 @@ final class FocusTimerService {
         durationMinutes = sanitizedMode.sanitizedDurationMinutes
         workDurationMinutes = sanitizedMode.enablePomodoro ? sanitizedMode.sanitizedPomodoroWorkMinutes : sanitizedMode.sanitizedDurationMinutes
         shortBreakDurationMinutes = sanitizedMode.sanitizedPomodoroBreakMinutes
+        longBreakDurationMinutes = sanitizedMode.sanitizedPomodoroLongBreakMinutes
         pomodoroRounds = sanitizedMode.enablePomodoro ? sanitizedMode.sanitizedPomodoroRounds : 1
         currentRound = 0
 
@@ -137,6 +139,16 @@ final class FocusTimerService {
         notificationService.notify(.breakStarted)
     }
 
+    private func startLongBreak() {
+        currentPhaseDuration = longBreakDurationMinutes * 60
+        remainingSeconds = currentPhaseDuration
+        pomodoroState = .longBreak
+        isPaused = false
+        deactivateFocusIntegration()
+        startTimer()
+        notificationService.notify(.breakStarted)
+    }
+
     private func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -171,18 +183,26 @@ final class FocusTimerService {
                 return
             }
 
-            guard completedRounds < pomodoroRounds else {
+            // After every 4 rounds (set), take a long break; after individual rounds, short break
+            let roundsInSet = 4
+            if completedRounds % roundsInSet == 0 && completedRounds < pomodoroRounds {
+                currentRound = completedRounds
+                soundPlayer.play(.workEnd)
+                startLongBreak()
+            } else if completedRounds < pomodoroRounds {
+                currentRound = completedRounds
+                soundPlayer.play(.workEnd)
+                startShortBreak()
+            } else {
                 endSession()
-                return
             }
-
-            currentRound = completedRounds
-            soundPlayer.play(.workEnd)
-            startShortBreak()
         case .shortBreak:
             soundPlayer.play(.breakEnd)
             startWorkPhase()
-        case .idle, .longBreak, .completed:
+        case .longBreak:
+            soundPlayer.play(.breakEnd)
+            startWorkPhase()
+        case .idle, .completed:
             break
         }
     }
@@ -222,7 +242,7 @@ final class FocusTimerService {
     }
 
     var isBreak: Bool {
-        pomodoroState == .shortBreak
+        pomodoroState == .shortBreak || pomodoroState == .longBreak
     }
 
     var progress: Double {
@@ -254,7 +274,7 @@ final class FocusTimerService {
         case .shortBreak:
             return "Break"
         case .longBreak:
-            return "Break"
+            return "Long Break"
         case .completed:
             return "Completed"
         }

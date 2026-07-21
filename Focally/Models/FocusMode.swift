@@ -17,7 +17,52 @@ struct FocusMode: Identifiable, Codable, Equatable {
     var enablePomodoro: Bool
     var pomodoroWorkMinutes: Int
     var pomodoroBreakMinutes: Int
+    var pomodoroLongBreakMinutes: Int
     var pomodoroRounds: Int
+
+    init(id: UUID = UUID(),
+         name: String = "",
+         emoji: String = ":brain:",
+         statusText: String = "",
+         durationMinutes: Int = 25,
+         enableDND: Bool = false,
+         enablePomodoro: Bool = false,
+         pomodoroWorkMinutes: Int = 25,
+         pomodoroBreakMinutes: Int = 5,
+         pomodoroLongBreakMinutes: Int = 15,
+         pomodoroRounds: Int = 4) {
+        self.id = id
+        self.name = name
+        self.emoji = emoji
+        self.statusText = statusText
+        self.durationMinutes = durationMinutes
+        self.enableDND = enableDND
+        self.enablePomodoro = enablePomodoro
+        self.pomodoroWorkMinutes = pomodoroWorkMinutes
+        self.pomodoroBreakMinutes = pomodoroBreakMinutes
+        self.pomodoroLongBreakMinutes = pomodoroLongBreakMinutes
+        self.pomodoroRounds = pomodoroRounds
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, emoji, statusText, durationMinutes, enableDND, enablePomodoro
+        case pomodoroWorkMinutes, pomodoroBreakMinutes, pomodoroLongBreakMinutes, pomodoroRounds
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? ""
+        emoji = try c.decodeIfPresent(String.self, forKey: .emoji) ?? ":brain:"
+        statusText = try c.decodeIfPresent(String.self, forKey: .statusText) ?? ""
+        durationMinutes = try c.decodeIfPresent(Int.self, forKey: .durationMinutes) ?? 25
+        enableDND = try c.decodeIfPresent(Bool.self, forKey: .enableDND) ?? false
+        enablePomodoro = try c.decodeIfPresent(Bool.self, forKey: .enablePomodoro) ?? false
+        pomodoroWorkMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroWorkMinutes) ?? 25
+        pomodoroBreakMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroBreakMinutes) ?? 5
+        pomodoroLongBreakMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroLongBreakMinutes) ?? 15
+        pomodoroRounds = try c.decodeIfPresent(Int.self, forKey: .pomodoroRounds) ?? 4
+    }
 
     static let builtInModes: [FocusMode] = [
         FocusMode(
@@ -30,6 +75,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
             enablePomodoro: true,
             pomodoroWorkMinutes: 25,
             pomodoroBreakMinutes: 5,
+            pomodoroLongBreakMinutes: 15,
             pomodoroRounds: 4
         ),
         FocusMode(
@@ -42,6 +88,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
             enablePomodoro: false,
             pomodoroWorkMinutes: 30,
             pomodoroBreakMinutes: 5,
+            pomodoroLongBreakMinutes: 15,
             pomodoroRounds: 1
         ),
         FocusMode(
@@ -54,6 +101,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
             enablePomodoro: false,
             pomodoroWorkMinutes: 15,
             pomodoroBreakMinutes: 5,
+            pomodoroLongBreakMinutes: 15,
             pomodoroRounds: 1
         )
     ]
@@ -88,6 +136,10 @@ struct FocusMode: Identifiable, Codable, Equatable {
         min(max(pomodoroBreakMinutes, 1), 30)
     }
 
+    var sanitizedPomodoroLongBreakMinutes: Int {
+        min(max(pomodoroLongBreakMinutes, 5), 60)
+    }
+
     var sanitizedPomodoroRounds: Int {
         min(max(pomodoroRounds, 1), 12)
     }
@@ -110,6 +162,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
             enablePomodoro: enableDND && enablePomodoro,
             pomodoroWorkMinutes: sanitizedPomodoroWorkMinutes,
             pomodoroBreakMinutes: sanitizedPomodoroBreakMinutes,
+            pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,
             pomodoroRounds: sanitizedPomodoroRounds
         )
     }
@@ -138,7 +191,7 @@ final class FocusModeStore {
     func add(_ mode: FocusMode) {
         var newMode = mode.sanitized()
         if newMode.id == UUID() {
-            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroRounds: newMode.pomodoroRounds)
+            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds)
         }
         modes.append(newMode)
         modes = Self.orderedModes(from: modes)

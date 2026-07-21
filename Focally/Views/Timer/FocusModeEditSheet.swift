@@ -85,7 +85,7 @@ struct FocusModeEditSheet: View {
                 }
 
                 HStack(spacing: 10) {
-                    // Live preview: larger size for clear visibility while typing
+                    // Single consistent preview size
                     if let localPreviewURL, let nsImage = NSImage(contentsOf: localPreviewURL) {
                         Image(nsImage: nsImage)
                             .resizable()
@@ -99,10 +99,6 @@ struct FocusModeEditSheet: View {
                             .font(.system(size: 28))
                             .frame(width: 40, height: 40)
                     }
-                    Text(EmojiValidator.convertShortcodeToUnicode(draftMode.emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? draftMode.emoji)
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                        .lineLimit(1)
                 }
 
                 Text("Type `:` to see recent emojis, or enter a Slack shortcode")
@@ -135,7 +131,8 @@ struct FocusModeEditSheet: View {
                 DisclosureGroup("Pomodoro settings") {
                     VStack(alignment: .leading, spacing: 12) {
                         Stepper("Work: \(draftMode.pomodoroWorkMinutes) min", value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
-                        Stepper("Break: \(draftMode.pomodoroBreakMinutes) min", value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
+                        Stepper("Short break: \(draftMode.pomodoroBreakMinutes) min", value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
+                        Stepper("Long break (every 4 rounds): \(draftMode.pomodoroLongBreakMinutes) min", value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
                         Stepper("Rounds: \(draftMode.pomodoroRounds)", value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
                     }
                     .padding(.top, 8)

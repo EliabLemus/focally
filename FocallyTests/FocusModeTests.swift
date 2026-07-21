@@ -20,6 +20,7 @@ final class FocusModeTests: XCTestCase {
             enablePomodoro: true,
             pomodoroWorkMinutes: 1,
             pomodoroBreakMinutes: 0,
+            pomodoroLongBreakMinutes: 3,
             pomodoroRounds: 99
         )
 
