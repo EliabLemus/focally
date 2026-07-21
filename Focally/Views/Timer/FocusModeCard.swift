@@ -63,6 +63,7 @@ struct FocusModeCard: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 24))
         }
+        .contentShape(Rectangle())
         .buttonStyle(.plain)
     }
 

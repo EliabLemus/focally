@@ -97,11 +97,14 @@ struct FocusMode: Identifiable, Codable, Equatable {
     }
 
     func sanitized() -> FocusMode {
-        FocusMode(
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedStatus = statusText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let effectiveName = trimmedName.isEmpty ? (trimmedStatus.isEmpty ? "Untitled" : trimmedStatus) : trimmedName
+        return FocusMode(
             id: id,
-            name: name,
+            name: effectiveName,
             emoji: emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? ":brain:" : emoji.trimmingCharacters(in: .whitespacesAndNewlines),
-            statusText: statusText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? name : statusText.trimmingCharacters(in: .whitespacesAndNewlines),
+            statusText: trimmedStatus.isEmpty ? effectiveName : trimmedStatus,
             durationMinutes: sanitizedDurationMinutes,
             enableDND: enableDND,
             enablePomodoro: enableDND && enablePomodoro,

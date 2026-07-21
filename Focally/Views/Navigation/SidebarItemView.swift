@@ -30,6 +30,7 @@ struct SidebarItemView: View {
             )
         }
         .buttonStyle(.plain)
+        .contentShape(Rectangle())
         .onHover { hovering in
             if hovering && !isActive {
                 // hover highlight — SwiftUI handles this via button style
