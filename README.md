@@ -1,6 +1,8 @@
 <div align="center">
 
-# ⏳ Focally
+<img src="https://raw.githubusercontent.com/EliabLemus/focally/main/Focally/Assets.xcassets/AppIcon.appiconset/icon_512x512%402x.png" alt="Focally Icon" width="128">
+
+# Focally
 
 **Focus sessions, managed.**
 
