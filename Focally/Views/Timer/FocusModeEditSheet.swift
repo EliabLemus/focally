@@ -5,6 +5,7 @@ struct FocusModeEditSheet: View {
     @Environment(SlackService.self) private var slackService
 
     @State private var draftMode: FocusMode
+    @State private var localPreviewURL: URL?
     let onSave: (FocusMode) -> Void
     var onDelete: (() -> Void)?
 
@@ -19,25 +20,47 @@ struct FocusModeEditSheet: View {
             Text("Edit \(draftMode.name)")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
-
             VStack(alignment: .leading, spacing: 8) {
                 Text("Emoji")
                     .font(.focallyBodyBold)
-                TextField(":brain:", text: $draftMode.emoji)
-                    .textFieldStyle(.roundedBorder)
+                TextField(
+                    draftMode.name.isEmpty ? "e.g. :brain:" : draftMode.emoji,
+                    text: $draftMode.emoji
+                )
+                .textFieldStyle(.roundedBorder)
+                .task(id: draftMode.emoji) {
+                    let shortcode = draftMode.emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if EmojiValidator.isCustomWorkspaceEmoji(shortcode, workspaceEmojiCodes: slackService.workspaceEmojiCodes),
+                       let urlString = slackService.workspaceEmojiImageURLs[shortcode],
+                       let url = URL(string: urlString) {
+                        let fetched = await EmojiCacheService.shared.emoji(for: shortcode, remoteURL: url)
+                        localPreviewURL = fetched
+                    } else {
+                        localPreviewURL = nil
+                    }
+                }
+
                 HStack(spacing: 10) {
-                    EmojiView(
-                        draftMode.emoji,
-                        customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
-                        workspaceEmojiCodes: slackService.workspaceEmojiCodes,
-                        font: .system(size: 20),
-                        dimension: 20
-                    )
+                    // Live preview: larger size for clear visibility while typing
+                    if let localPreviewURL, let nsImage = NSImage(contentsOf: localPreviewURL) {
+                        Image(nsImage: nsImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 40, height: 40)
+                    } else if EmojiValidator.isCustomWorkspaceEmoji(draftMode.emoji, workspaceEmojiCodes: slackService.workspaceEmojiCodes) {
+                        ProgressView()
+                            .frame(width: 40, height: 40)
+                    } else {
+                        Text(EmojiValidator.convertShortcodeToUnicode(draftMode.emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? draftMode.emoji)
+                            .font(.system(size: 28))
+                            .frame(width: 40, height: 40)
+                    }
                     Text(EmojiValidator.convertShortcodeToUnicode(draftMode.emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? draftMode.emoji)
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                         .lineLimit(1)
                 }
+
                 Text("Enter Slack emoji shortcode, e.g. :brain:")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)

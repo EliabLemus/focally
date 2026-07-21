@@ -8,7 +8,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Version](https://img.shields.io/badge/version-0.8.5-green)](https://github.com/EliabLemus/focally/releases)
+[![Version](https://img.shields.io/badge/version-0.8.6-green)](https://github.com/EliabLemus/focally/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 </div>

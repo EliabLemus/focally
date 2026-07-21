@@ -37,7 +37,7 @@ xcodebuild build \
 
 # Inject version into Info.plist (fix for build variables not being substituted)
 echo "📝 Injecting version info..."
-"$SCRIPT_DIR/inject-version.sh"
+"$SCRIPT_DIR/inject-version.sh" "$VERSION"
 
 # Find the .app
 APP_PATH=$(find "$BUILD_DIR/DerivedData" -name "${APP_NAME}.app" -type d | head -1)
