@@ -27,6 +27,13 @@ struct FocusModeEditSheet: View {
         return String(t.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
     }
 
+    private var breakLabelBinding: Binding<String> {
+        Binding(
+            get: { draftMode.breakLabel ?? "" },
+            set: { draftMode.breakLabel = $0.isEmpty ? nil : $0 }
+        )
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("Edit \(draftMode.name)")
@@ -155,6 +162,18 @@ struct FocusModeEditSheet: View {
                     .font(.focallyBodyBold)
                 TextField("In focus mode", text: $draftMode.statusText)
                     .textFieldStyle(.roundedBorder)
+            }
+
+            if draftMode.enablePomodoro {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Break label (optional)")
+                        .font(.focallyBodyBold)
+                    TextField("e.g. Coffee time ☕", text: breakLabelBinding)
+                        .textFieldStyle(.roundedBorder)
+                    Text("Shown during breaks. Falls back to \"Mode Name — Break\"")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+                }
             }
 
             VStack(alignment: .leading, spacing: 8) {

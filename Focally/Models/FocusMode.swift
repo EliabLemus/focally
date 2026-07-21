@@ -19,6 +19,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
     var pomodoroBreakMinutes: Int
     var pomodoroLongBreakMinutes: Int
     var pomodoroRounds: Int
+    var breakLabel: String?
 
     init(id: UUID = UUID(),
          name: String = "",
@@ -30,7 +31,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
          pomodoroWorkMinutes: Int = 25,
          pomodoroBreakMinutes: Int = 5,
          pomodoroLongBreakMinutes: Int = 15,
-         pomodoroRounds: Int = 4) {
+         pomodoroRounds: Int = 4,
+         breakLabel: String? = nil) {
         self.id = id
         self.name = name
         self.emoji = emoji
@@ -42,11 +44,13 @@ struct FocusMode: Identifiable, Codable, Equatable {
         self.pomodoroBreakMinutes = pomodoroBreakMinutes
         self.pomodoroLongBreakMinutes = pomodoroLongBreakMinutes
         self.pomodoroRounds = pomodoroRounds
+        self.breakLabel = breakLabel
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, emoji, statusText, durationMinutes, enableDND, enablePomodoro
         case pomodoroWorkMinutes, pomodoroBreakMinutes, pomodoroLongBreakMinutes, pomodoroRounds
+        case breakLabel
     }
 
     init(from decoder: Decoder) throws {
@@ -62,6 +66,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
         pomodoroBreakMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroBreakMinutes) ?? 5
         pomodoroLongBreakMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroLongBreakMinutes) ?? 15
         pomodoroRounds = try c.decodeIfPresent(Int.self, forKey: .pomodoroRounds) ?? 4
+        breakLabel = try c.decodeIfPresent(String.self, forKey: .breakLabel)
     }
 
     static let builtInModes: [FocusMode] = [
@@ -163,7 +168,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroWorkMinutes: sanitizedPomodoroWorkMinutes,
             pomodoroBreakMinutes: sanitizedPomodoroBreakMinutes,
             pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,
-            pomodoroRounds: sanitizedPomodoroRounds
+            pomodoroRounds: sanitizedPomodoroRounds,
+            breakLabel: breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines) : nil
         )
     }
 }
@@ -176,6 +182,14 @@ final class FocusModeStore {
     }
 
     private let defaults: UserDefaults
+    private static let diskDirectory = ".focally"
+    private static let diskFilename = "modes.json"
+
+    private static var diskURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(diskDirectory)
+            .appendingPathComponent(diskFilename)
+    }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -191,7 +205,7 @@ final class FocusModeStore {
     func add(_ mode: FocusMode) {
         var newMode = mode.sanitized()
         if newMode.id == UUID() {
-            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds)
+            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel)
         }
         modes.append(newMode)
         modes = Self.orderedModes(from: modes)
@@ -211,12 +225,25 @@ final class FocusModeStore {
     private func saveModes() {
         guard let data = try? JSONEncoder().encode(modes) else { return }
         defaults.set(data, forKey: FocusMode.defaultsKey)
+        Self.saveToDisk(data)
     }
 
     private static func loadModes(from defaults: UserDefaults) -> [FocusMode] {
+        // Priority: disk > UserDefaults > builtIn
+        if let diskData = loadFromDisk(),
+           let decoded = try? JSONDecoder().decode([FocusMode].self, from: diskData) {
+            let modes = mergeWithBuiltIns(decoded)
+            return orderedModes(from: modes)
+        }
+
         guard let data = defaults.data(forKey: FocusMode.defaultsKey),
               let decoded = try? JSONDecoder().decode([FocusMode].self, from: data) else {
             return FocusMode.builtInModes
+        }
+
+        // Migrate from UserDefaults to disk
+        if let data = try? JSONEncoder().encode(decoded) {
+            saveToDisk(data)
         }
 
         let sanitized = decoded.map { $0.sanitized() }
@@ -224,6 +251,29 @@ final class FocusModeStore {
             sanitized.first(where: { $0.id == builtInMode.id }) ?? builtInMode
         }
         return orderedModes(from: merged)
+    }
+
+    // MARK: - Disk persistence
+
+    private static func saveToDisk(_ data: Data) {
+        let fm = FileManager.default
+        let dir = diskURL.deletingLastPathComponent()
+        try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        // Write atomically
+        let tmpURL = dir.appendingPathComponent("modes.json.tmp")
+        try? data.write(to: tmpURL, options: .atomic)
+        _ = try? fm.replaceItemAt(diskURL, withItemAt: tmpURL)
+    }
+
+    private static func loadFromDisk() -> Data? {
+        try? Data(contentsOf: diskURL)
+    }
+
+    private static func mergeWithBuiltIns(_ decoded: [FocusMode]) -> [FocusMode] {
+        let sanitized = decoded.map { $0.sanitized() }
+        return FocusMode.builtInModes.map { builtInMode in
+            sanitized.first(where: { $0.id == builtInMode.id }) ?? builtInMode
+        } + sanitized.filter { !$0.isBuiltIn }
     }
 
     private static func orderedModes(from modes: [FocusMode]) -> [FocusMode] {

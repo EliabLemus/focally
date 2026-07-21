@@ -135,6 +135,7 @@ final class FocusTimerService {
         remainingSeconds = currentPhaseDuration
         pomodoroState = .shortBreak
         isPaused = false
+        currentActivity = currentMode?.breakLabel ?? "\(currentActivity) — Break"
         startTimer()
         notificationService.notify(.breakStarted)
     }
@@ -145,6 +146,8 @@ final class FocusTimerService {
         pomodoroState = .longBreak
         isPaused = false
         deactivateFocusIntegration()
+        let label = currentMode?.breakLabel
+        currentActivity = label.map { "\($0) — Long Break" } ?? "\(currentActivity) — Long Break"
         startTimer()
         notificationService.notify(.breakStarted)
     }
