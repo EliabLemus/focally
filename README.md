@@ -8,7 +8,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Version](https://img.shields.io/badge/version-0.7.15-green)](https://github.com/EliabLemus/focally/releases)
+[![Version](https://img.shields.io/badge/version-0.8.3-green)](https://github.com/EliabLemus/focally/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 </div>
@@ -25,22 +25,34 @@ Focally is one thing: **start a timer, get in the zone, let the app handle the r
 
 ## Features
 
-| Feature | Status |
-|---------|--------|
-| Focus timer (25/45/60/custom min) | ✅ |
-| Direct System Do Not Disturb | ✅ |
-| Apple Shortcuts integration | ✅ |
-| App Intents (Start/End Focus) | ✅ |
-| Slack status sync | ✅ |
-| Alert sound with repeat | ✅ |
-| Predefined tasks | ✅ |
-| Keychain-stored secrets | ✅ |
-| Google Calendar read | ✅ |
-| Session history | ✅ |
-| Schedule management | ✅ |
-| Analytics | ✅ |
-| Drag & Drop shortcut installation | ✅ |
-| Onboarding wizard | ✅ |
+### Three Focus Modes
+
+| Mode | What it does |
+|------|-------------|
+| 🎯 **Focus Time** | Classic timer (25/45/60/custom min) with DND + Slack sync |
+| 📋 **Meeting** | Fixed-duration session, keeps DND active, syncs Slack |
+| 📥 **Inbox** | Quick triage session with separate sound settings |
+
+### Integrations
+
+| Feature | Description |
+|---------|-------------|
+| Direct System DND | Toggles macOS Do Not Disturb via CFPreferences — no setup needed |
+| Signed Apple Shortcuts | Pre-signed `.shortcut` files for DND backup — one-button install |
+| App Intents | Start / Pause / Resume / End Focus via Shortcuts, Spotlight & Siri |
+| Slack Status Sync | Updates status + emoji per focus mode |
+| Google Calendar | Read-only calendar integration for meeting awareness |
+
+### App Features
+
+| Feature | Description |
+|---------|-------------|
+| Sound system | Per-mode sounds (work, break, completion) with live preview |
+| Custom Slack emoji | Workspace emoji rendering with persistent disk cache |
+| Session history | Full log of past focus sessions with analytics |
+| Schedule management | Set recurring focus blocks |
+| Onboarding wizard | Guided first-launch setup |
+| Keychain secrets | All tokens stored securely in macOS Keychain |
 
 ## Install
 
@@ -61,9 +73,10 @@ brew update && brew upgrade --cask focally
 
 | Step | What happens |
 |------|-------------|
-| **Start** | Pick an activity + duration → timer begins |
-| **Focus** | Direct System DND activates, optional Apple Shortcuts run, Slack status updates automatically |
-| **Finish** | Bell rings, notification fires, DND deactivates |
+| **Start** | Pick a mode + activity + duration → timer begins |
+| **Focus** | Direct DND activates, signed shortcuts fire as backup, Slack status updates |
+| **Pause/Resume** | DND and Slack status follow your session state |
+| **Finish** | Bell rings, notification fires, DND deactivates, Slack clears |
 
 ### Controls
 
@@ -76,6 +89,24 @@ brew update && brew upgrade --cask focally
 |---|---|---|
 | Accessibility | Toggle Do Not Disturb | System Settings → Privacy → Accessibility → Add Focally |
 | Notifications | Session alerts | System Settings → Notifications → Focally → Allow |
+
+## Focus Integration
+
+Focally uses a layered approach to focus integration:
+
+**1. Direct System DND (Primary)**
+- Most reliable — no setup required
+- Controls macOS Do Not Disturb via CFPreferences directly
+
+**2. Signed Apple Shortcuts (Backup)**
+- Pre-signed `.shortcut` files bundled with the app
+- One-button install from Settings → Integrations
+- Fires automatically alongside direct DND as redundancy
+
+**3. App Intents (System-wide)**
+- Exposes Start, Pause, Resume, and End Focus actions
+- Available in Shortcuts app, Spotlight, and Siri
+- Assign keyboard shortcuts via System Settings → Keyboard Shortcuts → App Shortcuts
 
 ## Build from source
 
@@ -90,7 +121,7 @@ xcodebuild build -scheme Focally -destination 'platform=macOS'
 
 ## Tech
 
-SwiftUI · AppKit · App Intents · NSStatusBar · macOS 14+ · XcodeGen · GitHub Actions · Homebrew tap
+SwiftUI · Observation · AppKit · App Intents · NSStatusBar · CFPreferences · macOS 14+ · XcodeGen · GitHub Actions · Homebrew tap
 
 ## Contributing
 
@@ -99,26 +130,6 @@ Fork → branch → PR. Keep it minimal. ✨
 ### Making Releases
 
 For detailed release procedures and troubleshooting, see [docs/RELEASE_GUIDE.md](docs/RELEASE_GUIDE.md).
-
-### Focus Integration
-
-Focally provides two modes for focus integration:
-
-**Direct System DND (Recommended)**
-- Focally directly controls macOS Do Not Disturb
-- No setup required
-- Most reliable method
-
-**Apple Shortcuts Integration**
-- Focally generates test shortcuts on first launch
-- Drag & drop shortcuts to Settings → Integrations
-- Optional backup automation
-- Full guide: [docs/FOCUS_INTEGRATION_USER_GUIDE.md](docs/FOCUS_INTEGRATION_USER_GUIDE.md)
-
-**App Intents**
-- Focally exposes "Start Focus" and "End Focus" actions
-- Available in Shortcuts, Spotlight, and Siri
-- No manual setup required
 
 ## License
 
