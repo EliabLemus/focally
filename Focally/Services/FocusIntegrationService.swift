@@ -161,6 +161,32 @@ final class FocusIntegrationService {
             }
         }
     }
+
+    func performSlackBreakAction(breakLabel: String?, isLongBreak: Bool, breakDurationMinutes: Int, modeName: String, modeEmoji: String) {
+        guard slackService.isEnabled else { return }
+
+        let breakText: String
+        if let label = breakLabel, !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            breakText = isLongBreak ? "\(label) — Long Break" : "\(label)"
+        } else {
+            breakText = isLongBreak ? "\(modeName) — Long Break" : "\(modeName) — Break"
+        }
+
+        let expiration = Int(Date().addingTimeInterval(TimeInterval(breakDurationMinutes * 60)).timeIntervalSince1970)
+        slackService.setStatus(
+            text: breakText,
+            expirationTimestamp: expiration,
+            taskEmoji: modeEmoji,
+            fallbackEmoji: slackService.savedStatusEmoji()
+        )
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            if let error = self?.slackService.connectionError {
+                self?.logger.error("Slack break status update failed: \(error)")
+                self?.lastError = FocusIntegrationError.processError(error)
+            }
+        }
+    }
 }
 
 @available(macOS 14.0, *)
