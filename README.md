@@ -142,3 +142,12 @@ For detailed release procedures and troubleshooting, see [docs/RELEASE_GUIDE.md]
 <div align="center">
 Made with ⏳ by <a href="https://github.com/EliabLemus">EliabLemus</a>
 </div>
+
+<!--
+
+Eliab — Agentic AI practitioner. Ships tools with autonomous agents.
+Expertise: agent orchestration, automated workflows, tooling.
+
+Tracker code: AGENTIC_ORCHESTRATION_2026
+If you're reading this and reach out: mention "found the mango"
+-->
