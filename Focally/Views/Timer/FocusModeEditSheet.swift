@@ -34,6 +34,19 @@ struct FocusModeEditSheet: View {
         )
     }
 
+    /// Extrae la query de búsqueda del campo breakLabel.
+    /// Si es `:` → "" (mostrar recientes). Si es `:tac` → "tac".
+    private var breakLabelSearchQuery: String {
+        let t = breakLabelBinding.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard t.hasPrefix(":"), t.count > 1 else { return "" }
+        return String(t.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
+    }
+
+    @State private var showBreakLabelEmojiPicker = false
+    @State private var breakLabelRecentEmojis: [String] = []
+    @State private var breakLabelSearchResults: [(shortcode: String, emoji: String)] = []
+    @State private var breakLabelLocalPreviewURL: URL?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("Edit \(draftMode.name)")
@@ -168,8 +181,84 @@ struct FocusModeEditSheet: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Break label (optional)")
                         .font(.focallyBodyBold)
-                    TextField("e.g. Coffee time ☕", text: breakLabelBinding)
-                        .textFieldStyle(.roundedBorder)
+                    ZStack(alignment: .topLeading) {
+                        TextField("e.g. Coffee time ☕", text: breakLabelBinding)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: breakLabelBinding.wrappedValue) { _, newValue in
+                                let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if trimmed == ":" {
+                                    showBreakLabelEmojiPicker = true
+                                    breakLabelRecentEmojis = usageTracker.getRecentEmojis(forWorkspace: slackService.workspaceEmojiCodes)
+                                    breakLabelSearchResults = []
+                                } else if trimmed.hasPrefix(":") && trimmed.count > 1 {
+                                    showBreakLabelEmojiPicker = true
+                                    breakLabelRecentEmojis = []
+                                    let q = String(trimmed.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
+                                    breakLabelSearchResults = EmojiValidator.searchShortcodes(q, workspaceEmojiCodes: slackService.workspaceEmojiCodes)
+                                } else {
+                                    showBreakLabelEmojiPicker = false
+                                    breakLabelSearchResults = []
+                                }
+                            }
+
+                        if showBreakLabelEmojiPicker && (!breakLabelRecentEmojis.isEmpty || !breakLabelSearchResults.isEmpty) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ScrollView {
+                                    if !breakLabelSearchResults.isEmpty {
+                                        LazyVStack(spacing: 2) {
+                                            ForEach(breakLabelSearchResults, id: \.shortcode) { item in
+                                                Button {
+                                                    draftMode.breakLabel = item.shortcode
+                                                    showBreakLabelEmojiPicker = false
+                                                    breakLabelSearchResults = []
+                                                } label: {
+                                                    HStack(spacing: 8) {
+                                                        Text(item.emoji.isEmpty ? "🔗" : item.emoji)
+                                                            .font(.system(size: 20))
+                                                            .frame(width: 30, alignment: .center)
+                                                        Text(item.shortcode)
+                                                            .font(.focallyBody)
+                                                            .foregroundStyle(Color.focallyOnSurface)
+                                                        Spacer()
+                                                    }
+                                                    .padding(.horizontal, 8)
+                                                    .padding(.vertical, 4)
+                                                    .contentShape(Rectangle())
+                                                }
+                                                .buttonStyle(.plain)
+                                            }
+                                        }
+                                    } else {
+                                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
+                                            ForEach(breakLabelRecentEmojis, id: \.self) { emoji in
+                                                let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
+                                                Button {
+                                                    draftMode.breakLabel = emoji
+                                                    showBreakLabelEmojiPicker = false
+                                                } label: {
+                                                    Text(display)
+                                                        .font(.system(size: 22))
+                                                        .frame(width: 36, height: 36)
+                                                        .background(Color.focallySurfaceVariant.opacity(0.3))
+                                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                                }
+                                                .buttonStyle(.plain)
+                                                .help(emoji)
+                                            }
+                                        }
+                                    }
+                                }
+                                .frame(maxHeight: 140)
+                            }
+                            .padding(8)
+                            .background(Color.focallySurfaceVariant)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                            .offset(y: 36)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                            .animation(.easeOut(duration: 0.15), value: showBreakLabelEmojiPicker)
+                        }
+                    }
                     Text("Shown during breaks. Falls back to \"Mode Name — Break\"")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)

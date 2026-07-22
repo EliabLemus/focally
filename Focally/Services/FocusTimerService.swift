@@ -136,6 +136,18 @@ final class FocusTimerService {
         pomodoroState = .shortBreak
         isPaused = false
         currentActivity = currentMode?.breakLabel ?? "\(currentActivity) — Break"
+
+        // Update Slack status for short break
+        if let mode = currentMode {
+            focusIntegrationService.performSlackBreakAction(
+                breakLabel: mode.breakLabel,
+                isLongBreak: false,
+                breakDurationMinutes: shortBreakDurationMinutes,
+                modeName: mode.name,
+                modeEmoji: mode.emoji
+            )
+        }
+
         startTimer()
         notificationService.notify(.breakStarted)
     }
@@ -145,9 +157,22 @@ final class FocusTimerService {
         remainingSeconds = currentPhaseDuration
         pomodoroState = .longBreak
         isPaused = false
-        deactivateFocusIntegration()
+
         let label = currentMode?.breakLabel
         currentActivity = label.map { "\($0) — Long Break" } ?? "\(currentActivity) — Long Break"
+
+        // Update Slack status for long break BEFORE deactivating DND
+        if let mode = currentMode {
+            focusIntegrationService.performSlackBreakAction(
+                breakLabel: mode.breakLabel,
+                isLongBreak: true,
+                breakDurationMinutes: longBreakDurationMinutes,
+                modeName: mode.name,
+                modeEmoji: mode.emoji
+            )
+        }
+
+        deactivateFocusIntegration()
         startTimer()
         notificationService.notify(.breakStarted)
     }
