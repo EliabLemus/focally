@@ -26,6 +26,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let focusIntegrationService = FocusIntegrationService.shared
     let shortcutsService = ManagedFocusShortcutsService.shared
     let slackService = SlackService()
+    private lazy var calendarService = CalendarSlackIntegrationService(
+        slackService: slackService,
+        dndService: dndService
+    )
     let notificationService = NotificationService()
     let focusModeStore = FocusModeStore()
     let usageTracker = EmojiUsageTracker.shared
@@ -66,6 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(focusIntegrationService)
             .environment(shortcutsService)
             .environment(slackService)
+            .environment(calendarService)
             .environment(focusModeStore)
             .environment(usageTracker)
         popover.contentViewController = NSHostingController(rootView: contentView)
@@ -73,6 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         observeTimerService()
         observeSlackEmojiCatalog()
         warmEmojiCacheIfNeeded()
+        calendarService.startIfEnabled()
 
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             if let popover = self?.popover, popover.isShown {
@@ -211,6 +217,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(focusIntegrationService)
             .environment(shortcutsService)
             .environment(slackService)
+            .environment(calendarService)
             .environment(focusModeStore)
             .environment(usageTracker)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))

@@ -5,6 +5,7 @@ struct MenuBarDropdownView: View {
     @Environment(FocusTimerService.self) private var timerService
     @Environment(DNDService.self) private var dndService
     @Environment(SlackService.self) private var slackService
+    @Environment(CalendarSlackIntegrationService.self) private var calendarService
     @Environment(\.colorScheme) private var colorScheme
 
     var onAddMode: (() -> Void)?
@@ -35,6 +36,7 @@ struct MenuBarDropdownView: View {
         .shadow(color: .black.opacity(colorScheme == .dark ? 0.4 : 0.1), radius: 30, y: 10)
         .onAppear {
             slackService.refreshEmojiCatalogIfPossible()
+            calendarService.startIfEnabled()
         }
     }
 

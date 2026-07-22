@@ -32,5 +32,7 @@
     <string>NSApplication</string>
     <key>NSAppleEventsUsageDescription</key>
     <string>Focally needs AppleEvents to control Do Not Disturb mode.</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>Focally reads your calendar to detect meetings and update your Slack status.</string>
 </dict>
 </plist>

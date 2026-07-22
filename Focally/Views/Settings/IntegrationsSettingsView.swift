@@ -2,6 +2,7 @@ import SwiftUI
 
 struct IntegrationsSettingsView: View {
     @Environment(SlackService.self) private var slackService
+    @Environment(CalendarSlackIntegrationService.self) private var calendarService
     @Environment(FocusIntegrationService.self) private var focusIntegrationService
     @Environment(ManagedFocusShortcutsService.self) private var shortcutsService
 
@@ -11,9 +12,49 @@ struct IntegrationsSettingsView: View {
     var body: some View {
         VStack(spacing: FocallySpacing.large) {
             slackCard
+            calendarCard
             automationCard
         }
         .onAppear(perform: loadCredentials)
+    }
+
+    private var calendarCard: some View {
+        @Bindable var calendarService = calendarService
+
+        return VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+            HStack(spacing: FocallySpacing.medium) {
+                iconTile(systemImage: "calendar", color: Color.focallyTertiary)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Calendar Integration")
+                        .font(.focallyBodyBold)
+                        .foregroundStyle(Color.focallyOnSurface)
+
+                    Text("Update Slack and quiet notifications during meetings.")
+                        .font(.focallyBody)
+                        .foregroundStyle(Color.focallyOutline)
+                }
+
+                Spacer()
+
+                connectionBadge(connected: calendarService.hasCalendarAccess)
+                FocallyToggleButton(isOn: calendarEnabledBinding)
+            }
+
+            Toggle("Show meeting title in Slack status", isOn: $calendarService.showMeetingTitle)
+                .accessibilityLabel("Show meeting title in Slack status")
+
+            Toggle("Enable Do Not Disturb for video calls", isOn: $calendarService.dndForMeetings)
+                .accessibilityLabel("Enable Do Not Disturb for video calls")
+
+            if let calendarError = calendarService.connectionError, !calendarError.isEmpty {
+                Text(calendarError)
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyError)
+            }
+        }
+        .padding(FocallySpacing.large)
+        .focallyGlassCard()
     }
 
     private var slackCard: some View {
@@ -169,6 +210,13 @@ struct IntegrationsSettingsView: View {
                     slackService.refreshEmojiCatalogIfPossible()
                 }
             }
+        )
+    }
+
+    private var calendarEnabledBinding: Binding<Bool> {
+        Binding(
+            get: { calendarService.isEnabled },
+            set: { calendarService.setEnabled($0) }
         )
     }
 

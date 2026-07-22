@@ -10,7 +10,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Version](https://img.shields.io/badge/version-0.8.13-green)](https://github.com/EliabLemus/focally/releases)
+[![Version](https://img.shields.io/badge/version-0.8.14-green)](https://github.com/EliabLemus/focally/releases)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 </div>
@@ -44,7 +44,8 @@ Focally is one thing: **start a timer, get in the zone, let the app handle the r
 | Signed Apple Shortcuts | Pre-signed `.shortcut` files for DND backup — one-button install |
 | App Intents | Start / Pause / Resume / End Focus via Shortcuts, Spotlight & Siri |
 | Slack Status Sync | Updates status + emoji per focus mode |
-| Google Calendar | Read-only calendar integration for meeting awareness |
+| macOS Calendar | Detects meetings through EventKit with no OAuth setup |
+| Calendar → Slack + DND | Updates Slack status during meetings and enables DND for video calls |
 
 ### App Features
 
