@@ -125,6 +125,13 @@ final class FocusTimerService {
         pomodoroState = .work
         isActive = true
         isPaused = false
+
+        // Restore original mode emoji and activity after break
+        if let mode = currentMode {
+            currentEmoji = mode.emoji
+            currentActivity = mode.name
+        }
+
         activateFocusIntegration()
         startTimer()
         notificationService.notify(.workSessionStarted(activity: currentActivity, durationMinutes: workDurationMinutes))
@@ -136,6 +143,11 @@ final class FocusTimerService {
         pomodoroState = .shortBreak
         isPaused = false
         currentActivity = currentMode?.breakLabel ?? "\(currentActivity) — Break"
+
+        // Extract emoji from breakLabel and update currentEmoji for menu bar display
+        if let label = currentMode?.breakLabel, let breakEmoji = extractEmoji(from: label) {
+            currentEmoji = breakEmoji
+        }
 
         // Update Slack status for short break
         if let mode = currentMode {
@@ -160,6 +172,11 @@ final class FocusTimerService {
 
         let label = currentMode?.breakLabel
         currentActivity = label.map { "\($0) — Long Break" } ?? "\(currentActivity) — Long Break"
+
+        // Extract emoji from breakLabel and update currentEmoji for menu bar display
+        if let label = currentMode?.breakLabel, let breakEmoji = extractEmoji(from: label) {
+            currentEmoji = breakEmoji
+        }
 
         // Update Slack status for long break BEFORE deactivating DND
         if let mode = currentMode {
@@ -306,6 +323,31 @@ final class FocusTimerService {
         case .completed:
             return "Completed"
         }
+    }
+
+    /// Extract emoji from a string like "Coffee time :coffee:" or ":coffee: break"
+    /// - Parameter text: String containing emoji shortcode or unicode emoji
+    /// - Returns: Emoji shortcode (e.g., ":coffee:") or nil if no emoji found
+    private func extractEmoji(from text: String) -> String? {
+        // Try to find Slack shortcode pattern :text:
+        let shortcodePattern = ":[a-zA-Z0-9_+-]+:"
+        if let range = text.range(of: shortcodePattern, options: .regularExpression) {
+            return String(text[range])
+        }
+
+        // Try to extract unicode emoji (fallback)
+        let emojiPattern = "[\\p{Emoji}&&\\p{GraphemeCluster}]"
+        if let range = text.range(of: emojiPattern, options: .regularExpression) {
+            let emoji = String(text[range])
+            // Try to convert unicode emoji back to shortcode for consistency
+            if let shortcode = EmojiValidator.convertUnicodeToShortcode(emoji, workspaceEmojis: []) {
+                return shortcode
+            }
+            // Return unicode emoji as-is if no shortcode mapping exists
+            return emoji
+        }
+
+        return nil
     }
 
     private func activateFocusIntegration() {
