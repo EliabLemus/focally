@@ -40,6 +40,10 @@ struct IntegrationsSettingsView: View {
                 connectionBadge(connected: calendarService.hasCalendarAccess)
                 FocallyToggleButton(isOn: calendarEnabledBinding)
             }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                calendarEnabledBinding.wrappedValue.toggle()
+            }
 
             Toggle("Show meeting title in Slack status", isOn: $calendarService.showMeetingTitle)
                 .accessibilityLabel("Show meeting title in Slack status")
@@ -76,6 +80,10 @@ struct IntegrationsSettingsView: View {
 
                 connectionBadge(connected: slackService.isConnected)
                 FocallyToggleButton(isOn: slackEnabledBinding)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                slackEnabledBinding.wrappedValue.toggle()
             }
 
             credentialField(title: "User Token", prompt: "xoxp-...", text: $slackToken, isSecure: true)

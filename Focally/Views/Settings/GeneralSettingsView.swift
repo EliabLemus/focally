@@ -127,6 +127,10 @@ struct GeneralSettingsView: View {
         }
         .padding(.horizontal, FocallySpacing.large)
         .padding(.vertical, FocallySpacing.medium)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            toggle.wrappedValue.toggle()
+        }
     }
 
     private func actionRow(icon: String, label: String, action: @escaping () -> Void) -> some View {
@@ -159,6 +163,7 @@ struct GeneralSettingsView: View {
             Text(title)
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurface)
+                .contentShape(Rectangle())
             Spacer()
             Picker(title, selection: selection) {
                 ForEach(title == "Completion sound" ? completionOptions : soundOptions, id: \.self) { option in
@@ -167,7 +172,9 @@ struct GeneralSettingsView: View {
             }
             .pickerStyle(.menu)
             .frame(width: 160)
+            .buttonStyle(.plain)
         }
+        .contentShape(Rectangle())
     }
 
     private func soundPreviewButton(for soundName: String) -> some View {
