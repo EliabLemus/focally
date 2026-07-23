@@ -24,17 +24,14 @@ struct SidebarItemView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
+            .contentShape(Rectangle())
             .background(
                 RoundedRectangle(cornerRadius: FocallyRadius.small)
                     .fill(isActive ? Color.focallySurfaceContainerHigh : Color.clear)
             )
         }
         .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
-        .onHover { hovering in
-            if hovering && !isActive {
-                // hover highlight — SwiftUI handles this via button style
-            }
-        }
     }
 }

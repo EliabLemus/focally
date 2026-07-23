@@ -86,9 +86,11 @@ struct MenuBarDropdownView: View {
                         }
                     }
                     .padding(12)
+                    .contentShape(Rectangle())
                     .background(Color.focallySurfaceContainerLow)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+                .contentShape(Rectangle())
                 .buttonStyle(.plain)
             }
 

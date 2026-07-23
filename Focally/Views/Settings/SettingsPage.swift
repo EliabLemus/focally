@@ -40,11 +40,13 @@ struct SettingsPage: View {
                         .padding(.horizontal, FocallySpacing.small)
                         .padding(.vertical, FocallySpacing.small)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
                         .background(
                             RoundedRectangle(cornerRadius: FocallyRadius.small)
                                 .fill(selectedSubpage == subpage ? Color.focallySurfaceContainerHigh : Color.clear)
                         )
                     }
+                    .contentShape(Rectangle())
                     .buttonStyle(.plain)
                 }
 
