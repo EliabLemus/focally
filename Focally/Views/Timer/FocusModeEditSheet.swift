@@ -69,7 +69,7 @@ struct FocusModeEditSheet: View {
                 VStack(alignment: .leading, spacing: 20) {
                     // ========== Section: Basic Settings ==========
                     Text("edit_mode_section_basic")
-                        .font(.focallyH2)
+                        .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
                     VStack(alignment: .leading, spacing: 18) {
@@ -427,7 +427,7 @@ struct FocusModeEditSheet: View {
 
                     // ========== Section: Advanced Settings ==========
                     Text("edit_mode_section_advanced")
-                        .font(.focallyH2)
+                        .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
                     VStack(alignment: .leading, spacing: 18) {

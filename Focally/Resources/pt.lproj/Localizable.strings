@@ -28,7 +28,7 @@
 
 /* ========== SidebarView ========== */
 "sidebar_app_name" = "Focally";
-"sidebar_tagline" = "Três modos de foco";
+"sidebar_tagline" = "Timer de produtividade";
 
 /* ========== IdleDashboardView ========== */
 "dashboard_focus_modes" = "MODOS DE FOCO";

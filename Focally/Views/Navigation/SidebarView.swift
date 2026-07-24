@@ -9,12 +9,6 @@ struct SidebarView: View {
                 Text("sidebar_app_name")
                     .font(.focallyH1)
                     .foregroundStyle(Color.focallyOnSurface)
-
-                Text("sidebar_tagline")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-                    .textCase(.uppercase)
-                    .tracking(3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, FocallySpacing.medium)
@@ -38,6 +32,17 @@ struct SidebarView: View {
             .padding(.top, FocallySpacing.small)
 
             Spacer()
+
+            VStack(spacing: 4) {
+                Text("sidebar_tagline")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+                    .textCase(.uppercase)
+                    .tracking(3)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, FocallySpacing.medium)
+            .padding(.bottom, FocallySpacing.medium)
         }
         .frame(width: 260)
         .background(Color.focallySurfaceContainerLow.opacity(0.8).ignoresSafeArea())
