@@ -10,7 +10,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Release](https://img.shields.io/badge/release-v0.8.16-green)](https://github.com/EliabLemus/focally/releases/latest)
+[![Release](https://img.shields.io/badge/release-v0.8.19-green)](https://github.com/EliabLemus/focally/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 </div>
@@ -58,20 +58,51 @@ Focally is one thing: **start a timer, get in the zone, let the app handle the r
 | Onboarding wizard | Guided first-launch setup |
 | Keychain secrets | All tokens stored securely in macOS Keychain |
 
-## Install
+## Installation
+
+### Homebrew (Recommended)
 
 ```bash
+# Add tap
 brew tap EliabLemus/focally
+
+# Install
 brew install --cask focally
 ```
 
-## Upgrade
+### Direct Download
+
+Download the latest DMG from [GitHub Releases](https://github.com/EliabLemus/focally/releases/latest).
+
+1. Open the DMG
+2. Drag **Focally.app** to **Applications**
+3. Launch from Applications folder (or Spotlight search)
+4. Grant Accessibility permission when prompted (System Settings → Privacy & Security → Accessibility → Add Focally)
+
+## Updates
+
+### Homebrew
 
 ```bash
+# Update homebrew and upgrade Focally
 brew update && brew upgrade --cask focally
 ```
 
-[Download latest DMG](https://github.com/EliabLemus/focally/releases) · [Build from source](#build-from-source)
+**Note**: If Homebrew refuses to upgrade, use:
+```bash
+brew reinstall --cask focally
+```
+
+### Direct Download
+
+1. Download latest DMG from [GitHub Releases](https://github.com/EliabLemus/focally/releases/latest)
+2. Open the DMG
+3. Drag **Focally.app** to **Applications** (replace when prompted)
+4. Relaunch Focally
+
+**Update Checker**: Focally automatically checks for updates every 24 hours. If a new version is available, you'll see an "Update available" indicator in **Settings → About**. Click it to open the download page.
+
+---
 
 ## How it works
 
