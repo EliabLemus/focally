@@ -14,7 +14,7 @@ struct MainWindow: View {
                         .font(.focallyH2)
                         .foregroundStyle(Color.focallyOnSurface)
                 } rightContent: {
-                    if selectedTab != .settings {
+                    if selectedTab != .settings && selectedTab != .metrics {
                         Button(action: openSettingsTab) {
                             Image(systemName: "gearshape")
                                 .font(.system(size: 14))
@@ -31,6 +31,8 @@ struct MainWindow: View {
                     switch selectedTab {
                     case .timer:
                         TimerPage()
+                    case .metrics:
+                        MetricsPage()
                     case .settings:
                         SettingsPage()
                     }

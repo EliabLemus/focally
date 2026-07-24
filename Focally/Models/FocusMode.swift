@@ -1,6 +1,22 @@
 import Foundation
 import Observation
 
+enum FocusModeType: String, Codable, CaseIterable {
+    case focusTime = "focus_time"
+    case meeting = "meeting"
+    case inbox = "inbox"
+    case custom = "custom"
+
+    var localizedLabel: String {
+        switch self {
+        case .focusTime: return "focus_mode_type_focus_time"
+        case .meeting: return "focus_mode_type_meeting"
+        case .inbox: return "focus_mode_type_inbox"
+        case .custom: return "focus_mode_type_custom"
+        }
+    }
+}
+
 struct FocusMode: Identifiable, Codable, Equatable {
     static let defaultsKey = "focusModes"
 
@@ -20,6 +36,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
     var pomodoroLongBreakMinutes: Int
     var pomodoroRounds: Int
     var breakLabel: String?
+    var type: FocusModeType
 
     init(id: UUID = UUID(),
          name: String = "",
@@ -32,7 +49,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
          pomodoroBreakMinutes: Int = 5,
          pomodoroLongBreakMinutes: Int = 15,
          pomodoroRounds: Int = 4,
-         breakLabel: String? = nil) {
+         breakLabel: String? = nil,
+         type: FocusModeType = .custom) {
         self.id = id
         self.name = name
         self.emoji = emoji
@@ -45,12 +63,13 @@ struct FocusMode: Identifiable, Codable, Equatable {
         self.pomodoroLongBreakMinutes = pomodoroLongBreakMinutes
         self.pomodoroRounds = pomodoroRounds
         self.breakLabel = breakLabel
+        self.type = type
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, emoji, statusText, durationMinutes, enableDND, enablePomodoro
         case pomodoroWorkMinutes, pomodoroBreakMinutes, pomodoroLongBreakMinutes, pomodoroRounds
-        case breakLabel
+        case breakLabel, type
     }
 
     init(from decoder: Decoder) throws {
@@ -67,6 +86,13 @@ struct FocusMode: Identifiable, Codable, Equatable {
         pomodoroLongBreakMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroLongBreakMinutes) ?? 15
         pomodoroRounds = try c.decodeIfPresent(Int.self, forKey: .pomodoroRounds) ?? 4
         breakLabel = try c.decodeIfPresent(String.self, forKey: .breakLabel)
+
+        // Backward compat: infer type from ID if missing
+        if let decodedType = try? c.decode(FocusModeType.self, forKey: .type) {
+            type = decodedType
+        } else {
+            type = Self.inferredType(from: id)
+        }
     }
 
     static let builtInModes: [FocusMode] = [
@@ -81,7 +107,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroWorkMinutes: 25,
             pomodoroBreakMinutes: 5,
             pomodoroLongBreakMinutes: 15,
-            pomodoroRounds: 4
+            pomodoroRounds: 4,
+            type: .focusTime
         ),
         FocusMode(
             id: meetingID,
@@ -94,7 +121,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroWorkMinutes: 30,
             pomodoroBreakMinutes: 5,
             pomodoroLongBreakMinutes: 15,
-            pomodoroRounds: 1
+            pomodoroRounds: 1,
+            type: .meeting
         ),
         FocusMode(
             id: inboxID,
@@ -107,7 +135,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroWorkMinutes: 15,
             pomodoroBreakMinutes: 5,
             pomodoroLongBreakMinutes: 15,
-            pomodoroRounds: 1
+            pomodoroRounds: 1,
+            type: .inbox
         )
     ]
 
@@ -153,6 +182,15 @@ struct FocusMode: Identifiable, Codable, Equatable {
         id == FocusMode.focusTimeID || id == FocusMode.meetingID || id == FocusMode.inboxID
     }
 
+    private static func inferredType(from id: UUID) -> FocusModeType {
+        switch id {
+        case focusTimeID: return .focusTime
+        case meetingID: return .meeting
+        case inboxID: return .inbox
+        default: return .custom
+        }
+    }
+
     func sanitized() -> FocusMode {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedStatus = statusText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -169,7 +207,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroBreakMinutes: sanitizedPomodoroBreakMinutes,
             pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,
             pomodoroRounds: sanitizedPomodoroRounds,
-            breakLabel: breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines) : nil
+            breakLabel: breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines) : nil,
+            type: type
         )
     }
 }

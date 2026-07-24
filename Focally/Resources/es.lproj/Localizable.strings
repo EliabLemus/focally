@@ -11,7 +11,20 @@
 
 /* ========== FocallyTab ========== */
 "tab_timer" = "Temporizador";
+"tab_metrics" = "Métricas";
 "tab_settings" = "Configuración";
+
+/* ========== Metrics ========== */
+"metrics_daily_title" = "Resumen diario";
+"metrics_weekly_title" = "Resumen semanal";
+"metrics_monthly_title" = "Resumen mensual";
+"metrics_pomodoros_completed" = "Pomodoros completados";
+"metrics_meeting_time" = "Tiempo en reuniones";
+"metrics_total_focus_time" = "Tiempo total de enfoque";
+"metrics_avg_focus_time" = "Enfoque diario prom.";
+"metrics_no_data" = "No hay sesiones registradas";
+"metrics_export_csv" = "Exportar CSV";
+"metrics_chart_placeholder" = "Gráficos disponibles en v0.10.0";
 
 /* ========== SettingsPage ========== */
 "settings_title" = "Configuración";

@@ -27,6 +27,9 @@ final class FocusTimerService {
     var shortBreakDurationMinutes = 5
     var longBreakDurationMinutes = 15
 
+    /// Tracks when the current session was started (for metrics recording).
+    private var sessionStartTime: Date?
+
     let settingsStore: SettingsStore
     let soundPlayer: SoundPlayerService
     let notificationService: NotificationService
@@ -78,6 +81,7 @@ final class FocusTimerService {
             duration: durationMinutes
         )
 
+        sessionStartTime = Date()
         startWorkPhase()
     }
 
@@ -107,6 +111,7 @@ final class FocusTimerService {
     }
 
     func endSession(playCompletionSound: Bool = true) {
+        recordMetricsOnCompletion()
         stopTimer()
         deactivateFocusIntegration()
         clearSessionState()
@@ -116,6 +121,38 @@ final class FocusTimerService {
         }
 
         notificationService.notify(.sessionEnded)
+    }
+
+    // MARK: - Metrics Recording
+
+    /// Records the completed session to `FocusMetricsService` for analytics.
+    /// Called automatically when a session ends (either by completion or manual stop).
+    private func recordMetricsOnCompletion() {
+        // Only record if we have a valid session with start time and mode.
+        guard let startTime = sessionStartTime, let mode = currentMode else { return }
+
+        let endTime = Date()
+        let duration = endTime.timeIntervalSince(startTime)
+        // Ignore sessions shorter than 30 seconds (likely accidental starts).
+        guard duration >= 30 else { return }
+
+        let pomodorosCompleted: Int?
+        if mode.enablePomodoro {
+            pomodorosCompleted = currentRound
+        } else {
+            pomodorosCompleted = nil
+        }
+
+        let record = FocusSessionRecord(
+            modeType: mode.type,
+            modeID: mode.id,
+            startTime: startTime,
+            endTime: endTime,
+            duration: duration,
+            pomodorosCompleted: pomodorosCompleted
+        )
+
+        FocusMetricsService.shared.recordSession(record)
     }
 
     private func startWorkPhase() {
