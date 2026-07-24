@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-07-24
+
+### Fixed
+- 🐛 **Critical SF Symbol Crash** — Replaced `moon.slash.fill` (iOS-only) → `moon` in ActiveFocusView (2 locations)
+- 📊 **Metrics Threshold** — Record sessions >= 5s (was 30s), now captures 2-minute sessions
+- 🌐 **Missing Localization** — Fixed `edit_mode_title` interpolation bug (raw key display)
+- 📝 **Missing Title Field** — Added TextField for Focus Mode name in edit sheet
+- ⏱️ **Duration Control UX** — Improved Stepper (1-600 range, localized format)
+- 📅 **Calendar Control UX** — Custom date picker with prev/next chevrons
+- 📍 **Menu Bar Layout** — Fixed emoji overlapping text (spacing: 1 → 2)
+- 🔄 **Break Label Conditional** — Only visible when Pomodoro is enabled
+
+### Localization Keys Added (EN/ES/PT)
+- `edit_mode_name`, `edit_mode_name_placeholder`
+- `edit_mode_duration_value`
+- `metrics_prev_day`, `metrics_next_day`
+
+### Technical
+- 🏗️ **Build** — Version bump to 0.9.1 (build 71)
+- ✅ **Tests** — All 47 tests passing
+
 ## [0.9.0] - 2026-07-24
 
 ### Added
