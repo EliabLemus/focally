@@ -248,7 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(updateChecker)
             .environment(\.locale, appLanguage.locale)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
-        window.title = "Focally"
+        window.title = "Focally Settings"
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 1200, height: 800))
