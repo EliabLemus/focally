@@ -10,15 +10,24 @@ struct FocusSetupView: View {
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("Focally")
+            Text("Focus timer with smart Do Not Disturb and Slack integration")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 10) {
-                setupRow(title: "1. Connect Slack", detail: "Paste your token in Settings → Integrations so Focally can set status and load emoji shortcodes.")
-                setupRow(title: "2. Verify DND", detail: "Focus Time enables macOS Do Not Disturb and Slack DND automatically. Meeting and Inbox leave them off by default.")
-                setupRow(title: "3. Customize modes", detail: "Use the gear icon on a mode card to adjust the shortcode, status message, duration, and Pomodoro cadence.")
+                setupRow(
+                    title: "1. Notifications Permission",
+                    detail: "Required to notify you when focus sessions start, almost end, and when breaks begin. We only send alerts for timer events."
+                )
+                setupRow(
+                    title: "2. Three Focus Modes",
+                    detail: "Focus Time (enables DND), Meeting & Inbox (leave DND off). Each mode has configurable duration, emoji, and status message."
+                )
+                setupRow(
+                    title: "3. Slack Integration (Optional)",
+                    detail: "Paste your Slack token in Settings to auto-update your status. Focally sets status for all modes and DND only for Focus Time."
+                )
             }
             .padding(18)
             .background(Color.focallySurfaceContainerLow)
