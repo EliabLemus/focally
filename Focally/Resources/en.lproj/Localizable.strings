@@ -61,6 +61,11 @@
 "edit_mode_rounds" = "Rounds: %d";
 "edit_mode_delete" = "Delete Mode";
 
+/* Focus Mode Edit Sheet - Section Headers */
+"edit_mode_section_basic" = "Basic Settings";
+"edit_mode_section_advanced" = "Advanced Settings";
+"emoji_picker_help" = "Insert emoji";
+
 /* ========== TimerControlsView ========== */
 "timer_resume_session" = "Resume Session";
 "timer_pause_session" = "Pause Session";

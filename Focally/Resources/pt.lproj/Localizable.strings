@@ -61,6 +61,11 @@
 "edit_mode_rounds" = "Rodadas: %d";
 "edit_mode_delete" = "Excluir Modo";
 
+/* Focus Mode Edit Sheet - Section Headers */
+"edit_mode_section_basic" = "Configurações Básicas";
+"edit_mode_section_advanced" = "Configurações Avançadas";
+"emoji_picker_help" = "Inserir emoji";
+
 /* ========== TimerControlsView ========== */
 "timer_resume_session" = "Retomar Sessão";
 "timer_pause_session" = "Pausar Sessão";
