@@ -90,6 +90,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(focusModeStore)
             .environment(usageTracker)
             .environment(updateChecker)
+            .environment(appLanguage)
             .environment(\.locale, appLanguage.locale)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
