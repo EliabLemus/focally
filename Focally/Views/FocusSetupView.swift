@@ -6,11 +6,11 @@ struct FocusSetupView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Set Up Focally")
+            Text("Focally")
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("Focally is now centered on three modes. Configure Slack once, then edit each mode when you need a different status or duration.")
+            Text("Focally")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
