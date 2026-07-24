@@ -504,7 +504,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Focally"
+        window.title = "Focally Setup"
         window.isReleasedWhenClosed = false
         window.center()
         window.contentViewController = NSHostingController(rootView: FocusSetupView())
