@@ -133,8 +133,8 @@ final class FocusTimerService {
 
         let endTime = Date()
         let duration = endTime.timeIntervalSince(startTime)
-        // Ignore sessions shorter than 30 seconds (likely accidental starts).
-        guard duration >= 30 else { return }
+        // Ignore sessions shorter than 5 seconds (likely accidental clicks).
+        guard duration >= 5 else { return }
 
         let pomodorosCompleted: Int?
         if mode.enablePomodoro {

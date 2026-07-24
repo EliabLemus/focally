@@ -61,7 +61,7 @@ struct FocusModeEditSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text(String(localized: "edit_mode_title_\(draftMode.name)"))
+            Text(String(format: String(localized: "edit_mode_title"), draftMode.name))
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
 
@@ -73,6 +73,15 @@ struct FocusModeEditSheet: View {
                         .foregroundStyle(Color.focallyOnSurface)
 
                     VStack(alignment: .leading, spacing: 18) {
+                        // MARK: Mode Name
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("edit_mode_name")
+                                .font(.focallyBodyBold)
+
+                            TextField(String(localized: "edit_mode_name_placeholder"), text: $draftMode.name)
+                                .textFieldStyle(.roundedBorder)
+                        }
+
                         // MARK: Mode Emoji
                         VStack(alignment: .leading, spacing: 8) {
                             Text("edit_mode_emoji")
@@ -308,9 +317,10 @@ struct FocusModeEditSheet: View {
                             }
                         }
 
-                        // MARK: Break Label
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("edit_mode_break_label")
+                        // MARK: Break Label (only visible when pomodoro is enabled)
+                        if draftMode.enablePomodoro {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("edit_mode_break_label")
                                 .font(.focallyBodyBold)
 
                             ZStack(alignment: .topLeading) {
@@ -412,12 +422,14 @@ struct FocusModeEditSheet: View {
                                 .font(.focallyCaption)
                                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                         }
+                        }
 
                         // MARK: Duration
                         VStack(alignment: .leading, spacing: 8) {
                             Text("edit_mode_duration")
                                 .font(.focallyBodyBold)
-                            Stepper("\(draftMode.durationMinutes) min", value: $draftMode.durationMinutes, in: 5...120, step: 5)
+                            Stepper(String(format: String(localized: "edit_mode_duration_value"), draftMode.durationMinutes), value: $draftMode.durationMinutes, in: 1...600, step: 5)
+                                .font(.focallyBody)
                         }
                     }
 

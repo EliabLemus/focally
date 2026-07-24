@@ -320,7 +320,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 isPaused: timerService.isPaused
             )
             button.image = composite
-            button.title = " \(timerService.currentActivity)"
+            button.title = "  \(timerService.currentActivity)"
         } else {
             button.image = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
             button.title = ""

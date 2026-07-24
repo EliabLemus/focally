@@ -23,6 +23,8 @@
 "metrics_total_focus_time" = "Total Focus Time";
 "metrics_avg_focus_time" = "Avg Daily Focus";
 "metrics_no_data" = "No sessions recorded";
+"metrics_prev_day" = "Previous day";
+"metrics_next_day" = "Next day";
 "metrics_export_csv" = "Export CSV";
 "metrics_chart_placeholder" = "Charts coming in v0.10.0";
 
@@ -56,6 +58,9 @@
 
 /* ========== FocusModeEditSheet ========== */
 "edit_mode_title" = "Edit %@";
+"edit_mode_name" = "Name";
+"edit_mode_name_placeholder" = "e.g. Focus Time";
+"edit_mode_duration_value" = "%d min";
 "edit_mode_emoji" = "Emoji";
 "edit_mode_emoji_placeholder_search" = "e.g. :brain:";
 "edit_mode_emoji_hint" = "Type `:` for recent emojis, `:query` to search (~1900 emojis)";

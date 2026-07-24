@@ -47,7 +47,7 @@ struct ActiveFocusView: View {
 
             statusPill(
                 title: dndService.isDNDActive ? String(localized: "focus_dnd_on") : String(localized: "focus_dnd_off"),
-                icon: dndService.isDNDActive ? "moon.fill" : "moon.slash.fill",
+                icon: dndService.isDNDActive ? "moon.fill" : "moon",
                 tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant
             )
 
@@ -165,7 +165,7 @@ struct ActiveFocusView: View {
     private var focusModeCard: some View {
         SupportCard(
             title: String(localized: "focus_mode_title"),
-            icon: dndService.isDNDActive ? "moon.fill" : "moon.slash.fill",
+            icon: dndService.isDNDActive ? "moon.fill" : "moon",
             tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallySecondary
         ) {
             VStack(alignment: .leading, spacing: 10) {

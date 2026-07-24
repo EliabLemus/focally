@@ -9,7 +9,7 @@ struct DailyMetricsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: FocallySpacing.large) {
-            // Date picker
+            // Date navigation with prev/next chevrons
             HStack(spacing: FocallySpacing.medium) {
                 Text("metrics_daily_title")
                     .font(.focallyH2)
@@ -17,9 +17,27 @@ struct DailyMetricsView: View {
 
                 Spacer()
 
-                DatePicker("", selection: $selectedDate, displayedComponents: [.date])
-                    .labelsHidden()
-                    .environment(\.locale, Locale.current)
+                Button(action: { changeDate(by: -1) }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.focallyOnSurface)
+                }
+                .buttonStyle(.plain)
+                .help(String(localized: "metrics_prev_day"))
+
+                Text(selectedDate, format: .dateTime.month(.abbreviated).day().year())
+                    .font(.focallyBodyBold)
+                    .foregroundStyle(Color.focallyOnSurface)
+                    .frame(minWidth: 120)
+
+                Button(action: { changeDate(by: 1) }) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.focallyOnSurface)
+                }
+                .buttonStyle(.plain)
+                .disabled(Calendar.current.isDateInToday(selectedDate) || Calendar.current.isDate(selectedDate, inSameDayAs: Date()))
+                .help(String(localized: "metrics_next_day"))
             }
 
             if let metrics {
@@ -61,6 +79,12 @@ struct DailyMetricsView: View {
 
             Spacer()
         }
+    }
+
+    // MARK: - Date Navigation
+
+    private func changeDate(by days: Int) {
+        selectedDate = Calendar.current.date(byAdding: .day, value: days, to: selectedDate) ?? selectedDate
     }
 }
 
