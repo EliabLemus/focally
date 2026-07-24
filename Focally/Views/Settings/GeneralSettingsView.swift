@@ -17,12 +17,12 @@ struct GeneralSettingsView: View {
 
     private var generalSettingsCard: some View {
         VStack(spacing: 0) {
-            settingsRow(icon: "arrow.right.circle", label: "Launch Focally at login", toggle: $launchAtLogin)
+            settingsRow(icon: "arrow.right.circle", label: String(localized: "general_launch_login"), toggle: $launchAtLogin)
 
             Divider()
                 .background(Color.focallyOutlineVariant)
 
-            settingsRow(icon: "bell.fill", label: "Enable sound notifications", toggle: soundEnabledBinding)
+            settingsRow(icon: "bell.fill", label: String(localized: "general_sound_notifications"), toggle: soundEnabledBinding)
 
             if soundPlayer.isEnabled {
                 soundConfiguration
@@ -31,7 +31,7 @@ struct GeneralSettingsView: View {
             Divider()
                 .background(Color.focallyOutlineVariant)
 
-            settingsRow(icon: "menubar.rectangle", label: "Show timer in Menu Bar", toggle: $showInMenuBar)
+            settingsRow(icon: "menubar.rectangle", label: String(localized: "general_menu_bar"), toggle: $showInMenuBar)
         }
         .padding(.top, FocallySpacing.extraSmall)
         .padding(.bottom, FocallySpacing.extraSmall)
@@ -41,15 +41,15 @@ struct GeneralSettingsView: View {
     private var soundConfiguration: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                pickerRow(title: "Work sound", selection: workSoundBinding)
+                pickerRow(title: String(localized: "general_work_sound"), selection: workSoundBinding)
                 soundPreviewButton(for: soundPlayer.workSoundName)
             }
             HStack {
-                pickerRow(title: "Break sound", selection: breakSoundBinding)
+                pickerRow(title: String(localized: "general_break_sound"), selection: breakSoundBinding)
                 soundPreviewButton(for: soundPlayer.breakSoundName)
             }
             HStack {
-                pickerRow(title: "Completion sound", selection: completionSoundBinding)
+                pickerRow(title: String(localized: "general_completion_sound"), selection: completionSoundBinding)
                 soundPreviewButton(for: soundPlayer.completionSoundName)
             }
         }
@@ -166,7 +166,7 @@ struct GeneralSettingsView: View {
                 .contentShape(Rectangle())
             Spacer()
             Picker(title, selection: selection) {
-                ForEach(title == "Completion sound" ? completionOptions : soundOptions, id: \.self) { option in
+                ForEach(title == String(localized: "general_completion_sound") ? completionOptions : soundOptions, id: \.self) { option in
                     Text(option).tag(option)
                 }
             }
@@ -189,6 +189,6 @@ struct GeneralSettingsView: View {
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
-        .help("Preview sound")
+        .help(String(localized: "general_preview_sound"))
     }
 }

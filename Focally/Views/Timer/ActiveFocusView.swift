@@ -40,13 +40,13 @@ struct ActiveFocusView: View {
     private var statusStrip: some View {
         HStack(spacing: 12) {
             statusPill(
-                title: timerService.isPaused ? "Paused" : "In focus",
+                title: timerService.isPaused ? String(localized: "focus_paused") : String(localized: "focus_in_focus"),
                 icon: timerService.isPaused ? "pause.fill" : "bolt.fill",
                 tint: timerService.isPaused ? Color.focallySecondary : Color.focallyPrimary
             )
 
             statusPill(
-                title: dndService.isDNDActive ? "Do Not Disturb on" : "Do Not Disturb off",
+                title: dndService.isDNDActive ? String(localized: "focus_dnd_on") : String(localized: "focus_dnd_off"),
                 icon: dndService.isDNDActive ? "moon.fill" : "moon.slash.fill",
                 tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant
             )
@@ -82,8 +82,8 @@ struct ActiveFocusView: View {
                     .frame(maxWidth: 760)
 
                 Text(timerService.isPaused
-                     ? "Your session is paused. Notifications can come in again until you resume."
-                     : "Stay with the current block. The timer, controls, and next milestone are all here.")
+                     ? String(localized: "focus_paused_message")
+                     : String(localized: "focus_active_message"))
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .multilineTextAlignment(.center)
@@ -107,9 +107,9 @@ struct ActiveFocusView: View {
                         .frame(maxWidth: 420)
 
                     HStack(spacing: 18) {
-                        heroMeta(title: "Elapsed", value: elapsedTimeString)
-                        heroMeta(title: "Mode", value: timerService.currentMode?.name ?? "Focus")
-                        heroMeta(title: "Next", value: nextPhaseLabel)
+                        heroMeta(title: String(localized: "focus_elapsed"), value: elapsedTimeString)
+                        heroMeta(title: String(localized: "focus_mode_label"), value: timerService.currentMode?.name ?? "Focus")
+                        heroMeta(title: String(localized: "focus_next"), value: nextPhaseLabel)
                     }
                 }
             }
@@ -147,31 +147,31 @@ struct ActiveFocusView: View {
 
     private var sessionProgressCard: some View {
         SupportCard(
-            title: "Session cadence",
+            title: String(localized: "focus_session_cadence"),
             icon: "waveform.path.ecg",
             tint: Color.focallyPrimary
         ) {
             VStack(alignment: .leading, spacing: 10) {
                 supportMetric(
-                    title: "Current block",
-                    value: timerService.currentMode?.enablePomodoro == true ? "Round \(timerService.currentRound + 1) of \(timerService.pomodoroRounds)" : "Single session"
+                    title: String(localized: "focus_current_block"),
+                    value: timerService.currentMode?.enablePomodoro == true ? String(format: String(localized: "focus_pomodoro_round"), timerService.currentRound + 1, timerService.pomodoroRounds) : String(localized: "focus_single_session")
                 )
-                supportMetric(title: "Break length", value: "\(timerService.shortBreakDurationMinutes)m")
-                supportMetric(title: "Pomodoro", value: timerService.currentMode?.enablePomodoro == true ? "Enabled" : "Off")
+                supportMetric(title: String(localized: "focus_break_length"), value: "\(timerService.shortBreakDurationMinutes)m")
+                supportMetric(title: String(localized: "focus_pomodoro"), value: timerService.currentMode?.enablePomodoro == true ? String(localized: "focus_pomodoro_enabled") : String(localized: "focus_pomodoro_off"))
             }
         }
     }
 
     private var focusModeCard: some View {
         SupportCard(
-            title: "Focus mode",
+            title: String(localized: "focus_mode_title"),
             icon: dndService.isDNDActive ? "moon.fill" : "moon.slash.fill",
             tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallySecondary
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                supportMetric(title: "System status", value: dndService.isDNDActive ? "Do Not Disturb is active" : "Do Not Disturb is off")
-                supportMetric(title: "Slack status", value: timerService.currentStatusText)
-                supportMetric(title: "When this ends", value: nextBreakSummary)
+                supportMetric(title: String(localized: "focus_system_status"), value: dndService.isDNDActive ? String(localized: "focus_dnd_active") : String(localized: "focus_dnd_inactive"))
+                supportMetric(title: String(localized: "focus_slack_status"), value: timerService.currentStatusText)
+                supportMetric(title: String(localized: "focus_when_ends"), value: nextBreakSummary)
             }
         }
     }
@@ -182,23 +182,23 @@ struct ActiveFocusView: View {
                 .font(.system(size: 60))
                 .foregroundStyle(Color.focallyError)
 
-            Text("Finish Focus Session?")
+            Text("focus_finish_title")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("This will stop the timer and end the current focus session")
+            Text("focus_finish_detail")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .multilineTextAlignment(.center)
 
             HStack(spacing: 12) {
-                Button("Cancel") {
+                Button("general_cancel") {
                     showFinishConfirmation = false
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
 
-                Button("Finish") {
+                Button("focus_finish_button") {
                     timerService.resetToIdle()
                     showFinishConfirmation = false
                 }
@@ -283,25 +283,25 @@ struct ActiveFocusView: View {
 
     private var nextBreakSummary: String {
         if timerService.isBreak {
-            return "Focus resumes when the break ends"
+            return String(localized: "focus_break_resumes")
         }
         if timerService.currentMode?.enablePomodoro != true {
-            return "Session ends when the timer reaches zero"
+            return String(localized: "focus_session_ends_zero")
         }
         if timerService.currentRound + 1 >= timerService.pomodoroRounds {
-            return "Session ends after this round"
+            return String(localized: "focus_session_ends_round")
         }
-        return "Break next · \(timerService.shortBreakDurationMinutes)m"
+        return String(format: String(localized: "focus_break_next"), timerService.shortBreakDurationMinutes)
     }
 
     private var nextPhaseLabel: String {
         if timerService.isBreak {
-            return "Focus"
+            return String(localized: "focus_next_phase_focus")
         }
         if timerService.currentMode?.enablePomodoro != true || timerService.currentRound + 1 >= timerService.pomodoroRounds {
-            return "Finish"
+            return String(localized: "focus_next_phase_finish")
         }
-        return "Break"
+        return String(localized: "focus_next_phase_break")
     }
 }
 

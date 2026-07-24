@@ -1,12 +1,25 @@
 import SwiftUI
 
-enum FocallyTab: String, CaseIterable, Identifiable {
-    case timer = "Timer"
-    case settings = "Settings"
+enum FocallyTab: CaseIterable, Identifiable {
+    case timer
+    case settings
 
     static let visibleTabs: [FocallyTab] = [.timer, .settings]
 
-    var id: String { rawValue }
+    var id: String { localizationKey }
+
+    var localizationKey: String {
+        switch self {
+        case .timer:
+            return "tab_timer"
+        case .settings:
+            return "tab_settings"
+        }
+    }
+
+    var localizedLabel: String {
+        String(localized: LocalizedStringResource(stringLiteral: localizationKey))
+    }
 
     var icon: String {
         switch self {

@@ -19,8 +19,6 @@ struct FocusModeEditSheet: View {
         self.onDelete = onDelete
     }
 
-    /// Extrae la query de búsqueda del campo emoji.
-    /// Si es ":" → "" (mostrar recientes). Si es ":tac" → "tac".
     private var searchQuery: String {
         let t = draftMode.emoji.trimmingCharacters(in: .whitespacesAndNewlines)
         guard t.hasPrefix(":"), t.count > 1 else { return "" }
@@ -34,8 +32,6 @@ struct FocusModeEditSheet: View {
         )
     }
 
-    /// Extrae la query de búsqueda del campo breakLabel.
-    /// Si es `:` → "" (mostrar recientes). Si es `:tac` → "tac".
     private var breakLabelSearchQuery: String {
         let t = breakLabelBinding.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard t.hasPrefix(":"), t.count > 1 else { return "" }
@@ -49,265 +45,266 @@ struct FocusModeEditSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Edit \(draftMode.name)")
+            Text(String(localized: "edit_mode_title_\(draftMode.name)"))
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Emoji")
-                    .font(.focallyBodyBold)
-                ZStack(alignment: .topLeading) {
-                    TextField(
-                        draftMode.name.isEmpty ? "e.g. :brain:" : draftMode.emoji,
-                        text: $draftMode.emoji
-                    )
-                    .textFieldStyle(.roundedBorder)
-                    .onChange(of: draftMode.emoji) { _, newValue in
-                        let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if trimmed == ":" {
-                            showEmojiPicker = true
-                            recentEmojis = usageTracker.getRecentEmojis(forWorkspace: slackService.workspaceEmojiCodes)
-                            searchResults = []
-                        } else if trimmed.hasPrefix(":") && trimmed.count > 1 {
-                            showEmojiPicker = true
-                            recentEmojis = []
-                            let q = String(trimmed.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
-                            searchResults = EmojiValidator.searchShortcodes(q, workspaceEmojiCodes: slackService.workspaceEmojiCodes)
-                        } else {
-                            showEmojiPicker = false
-                            searchResults = []
-                        }
-                    }
-                    .task(id: draftMode.emoji) {
-                        let shortcode = draftMode.emoji.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if EmojiValidator.isCustomWorkspaceEmoji(shortcode, workspaceEmojiCodes: slackService.workspaceEmojiCodes),
-                           let urlString = slackService.workspaceEmojiImageURLs[shortcode],
-                           let url = URL(string: urlString) {
-                            let fetched = await EmojiCacheService.shared.emoji(for: shortcode, remoteURL: url)
-                            localPreviewURL = fetched
-                        } else {
-                            localPreviewURL = nil
-                        }
-                    }
-
-                    if showEmojiPicker && (!recentEmojis.isEmpty || !searchResults.isEmpty) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            ScrollView {
-                                if !searchResults.isEmpty {
-                                    LazyVStack(spacing: 2) {
-                                        ForEach(searchResults, id: \.shortcode) { item in
-                                            Button {
-                                                draftMode.emoji = item.shortcode
-                                                showEmojiPicker = false
-                                                searchResults = []
-                                            } label: {
-                                                HStack(spacing: 8) {
-                                                    Text(item.emoji.isEmpty ? "🔗" : item.emoji)
-                                                        .font(.system(size: 20))
-                                                        .frame(width: 30, alignment: .center)
-                                                    Text(item.shortcode)
-                                                        .font(.focallyBody)
-                                                        .foregroundStyle(Color.focallyOnSurface)
-                                                    Spacer()
-                                                }
-                                                .padding(.horizontal, 8)
-                                                .padding(.vertical, 4)
-                                                .contentShape(Rectangle())
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
-                                    }
-                                } else {
-                                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
-                                        ForEach(recentEmojis, id: \.self) { emoji in
-                                            let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
-                                            Button {
-                                                draftMode.emoji = emoji
-                                                showEmojiPicker = false
-                                            } label: {
-                                                Text(display)
-                                                    .font(.system(size: 22))
-                                                    .frame(width: 36, height: 36)
-                                                    .background(Color.focallySurfaceVariant.opacity(0.3))
-                                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                            }
-                                            .buttonStyle(.plain)
-                                            .help(emoji)
-                                        }
-                                    }
-                                }
-                            }
-                            .frame(maxHeight: 140)
-                        }
-                        .padding(8)
-                        .background(Color.focallySurfaceVariant)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
-                        .offset(y: 36)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                        .animation(.easeOut(duration: 0.15), value: showEmojiPicker)
-                    }
-                }
-
-                HStack(spacing: 10) {
-                    // Single consistent preview size
-                    if let localPreviewURL, let nsImage = NSImage(contentsOf: localPreviewURL) {
-                        Image(nsImage: nsImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 40, height: 40)
-                    } else if EmojiValidator.isCustomWorkspaceEmoji(draftMode.emoji, workspaceEmojiCodes: slackService.workspaceEmojiCodes) {
-                        ProgressView()
-                            .frame(width: 40, height: 40)
-                    } else {
-                        Text(EmojiValidator.convertShortcodeToUnicode(draftMode.emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? draftMode.emoji)
-                            .font(.system(size: 28))
-                            .frame(width: 40, height: 40)
-                    }
-                }
-
-                Text("Type `:` for recent emojis, `:query` to search (~1900 emojis)")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Status message")
-                    .font(.focallyBodyBold)
-                TextField("In focus mode", text: $draftMode.statusText)
-                    .textFieldStyle(.roundedBorder)
-            }
-
-            if draftMode.enablePomodoro {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Break label (optional)")
-                        .font(.focallyBodyBold)
-                    ZStack(alignment: .topLeading) {
-                        TextField("e.g. Coffee time ☕", text: breakLabelBinding)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("edit_mode_emoji")
+                            .font(.focallyBodyBold)
+                        ZStack(alignment: .topLeading) {
+                            TextField(
+                                draftMode.name.isEmpty ? String(localized: "edit_mode_emoji_placeholder_search") : draftMode.emoji,
+                                text: $draftMode.emoji
+                            )
                             .textFieldStyle(.roundedBorder)
-                            .onChange(of: breakLabelBinding.wrappedValue) { _, newValue in
+                            .onChange(of: draftMode.emoji) { _, newValue in
                                 let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
                                 if trimmed == ":" {
-                                    showBreakLabelEmojiPicker = true
-                                    breakLabelRecentEmojis = usageTracker.getRecentEmojis(forWorkspace: slackService.workspaceEmojiCodes)
-                                    breakLabelSearchResults = []
+                                    showEmojiPicker = true
+                                    recentEmojis = usageTracker.getRecentEmojis(forWorkspace: slackService.workspaceEmojiCodes)
+                                    searchResults = []
                                 } else if trimmed.hasPrefix(":") && trimmed.count > 1 {
-                                    showBreakLabelEmojiPicker = true
-                                    breakLabelRecentEmojis = []
+                                    showEmojiPicker = true
+                                    recentEmojis = []
                                     let q = String(trimmed.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
-                                    breakLabelSearchResults = EmojiValidator.searchShortcodes(q, workspaceEmojiCodes: slackService.workspaceEmojiCodes)
+                                    searchResults = EmojiValidator.searchShortcodes(q, workspaceEmojiCodes: slackService.workspaceEmojiCodes)
                                 } else {
-                                    showBreakLabelEmojiPicker = false
-                                    breakLabelSearchResults = []
+                                    showEmojiPicker = false
+                                    searchResults = []
+                                }
+                            }
+                            .task(id: draftMode.emoji) {
+                                let shortcode = draftMode.emoji.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if EmojiValidator.isCustomWorkspaceEmoji(shortcode, workspaceEmojiCodes: slackService.workspaceEmojiCodes),
+                                   let urlString = slackService.workspaceEmojiImageURLs[shortcode],
+                                   let url = URL(string: urlString) {
+                                    let fetched = await EmojiCacheService.shared.emoji(for: shortcode, remoteURL: url)
+                                    localPreviewURL = fetched
+                                } else {
+                                    localPreviewURL = nil
                                 }
                             }
 
-                        if showBreakLabelEmojiPicker && (!breakLabelRecentEmojis.isEmpty || !breakLabelSearchResults.isEmpty) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                ScrollView {
-                                    if !breakLabelSearchResults.isEmpty {
-                                        LazyVStack(spacing: 2) {
-                                            ForEach(breakLabelSearchResults, id: \.shortcode) { item in
-                                                Button {
-                                                    draftMode.breakLabel = item.shortcode
-                                                    showBreakLabelEmojiPicker = false
-                                                    breakLabelSearchResults = []
-                                                } label: {
-                                                    HStack(spacing: 8) {
-                                                        Text(item.emoji.isEmpty ? "🔗" : item.emoji)
-                                                            .font(.system(size: 20))
-                                                            .frame(width: 30, alignment: .center)
-                                                        Text(item.shortcode)
-                                                            .font(.focallyBody)
-                                                            .foregroundStyle(Color.focallyOnSurface)
-                                                        Spacer()
+                            if showEmojiPicker && (!recentEmojis.isEmpty || !searchResults.isEmpty) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    ScrollView {
+                                        if !searchResults.isEmpty {
+                                            LazyVStack(spacing: 2) {
+                                                ForEach(searchResults, id: \.shortcode) { item in
+                                                    Button {
+                                                        draftMode.emoji = item.shortcode
+                                                        showEmojiPicker = false
+                                                        searchResults = []
+                                                    } label: {
+                                                        HStack(spacing: 8) {
+                                                            Text(item.emoji.isEmpty ? "🔗" : item.emoji)
+                                                                .font(.system(size: 20))
+                                                                .frame(width: 30, alignment: .center)
+                                                            Text(item.shortcode)
+                                                                .font(.focallyBody)
+                                                                .foregroundStyle(Color.focallyOnSurface)
+                                                            Spacer()
+                                                        }
+                                                        .padding(.horizontal, 8)
+                                                        .padding(.vertical, 4)
+                                                        .contentShape(Rectangle())
                                                     }
-                                                    .padding(.horizontal, 8)
-                                                    .padding(.vertical, 4)
-                                                    .contentShape(Rectangle())
+                                                    .buttonStyle(.plain)
                                                 }
-                                                .buttonStyle(.plain)
                                             }
-                                        }
-                                    } else {
-                                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
-                                            ForEach(breakLabelRecentEmojis, id: \.self) { emoji in
-                                                let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
-                                                Button {
-                                                    draftMode.breakLabel = emoji
-                                                    showBreakLabelEmojiPicker = false
-                                                } label: {
-                                                    Text(display)
-                                                        .font(.system(size: 22))
-                                                        .frame(width: 36, height: 36)
-                                                        .background(Color.focallySurfaceVariant.opacity(0.3))
-                                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        } else {
+                                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
+                                                ForEach(recentEmojis, id: \.self) { emoji in
+                                                    let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
+                                                    Button {
+                                                        draftMode.emoji = emoji
+                                                        showEmojiPicker = false
+                                                    } label: {
+                                                        Text(display)
+                                                            .font(.system(size: 22))
+                                                            .frame(width: 36, height: 36)
+                                                            .background(Color.focallySurfaceVariant.opacity(0.3))
+                                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                                    }
+                                                    .buttonStyle(.plain)
+                                                    .help(emoji)
                                                 }
-                                                .buttonStyle(.plain)
-                                                .help(emoji)
                                             }
                                         }
                                     }
+                                    .frame(maxHeight: 140)
                                 }
-                                .frame(maxHeight: 140)
+                                .padding(8)
+                                .background(Color.focallySurfaceVariant)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                                .offset(y: 36)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                                .animation(.easeOut(duration: 0.15), value: showEmojiPicker)
                             }
-                            .padding(8)
-                            .background(Color.focallySurfaceVariant)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                            .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
-                            .offset(y: 36)
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                            .animation(.easeOut(duration: 0.15), value: showBreakLabelEmojiPicker)
+                        }
+
+                        HStack(spacing: 10) {
+                            if let localPreviewURL, let nsImage = NSImage(contentsOf: localPreviewURL) {
+                                Image(nsImage: nsImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 40, height: 40)
+                            } else if EmojiValidator.isCustomWorkspaceEmoji(draftMode.emoji, workspaceEmojiCodes: slackService.workspaceEmojiCodes) {
+                                ProgressView()
+                                    .frame(width: 40, height: 40)
+                            } else {
+                                Text(EmojiValidator.convertShortcodeToUnicode(draftMode.emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? draftMode.emoji)
+                                    .font(.system(size: 28))
+                                    .frame(width: 40, height: 40)
+                            }
+                        }
+
+                        Text("edit_mode_emoji_hint")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyOnSurfaceVariant)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("edit_mode_status_message")
+                            .font(.focallyBodyBold)
+                        TextField(String(localized: "edit_mode_status_placeholder"), text: $draftMode.statusText)
+                            .textFieldStyle(.roundedBorder)
+                    }
+
+                    if draftMode.enablePomodoro {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("edit_mode_break_label")
+                                .font(.focallyBodyBold)
+                            ZStack(alignment: .topLeading) {
+                                TextField(String(localized: "edit_mode_break_placeholder"), text: breakLabelBinding)
+                                    .textFieldStyle(.roundedBorder)
+                                    .onChange(of: breakLabelBinding.wrappedValue) { _, newValue in
+                                        let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        if trimmed == ":" {
+                                            showBreakLabelEmojiPicker = true
+                                            breakLabelRecentEmojis = usageTracker.getRecentEmojis(forWorkspace: slackService.workspaceEmojiCodes)
+                                            breakLabelSearchResults = []
+                                        } else if trimmed.hasPrefix(":") && trimmed.count > 1 {
+                                            showBreakLabelEmojiPicker = true
+                                            breakLabelRecentEmojis = []
+                                            let q = String(trimmed.dropFirst()).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
+                                            breakLabelSearchResults = EmojiValidator.searchShortcodes(q, workspaceEmojiCodes: slackService.workspaceEmojiCodes)
+                                        } else {
+                                            showBreakLabelEmojiPicker = false
+                                            breakLabelSearchResults = []
+                                        }
+                                    }
+
+                                if showBreakLabelEmojiPicker && (!breakLabelRecentEmojis.isEmpty || !breakLabelSearchResults.isEmpty) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        ScrollView {
+                                            if !breakLabelSearchResults.isEmpty {
+                                                LazyVStack(spacing: 2) {
+                                                    ForEach(breakLabelSearchResults, id: \.shortcode) { item in
+                                                        Button {
+                                                            draftMode.breakLabel = item.shortcode
+                                                            showBreakLabelEmojiPicker = false
+                                                            breakLabelSearchResults = []
+                                                        } label: {
+                                                            HStack(spacing: 8) {
+                                                                Text(item.emoji.isEmpty ? "🔗" : item.emoji)
+                                                                    .font(.system(size: 20))
+                                                                    .frame(width: 30, alignment: .center)
+                                                                Text(item.shortcode)
+                                                                    .font(.focallyBody)
+                                                                    .foregroundStyle(Color.focallyOnSurface)
+                                                                Spacer()
+                                                            }
+                                                            .padding(.horizontal, 8)
+                                                            .padding(.vertical, 4)
+                                                            .contentShape(Rectangle())
+                                                        }
+                                                        .buttonStyle(.plain)
+                                                    }
+                                                }
+                                            } else {
+                                                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
+                                                    ForEach(breakLabelRecentEmojis, id: \.self) { emoji in
+                                                        let display = EmojiValidator.convertShortcodeToUnicode(emoji, workspaceEmojis: slackService.workspaceEmojiCodes) ?? emoji
+                                                        Button {
+                                                            draftMode.breakLabel = emoji
+                                                            showBreakLabelEmojiPicker = false
+                                                        } label: {
+                                                            Text(display)
+                                                                .font(.system(size: 22))
+                                                                .frame(width: 36, height: 36)
+                                                                .background(Color.focallySurfaceVariant.opacity(0.3))
+                                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                                        }
+                                                        .buttonStyle(.plain)
+                                                        .help(emoji)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .frame(maxHeight: 140)
+                                    }
+                                    .padding(8)
+                                    .background(Color.focallySurfaceVariant)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+                                    .offset(y: 36)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                                    .animation(.easeOut(duration: 0.15), value: showBreakLabelEmojiPicker)
+                                }
+                            }
+                            Text("edit_mode_break_hint")
+                                .font(.focallyCaption)
+                                .foregroundStyle(Color.focallyOnSurfaceVariant)
                         }
                     }
-                    Text("Shown during breaks. Falls back to \"Mode Name — Break\"")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOnSurfaceVariant)
-                }
-            }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Duration")
-                    .font(.focallyBodyBold)
-                Stepper("\(draftMode.durationMinutes) min", value: $draftMode.durationMinutes, in: 5...120, step: 5)
-            }
-
-            Toggle("Enable Do Not Disturb in Slack and macOS", isOn: $draftMode.enableDND)
-                .font(.focallyBody)
-
-            if draftMode.enableDND {
-                Toggle("Enable Pomodoro", isOn: $draftMode.enablePomodoro)
-                    .font(.focallyBody)
-            }
-
-            if draftMode.enableDND && draftMode.enablePomodoro {
-                DisclosureGroup("Pomodoro settings") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Stepper("Work: \(draftMode.pomodoroWorkMinutes) min", value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
-                        Stepper("Short break: \(draftMode.pomodoroBreakMinutes) min", value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
-                        Stepper("Long break (every 4 rounds): \(draftMode.pomodoroLongBreakMinutes) min", value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
-                        Stepper("Rounds: \(draftMode.pomodoroRounds)", value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("edit_mode_duration")
+                            .font(.focallyBodyBold)
+                        Stepper("\(draftMode.durationMinutes) min", value: $draftMode.durationMinutes, in: 5...120, step: 5)
                     }
-                    .padding(.top, 8)
+
+                    Toggle("edit_mode_enable_dnd", isOn: $draftMode.enableDND)
+                        .font(.focallyBody)
+
+                    if draftMode.enableDND {
+                        Toggle("edit_mode_enable_pomodoro", isOn: $draftMode.enablePomodoro)
+                            .font(.focallyBody)
+                    }
+
+                    if draftMode.enableDND && draftMode.enablePomodoro {
+                        DisclosureGroup("edit_mode_pomodoro_settings") {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Stepper(String(format: String(localized: "edit_mode_work"), draftMode.pomodoroWorkMinutes), value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
+                                Stepper(String(format: String(localized: "edit_mode_short_break"), draftMode.pomodoroBreakMinutes), value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
+                                Stepper(String(format: String(localized: "edit_mode_long_break"), draftMode.pomodoroLongBreakMinutes), value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
+                                Stepper(String(format: String(localized: "edit_mode_rounds"), draftMode.pomodoroRounds), value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
+                            }
+                            .padding(.top, 8)
+                        }
+                    }
                 }
             }
-
-            Spacer()
 
             HStack {
                 if !draftMode.isBuiltIn {
                     Button(role: .destructive) {
                         onDelete?()
                     } label: {
-                        Label("Delete Mode", systemImage: "trash")
+                        Label("edit_mode_delete", systemImage: "trash")
                     }
                 }
 
                 Spacer()
 
-                Button("Cancel") {
+                Button("general_cancel") {
                     dismiss()
                 }
-                Button("Save") {
+                Button("general_save") {
                     onSave(draftMode.sanitized())
                     dismiss()
                 }

@@ -1,0 +1,186 @@
+/* ========== FocusSetupView ========== */
+"setup_title" = "Focally";
+"setup_subtitle" = "Focus timer with smart Do Not Disturb and Slack integration";
+"setup_step1_title" = "1. Notifications Permission";
+"setup_step1_detail" = "Required to notify you when focus sessions start, almost end, and when breaks begin. We only send alerts for timer events.";
+"setup_step2_title" = "2. Three Focus Modes";
+"setup_step2_detail" = "Focus Time (enables DND), Meeting & Inbox (leave DND off). Each mode has configurable duration, emoji, and status message.";
+"setup_step3_title" = "3. Slack Integration (Optional)";
+"setup_step3_detail" = "Paste your Slack token in Settings to auto-update your status. Focally sets status for all modes and DND only for Focus Time.";
+"setup_dont_show_again" = "Don't show this again";
+
+/* ========== FocallyTab ========== */
+"tab_timer" = "Timer";
+"tab_settings" = "Settings";
+
+/* ========== SettingsPage ========== */
+"settings_title" = "Settings";
+"settings_general" = "General";
+"settings_language" = "Language";
+"settings_integrations" = "Integrations";
+"settings_appearance" = "Appearance";
+"settings_about" = "About";
+
+/* ========== Language Names ========== */
+"language_english" = "English";
+"language_spanish" = "Español";
+"language_portuguese" = "Português";
+
+/* ========== SidebarView ========== */
+"sidebar_app_name" = "Focally";
+"sidebar_tagline" = "Three focus modes";
+
+/* ========== IdleDashboardView ========== */
+"dashboard_focus_modes" = "FOCUS MODES";
+"dashboard_start_click" = "Start in one click.";
+"dashboard_description" = "Each mode keeps its own Slack emoji, status text, duration, and optional DND automation.";
+"dashboard_how_it_works" = "How it works";
+"dashboard_how_detail" = "Tap any card to start immediately. Edit when you need to change the Slack shortcode, status text, duration, or Pomodoro cadence for Focus Time.";
+"dashboard_add_mode" = "Add Mode";
+
+/* ========== FocusModeCard ========== */
+"focus_mode_dnd" = "DND";
+
+/* ========== FocusModeEditSheet ========== */
+"edit_mode_title" = "Edit %@";
+"edit_mode_emoji" = "Emoji";
+"edit_mode_emoji_placeholder_search" = "e.g. :brain:";
+"edit_mode_emoji_hint" = "Type `:` for recent emojis, `:query` to search (~1900 emojis)";
+"edit_mode_status_message" = "Status message";
+"edit_mode_status_placeholder" = "In focus mode";
+"edit_mode_break_label" = "Break label (optional)";
+"edit_mode_break_placeholder" = "e.g. Coffee time ☕";
+"edit_mode_break_hint" = "Shown during breaks. Falls back to \"Mode Name — Break\"";
+"edit_mode_duration" = "Duration";
+"edit_mode_enable_dnd" = "Enable Do Not Disturb in Slack and macOS";
+"edit_mode_enable_pomodoro" = "Enable Pomodoro";
+"edit_mode_pomodoro_settings" = "Pomodoro settings";
+"edit_mode_work" = "Work: %d min";
+"edit_mode_short_break" = "Short break: %d min";
+"edit_mode_long_break" = "Long break (every 4 rounds): %d min";
+"edit_mode_rounds" = "Rounds: %d";
+"edit_mode_delete" = "Delete Mode";
+
+/* ========== TimerControlsView ========== */
+"timer_resume_session" = "Resume Session";
+"timer_pause_session" = "Pause Session";
+"timer_resume_hint" = "Double tap to resume the paused session";
+"timer_pause_hint" = "Double tap to pause the current session";
+"timer_finish_session" = "Finish Session";
+"timer_finish_hint" = "Double tap to finish the current session";
+
+/* ========== ActiveFocusView ========== */
+"focus_paused" = "Paused";
+"focus_in_focus" = "In focus";
+"focus_dnd_on" = "Do Not Disturb on";
+"focus_dnd_off" = "Do Not Disturb off";
+"focus_paused_message" = "Your session is paused. Notifications can come in again until you resume.";
+"focus_active_message" = "Stay with the current block. The timer, controls, and next milestone are all here.";
+"focus_elapsed" = "Elapsed";
+"focus_mode_label" = "Mode";
+"focus_next" = "Next";
+"focus_next_phase_focus" = "Focus";
+"focus_next_phase_break" = "Break";
+"focus_next_phase_finish" = "Finish";
+"focus_session_cadence" = "Session cadence";
+"focus_current_block" = "Current block";
+"focus_pomodoro_round" = "Round %d of %d";
+"focus_single_session" = "Single session";
+"focus_break_length" = "Break length";
+"focus_pomodoro" = "Pomodoro";
+"focus_pomodoro_enabled" = "Enabled";
+"focus_pomodoro_off" = "Off";
+"focus_mode_title" = "Focus mode";
+"focus_system_status" = "System status";
+"focus_dnd_active" = "Do Not Disturb is active";
+"focus_dnd_inactive" = "Do Not Disturb is off";
+"focus_slack_status" = "Slack status";
+"focus_when_ends" = "When this ends";
+"focus_break_resumes" = "Focus resumes when the break ends";
+"focus_session_ends_zero" = "Session ends when the timer reaches zero";
+"focus_session_ends_round" = "Session ends after this round";
+"focus_break_next" = "Break next · %dm";
+"focus_finish_title" = "Finish Focus Session?";
+"focus_finish_detail" = "This will stop the timer and end the current focus session";
+"focus_finish_button" = "Finish";
+
+/* ========== EstimatedTimeCard ========== */
+"estimated_end_title" = "Estimated end";
+"estimated_finish_time" = "Finish time";
+"estimated_time_remaining" = "Time remaining";
+"estimated_current_phase" = "Current phase";
+
+/* ========== IntegrationsSettingsView ========== */
+"integrations_calendar_title" = "Calendar Integration";
+"integrations_calendar_desc" = "Update Slack and quiet notifications during meetings.";
+"integrations_show_meeting_title" = "Show meeting title in Slack status";
+"integrations_dnd_video_calls" = "Enable Do Not Disturb for video calls";
+"integrations_slack_title" = "Slack Integration";
+"integrations_slack_desc" = "Focally updates Slack status for all three modes and only enables Slack DND for modes that opt into DND.";
+"integrations_user_token" = "User Token";
+"integrations_token_emoji_scope" = "Token requires emoji:read scope for the emoji catalog.";
+"integrations_invalid_format" = "Invalid format. Slack tokens should start with xoxp- or xoxb-.";
+"integrations_save_token" = "Save Token";
+"integrations_test_connection" = "Test Connection";
+"integrations_test_focus" = "Test Focus Status";
+"integrations_emoji_loading" = "Slack emoji catalog: Loading...";
+"integrations_emoji_loaded" = "Slack emoji catalog: %d emojis loaded";
+"integrations_reload" = "Reload";
+"integrations_dnd_title" = "Do Not Disturb Automation";
+"integrations_dnd_desc" = "macOS DND is driven directly from each mode. Signed shortcuts provide keyboard trigger backup.";
+"integrations_shortcuts_installed" = "Shortcuts installed";
+"integrations_install_shortcuts" = "Install Shortcuts";
+"integrations_refresh" = "Refresh";
+"integrations_connected" = "Connected";
+"integrations_disconnected" = "Disconnected";
+"integrations_connected_check" = "Connected ✓";
+
+/* ========== GeneralSettingsView ========== */
+"general_launch_login" = "Launch Focally at login";
+"general_sound_notifications" = "Enable sound notifications";
+"general_menu_bar" = "Show timer in Menu Bar";
+"general_work_sound" = "Work sound";
+"general_break_sound" = "Break sound";
+"general_completion_sound" = "Completion sound";
+"general_preview_sound" = "Preview sound";
+
+/* ========== AppearanceSettingsView ========== */
+"appearance_title" = "Appearance";
+"appearance_light" = "Light";
+"appearance_dark" = "Dark";
+"appearance_system" = "System";
+
+/* ========== AboutSettingsView ========== */
+"about_version" = "Version %@";
+"about_build" = "Build %@";
+"about_developed" = "Developed with ❤️ using SwiftUI";
+"about_copyright" = "© 2025-2026 Eliab Lemus";
+"about_update_available" = "Update available";
+
+/* Permission Service */
+"permission_notifications" = "Notifications";
+"permission_calendar" = "Calendar";
+"permission_accessibility" = "Accessibility";
+"permission_dnd" = "Do Not Disturb";
+"permission_loss_title" = "Permissions Required After Update";
+"permission_loss_message" = "Focally has detected that some permissions were reset after the update. Please re-grant the required permissions in Settings to continue using all features.";
+"permission_loss_open_settings" = "Open Settings";
+"permission_loss_dismiss" = "Dismiss";
+
+/* General */
+"menubar_focus" = "Focus";
+"menubar_quick_start" = "Quick Start";
+"menubar_add_mode" = "Add Mode";
+"menubar_slack_ready" = "Slack ready";
+"menubar_slack_off" = "Slack off";
+"menubar_dnd_active" = "DND Active";
+"menubar_dnd_off" = "DND Off";
+
+/* ========== General Buttons ========== */
+"general_done" = "Done";
+"general_cancel" = "Cancel";
+"general_save" = "Save";
+"general_delete" = "Delete";
+
+/* ========== MainWindow ========== */
+"main_open_settings" = "Open Settings";

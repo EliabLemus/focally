@@ -35,7 +35,7 @@ struct AboutSettingsView: View {
                     .foregroundStyle(Color.focallyOnSurface)
 
                 HStack(spacing: FocallySpacing.extraSmall) {
-                    Text("Version \(appVersion)")
+                    Text(String(format: String(localized: "about_version"), appVersion))
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
 
@@ -48,7 +48,7 @@ struct AboutSettingsView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.focallyCaption)
-                                Text("Update available")
+                                Text("about_update_available")
                                     .font(.focallyCaption)
                             }
                             .foregroundStyle(Color.focallyPrimary)
@@ -64,7 +64,7 @@ struct AboutSettingsView: View {
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text("Build \(buildNumber)")
+                    Text(String(format: String(localized: "about_build"), buildNumber))
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                 }
@@ -75,11 +75,11 @@ struct AboutSettingsView: View {
                 .padding(.vertical, FocallySpacing.small)
 
             VStack(spacing: FocallySpacing.extraSmall) {
-                Text("Developed with ❤️ using SwiftUI")
+                Text("about_developed")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOutline)
 
-                Text("© 2025-2026 Eliab Lemus")
+                Text("about_copyright")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOutline)
             }

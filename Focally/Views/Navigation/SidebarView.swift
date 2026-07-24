@@ -6,11 +6,11 @@ struct SidebarView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Focally")
+                Text("sidebar_app_name")
                     .font(.focallyH1)
                     .foregroundStyle(Color.focallyOnSurface)
 
-                Text("Three focus modes")
+                Text("sidebar_tagline")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .textCase(.uppercase)
@@ -28,7 +28,7 @@ struct SidebarView: View {
                 ForEach(FocallyTab.visibleTabs) { tab in
                     SidebarItemView(
                         icon: tab.activeIcon,
-                        label: tab.rawValue,
+                        label: tab.localizedLabel,
                         isActive: selectedTab == tab,
                         action: { selectedTab = tab }
                     )

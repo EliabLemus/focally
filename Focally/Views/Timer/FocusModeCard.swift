@@ -47,7 +47,7 @@ struct FocusModeCard: View {
                 HStack(spacing: 10) {
                     badge(label: "\(mode.durationMinutes) min", systemImage: "timer")
                     if mode.enableDND {
-                        badge(label: "DND", systemImage: "moon.fill")
+                        badge(label: String(localized: "focus_mode_dnd"), systemImage: "moon.fill")
                     }
                     if mode.enablePomodoro {
                         badge(label: "\(mode.pomodoroWorkMinutes)/\(mode.pomodoroBreakMinutes)", systemImage: "repeat")

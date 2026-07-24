@@ -20,16 +20,21 @@
 		28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */; };
 		29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */; };
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
+		3C00972814298660B247AD5A /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95A80A407C1873456D6EBBF /* AppLanguage.swift */; };
 		3CA50BD80850175F7912AB33 /* FocusMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B309416511CC57079912AFE6 /* FocusMode.swift */; };
 		3CC347CA3B86E21F7D0947E8 /* FocallyGlassModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */; };
 		4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */; };
 		41890883893A4D5DB94888F7 /* FocusModeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */; };
+		42238CB9D8ABDFB1628167C2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ECF6F0911D78E7836F5068 /* Localizable.strings */; };
 		470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */; };
+		4918E9CBBD4CC68BA3921FA3 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7E2AD28154EB8F29CA62613D /* en.lproj */; };
 		4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */; };
 		4DA6D3EC99C075CD80C09883 /* confirmation_003.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */; };
 		4E171CBDCAE413F2F4D0F49F /* FocallyTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */; };
 		502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */; };
+		51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9D7A94AF842BA26A1156F5E9 /* pt.lproj */; };
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
+		5B72D2EA62C4AE9E2D086EF6 /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 4F41CEC41E4906B3E45ACE6B /* es.lproj */; };
 		5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */; };
 		5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440DA683BDD9156AD84D322C /* FocallyColors.swift */; };
 		62800918C6A9ABAF71CE9F6C /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */; };
@@ -51,6 +56,7 @@
 		970D3C8AD2A7D59A0BB95DCC /* FocallyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */; };
 		97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */; };
 		97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */; };
+		9D6DB5388C88D7DDB0AF8655 /* PermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD86686DB30D916F1B8BA083 /* PermissionService.swift */; };
 		A5C5DDFD64A5AA925679A34B /* AboutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */; };
 		AAB08AFF8D55115118E12B39 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DF9DEEC76304DC26DB445F /* SidebarView.swift */; };
 		ADAA439E664426F93640E1CC /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */; };
@@ -74,6 +80,7 @@
 		E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */; };
 		EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1032F662E9204A6D804DD2EF /* FocusTimerService.swift */; };
 		EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B872379B2018EE66D478415E /* Assets.xcassets */; };
+		EF03680027AC8B646E16D2C3 /* LanguageSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3380D59838114A5E74EC8FB /* LanguageSettingsView.swift */; };
 		EF16991241C55E181ED22ACF /* UpdateCheckerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */; };
 		F1D0296A1D2E03E29B5268CB /* FocusSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */; };
 		F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */; };
@@ -105,6 +112,7 @@
 		02A06E8000779E54DAFAFDDB /* FocallyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		051BDBCD3E21F1FD15B3D7CF /* FocallyTesting.swift.disabled */ = {isa = PBXFileReference; path = FocallyTesting.swift.disabled; sourceTree = "<group>"; };
 		09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSlackIntegrationService.swift; sourceTree = "<group>"; };
+		094ACF4CCDAE678B0F17C701 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTheme.swift; sourceTree = "<group>"; };
 		0DEA92C31BB1683C614672E5 /* focally-focus-off-signed.shortcut */ = {isa = PBXFileReference; path = "focally-focus-off-signed.shortcut"; sourceTree = "<group>"; };
 		1032F662E9204A6D804DD2EF /* FocusTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTimerService.swift; sourceTree = "<group>"; };
@@ -131,7 +139,9 @@
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
+		4F41CEC41E4906B3E45ACE6B /* es.lproj */ = {isa = PBXFileReference; path = es.lproj; sourceTree = "<group>"; };
 		4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerService.swift; sourceTree = "<group>"; };
+		53488A3E81071ACFBF858568 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
@@ -142,6 +152,7 @@
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
 		74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedFocusShortcutsService.swift; sourceTree = "<group>"; };
 		798F580A999292FEF45A0C39 /* glass_005.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = glass_005.aiff; sourceTree = "<group>"; };
+		7E2AD28154EB8F29CA62613D /* en.lproj */ = {isa = PBXFileReference; path = en.lproj; sourceTree = "<group>"; };
 		7E5DB55686DFAEB6AAB22D07 /* LayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerTests.swift; sourceTree = "<group>"; };
 		80AE26497177767F58D61D45 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		8106D91600D3C2013F5ACD33 /* bell.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = bell.aiff; sourceTree = "<group>"; };
@@ -152,23 +163,28 @@
 		887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallySpacing.swift; sourceTree = "<group>"; };
 		8C2677CB56C06B2FD04DCAF2 /* DesignSystemTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTestView.swift; sourceTree = "<group>"; };
 		8E5322A16B3B60603C5509F9 /* Focally.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Focally.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D7A94AF842BA26A1156F5E9 /* pt.lproj */ = {isa = PBXFileReference; path = pt.lproj; sourceTree = "<group>"; };
 		9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimatedTimeCard.swift; sourceTree = "<group>"; };
 		A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSetupView.swift; sourceTree = "<group>"; };
 		A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeCard.swift; sourceTree = "<group>"; };
 		A6B424719CB23B5544233E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B309416511CC57079912AFE6 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
+		B3380D59838114A5E74EC8FB /* LanguageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSettingsView.swift; sourceTree = "<group>"; };
 		B5043C8ECE27D0D64ACE0515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B684F97343BEF991F6AC0F71 /* EmojiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiView.swift; sourceTree = "<group>"; };
 		B7294FD9B10CC42662103B9B /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleDashboardView.swift; sourceTree = "<group>"; };
 		B872379B2018EE66D478415E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B95A80A407C1873456D6EBBF /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		C17386F3788F2D2F1263DBDD /* PomodoroState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroState.swift; sourceTree = "<group>"; };
 		C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
 		C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = confirmation_003.aiff; sourceTree = "<group>"; };
 		C98C5639BCFE72D1706C0464 /* pluck_002.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = pluck_002.aiff; sourceTree = "<group>"; };
 		CBFE7A23E5D451FB60786396 /* FocallyUITests.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocallyUITests.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiUsageTrackerTests.swift; sourceTree = "<group>"; };
+		CE97A0C0BBC4E27B49C8967D /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D1284C85CCD279FD11125147 /* focally-focus-on-signed.shortcut */ = {isa = PBXFileReference; path = "focally-focus-on-signed.shortcut"; sourceTree = "<group>"; };
+		DD86686DB30D916F1B8BA083 /* PermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionService.swift; sourceTree = "<group>"; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
 		E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCacheService.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
@@ -306,6 +322,7 @@
 		4E8101EF9D6FF1BD04DC4D3E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				B95A80A407C1873456D6EBBF /* AppLanguage.swift */,
 				B309416511CC57079912AFE6 /* FocusMode.swift */,
 				C17386F3788F2D2F1263DBDD /* PomodoroState.swift */,
 			);
@@ -318,11 +335,15 @@
 				B7294FD9B10CC42662103B9B /* AppIcon.icns */,
 				8106D91600D3C2013F5ACD33 /* bell.aiff */,
 				C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */,
+				7E2AD28154EB8F29CA62613D /* en.lproj */,
+				4F41CEC41E4906B3E45ACE6B /* es.lproj */,
 				0DEA92C31BB1683C614672E5 /* focally-focus-off-signed.shortcut */,
 				D1284C85CCD279FD11125147 /* focally-focus-on-signed.shortcut */,
 				798F580A999292FEF45A0C39 /* glass_005.aiff */,
 				C98C5639BCFE72D1706C0464 /* pluck_002.aiff */,
+				9D7A94AF842BA26A1156F5E9 /* pt.lproj */,
 				18BD5D25DEA66C56F6FC7A05 /* Fonts */,
+				98ECF6F0911D78E7836F5068 /* Localizable.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -401,6 +422,7 @@
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
 				74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */,
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
+				DD86686DB30D916F1B8BA083 /* PermissionService.swift */,
 				86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */,
 				24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */,
 				0179E6DB0D32C6C38E33CE35 /* SlackService.swift */,
@@ -418,6 +440,7 @@
 				F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */,
 				333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */,
 				31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */,
+				B3380D59838114A5E74EC8FB /* LanguageSettingsView.swift */,
 				80AE26497177767F58D61D45 /* SettingsPage.swift */,
 			);
 			path = Settings;
@@ -509,6 +532,8 @@
 			knownRegions = (
 				Base,
 				en,
+				es,
+				pt,
 			);
 			mainGroup = 4051D8D7C7F98FDA8B860CCE;
 			minimizedProjectReferenceProxies = 1;
@@ -535,12 +560,16 @@
 				803039DD967F5D993EC45A02 /* Inter-Medium.ttf in Resources */,
 				00FDD701DB74DCD2D82E469B /* Inter-Regular.ttf in Resources */,
 				CC6B0E5B7BD7393534E5039F /* Inter-SemiBold.ttf in Resources */,
+				42238CB9D8ABDFB1628167C2 /* Localizable.strings in Resources */,
 				679740AFC847642945563E39 /* bell.aiff in Resources */,
 				4DA6D3EC99C075CD80C09883 /* confirmation_003.aiff in Resources */,
+				4918E9CBBD4CC68BA3921FA3 /* en.lproj in Resources */,
+				5B72D2EA62C4AE9E2D086EF6 /* es.lproj in Resources */,
 				0C4F5B379C1114D2F4F50C2E /* focally-focus-off-signed.shortcut in Resources */,
 				68F5DEEE11D3BCAD5A8B1A63 /* focally-focus-on-signed.shortcut in Resources */,
 				1EB7549C72A8A8EBB126ADED /* glass_005.aiff in Resources */,
 				D47E178868502051F8D6A991 /* pluck_002.aiff in Resources */,
+				51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,6 +590,7 @@
 			files = (
 				A5C5DDFD64A5AA925679A34B /* AboutSettingsView.swift in Sources */,
 				CAECDE4AC6D75573BAECAF34 /* ActiveFocusView.swift in Sources */,
+				3C00972814298660B247AD5A /* AppLanguage.swift in Sources */,
 				62800918C6A9ABAF71CE9F6C /* AppearanceSettingsView.swift in Sources */,
 				97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */,
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
@@ -586,6 +616,7 @@
 				502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */,
 				2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */,
 				8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */,
+				EF03680027AC8B646E16D2C3 /* LanguageSettingsView.swift in Sources */,
 				63A648A7E8ACFA991912B86D /* Logger.swift in Sources */,
 				D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */,
 				470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */,
@@ -593,6 +624,7 @@
 				B451FACCAC9DBC96264B7812 /* Metrics.swift in Sources */,
 				6CB349FD5A20890E40E0ECC3 /* NotificationService.swift in Sources */,
 				71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */,
+				9D6DB5388C88D7DDB0AF8655 /* PermissionService.swift in Sources */,
 				36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */,
 				DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */,
 				93EE71221692619CD1E52FB0 /* SettingsStore.swift in Sources */,
@@ -647,6 +679,19 @@
 			targetProxy = 1D142BD0D61C024E91962404 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		98ECF6F0911D78E7836F5068 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				53488A3E81071ACFBF858568 /* en */,
+				094ACF4CCDAE678B0F17C701 /* es */,
+				CE97A0C0BBC4E27B49C8967D /* pt */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		10F7F8A7BA61FA50E60011A8 /* Debug */ = {

@@ -35,7 +35,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let usageTracker = EmojiUsageTracker.shared
     let emojiCacheService = EmojiCacheService.shared
     let updateChecker = UpdateCheckerService.shared
+    let permissionService = PermissionService.shared
     private lazy var settingsStore = SettingsStore()
+    let appLanguage = AppLanguage.shared
     private lazy var timerService = FocusTimerService(
         settingsStore: settingsStore,
         soundPlayer: .shared,
@@ -47,6 +49,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
+
+        // Auto-reconnect Slack if token exists and not already attempted (post-update)
+        slackService.attemptAutoReconnectionIfNeeded()
+
+        // Check permissions post-update (detect if lost)
+        permissionService.checkAllPermissions()
+        if permissionService.detectPermissionLoss() {
+            logger.info("Permissions lost post-update detected. Showing permission alert.")
+            showPermissionLossAlert()
+        } else {
+            permissionService.markPermissionsVerified()
+        }
+
         showSetupIfNeeded()
         applySavedTheme()
         notificationService.requestAuthorization()
@@ -75,6 +90,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(focusModeStore)
             .environment(usageTracker)
             .environment(updateChecker)
+            .environment(\.locale, appLanguage.locale)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
         observeTimerService()
@@ -122,9 +138,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if popover.isShown {
             popover.performClose(button)
         } else {
+            // Multi-monitor fix: Detect screen del button y forzar posicionamiento correcto
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             applySavedTheme()
-            popover.contentViewController?.view.window?.makeKey()
+            
+            // Forzar key window en el screen correcto
+            if let popoverWindow = popover.contentViewController?.view.window {
+                popoverWindow.makeKey()
+                popoverWindow.orderFrontRegardless()
+            }
         }
     }
 
@@ -223,6 +245,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(focusModeStore)
             .environment(usageTracker)
             .environment(updateChecker)
+            .environment(\.locale, appLanguage.locale)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
@@ -480,7 +503,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Focally Setup"
+        window.title = "Focally"
         window.isReleasedWhenClosed = false
         window.center()
         window.contentViewController = NSHostingController(rootView: FocusSetupView())
@@ -489,6 +512,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         setupWindow = window
         applySavedTheme()
+    }
+
+    private func showPermissionLossAlert() {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "permission_loss_title")
+        alert.informativeText = String(localized: "permission_loss_message")
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: String(localized: "permission_loss_open_settings"))
+        alert.addButton(withTitle: String(localized: "permission_loss_dismiss"))
+
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            openMainWindow()
+            // Esperar un momento y luego abrir settings
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                NotificationCenter.default.post(name: .focusNavigateToSettings, object: nil)
+            }
+        }
     }
 }
 

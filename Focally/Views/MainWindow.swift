@@ -10,7 +10,7 @@ struct MainWindow: View {
 
             VStack(spacing: 0) {
                 TopBarView {
-                    Text(selectedTab.rawValue)
+                    Text(selectedTab.localizedLabel)
                         .font(.focallyH2)
                         .foregroundStyle(Color.focallyOnSurface)
                 } rightContent: {
@@ -23,7 +23,7 @@ struct MainWindow: View {
                                 .background(Circle().fill(Color.focallySurfaceContainer))
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("Open Settings")
+                        .accessibilityLabel("main_open_settings")
                     }
                 }
 

@@ -27,8 +27,8 @@ struct TimerControlsView: View {
                     }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(timerService.isPaused ? "Resume Session" : "Pause Session")
-            .accessibilityHint(timerService.isPaused ? "Double tap to resume the paused session" : "Double tap to pause the current session")
+            .accessibilityLabel(timerService.isPaused ? String(localized: "timer_resume_session") : String(localized: "timer_pause_session"))
+            .accessibilityHint(timerService.isPaused ? String(localized: "timer_resume_hint") : String(localized: "timer_pause_hint"))
 
             // Finish Button
             Button(action: onFinish) {
@@ -42,9 +42,9 @@ struct TimerControlsView: View {
                     }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Finish Session")
-            .accessibilityHint("Double tap to finish the current session")
-            .help("Finish Session")
+            .accessibilityLabel("timer_finish_session")
+            .accessibilityHint("timer_finish_hint")
+            .help("timer_finish_session")
         }
         .padding(.horizontal, 40)
     }

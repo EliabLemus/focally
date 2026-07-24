@@ -1,18 +1,34 @@
 import SwiftUI
 
-enum SettingsSubpage: String, CaseIterable, Identifiable {
-    case general = "General"
-    case integrations = "Integrations"
-    case appearance = "Appearance"
-    case about = "About"
+enum SettingsSubpage: CaseIterable, Identifiable {
+    case general
+    case integrations
+    case appearance
+    case language
+    case about
 
-    var id: String { rawValue }
+    var id: String { localizationKey }
+
+    var localizationKey: String {
+        switch self {
+        case .general: return "settings_general"
+        case .integrations: return "settings_integrations"
+        case .appearance: return "settings_appearance"
+        case .language: return "settings_language"
+        case .about: return "settings_about"
+        }
+    }
+
+    var localizedLabel: String {
+        String(localized: LocalizedStringResource(stringLiteral: localizationKey))
+    }
 
     var icon: String {
         switch self {
         case .general: return "gearshape"
         case .integrations: return "message.fill"
         case .appearance: return "paintbrush"
+        case .language: return "globe"
         case .about: return "info.circle"
         }
     }
@@ -33,7 +49,7 @@ struct SettingsPage: View {
                                 .font(.system(size: 13))
                                 .frame(width: 18)
 
-                            Text(subpage.rawValue)
+                            Text(subpage.localizedLabel)
                                 .font(selectedSubpage == subpage ? .focallyBodyBold : .focallyBody)
                         }
                         .foregroundStyle(selectedSubpage == subpage ? Color.focallyOnSurface : Color.focallyOutline)
@@ -58,13 +74,13 @@ struct SettingsPage: View {
 
             VStack(spacing: 0) {
                 HStack(spacing: 4) {
-                    Text("Settings")
+                    Text("settings_title")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                     Text("›")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
-                    Text(selectedSubpage.rawValue)
+                    Text(selectedSubpage.localizedLabel)
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
@@ -93,6 +109,8 @@ struct SettingsPage: View {
             IntegrationsSettingsView()
         case .appearance:
             AppearanceSettingsView()
+        case .language:
+            LanguageSettingsView()
         case .about:
             AboutSettingsView()
         }

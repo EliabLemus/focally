@@ -49,6 +49,28 @@ class SlackService {
         return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
     }
 
+    // MARK: - Auto-Reconnection Post-Update
+
+    private static let connectionAttemptedKey = "slack.connectionAttempted"
+
+    func attemptAutoReconnectionIfNeeded() {
+        let connectionAttempted = UserDefaults.standard.bool(forKey: Self.connectionAttemptedKey)
+        let hasToken = token != nil
+
+        guard hasToken && !connectionAttempted else { return }
+
+        logger.info("Attempting Slack auto-reconnection post-update. token=\(maskedToken(token))")
+
+        // Marcar como intentado para evitar reintentos infinitos
+        UserDefaults.standard.set(true, forKey: Self.connectionAttemptedKey)
+
+        testConnection()
+    }
+
+    func resetConnectionAttemptedFlag() {
+        UserDefaults.standard.set(false, forKey: Self.connectionAttemptedKey)
+    }
+
     func disableSlackDND() {
         let maskedToken = maskedToken(token)
         logger.info("disableSlackDND called. isEnabled=\(self.isEnabled), token=\(maskedToken)")

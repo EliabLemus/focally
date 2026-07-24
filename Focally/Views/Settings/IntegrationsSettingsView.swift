@@ -26,11 +26,11 @@ struct IntegrationsSettingsView: View {
                 iconTile(systemImage: "calendar", color: Color.focallyTertiary)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Calendar Integration")
+                    Text("integrations_calendar_title")
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text("Update Slack and quiet notifications during meetings.")
+                    Text("integrations_calendar_desc")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                 }
@@ -45,11 +45,11 @@ struct IntegrationsSettingsView: View {
                 calendarEnabledBinding.wrappedValue.toggle()
             }
 
-            Toggle("Show meeting title in Slack status", isOn: $calendarService.showMeetingTitle)
-                .accessibilityLabel("Show meeting title in Slack status")
+            Toggle("integrations_show_meeting_title", isOn: $calendarService.showMeetingTitle)
+                .accessibilityLabel("integrations_show_meeting_title")
 
-            Toggle("Enable Do Not Disturb for video calls", isOn: $calendarService.dndForMeetings)
-                .accessibilityLabel("Enable Do Not Disturb for video calls")
+            Toggle("integrations_dnd_video_calls", isOn: $calendarService.dndForMeetings)
+                .accessibilityLabel("integrations_dnd_video_calls")
 
             if let calendarError = calendarService.connectionError, !calendarError.isEmpty {
                 Text(calendarError)
@@ -67,11 +67,11 @@ struct IntegrationsSettingsView: View {
                 iconTile(systemImage: "message.fill", color: Color.focallyPrimary)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Slack Integration")
+                    Text("integrations_slack_title")
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text("Focally updates Slack status for all three modes and only enables Slack DND for modes that opt into DND.")
+                    Text("integrations_slack_desc")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                 }
@@ -86,24 +86,24 @@ struct IntegrationsSettingsView: View {
                 slackEnabledBinding.wrappedValue.toggle()
             }
 
-            credentialField(title: "User Token", prompt: "xoxp-...", text: $slackToken, isSecure: true)
+            credentialField(title: String(localized: "integrations_user_token"), prompt: "xoxp-...", text: $slackToken, isSecure: true)
 
-            Text("Token requires emoji:read scope for the emoji catalog.")
+            Text("integrations_token_emoji_scope")
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyTertiary)
 
             if !slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
                !slackToken.hasPrefix("xoxp-") && !slackToken.hasPrefix("xoxb-") {
-                Text("Invalid format. Slack tokens should start with xoxp- or xoxb-.")
+                Text("integrations_invalid_format")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyError)
             }
 
             HStack(spacing: FocallySpacing.small) {
-                primaryButton("Save Token", action: saveSlackToken)
-                secondaryButton("Test Connection", action: testSlackConnection)
+                primaryButton(String(localized: "integrations_save_token"), action: saveSlackToken)
+                secondaryButton(String(localized: "integrations_test_connection"), action: testSlackConnection)
                     .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                secondaryButton("Test Focus Status", action: testSlackFocusIntegration)
+                secondaryButton(String(localized: "integrations_test_focus"), action: testSlackFocusIntegration)
                     .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
 
@@ -115,15 +115,15 @@ struct IntegrationsSettingsView: View {
 
             if slackService.isEnabled {
                 if slackService.workspaceEmojiCodes.isEmpty {
-                    Text("Slack emoji catalog: Loading...")
+                    Text("integrations_emoji_loading")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 } else {
                     HStack(spacing: FocallySpacing.extraSmall) {
-                        Text("Slack emoji catalog: \(slackService.workspaceEmojiCodes.count) emojis loaded")
+                        Text(String(format: String(localized: "integrations_emoji_loaded"), slackService.workspaceEmojiCodes.count))
                             .font(.focallyCaption)
                             .foregroundStyle(Color.focallyTertiary)
-                        Button("Reload") {
+                        Button("integrations_reload") {
                             slackService.refreshEmojiCatalogIfPossible()
                         }
                         .font(.focallyCaption)
@@ -149,11 +149,11 @@ struct IntegrationsSettingsView: View {
                 iconTile(systemImage: "moon.circle.fill", color: Color.focallySecondary)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Do Not Disturb Automation")
+                    Text("integrations_dnd_title")
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text("macOS DND is driven directly from each mode. Signed shortcuts provide keyboard trigger backup.")
+                    Text("integrations_dnd_desc")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                         .fixedSize(horizontal: false, vertical: true)
@@ -162,14 +162,14 @@ struct IntegrationsSettingsView: View {
 
             HStack(spacing: FocallySpacing.small) {
                 if focusIntegrationService.areShortcutsInstalled {
-                    Label("Shortcuts installed", systemImage: "checkmark.circle.fill")
+                    Label("integrations_shortcuts_installed", systemImage: "checkmark.circle.fill")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyPrimary)
                 } else {
                     Button {
                         shortcutsService.installShortcuts()
                     } label: {
-                        Label("Install Shortcuts", systemImage: "square.and.arrow.down")
+                        Label("integrations_install_shortcuts", systemImage: "square.and.arrow.down")
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
@@ -178,7 +178,7 @@ struct IntegrationsSettingsView: View {
                 Button {
                     shortcutsService.refreshInstallationState()
                 } label: {
-                    Text("Refresh")
+                    Text("integrations_refresh")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -241,7 +241,7 @@ struct IntegrationsSettingsView: View {
 
     private func testSlackConnection() {
         slackService.testConnection()
-        slackTestFeedback = slackService.isConnected ? "Connected ✓" : "Connection failed: \(slackService.connectionError ?? "Unknown error")"
+        slackTestFeedback = slackService.isConnected ? String(localized: "integrations_connected_check") : "Connection failed: \(slackService.connectionError ?? "Unknown error")"
     }
 
     private func testSlackFocusIntegration() {
@@ -251,7 +251,7 @@ struct IntegrationsSettingsView: View {
     }
 
     private func connectionBadge(connected: Bool) -> some View {
-        Text(connected ? "Connected" : "Disconnected")
+        Text(connected ? String(localized: "integrations_connected") : String(localized: "integrations_disconnected"))
             .font(.focallyCaption)
             .foregroundStyle(connected ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
             .padding(.horizontal, 10)

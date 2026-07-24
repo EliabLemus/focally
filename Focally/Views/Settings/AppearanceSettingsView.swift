@@ -5,7 +5,7 @@ struct AppearanceSettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: FocallySpacing.large) {
-            Text("Appearance")
+            Text(String(localized: "appearance_title"))
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
                 .padding(.bottom, FocallySpacing.extraSmall)
@@ -44,7 +44,7 @@ struct AppearanceSettingsView: View {
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .frame(width: 20)
 
-                Text(theme.label)
+                Text(theme.localizedLabel)
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurface)
 

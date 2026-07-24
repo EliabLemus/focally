@@ -55,15 +55,15 @@ struct IdleDashboardView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("FOCUS MODES")
+            Text("dashboard_focus_modes")
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyPrimary)
 
-            Text("Start in one click.")
+            Text("dashboard_start_click")
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("Each mode keeps its own Slack emoji, status text, duration, and optional DND automation.")
+            Text("dashboard_description")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
@@ -72,11 +72,11 @@ struct IdleDashboardView: View {
 
     private var footerCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("How it works")
+            Text("dashboard_how_it_works")
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("Tap any card to start immediately. Edit when you need to change the Slack shortcode, status text, duration, or Pomodoro cadence for Focus Time.")
+            Text("dashboard_how_detail")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
@@ -98,7 +98,7 @@ struct IdleDashboardView: View {
                     .font(.system(size: 28))
                     .foregroundStyle(Color.focallyPrimary.opacity(0.7))
 
-                Text("Add Mode")
+                Text("dashboard_add_mode")
                     .font(.focallyBodyBold)
                     .foregroundStyle(Color.focallyPrimary.opacity(0.7))
             }

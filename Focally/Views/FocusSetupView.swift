@@ -6,38 +6,38 @@ struct FocusSetupView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Focally")
+            Text("setup_title")
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("Focus timer with smart Do Not Disturb and Slack integration")
+            Text("setup_subtitle")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 10) {
                 setupRow(
-                    title: "1. Notifications Permission",
-                    detail: "Required to notify you when focus sessions start, almost end, and when breaks begin. We only send alerts for timer events."
+                    titleKey: "setup_step1_title",
+                    detailKey: "setup_step1_detail"
                 )
                 setupRow(
-                    title: "2. Three Focus Modes",
-                    detail: "Focus Time (enables DND), Meeting & Inbox (leave DND off). Each mode has configurable duration, emoji, and status message."
+                    titleKey: "setup_step2_title",
+                    detailKey: "setup_step2_detail"
                 )
                 setupRow(
-                    title: "3. Slack Integration (Optional)",
-                    detail: "Paste your Slack token in Settings to auto-update your status. Focally sets status for all modes and DND only for Focus Time."
+                    titleKey: "setup_step3_title",
+                    detailKey: "setup_step3_detail"
                 )
             }
             .padding(18)
             .background(Color.focallySurfaceContainerLow)
             .clipShape(RoundedRectangle(cornerRadius: 20))
 
-            Toggle("Don't show this again", isOn: $dontShowAgain)
+            Toggle("setup_dont_show_again", isOn: $dontShowAgain)
 
             HStack {
                 Spacer()
-                Button("Done") {
+                Button("general_done") {
                     if dontShowAgain {
                         UserDefaults.standard.set(true, forKey: "FocallySimpleSetupCompleted")
                     }
@@ -51,12 +51,12 @@ struct FocusSetupView: View {
         .background(Color.focallyBackground)
     }
 
-    private func setupRow(title: String, detail: String) -> some View {
+    private func setupRow(titleKey: LocalizedStringResource, detailKey: LocalizedStringResource) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
+            Text(titleKey)
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
-            Text(detail)
+            Text(detailKey)
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)

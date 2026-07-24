@@ -18,6 +18,17 @@ enum ThemeChoice: String, CaseIterable, Identifiable {
         }
     }
 
+    var localizedLabel: String {
+        switch self {
+        case .light:
+            return String(localized: LocalizedStringResource(stringLiteral: "appearance_light"))
+        case .dark:
+            return String(localized: LocalizedStringResource(stringLiteral: "appearance_dark"))
+        case .system:
+            return String(localized: LocalizedStringResource(stringLiteral: "appearance_system"))
+        }
+    }
+
     var icon: String {
         switch self {
         case .light:
