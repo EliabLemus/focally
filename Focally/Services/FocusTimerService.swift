@@ -160,6 +160,7 @@ final class FocusTimerService {
             )
         }
 
+        deactivateFocusIntegration()
         startTimer()
         notificationService.notify(.breakStarted)
     }

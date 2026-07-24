@@ -28,6 +28,9 @@ final class Logger {
     /// Logger para UI
     static let uiLogger = Logger(subsystem: "app.focally.mac", category: "UI")
 
+    /// Logger para Update Checker
+    static let update = Logger(subsystem: "app.focally.mac", category: "Update")
+
     // MARK: - Properties
 
     private let osLogger: os.Logger

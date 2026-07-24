@@ -74,6 +74,7 @@
 		E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */; };
 		EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1032F662E9204A6D804DD2EF /* FocusTimerService.swift */; };
 		EA48D35F158E4DC1C71ED845 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B872379B2018EE66D478415E /* Assets.xcassets */; };
+		EF16991241C55E181ED22ACF /* UpdateCheckerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */; };
 		F1D0296A1D2E03E29B5268CB /* FocusSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */; };
 		F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */; };
 		F2B8CBD723F1F53867939192 /* FocallyTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126D47EF69130589A232D146 /* FocallyTypography.swift */; };
@@ -130,6 +131,7 @@
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
+		4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerService.swift; sourceTree = "<group>"; };
 		55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
@@ -374,7 +376,6 @@
 				C570E45183822E3ECE9C3158 /* Observability */,
 				5AF2FE4BCEA66A832CB8637D /* Resources */,
 				F00A4423B12F413F1474634A /* Services */,
-				E9F34FF51F0D066322EEF1FD /* Utils */,
 				122010126CD7EFB3D8B2BF85 /* Views */,
 			);
 			path = Focally;
@@ -387,13 +388,6 @@
 				F92387AD9F889C1D3B3C1E65 /* Metrics.swift */,
 			);
 			path = Observability;
-			sourceTree = "<group>";
-		};
-		E9F34FF51F0D066322EEF1FD /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 		F00A4423B12F413F1474634A /* Services */ = {
@@ -411,6 +405,7 @@
 				24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */,
 				0179E6DB0D32C6C38E33CE35 /* SlackService.swift */,
 				E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */,
+				4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */,
 				F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */,
 			);
 			path = Services;
@@ -611,6 +606,7 @@
 				91403EE941CCFB17EA5AD082 /* TimerPage.swift in Sources */,
 				151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */,
 				4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */,
+				EF16991241C55E181ED22ACF /* UpdateCheckerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

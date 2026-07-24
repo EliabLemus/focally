@@ -34,6 +34,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let focusModeStore = FocusModeStore()
     let usageTracker = EmojiUsageTracker.shared
     let emojiCacheService = EmojiCacheService.shared
+    let updateChecker = UpdateCheckerService.shared
     private lazy var settingsStore = SettingsStore()
     private lazy var timerService = FocusTimerService(
         settingsStore: settingsStore,
@@ -73,6 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(calendarService)
             .environment(focusModeStore)
             .environment(usageTracker)
+            .environment(updateChecker)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
         observeTimerService()
@@ -220,6 +222,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(calendarService)
             .environment(focusModeStore)
             .environment(usageTracker)
+            .environment(updateChecker)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally"
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]

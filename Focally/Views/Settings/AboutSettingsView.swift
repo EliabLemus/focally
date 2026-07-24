@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct AboutSettingsView: View {
+    @Environment(UpdateCheckerService.self) private var updateChecker
+
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.5.1"
     }
@@ -36,6 +38,27 @@ struct AboutSettingsView: View {
                     Text("Version \(appVersion)")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
+
+                    if updateChecker.isNewVersionAvailable {
+                        Button(action: {
+                            if let url = updateChecker.updateUrl {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.focallyCaption)
+                                Text("Update available")
+                                    .font(.focallyCaption)
+                            }
+                            .foregroundStyle(Color.focallyPrimary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.focallyPrimaryContainer)
+                            .cornerRadius(FocallyRadius.small)
+                        }
+                        .buttonStyle(.plain)
+                    }
 
                     Text("·")
                         .font(.focallyCaption)
