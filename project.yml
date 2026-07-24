@@ -8,9 +8,6 @@ options:
   settings:
     base:
       FONT_PROCESSORS: [ttf]
-
-  settings:
-    base:
       SWIFT_VERSION: "5.9"
       PRODUCT_BUNDLE_IDENTIFIER: app.focally.mac
       MARKETING_VERSION: "0.9.0"
@@ -62,6 +59,8 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: true
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: false
+        MARKETING_VERSION: "0.9.0"
+        CURRENT_PROJECT_VERSION: "69"
     entitlements:
       path: Focally/Focally.entitlements
       properties:
