@@ -25,6 +25,8 @@
 "metrics_no_data" = "Nenhuma sessão registrada";
 "metrics_prev_day" = "Dia anterior";
 "metrics_next_day" = "Próximo dia";
+"metrics_prev_month" = "Mês anterior";
+"metrics_next_month" = "Próximo mês";
 "metrics_export_csv" = "Exportar CSV";
 "metrics_chart_placeholder" = "Gráficos disponíveis em v0.10.0";
 

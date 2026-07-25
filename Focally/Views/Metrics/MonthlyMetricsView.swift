@@ -14,9 +14,15 @@ struct MonthlyMetricsView: View {
         return formatter.string(from: selectedMonth)
     }
 
+    /// True if selectedMonth is in the same month as today (disables next button).
+    private var isCurrentMonth: Bool {
+        let calendar = Calendar.current
+        return calendar.isDate(selectedMonth, equalTo: Date(), toGranularity: .month)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: FocallySpacing.large) {
-            // Month picker
+            // Month navigation with prev/next chevrons
             HStack(spacing: FocallySpacing.medium) {
                 Text("metrics_monthly_title")
                     .font(.focallyH2)
@@ -24,9 +30,27 @@ struct MonthlyMetricsView: View {
 
                 Spacer()
 
+                Button(action: { changeMonth(by: -1) }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.focallyOnSurface)
+                }
+                .buttonStyle(.plain)
+                .help(String(localized: "metrics_prev_month"))
+
                 Text(monthText)
                     .font(.focallyBodyBold)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+                    .foregroundStyle(Color.focallyOnSurface)
+                    .frame(minWidth: 120)
+
+                Button(action: { changeMonth(by: 1) }) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.focallyOnSurface)
+                }
+                .buttonStyle(.plain)
+                .disabled(isCurrentMonth)
+                .help(String(localized: "metrics_next_month"))
             }
 
             if let metrics {
@@ -82,6 +106,21 @@ struct MonthlyMetricsView: View {
             }
 
             Spacer()
+        }
+    }
+
+    // MARK: - Actions
+
+    /// Shifts selectedMonth by the given number of months (negative for previous, positive for next).
+    private func changeMonth(by months: Int) {
+        let calendar = Calendar.current
+        if let newDate = calendar.date(byAdding: .month, value: months, to: selectedMonth) {
+            // Don't allow navigating past the current month
+            if months > 0, calendar.isDate(newDate, equalTo: Date(), toGranularity: .month) == false,
+               newDate > Date() {
+                return
+            }
+            selectedMonth = newDate
         }
     }
 }

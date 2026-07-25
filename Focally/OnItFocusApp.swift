@@ -246,6 +246,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(focusModeStore)
             .environment(usageTracker)
             .environment(updateChecker)
+            .environment(appLanguage)
             .environment(\.locale, appLanguage.locale)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally Settings"
@@ -334,7 +335,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let emojiSize: CGFloat = 14
         let fontSize: CGFloat = 12
         let padding: CGFloat = 2
-        let gap: CGFloat = 3
+        let gap: CGFloat = 6
 
         // Measure text
         let textFont = NSFont.systemFont(ofSize: fontSize)
@@ -345,8 +346,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let textString = NSAttributedString(string: " \(timeText)", attributes: textAttrs)
         let textSize = textString.size()
 
-        // Emoji dimension
-        let emojiDim = emojiSize
+        // Emoji dimension — measure actual rendered width instead of hardcoding
+        let emojiFont = NSFont.systemFont(ofSize: emojiSize)
+        let emojiAttrs: [NSAttributedString.Key: Any] = [.font: emojiFont]
+        let emojiAttrStr = NSAttributedString(string: emoji, attributes: emojiAttrs)
+        let emojiMeasureSize = emojiAttrStr.size()
+        let emojiDim = max(emojiMeasureSize.width, emojiSize)
 
         // Pause/play icon
         let iconDim: CGFloat = 10
@@ -363,14 +368,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         img.lockFocus()
 
         // Draw emoji
-        let emojiPoint = NSPoint(x: padding, y: (totalHeight - emojiDim) / 2)
+        let emojiPoint = NSPoint(x: padding, y: (totalHeight - emojiMeasureSize.height) / 2)
         if let emojiImage {
             let resized = emojiImage.resized(to: NSSize(width: emojiDim, height: emojiDim))
             resized.draw(in: NSRect(origin: emojiPoint, size: NSSize(width: emojiDim, height: emojiDim)))
         } else {
-            let emojiFont = NSFont.systemFont(ofSize: emojiSize)
-            let emojiAttrs: [NSAttributedString.Key: Any] = [.font: emojiFont]
-            let emojiAttrStr = NSAttributedString(string: emoji, attributes: emojiAttrs)
             emojiAttrStr.draw(at: emojiPoint)
         }
 

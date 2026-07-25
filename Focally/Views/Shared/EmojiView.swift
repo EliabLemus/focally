@@ -38,7 +38,8 @@ struct EmojiView: View {
     private var fallbackText: some View {
         Text(fallbackEmoji)
             .font(font)
-            .frame(width: dimension, height: dimension)
+            .frame(minWidth: dimension, minHeight: dimension)
+            .fixedSize()
     }
 
     private var imageURL: URL? {
@@ -98,6 +99,7 @@ private struct CachedEmojiImage: View {
     private var fallbackText: some View {
         Text(fallbackEmoji)
             .font(font)
-            .frame(width: dimension, height: dimension)
+            .frame(minWidth: dimension, minHeight: dimension)
+            .fixedSize()
     }
 }

@@ -19,6 +19,8 @@ struct FocusModeCard: View {
                             font: .system(size: 34),
                             dimension: 34
                         )
+                        .fixedSize()
+                        .frame(minWidth: 36, minHeight: 36)
 
                         Text(mode.name)
                             .font(.focallyH2)

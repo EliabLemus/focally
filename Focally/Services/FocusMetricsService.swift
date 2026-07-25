@@ -83,12 +83,14 @@ final class FocusMetricsService {
 
     /// Record a completed session. Called by `FocusTimerService` on session completion.
     func recordSession(_ session: FocusSessionRecord) {
+        print("[Metrics] recordSession called with: \(session)")
         records.append(session)
         // Cap stored records to prevent unbounded growth (MVP).
         if records.count > Self.maxRecords {
             records.removeFirst(records.count - Self.maxRecords)
         }
         saveRecords()
+        print("[Metrics] Saved \(records.count) records to UserDefaults")
     }
 
     // MARK: - Aggregation: Daily

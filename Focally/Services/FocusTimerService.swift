@@ -104,6 +104,7 @@ final class FocusTimerService {
     }
 
     func resetToIdle() {
+        recordMetricsOnCompletion()
         stopTimer()
         deactivateFocusIntegration()
         clearSessionState()
@@ -129,12 +130,18 @@ final class FocusTimerService {
     /// Called automatically when a session ends (either by completion or manual stop).
     private func recordMetricsOnCompletion() {
         // Only record if we have a valid session with start time and mode.
-        guard let startTime = sessionStartTime, let mode = currentMode else { return }
+        guard let startTime = sessionStartTime, let mode = currentMode else {
+            print("[Metrics] Skipping: no sessionStartTime or currentMode")
+            return
+        }
 
         let endTime = Date()
         let duration = endTime.timeIntervalSince(startTime)
         // Ignore sessions shorter than 5 seconds (likely accidental clicks).
-        guard duration >= 5 else { return }
+        guard duration >= 5 else {
+            print("[Metrics] Skipping: duration \(duration)s < 5s threshold")
+            return
+        }
 
         let pomodorosCompleted: Int?
         if mode.enablePomodoro {
@@ -152,7 +159,9 @@ final class FocusTimerService {
             pomodorosCompleted: pomodorosCompleted
         )
 
+        print("[Metrics] Recording session: \(record)")
         FocusMetricsService.shared.recordSession(record)
+        print("[Metrics] Total records: \(FocusMetricsService.shared.records.count)")
     }
 
     private func startWorkPhase() {
@@ -300,6 +309,7 @@ final class FocusTimerService {
         currentStatusText = ""
         currentEmoji = ":brain:"
         currentMode = nil
+        sessionStartTime = nil
     }
 
     private func saveLastUsed(activity: String, statusText: String, emoji: String, duration: Int) {

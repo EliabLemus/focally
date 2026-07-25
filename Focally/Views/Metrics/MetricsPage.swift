@@ -74,7 +74,7 @@ struct MetricsPage: View {
             // Content
             VStack(spacing: 0) {
                 HStack(spacing: 4) {
-                    Text("metrics_tab")
+                    Text("tab_metrics")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                     Text("›")
