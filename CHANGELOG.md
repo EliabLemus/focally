@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-07-24
+
+### Fixed
+- 📊 **Metrics Recording** — Added `recordMetricsOnCompletion()` to `resetToIdle()` (Finish Session button now records)
+- 📍 **Menu Bar Layout** — Increased emoji gap 3→6px, dynamic emoji measuring (no more overlap with pause control)
+- 🔲 **Focus Mode Icons Clipped** — Fixed `EmojiView` frame constraints (`minWidth/minHeight` + `.fixedSize()`)
+- 🌐 **Missing Localization** — Fixed `"metrics_tab"` → `"tab_metrics"` in Metrics title
+- 📅 **Monthly Metrics Picker** — Added prev/next month navigation (prev/next chevrons, month label)
+- 😊 **Emoji Rendering** — `.fixedSize()` on all emoji Text views, dynamic width measuring
+- 🌐 **Language Picker Crash** — Added `.environment(appLanguage)` to MainWindow (fixed missing environment object fatal error)
+
+### Localization Keys Added (EN/ES/PT)
+- `metrics_prev_month`
+- `metrics_next_month`
+
+### Technical
+- 🏗️ **Build** — Version bump to 0.9.2 (build 72)
+- 🐛 **Debug** — Added debug prints in metrics recording flow
+- ✅ **Tests** — All 47 tests passing
+
 ## [0.9.1] - 2026-07-24
 
 ### Fixed
