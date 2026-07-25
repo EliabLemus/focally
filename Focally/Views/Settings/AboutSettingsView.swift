@@ -35,7 +35,7 @@ struct AboutSettingsView: View {
                     .foregroundStyle(Color.focallyOnSurface)
 
                 HStack(spacing: FocallySpacing.extraSmall) {
-                    Text(String(format: String(localized: "about_version"), appVersion))
+                    Text(String(format: AppLanguage.shared.localizedString("about_version"), appVersion))
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
 
@@ -48,7 +48,7 @@ struct AboutSettingsView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.focallyCaption)
-                                Text("about_update_available")
+                                LocalizedText("about_update_available")
                                     .font(.focallyCaption)
                             }
                             .foregroundStyle(Color.focallyPrimary)
@@ -64,7 +64,7 @@ struct AboutSettingsView: View {
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text(String(format: String(localized: "about_build"), buildNumber))
+                    Text(String(format: AppLanguage.shared.localizedString("about_build"), buildNumber))
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                 }
@@ -75,11 +75,11 @@ struct AboutSettingsView: View {
                 .padding(.vertical, FocallySpacing.small)
 
             VStack(spacing: FocallySpacing.extraSmall) {
-                Text("about_developed")
+                LocalizedText("about_developed")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOutline)
 
-                Text("about_copyright")
+                LocalizedText("about_copyright")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOutline)
             }

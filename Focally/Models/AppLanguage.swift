@@ -43,4 +43,29 @@ final class AppLanguage {
     var locale: Locale {
         Locale(identifier: currentLanguage)
     }
+
+    /// Resolves a localized string from the correct `.lproj` bundle for the
+    /// current language.
+    ///
+    /// `String(localized:)` and `LocalizedStringResource` resolve against
+    /// `Bundle.main.preferredLocalizations` (the OS language), ignoring
+    /// SwiftUI's `\.locale` environment. This method loads the string from
+    /// the specific language's `.lproj` directory so that the user's manual
+    /// language override takes effect immediately.
+    ///
+    /// - Parameter key: The localization key in `Localizable.strings`.
+    /// - Returns: The translated string, or the key itself if not found.
+    func localizedString(_ key: String) -> String {
+        // Try the specific language bundle first
+        if let path = Bundle.main.path(forResource: currentLanguage, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            let value = bundle.localizedString(forKey: key, value: nil, table: nil)
+            if value != key {
+                return value
+            }
+        }
+
+        // Fallback: main bundle (uses preferredLocalizations)
+        return Bundle.main.localizedString(forKey: key, value: key, table: nil)
+    }
 }

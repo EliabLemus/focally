@@ -6,11 +6,11 @@ struct FocusSetupView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("setup_title")
+            LocalizedText("setup_title")
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("setup_subtitle")
+            LocalizedText("setup_subtitle")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
@@ -51,12 +51,12 @@ struct FocusSetupView: View {
         .background(Color.focallyBackground)
     }
 
-    private func setupRow(titleKey: LocalizedStringResource, detailKey: LocalizedStringResource) -> some View {
+    private func setupRow(titleKey: String, detailKey: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(titleKey)
+            LocalizedText(titleKey)
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
-            Text(detailKey)
+            LocalizedText(detailKey)
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)

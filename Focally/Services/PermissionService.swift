@@ -38,10 +38,10 @@ final class PermissionService {
 
         var displayName: String {
             switch self {
-            case .notifications: return String(localized: "permission_notifications")
-            case .calendar: return String(localized: "permission_calendar")
-            case .accessibility: return String(localized: "permission_accessibility")
-            case .dnd: return String(localized: "permission_dnd")
+            case .notifications: return AppLanguage.shared.localizedString("permission_notifications")
+            case .calendar: return AppLanguage.shared.localizedString("permission_calendar")
+            case .accessibility: return AppLanguage.shared.localizedString("permission_accessibility")
+            case .dnd: return AppLanguage.shared.localizedString("permission_dnd")
             }
         }
     }

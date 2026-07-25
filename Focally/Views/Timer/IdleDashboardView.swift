@@ -55,15 +55,15 @@ struct IdleDashboardView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("dashboard_focus_modes")
+            LocalizedText("dashboard_focus_modes")
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyPrimary)
 
-            Text("dashboard_start_click")
+            LocalizedText("dashboard_start_click")
                 .font(.focallyH1)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("dashboard_description")
+            LocalizedText("dashboard_description")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
@@ -72,11 +72,11 @@ struct IdleDashboardView: View {
 
     private var footerCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("dashboard_how_it_works")
+            LocalizedText("dashboard_how_it_works")
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("dashboard_how_detail")
+            LocalizedText("dashboard_how_detail")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
@@ -98,7 +98,7 @@ struct IdleDashboardView: View {
                     .font(.system(size: 28))
                     .foregroundStyle(Color.focallyPrimary.opacity(0.7))
 
-                Text("dashboard_add_mode")
+                LocalizedText("dashboard_add_mode")
                     .font(.focallyBodyBold)
                     .foregroundStyle(Color.focallyPrimary.opacity(0.7))
             }

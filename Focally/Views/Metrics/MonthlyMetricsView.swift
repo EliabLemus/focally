@@ -24,7 +24,7 @@ struct MonthlyMetricsView: View {
         VStack(alignment: .leading, spacing: FocallySpacing.large) {
             // Month navigation with prev/next chevrons
             HStack(spacing: FocallySpacing.medium) {
-                Text("metrics_monthly_title")
+                LocalizedText("metrics_monthly_title")
                     .font(.focallyH2)
                     .foregroundStyle(Color.focallyOnSurface)
 
@@ -36,7 +36,7 @@ struct MonthlyMetricsView: View {
                         .foregroundStyle(Color.focallyOnSurface)
                 }
                 .buttonStyle(.plain)
-                .help(String(localized: "metrics_prev_month"))
+                .help(AppLanguage.shared.localizedString("metrics_prev_month"))
 
                 Text(monthText)
                     .font(.focallyBodyBold)
@@ -50,7 +50,7 @@ struct MonthlyMetricsView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(isCurrentMonth)
-                .help(String(localized: "metrics_next_month"))
+                .help(AppLanguage.shared.localizedString("metrics_next_month"))
             }
 
             if let metrics {
@@ -82,7 +82,7 @@ struct MonthlyMetricsView: View {
                         .font(.system(size: 14))
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text("metrics_export_csv")
+                    LocalizedText("metrics_export_csv")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOutline)
                 }
@@ -98,7 +98,7 @@ struct MonthlyMetricsView: View {
                         .font(.system(size: 48))
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text("metrics_no_data")
+                    LocalizedText("metrics_no_data")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }

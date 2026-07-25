@@ -509,7 +509,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.title = "Focally Setup"
         window.isReleasedWhenClosed = false
         window.center()
-        window.contentViewController = NSHostingController(rootView: FocusSetupView())
+        window.contentViewController = NSHostingController(rootView: FocusSetupView()
+            .environment(appLanguage)
+            .environment(\.locale, appLanguage.locale))
         window.makeKeyAndOrderFront(nil)
         window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
@@ -519,11 +521,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showPermissionLossAlert() {
         let alert = NSAlert()
-        alert.messageText = String(localized: "permission_loss_title")
-        alert.informativeText = String(localized: "permission_loss_message")
+        alert.messageText = AppLanguage.shared.localizedString("permission_loss_title")
+        alert.informativeText = AppLanguage.shared.localizedString("permission_loss_message")
         alert.alertStyle = .warning
-        alert.addButton(withTitle: String(localized: "permission_loss_open_settings"))
-        alert.addButton(withTitle: String(localized: "permission_loss_dismiss"))
+        alert.addButton(withTitle: AppLanguage.shared.localizedString("permission_loss_open_settings"))
+        alert.addButton(withTitle: AppLanguage.shared.localizedString("permission_loss_dismiss"))
 
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {

@@ -21,11 +21,11 @@ enum ThemeChoice: String, CaseIterable, Identifiable {
     var localizedLabel: String {
         switch self {
         case .light:
-            return String(localized: LocalizedStringResource(stringLiteral: "appearance_light"))
+            return AppLanguage.shared.localizedString("appearance_light")
         case .dark:
-            return String(localized: LocalizedStringResource(stringLiteral: "appearance_dark"))
+            return AppLanguage.shared.localizedString("appearance_dark")
         case .system:
-            return String(localized: LocalizedStringResource(stringLiteral: "appearance_system"))
+            return AppLanguage.shared.localizedString("appearance_system")
         }
     }
 

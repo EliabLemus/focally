@@ -6,7 +6,7 @@ struct SidebarView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("sidebar_app_name")
+                LocalizedText("sidebar_app_name")
                     .font(.focallyH1)
                     .foregroundStyle(Color.focallyOnSurface)
             }
@@ -34,7 +34,7 @@ struct SidebarView: View {
             Spacer()
 
             VStack(spacing: 4) {
-                Text("sidebar_tagline")
+                LocalizedText("sidebar_tagline")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .textCase(.uppercase)

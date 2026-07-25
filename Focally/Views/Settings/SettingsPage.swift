@@ -20,7 +20,7 @@ enum SettingsSubpage: CaseIterable, Identifiable {
     }
 
     var localizedLabel: String {
-        String(localized: LocalizedStringResource(stringLiteral: localizationKey))
+        AppLanguage.shared.localizedString(localizationKey)
     }
 
     var icon: String {
@@ -74,7 +74,7 @@ struct SettingsPage: View {
 
             VStack(spacing: 0) {
                 HStack(spacing: 4) {
-                    Text("settings_title")
+                    LocalizedText("settings_title")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                     Text("›")

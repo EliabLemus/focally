@@ -27,8 +27,8 @@ struct TimerControlsView: View {
                     }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(timerService.isPaused ? String(localized: "timer_resume_session") : String(localized: "timer_pause_session"))
-            .accessibilityHint(timerService.isPaused ? String(localized: "timer_resume_hint") : String(localized: "timer_pause_hint"))
+            .accessibilityLabel(timerService.isPaused ? AppLanguage.shared.localizedString("timer_resume_session") : AppLanguage.shared.localizedString("timer_pause_session"))
+            .accessibilityHint(timerService.isPaused ? AppLanguage.shared.localizedString("timer_resume_hint") : AppLanguage.shared.localizedString("timer_pause_hint"))
 
             // Finish Button
             Button(action: onFinish) {

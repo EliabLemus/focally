@@ -40,7 +40,7 @@ struct LanguageSettingsView: View {
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .frame(width: 20)
 
-                Text(String(localized: LocalizedStringResource(stringLiteral: language.localizationKey)))
+                Text(appLanguage.localizedString(language.localizationKey))
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurface)
 

@@ -61,36 +61,36 @@ struct FocusModeEditSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text(String(format: String(localized: "edit_mode_title"), draftMode.name))
+            Text(String(format: AppLanguage.shared.localizedString("edit_mode_title"), draftMode.name))
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     // ========== Section: Basic Settings ==========
-                    Text("edit_mode_section_basic")
+                    LocalizedText("edit_mode_section_basic")
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
                     VStack(alignment: .leading, spacing: 18) {
                         // MARK: Mode Name
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("edit_mode_name")
+                            LocalizedText("edit_mode_name")
                                 .font(.focallyBodyBold)
 
-                            TextField(String(localized: "edit_mode_name_placeholder"), text: $draftMode.name)
+                            TextField(AppLanguage.shared.localizedString("edit_mode_name_placeholder"), text: $draftMode.name)
                                 .textFieldStyle(.roundedBorder)
                         }
 
                         // MARK: Mode Emoji
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("edit_mode_emoji")
+                            LocalizedText("edit_mode_emoji")
                                 .font(.focallyBodyBold)
 
                             ZStack(alignment: .topLeading) {
                                 HStack(spacing: 8) {
                                     TextField(
-                                        draftMode.name.isEmpty ? String(localized: "edit_mode_emoji_placeholder_search") : draftMode.emoji,
+                                        draftMode.name.isEmpty ? AppLanguage.shared.localizedString("edit_mode_emoji_placeholder_search") : draftMode.emoji,
                                         text: $draftMode.emoji
                                     )
                                     .textFieldStyle(.roundedBorder)
@@ -134,7 +134,7 @@ struct FocusModeEditSheet: View {
                                             .foregroundStyle(Color.focallyOnSurfaceVariant)
                                     }
                                     .buttonStyle(.plain)
-                                    .help(String(localized: "emoji_picker_help"))
+                                    .help(AppLanguage.shared.localizedString("emoji_picker_help"))
                                 }
 
                                 if showEmojiPicker && (!recentEmojis.isEmpty || !searchResults.isEmpty) {
@@ -212,18 +212,18 @@ struct FocusModeEditSheet: View {
                                 }
                             }
 
-                            Text("edit_mode_emoji_hint")
+                            LocalizedText("edit_mode_emoji_hint")
                                 .font(.focallyCaption)
                                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                         }
 
                         // MARK: Status Message
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("edit_mode_status_message")
+                            LocalizedText("edit_mode_status_message")
                                 .font(.focallyBodyBold)
 
                             HStack(spacing: 8) {
-                                TextField(String(localized: "edit_mode_status_placeholder"), text: $draftMode.statusText)
+                                TextField(AppLanguage.shared.localizedString("edit_mode_status_placeholder"), text: $draftMode.statusText)
                                     .textFieldStyle(.roundedBorder)
                                     .onChange(of: draftMode.statusText) { _, newValue in
                                         let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -254,7 +254,7 @@ struct FocusModeEditSheet: View {
                                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                                 }
                                 .buttonStyle(.plain)
-                                .help(String(localized: "emoji_picker_help"))
+                                .help(AppLanguage.shared.localizedString("emoji_picker_help"))
                             }
 
                             // Emoji picker overlay for status message
@@ -320,12 +320,12 @@ struct FocusModeEditSheet: View {
                         // MARK: Break Label (only visible when pomodoro is enabled)
                         if draftMode.enablePomodoro {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("edit_mode_break_label")
+                                LocalizedText("edit_mode_break_label")
                                 .font(.focallyBodyBold)
 
                             ZStack(alignment: .topLeading) {
                                 HStack(spacing: 8) {
-                                    TextField(String(localized: "edit_mode_break_placeholder"), text: breakLabelBinding)
+                                    TextField(AppLanguage.shared.localizedString("edit_mode_break_placeholder"), text: breakLabelBinding)
                                         .textFieldStyle(.roundedBorder)
                                         .onChange(of: breakLabelBinding.wrappedValue) { _, newValue in
                                             let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -356,7 +356,7 @@ struct FocusModeEditSheet: View {
                                             .foregroundStyle(Color.focallyOnSurfaceVariant)
                                     }
                                     .buttonStyle(.plain)
-                                    .help(String(localized: "emoji_picker_help"))
+                                    .help(AppLanguage.shared.localizedString("emoji_picker_help"))
                                 }
 
                                 if showBreakLabelEmojiPicker && (!breakLabelRecentEmojis.isEmpty || !breakLabelSearchResults.isEmpty) {
@@ -418,7 +418,7 @@ struct FocusModeEditSheet: View {
                                 }
                             }
 
-                            Text("edit_mode_break_hint")
+                            LocalizedText("edit_mode_break_hint")
                                 .font(.focallyCaption)
                                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                         }
@@ -426,9 +426,9 @@ struct FocusModeEditSheet: View {
 
                         // MARK: Duration
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("edit_mode_duration")
+                            LocalizedText("edit_mode_duration")
                                 .font(.focallyBodyBold)
-                            Stepper(String(format: String(localized: "edit_mode_duration_value"), draftMode.durationMinutes), value: $draftMode.durationMinutes, in: 1...600, step: 5)
+                            Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_duration_value"), draftMode.durationMinutes), value: $draftMode.durationMinutes, in: 1...600, step: 5)
                                 .font(.focallyBody)
                         }
                     }
@@ -438,7 +438,7 @@ struct FocusModeEditSheet: View {
                         .padding(.vertical, 8)
 
                     // ========== Section: Advanced Settings ==========
-                    Text("edit_mode_section_advanced")
+                    LocalizedText("edit_mode_section_advanced")
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
@@ -455,10 +455,10 @@ struct FocusModeEditSheet: View {
                         if draftMode.enablePomodoro {
                             DisclosureGroup("edit_mode_pomodoro_settings") {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    Stepper(String(format: String(localized: "edit_mode_work"), draftMode.pomodoroWorkMinutes), value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
-                                    Stepper(String(format: String(localized: "edit_mode_short_break"), draftMode.pomodoroBreakMinutes), value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
-                                    Stepper(String(format: String(localized: "edit_mode_long_break"), draftMode.pomodoroLongBreakMinutes), value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
-                                    Stepper(String(format: String(localized: "edit_mode_rounds"), draftMode.pomodoroRounds), value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
+                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_work"), draftMode.pomodoroWorkMinutes), value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
+                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_short_break"), draftMode.pomodoroBreakMinutes), value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
+                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_long_break"), draftMode.pomodoroLongBreakMinutes), value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
+                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_rounds"), draftMode.pomodoroRounds), value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
                                 }
                                 .padding(.top, 8)
                             }

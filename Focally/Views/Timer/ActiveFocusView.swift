@@ -40,13 +40,13 @@ struct ActiveFocusView: View {
     private var statusStrip: some View {
         HStack(spacing: 12) {
             statusPill(
-                title: timerService.isPaused ? String(localized: "focus_paused") : String(localized: "focus_in_focus"),
+                title: timerService.isPaused ? AppLanguage.shared.localizedString("focus_paused") : AppLanguage.shared.localizedString("focus_in_focus"),
                 icon: timerService.isPaused ? "pause.fill" : "bolt.fill",
                 tint: timerService.isPaused ? Color.focallySecondary : Color.focallyPrimary
             )
 
             statusPill(
-                title: dndService.isDNDActive ? String(localized: "focus_dnd_on") : String(localized: "focus_dnd_off"),
+                title: dndService.isDNDActive ? AppLanguage.shared.localizedString("focus_dnd_on") : AppLanguage.shared.localizedString("focus_dnd_off"),
                 icon: dndService.isDNDActive ? "moon.fill" : "moon",
                 tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant
             )
@@ -82,8 +82,8 @@ struct ActiveFocusView: View {
                     .frame(maxWidth: 760)
 
                 Text(timerService.isPaused
-                     ? String(localized: "focus_paused_message")
-                     : String(localized: "focus_active_message"))
+                     ? AppLanguage.shared.localizedString("focus_paused_message")
+                     : AppLanguage.shared.localizedString("focus_active_message"))
                     .font(.focallyBody)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
                     .multilineTextAlignment(.center)
@@ -107,9 +107,9 @@ struct ActiveFocusView: View {
                         .frame(maxWidth: 420)
 
                     HStack(spacing: 18) {
-                        heroMeta(title: String(localized: "focus_elapsed"), value: elapsedTimeString)
-                        heroMeta(title: String(localized: "focus_mode_label"), value: timerService.currentMode?.name ?? "Focus")
-                        heroMeta(title: String(localized: "focus_next"), value: nextPhaseLabel)
+                        heroMeta(title: AppLanguage.shared.localizedString("focus_elapsed"), value: elapsedTimeString)
+                        heroMeta(title: AppLanguage.shared.localizedString("focus_mode_label"), value: timerService.currentMode?.name ?? "Focus")
+                        heroMeta(title: AppLanguage.shared.localizedString("focus_next"), value: nextPhaseLabel)
                     }
                 }
             }
@@ -147,31 +147,31 @@ struct ActiveFocusView: View {
 
     private var sessionProgressCard: some View {
         SupportCard(
-            title: String(localized: "focus_session_cadence"),
+            title: AppLanguage.shared.localizedString("focus_session_cadence"),
             icon: "waveform.path.ecg",
             tint: Color.focallyPrimary
         ) {
             VStack(alignment: .leading, spacing: 10) {
                 supportMetric(
-                    title: String(localized: "focus_current_block"),
-                    value: timerService.currentMode?.enablePomodoro == true ? String(format: String(localized: "focus_pomodoro_round"), timerService.currentRound + 1, timerService.pomodoroRounds) : String(localized: "focus_single_session")
+                    title: AppLanguage.shared.localizedString("focus_current_block"),
+                    value: timerService.currentMode?.enablePomodoro == true ? String(format: AppLanguage.shared.localizedString("focus_pomodoro_round"), timerService.currentRound + 1, timerService.pomodoroRounds) : AppLanguage.shared.localizedString("focus_single_session")
                 )
-                supportMetric(title: String(localized: "focus_break_length"), value: "\(timerService.shortBreakDurationMinutes)m")
-                supportMetric(title: String(localized: "focus_pomodoro"), value: timerService.currentMode?.enablePomodoro == true ? String(localized: "focus_pomodoro_enabled") : String(localized: "focus_pomodoro_off"))
+                supportMetric(title: AppLanguage.shared.localizedString("focus_break_length"), value: "\(timerService.shortBreakDurationMinutes)m")
+                supportMetric(title: AppLanguage.shared.localizedString("focus_pomodoro"), value: timerService.currentMode?.enablePomodoro == true ? AppLanguage.shared.localizedString("focus_pomodoro_enabled") : AppLanguage.shared.localizedString("focus_pomodoro_off"))
             }
         }
     }
 
     private var focusModeCard: some View {
         SupportCard(
-            title: String(localized: "focus_mode_title"),
+            title: AppLanguage.shared.localizedString("focus_mode_title"),
             icon: dndService.isDNDActive ? "moon.fill" : "moon",
             tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallySecondary
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                supportMetric(title: String(localized: "focus_system_status"), value: dndService.isDNDActive ? String(localized: "focus_dnd_active") : String(localized: "focus_dnd_inactive"))
-                supportMetric(title: String(localized: "focus_slack_status"), value: timerService.currentStatusText)
-                supportMetric(title: String(localized: "focus_when_ends"), value: nextBreakSummary)
+                supportMetric(title: AppLanguage.shared.localizedString("focus_system_status"), value: dndService.isDNDActive ? AppLanguage.shared.localizedString("focus_dnd_active") : AppLanguage.shared.localizedString("focus_dnd_inactive"))
+                supportMetric(title: AppLanguage.shared.localizedString("focus_slack_status"), value: timerService.currentStatusText)
+                supportMetric(title: AppLanguage.shared.localizedString("focus_when_ends"), value: nextBreakSummary)
             }
         }
     }
@@ -182,11 +182,11 @@ struct ActiveFocusView: View {
                 .font(.system(size: 60))
                 .foregroundStyle(Color.focallyError)
 
-            Text("focus_finish_title")
+            LocalizedText("focus_finish_title")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
 
-            Text("focus_finish_detail")
+            LocalizedText("focus_finish_detail")
                 .font(.focallyBody)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
                 .multilineTextAlignment(.center)
@@ -283,25 +283,25 @@ struct ActiveFocusView: View {
 
     private var nextBreakSummary: String {
         if timerService.isBreak {
-            return String(localized: "focus_break_resumes")
+            return AppLanguage.shared.localizedString("focus_break_resumes")
         }
         if timerService.currentMode?.enablePomodoro != true {
-            return String(localized: "focus_session_ends_zero")
+            return AppLanguage.shared.localizedString("focus_session_ends_zero")
         }
         if timerService.currentRound + 1 >= timerService.pomodoroRounds {
-            return String(localized: "focus_session_ends_round")
+            return AppLanguage.shared.localizedString("focus_session_ends_round")
         }
-        return String(format: String(localized: "focus_break_next"), timerService.shortBreakDurationMinutes)
+        return String(format: AppLanguage.shared.localizedString("focus_break_next"), timerService.shortBreakDurationMinutes)
     }
 
     private var nextPhaseLabel: String {
         if timerService.isBreak {
-            return String(localized: "focus_next_phase_focus")
+            return AppLanguage.shared.localizedString("focus_next_phase_focus")
         }
         if timerService.currentMode?.enablePomodoro != true || timerService.currentRound + 1 >= timerService.pomodoroRounds {
-            return String(localized: "focus_next_phase_finish")
+            return AppLanguage.shared.localizedString("focus_next_phase_finish")
         }
-        return String(localized: "focus_next_phase_break")
+        return AppLanguage.shared.localizedString("focus_next_phase_break")
     }
 }
 

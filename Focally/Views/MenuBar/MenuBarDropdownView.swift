@@ -42,7 +42,7 @@ struct MenuBarDropdownView: View {
 
     private var headerRow: some View {
         HStack {
-            Text("menubar_focus")
+            LocalizedText("menubar_focus")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
             Spacer()
@@ -54,7 +54,7 @@ struct MenuBarDropdownView: View {
 
     private var quickStartSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("menubar_quick_start")
+            LocalizedText("menubar_quick_start")
                 .font(.focallyBodyBold)
                 .foregroundStyle(Color.focallyOnSurface)
 
@@ -99,7 +99,7 @@ struct MenuBarDropdownView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle")
                             .font(.system(size: 16))
-                        Text("menubar_add_mode")
+                        LocalizedText("menubar_add_mode")
                             .font(.focallyBody)
                     }
                     .foregroundStyle(Color.focallyPrimary)
@@ -129,7 +129,7 @@ struct MenuBarDropdownView: View {
                         .font(.focallyBodyBold)
                         .foregroundStyle(Color.focallyOnSurface)
 
-                    Text(timerService.isPaused ? String(localized: "focus_paused") : timerService.phaseName)
+                    Text(timerService.isPaused ? AppLanguage.shared.localizedString("focus_paused") : timerService.phaseName)
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
@@ -160,7 +160,7 @@ struct MenuBarDropdownView: View {
                 .progressViewStyle(.linear)
                 .tint(Color.focallyPrimary)
 
-            Text(dndService.isDNDActive ? String(localized: "focus_dnd_active") : String(localized: "focus_dnd_inactive"))
+            Text(dndService.isDNDActive ? AppLanguage.shared.localizedString("focus_dnd_active") : AppLanguage.shared.localizedString("focus_dnd_inactive"))
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)
         }
@@ -180,13 +180,13 @@ struct MenuBarDropdownView: View {
                 .padding(.horizontal, 16)
 
             HStack(spacing: 12) {
-                Label(slackService.isEnabled ? String(localized: "menubar_slack_ready") : String(localized: "menubar_slack_off"), systemImage: "message.fill")
+                Label(slackService.isEnabled ? AppLanguage.shared.localizedString("menubar_slack_ready") : AppLanguage.shared.localizedString("menubar_slack_off"), systemImage: "message.fill")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
 
                 Spacer()
 
-                Label(dndService.isDNDActive ? String(localized: "menubar_dnd_active") : String(localized: "menubar_dnd_off"), systemImage: "moon.fill")
+                Label(dndService.isDNDActive ? AppLanguage.shared.localizedString("menubar_dnd_active") : AppLanguage.shared.localizedString("menubar_dnd_off"), systemImage: "moon.fill")
                     .font(.focallyCaption)
                     .foregroundStyle(dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant)
             }

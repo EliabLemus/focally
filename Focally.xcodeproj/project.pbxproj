@@ -18,6 +18,7 @@
 		2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */; };
 		22CE09543F47353743C5813D /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */; };
 		23343E6DF0FA805301371444 /* FocusModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */; };
+		2731EA700E29620308CD9A7A /* LocalizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E84D3100C98A086F2F66CA /* LocalizedText.swift */; };
 		28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */; };
 		29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */; };
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
@@ -144,6 +145,7 @@
 		440DA683BDD9156AD84D322C /* FocallyColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyColors.swift; sourceTree = "<group>"; };
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnItFocusApp.swift; sourceTree = "<group>"; };
+		45E84D3100C98A086F2F66CA /* LocalizedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedText.swift; sourceTree = "<group>"; };
 		494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerServiceTests.swift; sourceTree = "<group>"; };
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
@@ -383,6 +385,7 @@
 			isa = PBXGroup;
 			children = (
 				B684F97343BEF991F6AC0F71 /* EmojiView.swift */,
+				45E84D3100C98A086F2F66CA /* LocalizedText.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -649,6 +652,7 @@
 				2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */,
 				8F78AC672E80865A93223480 /* KeychainHelper.swift in Sources */,
 				EF03680027AC8B646E16D2C3 /* LanguageSettingsView.swift in Sources */,
+				2731EA700E29620308CD9A7A /* LocalizedText.swift in Sources */,
 				63A648A7E8ACFA991912B86D /* Logger.swift in Sources */,
 				D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */,
 				470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */,
@@ -738,7 +742,7 @@
 				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 72;
+				CURRENT_PROJECT_VERSION = 73;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Focally/Info.plist;
@@ -746,7 +750,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.Focally;
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;
@@ -797,7 +801,7 @@
 				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 72;
+				CURRENT_PROJECT_VERSION = 73;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Focally/Info.plist;
@@ -805,7 +809,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.Focally;
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;

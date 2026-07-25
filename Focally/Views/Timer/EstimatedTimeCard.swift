@@ -6,14 +6,14 @@ struct EstimatedTimeCard: View {
 
     var body: some View {
         SupportCard(
-            title: String(localized: "estimated_end_title"),
+            title: AppLanguage.shared.localizedString("estimated_end_title"),
             icon: "clock.badge.checkmark",
             tint: Color.focallySecondary
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                supportMetric(title: String(localized: "estimated_finish_time"), value: estimatedEndTimeString)
-                supportMetric(title: String(localized: "estimated_time_remaining"), value: timerService.remainingMinutesString)
-                supportMetric(title: String(localized: "estimated_current_phase"), value: timerService.phaseName)
+                supportMetric(title: AppLanguage.shared.localizedString("estimated_finish_time"), value: estimatedEndTimeString)
+                supportMetric(title: AppLanguage.shared.localizedString("estimated_time_remaining"), value: timerService.remainingMinutesString)
+                supportMetric(title: AppLanguage.shared.localizedString("estimated_current_phase"), value: timerService.phaseName)
             }
         }
     }

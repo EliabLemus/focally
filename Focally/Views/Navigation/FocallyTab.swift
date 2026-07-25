@@ -21,7 +21,7 @@ enum FocallyTab: CaseIterable, Identifiable {
     }
 
     var localizedLabel: String {
-        String(localized: LocalizedStringResource(stringLiteral: localizationKey))
+        AppLanguage.shared.localizedString(localizationKey)
     }
 
     var icon: String {

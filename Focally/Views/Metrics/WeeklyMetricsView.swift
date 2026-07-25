@@ -50,7 +50,7 @@ struct WeeklyMetricsView: View {
                 Spacer()
             }
 
-            Text("metrics_weekly_title")
+            LocalizedText("metrics_weekly_title")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
 
@@ -83,7 +83,7 @@ struct WeeklyMetricsView: View {
                         .font(.system(size: 32))
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text("metrics_chart_placeholder")
+                    LocalizedText("metrics_chart_placeholder")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                 }
@@ -98,7 +98,7 @@ struct WeeklyMetricsView: View {
                         .font(.system(size: 48))
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text("metrics_no_data")
+                    LocalizedText("metrics_no_data")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }

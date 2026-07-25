@@ -11,7 +11,7 @@ struct DailyMetricsView: View {
         VStack(alignment: .leading, spacing: FocallySpacing.large) {
             // Date navigation with prev/next chevrons
             HStack(spacing: FocallySpacing.medium) {
-                Text("metrics_daily_title")
+                LocalizedText("metrics_daily_title")
                     .font(.focallyH2)
                     .foregroundStyle(Color.focallyOnSurface)
 
@@ -23,7 +23,7 @@ struct DailyMetricsView: View {
                         .foregroundStyle(Color.focallyOnSurface)
                 }
                 .buttonStyle(.plain)
-                .help(String(localized: "metrics_prev_day"))
+                .help(AppLanguage.shared.localizedString("metrics_prev_day"))
 
                 Text(selectedDate, format: .dateTime.month(.abbreviated).day().year())
                     .font(.focallyBodyBold)
@@ -37,7 +37,7 @@ struct DailyMetricsView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(Calendar.current.isDateInToday(selectedDate) || Calendar.current.isDate(selectedDate, inSameDayAs: Date()))
-                .help(String(localized: "metrics_next_day"))
+                .help(AppLanguage.shared.localizedString("metrics_next_day"))
             }
 
             if let metrics {
@@ -70,7 +70,7 @@ struct DailyMetricsView: View {
                         .font(.system(size: 48))
                         .foregroundStyle(Color.focallyOutline)
 
-                    Text("metrics_no_data")
+                    LocalizedText("metrics_no_data")
                         .font(.focallyBody)
                         .foregroundStyle(Color.focallyOnSurfaceVariant)
                 }
@@ -91,8 +91,10 @@ struct DailyMetricsView: View {
 // MARK: - MetricCard (shared component)
 
 struct MetricCard: View {
+    @Environment(AppLanguage.self) private var appLanguage
+
     let icon: String
-    let title: LocalizedStringResource
+    let title: String
     let value: String
 
     var body: some View {
@@ -102,7 +104,7 @@ struct MetricCard: View {
                     .font(.system(size: 14))
                     .foregroundStyle(Color.focallyTertiary)
 
-                Text(title)
+                Text(appLanguage.localizedString(title))
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }

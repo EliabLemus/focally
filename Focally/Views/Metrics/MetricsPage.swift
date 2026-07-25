@@ -18,7 +18,7 @@ enum MetricsSubpage: CaseIterable, Identifiable {
     }
 
     var localizedLabel: String {
-        String(localized: LocalizedStringResource(stringLiteral: localizationKey))
+        AppLanguage.shared.localizedString(localizationKey)
     }
 
     var icon: String {
@@ -74,7 +74,7 @@ struct MetricsPage: View {
             // Content
             VStack(spacing: 0) {
                 HStack(spacing: 4) {
-                    Text("tab_metrics")
+                    LocalizedText("tab_metrics")
                         .font(.focallyCaption)
                         .foregroundStyle(Color.focallyOutline)
                     Text("›")
