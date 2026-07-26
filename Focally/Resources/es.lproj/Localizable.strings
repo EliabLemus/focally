@@ -29,6 +29,16 @@
 "metrics_next_month" = "Mes siguiente";
 "metrics_export_csv" = "Exportar CSV";
 "metrics_chart_placeholder" = "Gráficos disponibles en v0.10.0";
+"metrics_filter_all_days" = "Todos los días";
+"metrics_filter_days" = "Filtrar días";
+"metrics_filter_days_title" = "Filtrar días";
+"metrics_filter_clear" = "Limpiar todo";
+"metrics_filter_done" = "Listo";
+"metrics_filter_last_day" = "Último día del mes";
+"metrics_focus_time_type" = "Tiempo de enfoque";
+"metrics_meeting_type" = "Reunión";
+"metrics_inbox_type" = "Bandeja de entrada";
+"metrics_custom_type" = "Personalizado";
 
 /* ========== SettingsPage ========== */
 "settings_title" = "Configuración";
@@ -62,6 +72,8 @@
 "edit_mode_title" = "Editar %@";
 "edit_mode_name" = "Nombre";
 "edit_mode_name_placeholder" = "ej. Tiempo de Enfoque";
+"edit_mode_type" = "Tipo";
+"edit_mode_type_placeholder" = "Seleccionar tipo";
 "edit_mode_duration_value" = "%d min";
 "edit_mode_emoji" = "Emoji";
 "edit_mode_emoji_placeholder_search" = "ej. :brain:";

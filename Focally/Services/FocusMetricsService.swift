@@ -8,6 +8,10 @@ struct DailyMetrics: Codable, Equatable {
     let pomodorosCompleted: Int
     let meetingTime: TimeInterval       // in seconds
     let totalFocusTime: TimeInterval    // in seconds
+    let focusTimeDuration: TimeInterval
+    let meetingDuration: TimeInterval
+    let inboxDuration: TimeInterval
+    let customDuration: TimeInterval
 
     var meetingTimeFormatted: String {
         Self.formatDuration(meetingTime)
@@ -15,6 +19,22 @@ struct DailyMetrics: Codable, Equatable {
 
     var totalFocusTimeFormatted: String {
         Self.formatDuration(totalFocusTime)
+    }
+
+    var focusTimeDurationFormatted: String {
+        Self.formatDuration(focusTimeDuration)
+    }
+
+    var meetingDurationFormatted: String {
+        Self.formatDuration(meetingDuration)
+    }
+
+    var inboxDurationFormatted: String {
+        Self.formatDuration(inboxDuration)
+    }
+
+    var customDurationFormatted: String {
+        Self.formatDuration(customDuration)
     }
 
     static func formatDuration(_ seconds: TimeInterval) -> String {
@@ -33,9 +53,17 @@ struct WeeklyMetrics: Codable, Equatable {
     let meetingTime: TimeInterval
     let totalFocusTime: TimeInterval
     let daysWithData: Int
+    let focusTimeDuration: TimeInterval
+    let meetingDuration: TimeInterval
+    let inboxDuration: TimeInterval
+    let customDuration: TimeInterval
 
     var meetingTimeFormatted: String { DailyMetrics.formatDuration(meetingTime) }
     var totalFocusTimeFormatted: String { DailyMetrics.formatDuration(totalFocusTime) }
+    var focusTimeDurationFormatted: String { DailyMetrics.formatDuration(focusTimeDuration) }
+    var meetingDurationFormatted: String { DailyMetrics.formatDuration(meetingDuration) }
+    var inboxDurationFormatted: String { DailyMetrics.formatDuration(inboxDuration) }
+    var customDurationFormatted: String { DailyMetrics.formatDuration(customDuration) }
     var avgDailyFocusTime: TimeInterval {
         daysWithData > 0 ? totalFocusTime / Double(daysWithData) : 0
     }
@@ -50,9 +78,24 @@ struct MonthlyMetrics: Codable, Equatable {
     let meetingTime: TimeInterval
     let totalFocusTime: TimeInterval
     let weeksWithData: Int
+    let focusTimeDuration: TimeInterval
+    let meetingDuration: TimeInterval
+    let inboxDuration: TimeInterval
+    let customDuration: TimeInterval
 
     var meetingTimeFormatted: String { DailyMetrics.formatDuration(meetingTime) }
     var totalFocusTimeFormatted: String { DailyMetrics.formatDuration(totalFocusTime) }
+    var focusTimeDurationFormatted: String { DailyMetrics.formatDuration(focusTimeDuration) }
+    var meetingDurationFormatted: String { DailyMetrics.formatDuration(meetingDuration) }
+    var inboxDurationFormatted: String { DailyMetrics.formatDuration(inboxDuration) }
+    var customDurationFormatted: String { DailyMetrics.formatDuration(customDuration) }
+}
+
+private struct ModeTypeBreakdown {
+    let focusTimeDuration: TimeInterval
+    let meetingDuration: TimeInterval
+    let inboxDuration: TimeInterval
+    let customDuration: TimeInterval
 }
 
 // MARK: - FocusMetricsService
@@ -108,12 +151,17 @@ final class FocusMetricsService {
         let pomodoros = dayRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
         let meetingTime = dayRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
         let totalFocus = dayRecords.reduce(0) { $0 + $1.duration }
+        let breakdown = modeTypeBreakdown(for: dayRecords)
 
         return DailyMetrics(
             date: targetDay,
             pomodorosCompleted: pomodoros,
             meetingTime: meetingTime,
-            totalFocusTime: totalFocus
+            totalFocusTime: totalFocus,
+            focusTimeDuration: breakdown.focusTimeDuration,
+            meetingDuration: breakdown.meetingDuration,
+            inboxDuration: breakdown.inboxDuration,
+            customDuration: breakdown.customDuration
         )
     }
 
@@ -126,31 +174,34 @@ final class FocusMetricsService {
         guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: date) else {
             return nil
         }
-        let weekStart = weekInterval.start
-
         let weekRecords = records.filter { record in
             weekInterval.contains(record.startTime)
         }
 
-        guard !weekRecords.isEmpty else { return nil }
+        return makeWeeklyMetrics(
+            weekRecords: weekRecords,
+            weekStart: weekInterval.start,
+            calendar: calendar
+        )
+    }
 
-        let pomodoros = weekRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
-        let meetingTime = weekRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
-        let totalFocus = weekRecords.reduce(0) { $0 + $1.duration }
-
-        // Count unique days with data
-        var daysWithSessions: Set<DateComponents> = []
-        for record in weekRecords {
-            let comps = calendar.dateComponents([.year, .month, .day], from: record.startTime)
-            daysWithSessions.insert(comps)
+    /// Returns weekly metrics for the week containing `date`, filtered to matching weekdays.
+    func getWeeklyMetrics(for date: Date, dayOfWeeks: Set<Int>) -> WeeklyMetrics? {
+        let calendar = isoCalendar
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: date) else {
+            return nil
         }
 
-        return WeeklyMetrics(
-            weekStartDate: weekStart,
-            pomodorosCompleted: pomodoros,
-            meetingTime: meetingTime,
-            totalFocusTime: totalFocus,
-            daysWithData: daysWithSessions.count
+        let weekRecords = records.filter { record in
+            let weekday = calendar.component(.weekday, from: record.startTime)
+            let matchesDayOfWeek = dayOfWeeks.isEmpty || dayOfWeeks.contains(weekday)
+            return weekInterval.contains(record.startTime) && matchesDayOfWeek
+        }
+
+        return makeWeeklyMetrics(
+            weekRecords: weekRecords,
+            weekStart: weekInterval.start,
+            calendar: calendar
         )
     }
 
@@ -162,33 +213,38 @@ final class FocusMetricsService {
         guard let monthInterval = calendar.dateInterval(of: .month, for: date) else {
             return nil
         }
-        let monthStart = monthInterval.start
-
         let monthRecords = records.filter { record in
             monthInterval.contains(record.startTime)
         }
 
-        guard !monthRecords.isEmpty else { return nil }
+        return makeMonthlyMetrics(
+            monthRecords: monthRecords,
+            monthStart: monthInterval.start
+        )
+    }
 
-        let pomodoros = monthRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
-        let meetingTime = monthRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
-        let totalFocus = monthRecords.reduce(0) { $0 + $1.duration }
-
-        // Count unique weeks with data
-        let iso = isoCalendar
-        var weeksWithSessions: Set<Int> = []
-        for record in monthRecords {
-            let comps = iso.dateComponents([.yearForWeekOfYear, .weekOfYear], from: record.startTime)
-            let hash = (comps.yearForWeekOfYear ?? 0) * 100 + (comps.weekOfYear ?? 0)
-            weeksWithSessions.insert(hash)
+    /// Returns monthly metrics for the month containing `date`, filtered to matching day numbers.
+    /// Use `0` in `daysOfMonth` to include the last day of the month.
+    func getMonthlyMetrics(for date: Date, daysOfMonth: Set<Int>) -> MonthlyMetrics? {
+        let calendar = Calendar.current
+        guard let monthInterval = calendar.dateInterval(of: .month, for: date) else {
+            return nil
         }
 
-        return MonthlyMetrics(
-            monthStartDate: monthStart,
-            pomodorosCompleted: pomodoros,
-            meetingTime: meetingTime,
-            totalFocusTime: totalFocus,
-            weeksWithData: weeksWithSessions.count
+        let lastDayOfMonth = calendar.range(of: .day, in: .month, for: date)?.count ?? 31
+        let monthRecords = records.filter { record in
+            guard monthInterval.contains(record.startTime) else {
+                return false
+            }
+
+            let day = calendar.component(.day, from: record.startTime)
+            let isLastDay = day == lastDayOfMonth && daysOfMonth.contains(0)
+            return daysOfMonth.isEmpty || daysOfMonth.contains(day) || isLastDay
+        }
+
+        return makeMonthlyMetrics(
+            monthRecords: monthRecords,
+            monthStart: monthInterval.start
         )
     }
 
@@ -225,5 +281,77 @@ final class FocusMetricsService {
         var cal = Calendar(identifier: .iso8601)
         cal.timeZone = .current
         return cal
+    }
+
+    private func makeWeeklyMetrics(
+        weekRecords: [FocusSessionRecord],
+        weekStart: Date,
+        calendar: Calendar
+    ) -> WeeklyMetrics? {
+        guard !weekRecords.isEmpty else { return nil }
+
+        let pomodoros = weekRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
+        let meetingTime = weekRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
+        let totalFocus = weekRecords.reduce(0) { $0 + $1.duration }
+        let breakdown = modeTypeBreakdown(for: weekRecords)
+
+        var daysWithSessions: Set<DateComponents> = []
+        for record in weekRecords {
+            let components = calendar.dateComponents([.year, .month, .day], from: record.startTime)
+            daysWithSessions.insert(components)
+        }
+
+        return WeeklyMetrics(
+            weekStartDate: weekStart,
+            pomodorosCompleted: pomodoros,
+            meetingTime: meetingTime,
+            totalFocusTime: totalFocus,
+            daysWithData: daysWithSessions.count,
+            focusTimeDuration: breakdown.focusTimeDuration,
+            meetingDuration: breakdown.meetingDuration,
+            inboxDuration: breakdown.inboxDuration,
+            customDuration: breakdown.customDuration
+        )
+    }
+
+    private func makeMonthlyMetrics(
+        monthRecords: [FocusSessionRecord],
+        monthStart: Date
+    ) -> MonthlyMetrics? {
+        guard !monthRecords.isEmpty else { return nil }
+
+        let pomodoros = monthRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
+        let meetingTime = monthRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
+        let totalFocus = monthRecords.reduce(0) { $0 + $1.duration }
+        let breakdown = modeTypeBreakdown(for: monthRecords)
+
+        let iso = isoCalendar
+        var weeksWithSessions: Set<Int> = []
+        for record in monthRecords {
+            let components = iso.dateComponents([.yearForWeekOfYear, .weekOfYear], from: record.startTime)
+            let hash = (components.yearForWeekOfYear ?? 0) * 100 + (components.weekOfYear ?? 0)
+            weeksWithSessions.insert(hash)
+        }
+
+        return MonthlyMetrics(
+            monthStartDate: monthStart,
+            pomodorosCompleted: pomodoros,
+            meetingTime: meetingTime,
+            totalFocusTime: totalFocus,
+            weeksWithData: weeksWithSessions.count,
+            focusTimeDuration: breakdown.focusTimeDuration,
+            meetingDuration: breakdown.meetingDuration,
+            inboxDuration: breakdown.inboxDuration,
+            customDuration: breakdown.customDuration
+        )
+    }
+
+    private func modeTypeBreakdown(for records: [FocusSessionRecord]) -> ModeTypeBreakdown {
+        ModeTypeBreakdown(
+            focusTimeDuration: records.filter { $0.modeType == .focusTime }.reduce(0) { $0 + $1.duration },
+            meetingDuration: records.filter { $0.modeType == .meeting }.reduce(0) { $0 + $1.duration },
+            inboxDuration: records.filter { $0.modeType == .inbox }.reduce(0) { $0 + $1.duration },
+            customDuration: records.filter { $0.modeType == .custom }.reduce(0) { $0 + $1.duration }
+        )
     }
 }

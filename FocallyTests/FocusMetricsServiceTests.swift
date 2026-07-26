@@ -54,6 +54,19 @@ final class FocusMetricsServiceTests: XCTestCase {
         XCTAssertEqual(daily?.totalFocusTime, 1800)
     }
 
+    func testDailyMetrics_modeTypeBreakdown() {
+        sut.recordSession(makeRecord(duration: 1200, modeID: FocusMode.focusTimeID))
+        sut.recordSession(makeRecord(duration: 600, modeID: FocusMode.meetingID))
+        sut.recordSession(makeRecord(duration: 300, modeID: FocusMode.inboxID))
+        sut.recordSession(makeRecord(duration: 900, modeID: UUID()))
+
+        let daily = sut.getDailyMetrics(for: Date())!
+        XCTAssertEqual(daily.focusTimeDuration, 1200)
+        XCTAssertEqual(daily.meetingDuration, 600)
+        XCTAssertEqual(daily.inboxDuration, 300)
+        XCTAssertEqual(daily.customDuration, 900)
+    }
+
     func testDailyMetrics_dateBoundary() {
         // Record for yesterday
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
@@ -95,6 +108,35 @@ final class FocusMetricsServiceTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(weekly!.daysWithData, 1)
     }
 
+    func testWeeklyMetrics_modeTypeBreakdown() {
+        let monday = isoDate(year: 2026, month: 7, day: 20, hour: 9)
+
+        sut.recordSession(makeRecord(startTime: monday, duration: 1200, modeID: FocusMode.focusTimeID))
+        sut.recordSession(makeRecord(startTime: monday, duration: 900, modeID: FocusMode.meetingID))
+        sut.recordSession(makeRecord(startTime: monday, duration: 300, modeID: FocusMode.inboxID))
+        sut.recordSession(makeRecord(startTime: monday, duration: 600, modeID: UUID()))
+
+        let weekly = sut.getWeeklyMetrics(for: monday)
+        XCTAssertEqual(weekly?.focusTimeDuration, 1200)
+        XCTAssertEqual(weekly?.meetingDuration, 900)
+        XCTAssertEqual(weekly?.inboxDuration, 300)
+        XCTAssertEqual(weekly?.customDuration, 600)
+    }
+
+    func testWeeklyMetrics_dayOfWeekFilter() {
+        let monday = isoDate(year: 2026, month: 7, day: 20, hour: 9)
+        let tuesday = isoDate(year: 2026, month: 7, day: 21, hour: 9)
+
+        sut.recordSession(makeRecord(startTime: monday, duration: 1200, modeID: FocusMode.focusTimeID))
+        sut.recordSession(makeRecord(startTime: tuesday, duration: 900, modeID: FocusMode.meetingID))
+
+        let weekly = sut.getWeeklyMetrics(for: monday, dayOfWeeks: [2])
+        XCTAssertEqual(weekly?.totalFocusTime, 1200)
+        XCTAssertEqual(weekly?.focusTimeDuration, 1200)
+        XCTAssertEqual(weekly?.meetingDuration, 0)
+        XCTAssertEqual(weekly?.daysWithData, 1)
+    }
+
     // MARK: - Monthly Aggregation
 
     func testMonthlyMetrics_noData_returnsNil() {
@@ -122,6 +164,47 @@ final class FocusMetricsServiceTests: XCTestCase {
         XCTAssertNotNil(sut.getMonthlyMetrics(for: lastMonth))
     }
 
+    func testMonthlyMetrics_modeTypeBreakdown() {
+        let julyFirst = isoDate(year: 2026, month: 7, day: 1, hour: 9)
+
+        sut.recordSession(makeRecord(startTime: julyFirst, duration: 1000, modeID: FocusMode.focusTimeID))
+        sut.recordSession(makeRecord(startTime: julyFirst, duration: 800, modeID: FocusMode.meetingID))
+        sut.recordSession(makeRecord(startTime: julyFirst, duration: 400, modeID: FocusMode.inboxID))
+        sut.recordSession(makeRecord(startTime: julyFirst, duration: 200, modeID: UUID()))
+
+        let monthly = sut.getMonthlyMetrics(for: julyFirst)
+        XCTAssertEqual(monthly?.focusTimeDuration, 1000)
+        XCTAssertEqual(monthly?.meetingDuration, 800)
+        XCTAssertEqual(monthly?.inboxDuration, 400)
+        XCTAssertEqual(monthly?.customDuration, 200)
+    }
+
+    func testMonthlyMetrics_dayOfMonthFilter() {
+        let firstDay = isoDate(year: 2026, month: 7, day: 1, hour: 9)
+        let fifteenthDay = isoDate(year: 2026, month: 7, day: 15, hour: 9)
+
+        sut.recordSession(makeRecord(startTime: firstDay, duration: 1000, modeID: FocusMode.focusTimeID))
+        sut.recordSession(makeRecord(startTime: fifteenthDay, duration: 500, modeID: FocusMode.meetingID))
+
+        let monthly = sut.getMonthlyMetrics(for: firstDay, daysOfMonth: [15])
+        XCTAssertEqual(monthly?.totalFocusTime, 500)
+        XCTAssertEqual(monthly?.meetingDuration, 500)
+        XCTAssertEqual(monthly?.focusTimeDuration, 0)
+    }
+
+    func testMonthlyMetrics_lastDayFilter() {
+        let lastDay = isoDate(year: 2026, month: 7, day: 31, hour: 9)
+        let earlierDay = isoDate(year: 2026, month: 7, day: 30, hour: 9)
+
+        sut.recordSession(makeRecord(startTime: lastDay, duration: 700, modeID: FocusMode.focusTimeID))
+        sut.recordSession(makeRecord(startTime: earlierDay, duration: 300, modeID: FocusMode.meetingID))
+
+        let monthly = sut.getMonthlyMetrics(for: lastDay, daysOfMonth: [0])
+        XCTAssertEqual(monthly?.totalFocusTime, 700)
+        XCTAssertEqual(monthly?.focusTimeDuration, 700)
+        XCTAssertEqual(monthly?.meetingDuration, 0)
+    }
+
     // MARK: - Duration Formatting
 
     func testFormatDuration_minutes() {
@@ -142,13 +225,37 @@ final class FocusMetricsServiceTests: XCTestCase {
         pomodoros: Int? = nil,
         modeID: UUID = FocusMode.focusTimeID
     ) -> FocusSessionRecord {
-        FocusSessionRecord(
-            modeName: "Test",
+        let modeType: FocusModeType
+        switch modeID {
+        case FocusMode.focusTimeID:
+            modeType = .focusTime
+        case FocusMode.meetingID:
+            modeType = .meeting
+        case FocusMode.inboxID:
+            modeType = .inbox
+        default:
+            modeType = .custom
+        }
+
+        return FocusSessionRecord(
+            modeType: modeType,
             modeID: modeID,
             startTime: startTime,
             endTime: startTime.addingTimeInterval(duration),
             duration: duration,
             pomodorosCompleted: pomodoros
         )
+    }
+
+    private func isoDate(year: Int, month: Int, day: Int, hour: Int) -> Date {
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = day
+        components.hour = hour
+        components.minute = 0
+        components.second = 0
+        components.timeZone = TimeZone.current
+        return Calendar(identifier: .iso8601).date(from: components)!
     }
 }

@@ -39,7 +39,16 @@ final class FocusModeTests: XCTestCase {
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
 
+        // Clear disk cache too (same path as FocusModeStore uses: ~/.focally/modes.json)
+        let diskURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".focally/modes.json")
+        try? FileManager.default.removeItem(at: diskURL)
+
         let store = FocusModeStore(defaults: defaults)
-        XCTAssertEqual(store.modes.map(\.id), [FocusMode.focusTimeID, FocusMode.meetingID, FocusMode.inboxID])
+        let modeIDs = store.modes.map(\.id)
+        // Check first 3 are built-in in correct order
+        XCTAssertEqual(Array(modeIDs.prefix(3)), [FocusMode.focusTimeID, FocusMode.meetingID, FocusMode.inboxID])
+        // No extra modes should exist (only built-ins)
+        XCTAssertEqual(modeIDs.count, 3)
     }
 }

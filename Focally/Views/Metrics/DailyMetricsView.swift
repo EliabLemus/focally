@@ -45,7 +45,6 @@ struct DailyMetricsView: View {
                 LazyVGrid(columns: [
                     GridItem(.flexible(), spacing: FocallySpacing.medium),
                     GridItem(.flexible(), spacing: FocallySpacing.medium),
-                    GridItem(.flexible(), spacing: FocallySpacing.medium),
                 ], spacing: FocallySpacing.medium) {
                     MetricCard(
                         icon: "checkmark.circle.fill",
@@ -61,6 +60,11 @@ struct DailyMetricsView: View {
                         icon: "brain.head.profile.fill",
                         title: "metrics_total_focus_time",
                         value: metrics.totalFocusTimeFormatted
+                    )
+                    MetricCard(
+                        icon: "brain.head.profile.fill",
+                        title: "metrics_focus_time_type",
+                        value: metrics.focusTimeDurationFormatted
                     )
                 }
             } else {

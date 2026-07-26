@@ -29,6 +29,16 @@
 "metrics_next_month" = "Next month";
 "metrics_export_csv" = "Export CSV";
 "metrics_chart_placeholder" = "Charts coming in v0.10.0";
+"metrics_filter_all_days" = "All Days";
+"metrics_filter_days" = "Filter Days";
+"metrics_filter_days_title" = "Filter Days";
+"metrics_filter_clear" = "Clear all";
+"metrics_filter_done" = "Done";
+"metrics_filter_last_day" = "Last day of month";
+"metrics_focus_time_type" = "Focus Time";
+"metrics_meeting_type" = "Meeting";
+"metrics_inbox_type" = "Inbox";
+"metrics_custom_type" = "Custom";
 
 /* ========== SettingsPage ========== */
 "settings_title" = "Settings";
@@ -62,6 +72,8 @@
 "edit_mode_title" = "Edit %@";
 "edit_mode_name" = "Name";
 "edit_mode_name_placeholder" = "e.g. Focus Time";
+"edit_mode_type" = "Type";
+"edit_mode_type_placeholder" = "Select type";
 "edit_mode_duration_value" = "%d min";
 "edit_mode_emoji" = "Emoji";
 "edit_mode_emoji_placeholder_search" = "e.g. :brain:";

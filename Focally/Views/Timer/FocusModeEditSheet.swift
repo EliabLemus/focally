@@ -82,6 +82,21 @@ struct FocusModeEditSheet: View {
                                 .textFieldStyle(.roundedBorder)
                         }
 
+                        // MARK: Mode Type
+                        VStack(alignment: .leading, spacing: 8) {
+                            LocalizedText("edit_mode_type")
+                                .font(.focallyBodyBold)
+
+                            Picker(AppLanguage.shared.localizedString("edit_mode_type_placeholder"), selection: $draftMode.type) {
+                                ForEach(FocusModeType.allCases, id: \.self) { type in
+                                    Text(AppLanguage.shared.localizedString(type.localizedLabel))
+                                        .tag(type)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .buttonStyle(.plain)
+                        }
+
                         // MARK: Mode Emoji
                         VStack(alignment: .leading, spacing: 8) {
                             LocalizedText("edit_mode_emoji")

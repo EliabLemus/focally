@@ -2,9 +2,14 @@ import SwiftUI
 
 struct WeeklyMetricsView: View {
     @State private var weekAnchorDate: Date = Date()
+    @State private var selectedDayOfWeeks: Set<Int> = []
+    @State private var showDayOfWeekFilter = false
 
     private var metrics: WeeklyMetrics? {
-        FocusMetricsService.shared.getWeeklyMetrics(for: weekAnchorDate)
+        if selectedDayOfWeeks.isEmpty {
+            return FocusMetricsService.shared.getWeeklyMetrics(for: weekAnchorDate)
+        }
+        return FocusMetricsService.shared.getWeeklyMetrics(for: weekAnchorDate, dayOfWeeks: selectedDayOfWeeks)
     }
 
     private var weekRangeText: String {
@@ -50,13 +55,30 @@ struct WeeklyMetricsView: View {
                 Spacer()
             }
 
+            Button(action: { showDayOfWeekFilter.toggle() }) {
+                HStack(spacing: FocallySpacing.extraSmall) {
+                    Image(systemName: selectedDayOfWeeks.isEmpty ? "calendar" : "calendar.badge.checkmark")
+                        .font(.system(size: 14))
+                    Text(
+                        selectedDayOfWeeks.isEmpty
+                            ? AppLanguage.shared.localizedString("metrics_filter_all_days")
+                            : AppLanguage.shared.localizedString("metrics_filter_days")
+                    )
+                }
+                .font(.focallyBody)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+            }
+            .buttonStyle(.plain)
+            .sheet(isPresented: $showDayOfWeekFilter) {
+                DayOfWeekFilterSheet(selectedDays: $selectedDayOfWeeks)
+            }
+
             LocalizedText("metrics_weekly_title")
                 .font(.focallyH2)
                 .foregroundStyle(Color.focallyOnSurface)
 
             if let metrics {
                 LazyVGrid(columns: [
-                    GridItem(.flexible(), spacing: FocallySpacing.medium),
                     GridItem(.flexible(), spacing: FocallySpacing.medium),
                     GridItem(.flexible(), spacing: FocallySpacing.medium),
                 ], spacing: FocallySpacing.medium) {
@@ -74,6 +96,26 @@ struct WeeklyMetricsView: View {
                         icon: "brain.head.profile.fill",
                         title: "metrics_avg_focus_time",
                         value: metrics.avgDailyFocusTimeFormatted
+                    )
+                    MetricCard(
+                        icon: "brain.head.profile.fill",
+                        title: "metrics_focus_time_type",
+                        value: metrics.focusTimeDurationFormatted
+                    )
+                    MetricCard(
+                        icon: "person.2.fill",
+                        title: "metrics_meeting_type",
+                        value: metrics.meetingDurationFormatted
+                    )
+                    MetricCard(
+                        icon: "tray.fill",
+                        title: "metrics_inbox_type",
+                        value: metrics.inboxDurationFormatted
+                    )
+                    MetricCard(
+                        icon: "star.fill",
+                        title: "metrics_custom_type",
+                        value: metrics.customDurationFormatted
                     )
                 }
 

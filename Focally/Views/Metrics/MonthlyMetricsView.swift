@@ -2,9 +2,14 @@ import SwiftUI
 
 struct MonthlyMetricsView: View {
     @State private var selectedMonth: Date = Date()
+    @State private var selectedDaysOfMonth: Set<Int> = []
+    @State private var showDayOfMonthFilter = false
 
     private var metrics: MonthlyMetrics? {
-        FocusMetricsService.shared.getMonthlyMetrics(for: selectedMonth)
+        if selectedDaysOfMonth.isEmpty {
+            return FocusMetricsService.shared.getMonthlyMetrics(for: selectedMonth)
+        }
+        return FocusMetricsService.shared.getMonthlyMetrics(for: selectedMonth, daysOfMonth: selectedDaysOfMonth)
     }
 
     private var monthText: String {
@@ -53,9 +58,26 @@ struct MonthlyMetricsView: View {
                 .help(AppLanguage.shared.localizedString("metrics_next_month"))
             }
 
+            Button(action: { showDayOfMonthFilter.toggle() }) {
+                HStack(spacing: FocallySpacing.extraSmall) {
+                    Image(systemName: selectedDaysOfMonth.isEmpty ? "calendar" : "calendar.badge.checkmark")
+                        .font(.system(size: 14))
+                    Text(
+                        selectedDaysOfMonth.isEmpty
+                            ? AppLanguage.shared.localizedString("metrics_filter_all_days")
+                            : AppLanguage.shared.localizedString("metrics_filter_days")
+                    )
+                }
+                .font(.focallyBody)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+            }
+            .buttonStyle(.plain)
+            .sheet(isPresented: $showDayOfMonthFilter) {
+                DayOfMonthFilterSheet(selectedDays: $selectedDaysOfMonth)
+            }
+
             if let metrics {
                 LazyVGrid(columns: [
-                    GridItem(.flexible(), spacing: FocallySpacing.medium),
                     GridItem(.flexible(), spacing: FocallySpacing.medium),
                     GridItem(.flexible(), spacing: FocallySpacing.medium),
                 ], spacing: FocallySpacing.medium) {
@@ -73,6 +95,26 @@ struct MonthlyMetricsView: View {
                         icon: "brain.head.profile.fill",
                         title: "metrics_total_focus_time",
                         value: metrics.totalFocusTimeFormatted
+                    )
+                    MetricCard(
+                        icon: "brain.head.profile.fill",
+                        title: "metrics_focus_time_type",
+                        value: metrics.focusTimeDurationFormatted
+                    )
+                    MetricCard(
+                        icon: "person.2.fill",
+                        title: "metrics_meeting_type",
+                        value: metrics.meetingDurationFormatted
+                    )
+                    MetricCard(
+                        icon: "tray.fill",
+                        title: "metrics_inbox_type",
+                        value: metrics.inboxDurationFormatted
+                    )
+                    MetricCard(
+                        icon: "star.fill",
+                        title: "metrics_custom_type",
+                        value: metrics.customDurationFormatted
                     )
                 }
 
