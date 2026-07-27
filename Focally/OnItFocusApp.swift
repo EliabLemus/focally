@@ -332,10 +332,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Renders a composite NSImage for the menu bar: emoji + time text.
     private static func renderMenuBarImage(emoji: String, emojiImage: NSImage?, timeText: String, isPaused: Bool) -> NSImage {
-        let emojiSize: CGFloat = 14
+        let emojiSize: CGFloat = 11
         let fontSize: CGFloat = 12
         let padding: CGFloat = 2
-        let gap: CGFloat = 6
+        let gap: CGFloat = 4
 
         // Measure text
         let textFont = NSFont.systemFont(ofSize: fontSize)
@@ -346,12 +346,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let textString = NSAttributedString(string: " \(timeText)", attributes: textAttrs)
         let textSize = textString.size()
 
-        // Emoji dimension — measure actual rendered width instead of hardcoding
+        // Emoji dimension — fix to menu bar height
         let emojiFont = NSFont.systemFont(ofSize: emojiSize)
         let emojiAttrs: [NSAttributedString.Key: Any] = [.font: emojiFont]
         let emojiAttrStr = NSAttributedString(string: emoji, attributes: emojiAttrs)
         let emojiMeasureSize = emojiAttrStr.size()
-        let emojiDim = max(emojiMeasureSize.width, emojiSize)
+        let emojiDim = emojiSize  // Fixed size, don't let it grow
 
         // Pause/play icon
         let iconDim: CGFloat = 10
