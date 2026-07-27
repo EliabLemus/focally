@@ -17,6 +17,24 @@ enum FocusModeType: String, Codable, CaseIterable {
     }
 }
 
+/// Describes the nature of a focus session (user-selectable).
+/// Distinct from `FocusModeType` which categorizes built-in vs custom modes.
+enum FocusType: String, Codable, CaseIterable {
+    case work
+    case meeting
+    case email
+    case learning
+
+    var localizedLabel: String {
+        switch self {
+        case .work: return "focus_type_work"
+        case .meeting: return "focus_type_meeting"
+        case .email: return "focus_type_email"
+        case .learning: return "focus_type_learning"
+        }
+    }
+}
+
 struct FocusMode: Identifiable, Codable, Equatable {
     static let defaultsKey = "focusModes"
 
@@ -37,6 +55,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
     var pomodoroRounds: Int
     var breakLabel: String?
     var type: FocusModeType
+    var focusType: FocusType
 
     init(id: UUID = UUID(),
          name: String = "",
@@ -50,7 +69,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
          pomodoroLongBreakMinutes: Int = 15,
          pomodoroRounds: Int = 4,
          breakLabel: String? = nil,
-         type: FocusModeType = .custom) {
+         type: FocusModeType = .custom,
+         focusType: FocusType = .work) {
         self.id = id
         self.name = name
         self.emoji = emoji
@@ -64,12 +84,13 @@ struct FocusMode: Identifiable, Codable, Equatable {
         self.pomodoroRounds = pomodoroRounds
         self.breakLabel = breakLabel
         self.type = type
+        self.focusType = focusType
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, emoji, statusText, durationMinutes, enableDND, enablePomodoro
         case pomodoroWorkMinutes, pomodoroBreakMinutes, pomodoroLongBreakMinutes, pomodoroRounds
-        case breakLabel, type
+        case breakLabel, type, focusType
     }
 
     init(from decoder: Decoder) throws {
@@ -93,6 +114,9 @@ struct FocusMode: Identifiable, Codable, Equatable {
         } else {
             type = Self.inferredType(from: id)
         }
+
+        // Backward compat: default to .work if missing
+        focusType = try c.decodeIfPresent(FocusType.self, forKey: .focusType) ?? .work
     }
 
     static let builtInModes: [FocusMode] = [
@@ -208,7 +232,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,
             pomodoroRounds: sanitizedPomodoroRounds,
             breakLabel: breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines) : nil,
-            type: type
+            type: type,
+            focusType: focusType
         )
     }
 }
@@ -244,7 +269,7 @@ final class FocusModeStore {
     func add(_ mode: FocusMode) {
         var newMode = mode.sanitized()
         if newMode.id == UUID() {
-            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel)
+            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel, type: newMode.type, focusType: newMode.focusType)
         }
         modes.append(newMode)
         modes = Self.orderedModes(from: modes)

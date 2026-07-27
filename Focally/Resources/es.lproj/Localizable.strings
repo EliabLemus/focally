@@ -74,6 +74,12 @@
 "edit_mode_name_placeholder" = "ej. Tiempo de Enfoque";
 "edit_mode_type" = "Tipo";
 "edit_mode_type_placeholder" = "Seleccionar tipo";
+"edit_mode_focus_type" = "Tipo de Enfoque";
+"edit_mode_focus_type_placeholder" = "Seleccionar tipo de enfoque";
+"focus_type_work" = "Trabajo";
+"focus_type_meeting" = "Reunión";
+"focus_type_email" = "Correo";
+"focus_type_learning" = "Aprendizaje";
 "edit_mode_duration_value" = "%d min";
 "edit_mode_emoji" = "Emoji";
 "edit_mode_emoji_placeholder_search" = "ej. :brain:";

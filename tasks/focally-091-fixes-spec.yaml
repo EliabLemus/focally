@@ -1,0 +1,44 @@
+version: 0.9.1
+title: "Focally v0.9.1 Fixes"
+date: 2026-07-27
+
+changes:
+  - id: 1
+    title: "Add FocusType enum to FocusMode.swift"
+    description: |
+      New enum with 4 cases: work, meeting, email, learning.
+      Separate from existing FocusModeType (focusTime/meeting/inbox/custom) which
+      categorizes built-in vs custom. FocusType describes the nature of the focus session.
+
+  - id: 2
+    title: "Add focusType property to FocusMode model"
+    description: |
+      Add var focusType: FocusType to FocusMode struct.
+      Update memberwise initializer with default .work.
+      Update Codable decoder with backward-compat fallback.
+      Update CodingKeys to include focusType.
+      Update sanitized() to preserve focusType.
+
+  - id: 3
+    title: "Add Focus Type picker UI in FocusModeEditSheet"
+    description: |
+      Add a FocusType Picker before the Duration section (in Basic Settings).
+      Use .menu picker style. Bind to $draftMode.focusType.
+
+  - id: 4
+    title: "Wrap Pomodoro DisclosureGroup content in ScrollView"
+    description: |
+      Wrap the 4 Stepper controls inside the Pomodoro DisclosureGroup in a ScrollView
+      with .frame(maxHeight: 200) to prevent overflow when expanded.
+
+  - id: 5
+    title: "Bump version in project.yml"
+    description: |
+      MARKETING_VERSION: "0.9.0" -> "0.9.1"
+      CURRENT_PROJECT_VERSION: "73" -> "67"
+
+conventions:
+  - "Use [weak self] with type hints in closures"
+  - "Use design tokens (FocallySpacing, FocallyRadius)"
+  - "Keep SwiftUI idiomatic"
+  - "Add localization strings for EN/ES/PT"
