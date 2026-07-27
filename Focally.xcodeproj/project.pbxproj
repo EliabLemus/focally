@@ -13,7 +13,6 @@
 		0E041FFD0374DC4E0391F641 /* MetricsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5FBFE134F2E3538C855A77 /* MetricsPage.swift */; };
 		151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824FFB84C09F608FF1A0E65B /* TopBarView.swift */; };
 		1546EA3A0E314D00A7465E21 /* SoundPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */; };
-		19BD4A1C43F44B6AA1296A11 /* DayOfMonthFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C4D9F2E34D4D70BFAE3C91 /* DayOfMonthFilterSheet.swift */; };
 		1CDEA207B423CA61E8D21033 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1825FA0D4F141DB46F655310 /* Cocoa.framework */; };
 		1EB7549C72A8A8EBB126ADED /* glass_005.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 798F580A999292FEF45A0C39 /* glass_005.aiff */; };
 		2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */; };
@@ -23,10 +22,10 @@
 		28F4668E8B5055976BA76C10 /* SidebarItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */; };
 		29B7D127E99DE7B01F268890 /* FocallyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894B41DF72CDB2742449EF9 /* FocallyUITests.swift */; };
 		36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17386F3788F2D2F1263DBDD /* PomodoroState.swift */; };
-		3F1AF67C8A194BE9B691CB22 /* DayOfWeekFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A0B11E5C2A741758A924B61 /* DayOfWeekFilterSheet.swift */; };
 		3C00972814298660B247AD5A /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95A80A407C1873456D6EBBF /* AppLanguage.swift */; };
 		3CA50BD80850175F7912AB33 /* FocusMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B309416511CC57079912AFE6 /* FocusMode.swift */; };
 		3CC347CA3B86E21F7D0947E8 /* FocallyGlassModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */; };
+		3F2C012DD23E311952774209 /* DayOfWeekFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED848256E51CF79ED15AE0E /* DayOfWeekFilterSheet.swift */; };
 		4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */; };
 		41890883893A4D5DB94888F7 /* FocusModeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */; };
 		42238CB9D8ABDFB1628167C2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ECF6F0911D78E7836F5068 /* Localizable.strings */; };
@@ -50,6 +49,7 @@
 		6F971A4BAF0AFD199B6948A1 /* LayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5DB55686DFAEB6AAB22D07 /* LayerTests.swift */; };
 		71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */; };
 		72C50B6FF38D05A2E9F440C5 /* FocallySpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */; };
+		77F5833236C41851956FFA35 /* DayOfMonthFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C81AE90F26064902AB1692 /* DayOfMonthFilterSheet.swift */; };
 		7C262F088F990DED923716C5 /* DNDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E3F6355136EFD90EE198C8 /* DNDService.swift */; };
 		803039DD967F5D993EC45A02 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */; };
 		809EBE91F71EE7FC5E7AE0C8 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */; };
@@ -136,6 +136,7 @@
 		1AEE7F3695EF4097CA9CAA33 /* TimerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerControlsView.swift; sourceTree = "<group>"; };
 		1C18F5B206E8657516539F2E /* SimpleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTests.swift; sourceTree = "<group>"; };
 		1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusIntegrationService.swift; sourceTree = "<group>"; };
+		1ED848256E51CF79ED15AE0E /* DayOfWeekFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfWeekFilterSheet.swift; sourceTree = "<group>"; };
 		1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeTests.swift; sourceTree = "<group>"; };
 		24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutDropHandler.swift; sourceTree = "<group>"; };
@@ -151,7 +152,6 @@
 		494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerServiceTests.swift; sourceTree = "<group>"; };
 		4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
-		4A0B11E5C2A741758A924B61 /* DayOfWeekFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfWeekFilterSheet.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		4F41CEC41E4906B3E45ACE6B /* es.lproj */ = {isa = PBXFileReference; path = es.lproj; sourceTree = "<group>"; };
 		4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerService.swift; sourceTree = "<group>"; };
@@ -164,7 +164,6 @@
 		6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDropdownView.swift; sourceTree = "<group>"; };
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
-		73C4D9F2E34D4D70BFAE3C91 /* DayOfMonthFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfMonthFilterSheet.swift; sourceTree = "<group>"; };
 		74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedFocusShortcutsService.swift; sourceTree = "<group>"; };
 		798F580A999292FEF45A0C39 /* glass_005.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = glass_005.aiff; sourceTree = "<group>"; };
 		7E2AD28154EB8F29CA62613D /* en.lproj */ = {isa = PBXFileReference; path = en.lproj; sourceTree = "<group>"; };
@@ -185,6 +184,7 @@
 		A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSetupView.swift; sourceTree = "<group>"; };
 		A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeCard.swift; sourceTree = "<group>"; };
 		A6B424719CB23B5544233E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A7C81AE90F26064902AB1692 /* DayOfMonthFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfMonthFilterSheet.swift; sourceTree = "<group>"; };
 		B309416511CC57079912AFE6 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
 		B3380D59838114A5E74EC8FB /* LanguageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSettingsView.swift; sourceTree = "<group>"; };
 		B5043C8ECE27D0D64ACE0515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -421,6 +421,7 @@
 				C570E45183822E3ECE9C3158 /* Observability */,
 				5AF2FE4BCEA66A832CB8637D /* Resources */,
 				F00A4423B12F413F1474634A /* Services */,
+				E9F34FF51F0D066322EEF1FD /* Utils */,
 				122010126CD7EFB3D8B2BF85 /* Views */,
 			);
 			path = Focally;
@@ -435,12 +436,19 @@
 			path = Observability;
 			sourceTree = "<group>";
 		};
+		E9F34FF51F0D066322EEF1FD /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		EE4B76F1DD57D4BEE173F223 /* Metrics */ = {
 			isa = PBXGroup;
 			children = (
-				73C4D9F2E34D4D70BFAE3C91 /* DayOfMonthFilterSheet.swift */,
-				4A0B11E5C2A741758A924B61 /* DayOfWeekFilterSheet.swift */,
 				89097339EC6F280CD7AF1427 /* DailyMetricsView.swift */,
+				A7C81AE90F26064902AB1692 /* DayOfMonthFilterSheet.swift */,
+				1ED848256E51CF79ED15AE0E /* DayOfWeekFilterSheet.swift */,
 				DA5FBFE134F2E3538C855A77 /* MetricsPage.swift */,
 				FB59D3124E36D64872ABE213 /* MonthlyMetricsView.swift */,
 				E4F7814C1833FF79761439FC /* WeeklyMetricsView.swift */,
@@ -633,9 +641,9 @@
 				97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */,
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
-				19BD4A1C43F44B6AA1296A11 /* DayOfMonthFilterSheet.swift in Sources */,
-				3F1AF67C8A194BE9B691CB22 /* DayOfWeekFilterSheet.swift in Sources */,
 				BB40A5E3AF07A27BBAD14850 /* DailyMetricsView.swift in Sources */,
+				77F5833236C41851956FFA35 /* DayOfMonthFilterSheet.swift in Sources */,
+				3F2C012DD23E311952774209 /* DayOfWeekFilterSheet.swift in Sources */,
 				B83B768C2CF5BCC948DBD75B /* DesignSystemTestView.swift in Sources */,
 				B758763E9D491EC281759FA3 /* EmojiCacheService.swift in Sources */,
 				6B6C84E33B67757CA8B0CB18 /* EmojiView.swift in Sources */,

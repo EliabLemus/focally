@@ -469,13 +469,16 @@ struct FocusModeEditSheet: View {
                         // Pomodoro Settings (DisclosureGroup, shown when Pomodoro enabled)
                         if draftMode.enablePomodoro {
                             DisclosureGroup("edit_mode_pomodoro_settings") {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_work"), draftMode.pomodoroWorkMinutes), value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
-                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_short_break"), draftMode.pomodoroBreakMinutes), value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
-                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_long_break"), draftMode.pomodoroLongBreakMinutes), value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
-                                    Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_rounds"), draftMode.pomodoroRounds), value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
+                                ScrollView {
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_work"), draftMode.pomodoroWorkMinutes), value: $draftMode.pomodoroWorkMinutes, in: 5...120, step: 5)
+                                        Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_short_break"), draftMode.pomodoroBreakMinutes), value: $draftMode.pomodoroBreakMinutes, in: 1...30, step: 1)
+                                        Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_long_break"), draftMode.pomodoroLongBreakMinutes), value: $draftMode.pomodoroLongBreakMinutes, in: 5...60, step: 5)
+                                        Stepper(String(format: AppLanguage.shared.localizedString("edit_mode_rounds"), draftMode.pomodoroRounds), value: $draftMode.pomodoroRounds, in: 1...12, step: 1)
+                                    }
+                                    .padding(.top, 8)
                                 }
-                                .padding(.top, 8)
+                                .frame(maxHeight: 200)
                             }
                             .padding(.top, 8)
                         }
