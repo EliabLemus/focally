@@ -1,0 +1,253 @@
+spec_version: "1.0"
+name: "focally-calendar-patch-v0.9.1"
+title: "Parche Calendar UI v0.9.1 - Exponer eventos existentes"
+description: |
+  PATCH v0.9.1: Hacer visible la integración de calendario que ya existe en backend.
+
+  PROBLEMA:
+  - CalendarSlackIntegrationService ya detecta eventos (checkForActiveMeeting, 30s poll)
+  - Ya expone @Published var currentMeeting: CalendarMeeting?
+  - PERO: No hay UI que muestre esta información
+  - Los pomodoros corren sin considerar eventos activos
+
+  OBJETIVO:
+  - Widget simple para mostrar current meeting en UI
+  - Agregar a MenuBarDropdownView y IdleDashboardView
+  - Alerta simple al iniciar pomodoro si hay meeting activo
+
+  SCOPE (NO major features):
+  - NO crear CalendarConflictSheet completo
+  - NO sugerencias avanzadas
+  - Solo exponer funcionalidad existente
+
+  APROXIMACIÓN:
+  - Componente CalendarMeetingCard (minimalista)
+  - Integración UI en 2 lugares existentes
+  - Alerta simple (badge) en TimerPage
+
+estimated_hours: 2
+version: "0.9.1"
+branch: "main"
+base_commit: "7a82cc8"
+
+files_to_modify:
+  - Focally/Views/Calendar/CalendarMeetingCard.swift [NEW]
+  - Focally/Views/MenuBar/MenuBarDropdownView.swift
+  - Focally/Views/Timer/IdleDashboardView.swift
+  - Focally/Views/Timer/TimerPage.swift
+
+tasks:
+  - id: "task-1"
+    title: "Crear CalendarMeetingCard component"
+    description: |
+      Crear componente SwiftUI simple para mostrar meeting card.
+      Usar diseño existente de Focally (glass card, spacing, colors).
+
+    steps:
+      - Crear archivo Focally/Views/Calendar/CalendarMeetingCard.swift
+      - Implementar struct CalendarMeetingCard
+      - Usar propiedades de CalendarMeeting (title, startTime, endTime, hasVideoCall)
+
+    acceptance_criteria:
+      - Componente compila sin errores
+      - Muestra title, time range, y video indicator
+      - Usa FocallySpacing, FocallyRadius, Color.focally*
+      - Es reutilizable en múltiples vistas
+
+    files:
+      - path: Focally/Views/Calendar/CalendarMeetingCard.swift
+        create: true
+        content: |
+          import SwiftUI
+          import Foundation
+
+          struct CalendarMeetingCard: View {
+              let meeting: CalendarMeeting
+              let isActive: Bool
+
+              var timeRange: String {
+                  let formatter = DateFormatter()
+                  formatter.timeStyle = .short
+                  formatter.dateStyle = .none
+                  return "\(formatter.string(from: meeting.startTime)) - \(formatter.string(from: meeting.endTime))"
+              }
+
+              var body: some View {
+                  HStack(spacing: FocallySpacing.small) {
+                      // Calendar icon
+                      Image(systemName: "calendar.badge.clock")
+                          .font(.system(size: 14))
+                          .foregroundStyle(isActive ? Color.focallyPrimary : Color.focallyTertiary)
+
+                      VStack(alignment: .leading, spacing: 2) {
+                          Text(meeting.title)
+                              .font(.focallyBodyBold)
+                              .foregroundStyle(Color.focallyOnSurface)
+                              .lineLimit(1)
+
+                          Text(timeRange)
+                              .font(.focallyCaption)
+                              .foregroundStyle(Color.focallyOnSurfaceVariant)
+                      }
+
+                      Spacer()
+
+                      // Video call indicator
+                      if meeting.hasVideoCall {
+                          Image(systemName: "video.fill")
+                              .font(.caption2)
+                              .foregroundStyle(Color.focallySecondary)
+                      }
+                  }
+                  .padding(FocallySpacing.small)
+                  .background(
+                      RoundedRectangle(cornerRadius: FocallyRadius.small)
+                          .fill(isActive ? Color.focallyPrimaryContainer : Color.focallySurfaceContainerLow)
+                  )
+              }
+          }
+
+  - id: "task-2"
+    title: "Integrar CalendarMeetingCard en MenuBarDropdownView"
+    description: |
+      Agregar CalendarMeetingCard en MenuBarDropdownView si hay meeting activo.
+      Usar @Environment(CalendarSlackIntegrationService) para acceder a currentMeeting.
+
+    steps:
+      - Abrir Focally/Views/MenuBar/MenuBarDropdownView.swift
+      - Verificar que @Environment(CalendarSlackIntegrationService) existe
+      - Agregar sección "Current Meeting" después de header
+      - Mostrar CalendarMeetingCard solo si currentMeeting != nil
+
+    acceptance_criteria:
+      - Meeting card aparece en menú dropdown si hay meeting activo
+      - No aparece si no hay meeting
+      - Layout respeta spacing y glass card pattern
+
+    files:
+      - path: Focally/Views/MenuBar/MenuBarDropdownView.swift
+        patch_after: |2
+          // MARK: - Header
+          headerSection
+        patch_content: |
+          // MARK: - Current Calendar Event
+          if calendarService.currentMeeting != nil {
+              VStack(spacing: FocallySpacing.small) {
+                  LocalizedText("menubar_current_meeting")
+                      .font(.focallyCaption)
+                      .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                  if let meeting = calendarService.currentMeeting {
+                      CalendarMeetingCard(meeting: meeting, isActive: true)
+                  }
+              }
+              .padding(.horizontal, FocallySpacing.medium)
+          }
+
+  - id: "task-3"
+    title: "Integrar CalendarMeetingCard en IdleDashboardView"
+    description: |
+      Agregar CalendarMeetingCard en IdleDashboardView si hay meeting activo.
+      Mostrar al tope, antes de FocusModeCards.
+
+    steps:
+      - Abrir Focally/Views/Timer/IdleDashboardView.swift
+      - Verificar que @Environment(CalendarSlackIntegrationService) existe
+      - Agregar sección "Current Meeting" al inicio del VStack
+      - Mostrar CalendarMeetingCard solo si currentMeeting != nil
+
+    acceptance_criteria:
+      - Meeting card aparece en IdleDashboard si hay meeting activo
+      - Aparece primero (before FocusModeCards)
+      - Layout limpio con spacing apropiado
+
+    files:
+      - path: Focally/Views/Timer/IdleDashboardView.swift
+        patch_after: |2
+          ScrollView {
+              VStack(spacing: FocallySpacing.large) {
+        patch_content: |
+          // MARK: - Current Calendar Event
+          if calendarService.currentMeeting != nil {
+              if let meeting = calendarService.currentMeeting {
+                  Section(header: SectionHeader(title: "Current Meeting")) {
+                      CalendarMeetingCard(meeting: meeting, isActive: true)
+                  }
+              }
+          }
+
+  - id: "task-4"
+    title: "Agregar alerta simple en TimerPage cuando hay meeting activo"
+    description: |
+      Mostrar badge/advertencia en TimerPage si hay meeting activo.
+      No interrumpir pomodoro, solo advertir visualmente.
+
+    steps:
+      - Abrir Focally/Views/Timer/TimerPage.swift
+      - Verificar que @Environment(CalendarSlackIntegrationService) existe
+      - Agregar badge visual (small label) cuando timerService.isActive && calendarService.currentMeeting != nil
+      - Usar Color.focallyWarning para badge
+
+    acceptance_criteria:
+      - Badge aparece cuando pomodoro corre Y hay meeting activo
+      - Badge desaparece cuando no hay meeting
+      - No interrumpe timer UI principal
+
+    files:
+      - path: Focally/Views/Timer/TimerPage.swift
+        patch_after: |2
+          // Timer display section
+        patch_content: |
+          // MARK: - Active Meeting Warning
+          if timerService.isActive, calendarService.currentMeeting != nil {
+              HStack(spacing: FocallySpacing.extraSmall) {
+                  Image(systemName: "exclamationmark.triangle.fill")
+                      .font(.caption2)
+                      .foregroundStyle(Color.focallyWarning)
+                  LocalizedText("active_meeting_warning")
+                      .font(.focallyCaption)
+                      .foregroundStyle(Color.focallyWarning)
+              }
+              .padding(FocallySpacing.extraSmall)
+              .background(Color.focallyWarningContainer)
+              .clipShape(Capsule())
+          }
+
+localization:
+  add:
+    - key: "menubar_current_meeting"
+      en: "Current Meeting"
+      es: "Reunión actual"
+      pt: "Reunião atual"
+    - key: "active_meeting_warning"
+      en: "You have an active meeting"
+      es: "Tienes una reunión activa"
+      pt: "Você tem uma reunião ativa"
+
+verification:
+  - build_and_test:
+      - "xcodebuild -project Focally.xcodeproj -scheme Focally -configuration Release build"
+      - "cp DerivedData/Build/Products/Release/Focally.app /Applications/"
+      - "killall Focally; open -a Focally"
+  - manual_testing:
+      - step: "Crear evento en Calendar app (p.ej. 'Test Meeting', ahora + 10 min)"
+        verify: "Meeting card aparece en MenuBarDropdownView e IdleDashboardView"
+      - step: "Iniciar pomodoro mientras meeting activo"
+        verify: "Badge 'active_meeting_warning' aparece en TimerPage"
+      - step: "Terminar meeting en Calendar app"
+        verify: "Meeting card desaparece de UI"
+
+success_criteria:
+  - CalendarMeetingCard compila sin errores
+  - UI muestra meeting activo en 2 lugares (MenuBar, IdleDashboard)
+  - Alerta badge aparece en TimerPage durante pomodoro + meeting
+  - No warnings ni errors en build
+  - Funcionalidad es visible (ya existía backend, ahora expuesta)
+
+notes: |
+  Este es un PARCHE, no un major feature.
+  La funcionalidad backend ya existe (CalendarSlackIntegrationService).
+  Solo exponemos a través de UI.
+
+  VERSION BUMP:
+  - project.yml: MARKETING_VERSION = 0.9.1, CURRENT_PROJECT_VERSION = 74

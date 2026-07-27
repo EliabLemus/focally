@@ -4,6 +4,7 @@ struct ActiveFocusView: View {
     @Environment(FocusTimerService.self) private var timerService
     @Environment(DNDService.self) private var dndService
     @Environment(SlackService.self) private var slackService
+    @Environment(CalendarSlackIntegrationService.self) private var calendarService
 
     @State private var showFinishConfirmation = false
 
@@ -50,6 +51,20 @@ struct ActiveFocusView: View {
                 icon: dndService.isDNDActive ? "moon.fill" : "moon",
                 tint: dndService.isDNDActive ? Color.focallyPrimary : Color.focallyOnSurfaceVariant
             )
+
+            if calendarService.currentMeeting != nil {
+                HStack(spacing: FocallySpacing.extraSmall) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.caption2)
+                        .foregroundStyle(Color.focallyError)
+                    LocalizedText("active_meeting_warning")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyError)
+                }
+                .padding(FocallySpacing.extraSmall)
+                .background(Color.focallyErrorContainer)
+                .clipShape(Capsule())
+            }
 
             Spacer()
 

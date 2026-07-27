@@ -4,6 +4,7 @@ struct IdleDashboardView: View {
     @Environment(FocusModeStore.self) private var focusModeStore
     @Environment(FocusTimerService.self) private var timerService
     @Environment(SlackService.self) private var slackService
+    @Environment(CalendarSlackIntegrationService.self) private var calendarService
 
     @State private var editingMode: FocusMode?
     @State private var isAddingMode = false
@@ -12,6 +13,16 @@ struct IdleDashboardView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: FocallySpacing.large) {
                 header
+
+                if let meeting = calendarService.currentMeeting {
+                    VStack(alignment: .leading, spacing: FocallySpacing.small) {
+                        LocalizedText("menubar_current_meeting")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyPrimary)
+
+                        CalendarMeetingCard(meeting: meeting, isActive: true)
+                    }
+                }
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: FocallySpacing.medium)], spacing: FocallySpacing.medium) {
                     ForEach(focusModeStore.modes) { mode in

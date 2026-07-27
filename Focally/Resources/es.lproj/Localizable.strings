@@ -221,3 +221,7 @@
 
 /* ========== MainWindow ========== */
 "main_open_settings" = "Abrir Configuración";
+
+/* ========== CalendarMeetingCard ========== */
+"menubar_current_meeting" = "Reunión actual";
+"active_meeting_warning" = "Tienes una reunión activa";

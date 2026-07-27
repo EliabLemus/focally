@@ -16,6 +16,19 @@ struct MenuBarDropdownView: View {
 
             ScrollView {
                 VStack(spacing: 14) {
+                    if let meeting = calendarService.currentMeeting {
+                        VStack(alignment: .leading, spacing: 6) {
+                            LocalizedText("menubar_current_meeting")
+                                .font(.focallyCaption)
+                                .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                            CalendarMeetingCard(meeting: meeting, isActive: true)
+                        }
+
+                        Divider()
+                            .padding(.horizontal, 4)
+                    }
+
                     if timerService.hasSession {
                         activeSessionCard
                     } else {

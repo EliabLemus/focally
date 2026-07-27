@@ -32,6 +32,7 @@
 		470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */; };
 		4918E9CBBD4CC68BA3921FA3 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7E2AD28154EB8F29CA62613D /* en.lproj */; };
 		4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */; };
+		4C0A3FE7746EDEED810ABE73 /* CalendarMeetingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECC6A5FE697AA23DE9211391 /* CalendarMeetingCard.swift */; };
 		4DA6D3EC99C075CD80C09883 /* confirmation_003.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */; };
 		4E171CBDCAE413F2F4D0F49F /* FocallyTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */; };
 		502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */; };
@@ -207,6 +208,7 @@
 		E4F7814C1833FF79761439FC /* WeeklyMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyMetricsView.swift; sourceTree = "<group>"; };
 		E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCacheService.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
+		ECC6A5FE697AA23DE9211391 /* CalendarMeetingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMeetingCard.swift; sourceTree = "<group>"; };
 		EE5872A55A4E62A78C086B3F /* FocallyGlassModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyGlassModifier.swift; sourceTree = "<group>"; };
 		F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
 		F2E3F6355136EFD90EE198C8 /* DNDService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDService.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */,
 				4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */,
 				6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */,
+				F831EF04D80C14D3ADB7C648 /* Calendar */,
 				4A2B7356CDB6634F3D74235D /* MenuBar */,
 				EE4B76F1DD57D4BEE173F223 /* Metrics */,
 				0AEF4C2BBDBDF4F45D0BD085 /* Navigation */,
@@ -479,6 +482,14 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		F831EF04D80C14D3ADB7C648 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				ECC6A5FE697AA23DE9211391 /* CalendarMeetingCard.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
 		FA124C2C4FF6A6CB599B6642 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -638,6 +649,7 @@
 				CAECDE4AC6D75573BAECAF34 /* ActiveFocusView.swift in Sources */,
 				3C00972814298660B247AD5A /* AppLanguage.swift in Sources */,
 				62800918C6A9ABAF71CE9F6C /* AppearanceSettingsView.swift in Sources */,
+				4C0A3FE7746EDEED810ABE73 /* CalendarMeetingCard.swift in Sources */,
 				97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */,
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
@@ -758,7 +770,7 @@
 				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 73;
+				CURRENT_PROJECT_VERSION = 74;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Focally/Info.plist;
@@ -766,7 +778,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.0;
+				MARKETING_VERSION = 0.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.Focally;
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;
@@ -817,7 +829,7 @@
 				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 73;
+				CURRENT_PROJECT_VERSION = 74;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Focally/Info.plist;
@@ -825,7 +837,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.0;
+				MARKETING_VERSION = 0.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.Focally;
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;

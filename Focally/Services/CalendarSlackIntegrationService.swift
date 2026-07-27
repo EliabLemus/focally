@@ -16,7 +16,7 @@ final class CalendarSlackIntegrationService {
     }
     private(set) var hasCalendarAccess: Bool
     private var events: [CalendarMeeting] = []
-    private var currentMeeting: CalendarMeeting?
+    private(set) var currentMeeting: CalendarMeeting?
     var connectionError: String?
     var showMeetingTitle: Bool {
         didSet {
@@ -164,7 +164,7 @@ final class CalendarSlackIntegrationService {
     }
 }
 
-private struct CalendarMeeting: Identifiable, Equatable {
+struct CalendarMeeting: Identifiable, Equatable {
     let id: String
     let title: String
     let startTime: Date
