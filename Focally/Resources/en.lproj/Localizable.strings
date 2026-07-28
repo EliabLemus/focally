@@ -225,3 +225,11 @@
 /* ========== CalendarMeetingCard ========== */
 "menubar_current_meeting" = "Current Meeting";
 "active_meeting_warning" = "You have an active meeting";
+
+/* ========== Update Alert Badge ========== */
+"update_available_badge" = "Update available";
+"update_version" = "v%@";
+
+/* ========== Update Notification ========== */
+"notification_update_title" = "New Version Available";
+"notification_update_body" = "Focally %@ is now available. Click to download.";

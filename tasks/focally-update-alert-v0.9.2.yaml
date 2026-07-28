@@ -1,0 +1,201 @@
+spec_version: "1.0"
+name: "focally-update-alert-v0.9.2"
+title: "Parche Update Alert v0.9.2 - Badge + notificación nativa"
+description: |
+  PATCH v0.9.2: Agregar alertas visuales y nativas cuando hay nueva versión disponible.
+
+  PROBLEMA:
+  - UpdateCheckerService detecta nueva versión cada 24h via GitHub API
+  - Badge existe solo en AboutSettingsView (Settings → About)
+  - No hay alerta en UI principal (MenuBarDropdownView, IdleDashboardView)
+  - No hay notificación nativa de macOS
+
+  OBJETIVO:
+  - Badge en MenuBarDropdownView (visible al abrir menú)
+  - Badge en IdleDashboardView (visible al abrir app)
+  - Notificación nativa de macOS cuando se detecta nueva versión
+
+  SCOPE (NO major features):
+  - NO cambiar lógica de UpdateCheckerService (ya funciona)
+  - Solo agregar UI badges + notificación
+
+estimated_hours: 1
+version: "0.9.2"
+branch: "main"
+base_commit: "1e1a331"
+
+files_to_modify:
+  - Focally/Views/MenuBar/MenuBarDropdownView.swift
+  - Focally/Views/Timer/IdleDashboardView.swift
+  - Focally/Services/UpdateCheckerService.swift
+
+tasks:
+  - id: "task-1"
+    title: "Agregar badge en MenuBarDropdownView"
+    description: |
+      Mostrar badge "Update available" en MenuBarDropdownView cuando hay nueva versión.
+      Badge visible al tope, antes de header o sesión actual.
+
+    steps:
+      - Abrir Focally/Views/MenuBar/MenuBarDropdownView.swift
+      - Agregar @Environment(UpdateCheckerService.self) si no existe
+      - Agregar sección "Update Available" con badge al inicio del VStack
+      - Badge debe ser clickable → abrir updateChecker.updateUrl
+
+    acceptance_criteria:
+      - Badge aparece en menú dropdown cuando updateChecker.isNewVersionAvailable == true
+      - Badge desaparece cuando isNewVersionAvailable == false
+      - Click en badge abre URL de release en navegador
+      - Layout respeta FocallySpacing y glass card pattern
+
+    files:
+      - path: Focally/Views/MenuBar/MenuBarDropdownView.swift
+        patch_after: |2
+          // MARK: - Body
+          var body: some View {
+        patch_content: |
+          // MARK: - Update Available Badge
+          if updateChecker.isNewVersionAvailable {
+            Button(action: {
+              if let url = updateChecker.updateUrl {
+                NSWorkspace.shared.open(url)
+              }
+            }) {
+              HStack(spacing: FocallySpacing.extraSmall) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                  .font(.caption2)
+                LocalizedText("update_available_badge")
+                  .font(.focallyBodyBold)
+                if let version = updateChecker.latestVersion {
+                  Text(String(format: AppLanguage.shared.localizedString("update_version"), version))
+                    .font(.focallyCaption)
+                }
+              }
+              .foregroundStyle(Color.focallyOnPrimary)
+              .padding(.horizontal, 12)
+              .padding(.vertical, 8)
+              .background(Color.focallyPrimary)
+              .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.small))
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, FocallySpacing.medium)
+            .padding(.top, FocallySpacing.medium)
+          }
+
+  - id: "task-2"
+    title: "Agregar badge en IdleDashboardView"
+    description: |
+      Mostrar badge "Update available" en IdleDashboardView cuando hay nueva versión.
+      Badge visible al tope, antes de header o FocusModeCards.
+
+    steps:
+      - Abrir Focally/Views/Timer/IdleDashboardView.swift
+      - Agregar @Environment(UpdateCheckerService.self) si no existe
+      - Agregar sección "Update Available" con badge al inicio del ScrollView
+      - Badge debe ser clickable → abrir updateChecker.updateUrl
+
+    acceptance_criteria:
+      - Badge aparece en IdleDashboard cuando updateChecker.isNewVersionAvailable == true
+      - Badge desaparece cuando isNewVersionAvailable == false
+      - Click en badge abre URL de release en navegador
+      - Layout limpio con spacing apropiado
+
+    files:
+      - path: Focally/Views/Timer/IdleDashboardView.swift
+        patch_after: |2
+          ScrollView {
+              VStack(spacing: FocallySpacing.large) {
+        patch_content: |
+          // MARK: - Update Available Badge
+          if updateChecker.isNewVersionAvailable {
+            Button(action: {
+              if let url = updateChecker.updateUrl {
+                NSWorkspace.shared.open(url)
+              }
+            }) {
+              HStack(spacing: FocallySpacing.extraSmall) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                  .font(.caption2)
+                LocalizedText("update_available_badge")
+                  .font(.focallyBodyBold)
+                if let version = updateChecker.latestVersion {
+                  Text(String(format: AppLanguage.shared.localizedString("update_version"), version))
+                    .font(.focallyCaption)
+                }
+              }
+              .foregroundStyle(Color.focallyOnPrimary)
+              .padding(.horizontal, 12)
+              .padding(.vertical, 8)
+              .background(Color.focallyPrimary)
+              .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.small))
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, FocallySpacing.medium)
+          }
+
+  - id: "task-3"
+    title: "Agregar notificación nativa en UpdateCheckerService"
+    description: |
+      Enviar notificación nativa de macOS cuando se detecte nueva versión.
+      Usar NotificationService existente.
+
+    steps:
+      - Abrir Focally/Services/UpdateCheckerService.swift
+      - Inyectar NotificationService en init (ya existe en FocusTimerService, usar mismo patrón)
+      - En checkForUpdates(), cuando isNewVersionAvailable == true, enviar notificación
+      - Notificación debe ser "update_available" (crear en NotificationService)
+
+    acceptance_criteria:
+      - Notificación nativa aparece cuando se detecta nueva versión
+      - Click en notificación abre updateChecker.updateUrl
+      - No duplicar notificaciones (ya que hay cooldown 24h)
+
+    files:
+      - path: Focally/Services/UpdateCheckerService.swift
+        patch_after: |2
+          /// Compares two semantic version strings.
+        patch_content: |
+          /// Compares two semantic version strings.
+          /// Returns .orderedDescending if lhs > rhs, .orderedAscending if lhs < rhs, .orderedSame if equal.
+          private func compareVersions(_ lhs: String, _ rhs: String) -> ComparisonResult {
+            let lhsParts = parseVersion(lhs)
+            let rhsParts = parseVersion(rhs)
+
+            let maxCount = max(lhsParts.count, rhsParts.count)
+
+            for i in 0..<maxCount {
+              let lhs = lhsParts.indices.contains(i) ? lhsParts[i] : 0
+              let rhs = rhsParts.indices.contains(i) ? rhsParts[i] : 0
+
+              if lhs < rhs { return .orderedAscending }
+              if lhs > rhs { return .orderedDescending }
+            }
+
+            return .orderedSame
+          }
+
+      - path: Focally/Services/UpdateCheckerService.swift
+        patch_in_class: |
+          private let logger = Logger.update
+          private let defaults = UserDefaults.standard
+          private let githubRepo = "EliabLemus/focally"
+          private let notificationService = NotificationService
+
+  - id: "task-4"
+    title: "Agregar tipo de notificación en NotificationService"
+    description: |
+      Crear tipo de notificación "updateAvailable" en NotificationService.
+
+    steps:
+      - Abrir Focally/Services/NotificationService.swift
+      - Agregar case a enum NotificationType
+      - Agregar mensaje localizado
+
+    acceptance_criteria:
+      - NotificationType.updateAvailable existe
+      - Mensaje localizado en EN/ES/PT
+
+    files:
+      - path: Focally/Services/NotificationService.swift
+        patch_after: |2
+          enum NotificationType:

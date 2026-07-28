@@ -5,6 +5,7 @@ struct IdleDashboardView: View {
     @Environment(FocusTimerService.self) private var timerService
     @Environment(SlackService.self) private var slackService
     @Environment(CalendarSlackIntegrationService.self) private var calendarService
+    @Environment(UpdateCheckerService.self) private var updateChecker
 
     @State private var editingMode: FocusMode?
     @State private var isAddingMode = false
@@ -12,6 +13,33 @@ struct IdleDashboardView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: FocallySpacing.large) {
+                // MARK: - Update Available Badge
+                if updateChecker.isNewVersionAvailable {
+                    Button(action: {
+                        if let url = updateChecker.updateUrl {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }) {
+                        HStack(spacing: FocallySpacing.extraSmall) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.caption2)
+                            LocalizedText("update_available_badge")
+                                .font(.focallyBodyBold)
+                            if let version = updateChecker.latestVersion {
+                                Text(String(format: AppLanguage.shared.localizedString("update_version"), version))
+                                    .font(.focallyCaption)
+                            }
+                        }
+                        .foregroundStyle(Color.focallyOnPrimary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.focallyPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.small))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, FocallySpacing.medium)
+                }
+
                 header
 
                 if let meeting = calendarService.currentMeeting {

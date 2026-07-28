@@ -13,6 +13,7 @@ final class UpdateCheckerService {
     private let logger = Logger.update
     private let defaults = UserDefaults.standard
     private let githubRepo = "EliabLemus/focally"
+    private let notificationService: NotificationService
 
     private static let lastCheckKey = "focally.updateChecker.lastCheck"
     private static let latestVersionKey = "focally.updateChecker.latestVersion"
@@ -65,7 +66,8 @@ final class UpdateCheckerService {
 
     // MARK: - Init
 
-    private init() {
+    private init(notificationService: NotificationService = NotificationService()) {
+        self.notificationService = notificationService
         lastCheckDate = defaults.object(forKey: Self.lastCheckKey) as? Date
         latestVersion = defaults.string(forKey: Self.latestVersionKey)
 
@@ -129,6 +131,7 @@ final class UpdateCheckerService {
 
                     if self.isNewVersionAvailable {
                         self.logger.info("New version available: \(version) (current: \(self.currentVersion))")
+                        self.notificationService.notify(.updateAvailable(version: version))
                     } else {
                         self.logger.info("Already on latest version: \(self.currentVersion)")
                     }

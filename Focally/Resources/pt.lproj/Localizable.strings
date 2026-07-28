@@ -225,3 +225,11 @@
 /* ========== CalendarMeetingCard ========== */
 "menubar_current_meeting" = "Reunião atual";
 "active_meeting_warning" = "Você tem uma reunião ativa";
+
+/* ========== Update Alert Badge ========== */
+"update_available_badge" = "Atualização disponível";
+"update_version" = "v%@";
+
+/* ========== Update Notification ========== */
+"notification_update_title" = "Nova Versão Disponível";
+"notification_update_body" = "Focally %@ está disponível. Clique para baixar.";
