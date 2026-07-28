@@ -122,7 +122,7 @@ struct MenuBarDropdownView: View {
 
                         Spacer()
 
-                        if mode.enableDND {
+                        if mode.enableMacOSDND {
                             Image(systemName: "moon.fill")
                                 .foregroundStyle(Color.focallyPrimary)
                         }

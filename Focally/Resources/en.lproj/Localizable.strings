@@ -84,7 +84,8 @@
 "edit_mode_break_placeholder" = "e.g. Coffee time ☕";
 "edit_mode_break_hint" = "Shown during breaks. Falls back to \"Mode Name — Break\"";
 "edit_mode_duration" = "Duration";
-"edit_mode_enable_dnd" = "Enable Do Not Disturb in Slack and macOS";
+"edit_mode_enable_macos_dnd" = "Enable macOS Do Not Disturb";
+"edit_mode_enable_slack_dnd" = "Enable Slack Do Not Disturb";
 "edit_mode_enable_pomodoro" = "Enable Pomodoro";
 "edit_mode_pomodoro_settings" = "Pomodoro settings";
 "edit_mode_work" = "Work: %d min";

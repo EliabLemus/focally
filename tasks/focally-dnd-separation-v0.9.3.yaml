@@ -1,0 +1,159 @@
+spec_version: "1.0"
+name: "focally-dnd-separation-v0.9.3"
+title: "Separar DND macOS y Slack - v0.9.3"
+description: |
+  PATCH v0.9.3: Separar control de DND nativo macOS y Slack DND en dos flags independientes.
+  PROBLEMA: enableDND unica flag controla ambos.
+  OBJETIVO: enableMacOSDND y enableSlackDND separados.
+
+estimated_hours: 1
+version: "0.9.3"
+branch: "main"
+base_commit: "f6f7763"
+
+files_to_modify:
+  - Focally/Models/FocusMode.swift
+  - Focally/Views/Timer/FocusModeEditSheet.swift
+  - Focally/Services/FocusTimerService.swift
+  - Focally/Resources/en.lproj/Localizable.strings
+  - Focally/Resources/es.lproj/Localizable.strings
+  - Focally/Resources/pt.lproj/Localizable.strings
+
+tasks:
+  - id: "task-1"
+    title: "Separar enableDND en FocusMode model"
+    description: |
+      Reemplazar enableDND con enableMacOSDND y enableSlackDND.
+      Actualizar struct, init, CodingKeys, decoder, sanitized() y builtInModes.
+
+    files:
+      - path: Focally/Models/FocusMode.swift
+        patch_before_var: |
+          var enableDND: Bool
+          var enablePomodoro: Bool
+        patch_after_var: |
+          var enableMacOSDND: Bool
+          var enableSlackDND: Bool
+          var enablePomodoro: Bool
+        patch_before_init_param: |
+          enableDND: Bool = false,
+          enablePomodoro: Bool = false,
+        patch_after_init_param: |
+          enableMacOSDND: Bool = false,
+          enableSlackDND: Bool = false,
+          enablePomodoro: Bool = false,
+        patch_before_init_assign: |
+          self.enableDND = enableDND
+        patch_after_init_assign: |
+          self.enableMacOSDND = enableMacOSDND
+          self.enableSlackDND = enableSlackDND
+        patch_before_codingkeys: |
+          case id, name, emoji, statusText, durationMinutes, enableDND, enablePomodoro
+        patch_after_codingkeys: |
+          case id, name, emoji, statusText, durationMinutes, enableMacOSDND, enableSlackDND, enablePomodoro
+        patch_before_decode: |
+          enableDND = try c.decodeIfPresent(Bool.self, forKey: .enableDND) ?? false
+          enablePomodoro = try c.decodeIfPresent(Bool.self, forKey: .enablePomodoro) ?? false
+        patch_after_decode: |
+          enableMacOSDND = try c.decodeIfPresent(Bool.self, forKey: .enableMacOSDND) ?? false
+          enableSlackDND = try c.decodeIfPresent(Bool.self, forKey: .enableSlackDND) ?? false
+          enablePomodoro = try c.decodeIfPresent(Bool.self, forKey: .enablePomodoro) ?? false
+        patch_before_sanitize: |
+          enableDND: enableDND,
+          enablePomodoro: enableDND && enablePomodoro,
+        patch_after_sanitize: |
+          enableMacOSDND: enableMacOSDND,
+          enableSlackDND: enableSlackDND,
+          enablePomodoro: enableMacOSDND && enablePomodoro,
+        patch_before_builtin_focustime: |
+          enableDND: true,
+          enablePomodoro: true,
+        patch_after_builtin_focustime: |
+          enableMacOSDND: true,
+          enableSlackDND: true,
+          enablePomodoro: true,
+        patch_before_builtin_meeting: |
+          enableDND: false,
+          enablePomodoro: false,
+        patch_after_builtin_meeting: |
+          enableMacOSDND: false,
+          enableSlackDND: false,
+          enablePomodoro: false,
+        patch_before_builtin_inbox: |
+          enableDND: false,
+          enablePomodoro: false,
+        patch_after_builtin_inbox: |
+          enableMacOSDND: false,
+          enableSlackDND: false,
+          enablePomodoro: false,
+
+  - id: "task-2"
+    title: "Actualizar UI - dos toggles separados"
+    description: |
+      Reemplazar toggle unico con dos toggles:
+      1. Toggle enableMacOSDND con label "settings_enable_macos_dnd"
+      2. Toggle enableSlackDND con label "settings_enable_slack_dnd"
+
+    files:
+      - path: Focally/Views/Timer/FocusModeEditSheet.swift
+        patch_before: |
+          Toggle(isOn: $editingMode.enableDND) {
+              LocalizedText("settings_enable_dnd")
+          }
+        patch_after: |
+          Toggle(isOn: $editingMode.enableMacOSDND) {
+              LocalizedText("settings_enable_macos_dnd")
+          }
+
+          Toggle(isOn: $editingMode.enableSlackDND) {
+              LocalizedText("settings_enable_slack_dnd")
+          }
+
+  - id: "task-3"
+    title: "Actualizar FocusTimerService lógica"
+    description: |
+      Activar DND nativo solo si mode.enableMacOSDND.
+      Activar Slack DND solo si mode.enableSlackDND.
+      Mismo patrón para deactivate.
+
+    files:
+      - path: Focally/Services/FocusTimerService.swift
+        patch_before_activate: |
+          DNDService.shared.activateDND()
+        patch_after_activate: |
+          if mode.enableMacOSDND {
+              DNDService.shared.activateDND()
+          }
+
+          if mode.enableSlackDND {
+              slackService.setSlackDNDSnooze(minutes: mode.durationMinutes)
+          }
+        patch_before_deactivate: |
+          DNDService.shared.deactivateDND()
+          slackService.disableSlackDND()
+        patch_after_deactivate: |
+          if mode.enableMacOSDND {
+              DNDService.shared.deactivateDND()
+          }
+
+          if mode.enableSlackDND {
+              slackService.disableSlackDND()
+          }
+
+  - id: "task-4"
+    title: "Agregar localización strings"
+    description: Agregar keys para nuevos toggles en EN/ES/PT
+
+    files:
+      - path: Focally/Resources/en.lproj/Localizable.strings
+        add_keys: |
+          "settings_enable_macos_dnd" = "Enable macOS DND";
+          "settings_enable_slack_dnd" = "Enable Slack DND";
+      - path: Focally/Resources/es.lproj/Localizable.strings
+        add_keys: |
+          "settings_enable_macos_dnd" = "Activar DND de macOS";
+          "settings_enable_slack_dnd" = "Activar DND de Slack";
+      - path: Focally/Resources/pt.lproj/Localizable.strings
+        add_keys: |
+          "settings_enable_macos_dnd" = "Ativar DND do macOS";
+          "settings_enable_slack_dnd" = "Ativar DND do Slack";

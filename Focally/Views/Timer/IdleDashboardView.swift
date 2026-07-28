@@ -85,7 +85,7 @@ struct IdleDashboardView: View {
             .environment(slackService)
         }
         .sheet(isPresented: $isAddingMode) {
-            FocusModeEditSheet(mode: FocusMode(id: UUID(), name: "", emoji: ":rocket:", statusText: "", durationMinutes: 25, enableDND: true, enablePomodoro: false, pomodoroWorkMinutes: 25, pomodoroBreakMinutes: 5, pomodoroLongBreakMinutes: 15, pomodoroRounds: 1), onSave: { newMode in
+            FocusModeEditSheet(mode: FocusMode(id: UUID(), name: "", emoji: ":rocket:", statusText: "", durationMinutes: 25, enableMacOSDND: true, enableSlackDND: true, enablePomodoro: false, pomodoroWorkMinutes: 25, pomodoroBreakMinutes: 5, pomodoroLongBreakMinutes: 15, pomodoroRounds: 1), onSave: { newMode in
                 focusModeStore.add(newMode)
             })
             .environment(slackService)

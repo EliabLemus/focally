@@ -458,8 +458,12 @@ struct FocusModeEditSheet: View {
                         .foregroundStyle(Color.focallyOnSurface)
 
                     VStack(alignment: .leading, spacing: 18) {
-                        // DND Toggle (independent)
-                        Toggle("edit_mode_enable_dnd", isOn: $draftMode.enableDND)
+                        // macOS DND Toggle (independent)
+                        Toggle("edit_mode_enable_macos_dnd", isOn: $draftMode.enableMacOSDND)
+                            .font(.focallyBody)
+
+                        // Slack DND Toggle (independent)
+                        Toggle("edit_mode_enable_slack_dnd", isOn: $draftMode.enableSlackDND)
                             .font(.focallyBody)
 
                         // Pomodoro Toggle (independent)

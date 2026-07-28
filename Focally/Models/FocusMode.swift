@@ -17,6 +17,11 @@ enum FocusModeType: String, Codable, CaseIterable {
     }
 }
 
+/// Private CodingKeys for backward-compatible decoding of the pre-0.9.3 "enableDND" field.
+private enum LegacyDNDKey: String, CodingKey {
+    case enableDND
+}
+
 struct FocusMode: Identifiable, Codable, Equatable {
     static let defaultsKey = "focusModes"
 
@@ -29,7 +34,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
     var emoji: String
     var statusText: String
     var durationMinutes: Int
-    var enableDND: Bool
+    var enableMacOSDND: Bool
+    var enableSlackDND: Bool
     var enablePomodoro: Bool
     var pomodoroWorkMinutes: Int
     var pomodoroBreakMinutes: Int
@@ -43,7 +49,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
          emoji: String = ":brain:",
          statusText: String = "",
          durationMinutes: Int = 25,
-         enableDND: Bool = false,
+         enableMacOSDND: Bool = false,
+         enableSlackDND: Bool = false,
          enablePomodoro: Bool = false,
          pomodoroWorkMinutes: Int = 25,
          pomodoroBreakMinutes: Int = 5,
@@ -56,7 +63,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
         self.emoji = emoji
         self.statusText = statusText
         self.durationMinutes = durationMinutes
-        self.enableDND = enableDND
+        self.enableMacOSDND = enableMacOSDND
+        self.enableSlackDND = enableSlackDND
         self.enablePomodoro = enablePomodoro
         self.pomodoroWorkMinutes = pomodoroWorkMinutes
         self.pomodoroBreakMinutes = pomodoroBreakMinutes
@@ -67,7 +75,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, emoji, statusText, durationMinutes, enableDND, enablePomodoro
+        case id, name, emoji, statusText, durationMinutes, enableMacOSDND, enableSlackDND, enablePomodoro
         case pomodoroWorkMinutes, pomodoroBreakMinutes, pomodoroLongBreakMinutes, pomodoroRounds
         case breakLabel, type
     }
@@ -79,7 +87,13 @@ struct FocusMode: Identifiable, Codable, Equatable {
         emoji = try c.decodeIfPresent(String.self, forKey: .emoji) ?? ":brain:"
         statusText = try c.decodeIfPresent(String.self, forKey: .statusText) ?? ""
         durationMinutes = try c.decodeIfPresent(Int.self, forKey: .durationMinutes) ?? 25
-        enableDND = try c.decodeIfPresent(Bool.self, forKey: .enableDND) ?? false
+
+        // Decode new keys; fall back to legacy "enableDND" if absent (backward compat <0.9.3)
+        let legacyContainer = try decoder.container(keyedBy: LegacyDNDKey.self)
+        let legacyDND = try legacyContainer.decodeIfPresent(Bool.self, forKey: .enableDND)
+        enableMacOSDND = try c.decodeIfPresent(Bool.self, forKey: .enableMacOSDND) ?? legacyDND ?? false
+        enableSlackDND = try c.decodeIfPresent(Bool.self, forKey: .enableSlackDND) ?? legacyDND ?? false
+
         enablePomodoro = try c.decodeIfPresent(Bool.self, forKey: .enablePomodoro) ?? false
         pomodoroWorkMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroWorkMinutes) ?? 25
         pomodoroBreakMinutes = try c.decodeIfPresent(Int.self, forKey: .pomodoroBreakMinutes) ?? 5
@@ -102,7 +116,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             emoji: ":brain:",
             statusText: "In focus mode",
             durationMinutes: 25,
-            enableDND: true,
+            enableMacOSDND: true,
+            enableSlackDND: true,
             enablePomodoro: true,
             pomodoroWorkMinutes: 25,
             pomodoroBreakMinutes: 5,
@@ -116,7 +131,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             emoji: ":calendar:",
             statusText: "In a meeting",
             durationMinutes: 30,
-            enableDND: false,
+            enableMacOSDND: false,
+            enableSlackDND: false,
             enablePomodoro: false,
             pomodoroWorkMinutes: 30,
             pomodoroBreakMinutes: 5,
@@ -130,7 +146,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             emoji: ":email:",
             statusText: "Clearing inbox",
             durationMinutes: 15,
-            enableDND: false,
+            enableMacOSDND: false,
+            enableSlackDND: false,
             enablePomodoro: false,
             pomodoroWorkMinutes: 15,
             pomodoroBreakMinutes: 5,
@@ -201,8 +218,9 @@ struct FocusMode: Identifiable, Codable, Equatable {
             emoji: emoji.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? ":brain:" : emoji.trimmingCharacters(in: .whitespacesAndNewlines),
             statusText: trimmedStatus.isEmpty ? effectiveName : trimmedStatus,
             durationMinutes: sanitizedDurationMinutes,
-            enableDND: enableDND,
-            enablePomodoro: enableDND && enablePomodoro,
+            enableMacOSDND: enableMacOSDND,
+            enableSlackDND: enableSlackDND,
+            enablePomodoro: enableMacOSDND && enablePomodoro,
             pomodoroWorkMinutes: sanitizedPomodoroWorkMinutes,
             pomodoroBreakMinutes: sanitizedPomodoroBreakMinutes,
             pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,
@@ -244,7 +262,7 @@ final class FocusModeStore {
     func add(_ mode: FocusMode) {
         var newMode = mode.sanitized()
         if newMode.id == UUID() {
-            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableDND: newMode.enableDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel)
+            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableMacOSDND: newMode.enableMacOSDND, enableSlackDND: newMode.enableSlackDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel)
         }
         modes.append(newMode)
         modes = Self.orderedModes(from: modes)

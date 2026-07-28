@@ -770,7 +770,7 @@
 				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 75;
+				CURRENT_PROJECT_VERSION = 76;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Focally/Info.plist;
@@ -778,7 +778,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.3;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.Focally;
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;
@@ -829,7 +829,7 @@
 				CODE_SIGN_ENTITLEMENTS = Focally/Focally.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 75;
+				CURRENT_PROJECT_VERSION = 76;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Focally/Info.plist;
@@ -837,7 +837,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.3;
 				PRODUCT_BUNDLE_IDENTIFIER = app.focally.Focally;
 				PRODUCT_BUNDLE_NAME = Focally;
 				SDKROOT = macosx;

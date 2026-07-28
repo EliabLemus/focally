@@ -84,7 +84,8 @@
 "edit_mode_break_placeholder" = "ex. Café ☕";
 "edit_mode_break_hint" = "Exibido durante as pausas. Usa \"Nome do Modo — Pausa\" como padrão";
 "edit_mode_duration" = "Duração";
-"edit_mode_enable_dnd" = "Ativar Não Perturbar no Slack e macOS";
+"edit_mode_enable_macos_dnd" = "Ativar Não Perturbar do macOS";
+"edit_mode_enable_slack_dnd" = "Ativar Não Perturbar do Slack";
 "edit_mode_enable_pomodoro" = "Ativar Pomodoro";
 "edit_mode_pomodoro_settings" = "Configurações Pomodoro";
 "edit_mode_work" = "Trabalho: %d min";

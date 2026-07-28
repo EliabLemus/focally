@@ -102,7 +102,7 @@ final class FocusIntegrationService {
     private func performDirectFocusAction(_ action: FocusIntegrationAction, mode: FocusMode?) {
         guard isEnabled else { return }
 
-        let shouldToggleDND = mode?.enableDND == true
+        let shouldToggleDND = mode?.enableMacOSDND == true
         switch action {
         case .start:
             guard shouldToggleDND else {
@@ -144,12 +144,12 @@ final class FocusIntegrationService {
                 taskEmoji: mode.emoji,
                 fallbackEmoji: slackService.savedStatusEmoji()
             )
-            if mode.enableDND {
+            if mode.enableSlackDND {
                 slackService.setSlackDNDSnooze(minutes: mode.sanitizedDurationMinutes)
             }
         case .end:
             slackService.clearStatus()
-            if mode?.enableDND == true {
+            if mode?.enableSlackDND == true {
                 slackService.disableSlackDND()
             }
         }

@@ -84,7 +84,8 @@
 "edit_mode_break_placeholder" = "ej. Café ☕";
 "edit_mode_break_hint" = "Se muestra durante los descansos. Por defecto usa \"Nombre del Modo — Descanso\"";
 "edit_mode_duration" = "Duración";
-"edit_mode_enable_dnd" = "Activar No Molestar en Slack y macOS";
+"edit_mode_enable_macos_dnd" = "Activar No Molestar de macOS";
+"edit_mode_enable_slack_dnd" = "Activar No Molestar de Slack";
 "edit_mode_enable_pomodoro" = "Activar Pomodoro";
 "edit_mode_pomodoro_settings" = "Configuración Pomodoro";
 "edit_mode_work" = "Trabajo: %d min";
