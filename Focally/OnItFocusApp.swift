@@ -531,10 +531,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if response == .alertFirstButtonReturn {
             openMainWindow()
             // Esperar un momento y luego abrir settings
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 NotificationCenter.default.post(name: .focusNavigateToSettings, object: nil)
             }
         }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        logger.info("Application terminating - forcing cleanup of active sessions and focus integration")
+
+        // Reset any active timer session to ensure DND is deactivated
+        if timerService.isActive {
+            logger.info("Terminating active timer session")
+            timerService.resetToIdle()
+        }
+
+        // Explicitly deactivate focus integration (macOS DND + Slack)
+        focusIntegrationService.deactivateFocus()
     }
 }
 
