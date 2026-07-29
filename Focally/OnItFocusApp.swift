@@ -323,7 +323,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.image = composite
             button.title = "  \(timerService.currentActivity)"
         } else {
-            button.image = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
+            let timerIcon = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
+            timerIcon?.isTemplate = true
+            // Set appropriate size for status bar (menu bar icons are typically 16-20px)
+            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+            button.image = timerIcon?.withSymbolConfiguration(config)
             button.title = ""
         }
 
