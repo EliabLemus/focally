@@ -8,6 +8,7 @@ struct FocusModeEditSheet: View {
     @State private var draftMode: FocusMode
     @State private var localPreviewURL: URL?
     @State private var showEmojiPicker = false
+    @State private var showAddTypeSheet = false
     @State private var recentEmojis: [String] = []
     @State private var searchResults: [(shortcode: String, emoji: String)] = []
     let onSave: (FocusMode) -> Void
@@ -87,14 +88,32 @@ struct FocusModeEditSheet: View {
                             LocalizedText("edit_mode_type")
                                 .font(.focallyBodyBold)
 
-                            Picker(AppLanguage.shared.localizedString("edit_mode_type_placeholder"), selection: $draftMode.type) {
-                                ForEach(FocusModeType.allCases, id: \.self) { type in
-                                    Text(AppLanguage.shared.localizedString(type.localizedLabel))
-                                        .tag(type)
+                            Picker(AppLanguage.shared.localizedString("focus_mode_type_picker"), selection: $draftMode.typeDescriptor) {
+                                ForEach(FocusTypesService.shared.getAllDescriptors()) { descriptor in
+                                    HStack(spacing: FocallySpacing.extraSmall) {
+                                        if !descriptor.emoji.isEmpty {
+                                            Text(descriptor.emoji)
+                                        }
+                                        Text(descriptor.name)
+                                    }
+                                    .tag(descriptor)
                                 }
                             }
                             .pickerStyle(.menu)
                             .buttonStyle(.plain)
+                            .accessibilityLabel(
+                                AppLanguage.shared.localizedString("focus_mode_type_picker")
+                            )
+
+                            Button {
+                                showAddTypeSheet = true
+                            } label: {
+                                Label("focus_types_add_new", systemImage: "plus")
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(
+                                AppLanguage.shared.localizedString("focus_types_add_new")
+                            )
                         }
 
                         // MARK: Mode Emoji
@@ -516,6 +535,9 @@ struct FocusModeEditSheet: View {
         .background(Color.focallyBackground)
         .onTapGesture {
             closeAllPickers()
+        }
+        .sheet(isPresented: $showAddTypeSheet) {
+            AddFocusTypeSheet()
         }
     }
 

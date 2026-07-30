@@ -96,27 +96,16 @@ struct MonthlyMetricsView: View {
                         title: "metrics_total_focus_time",
                         value: metrics.totalFocusTimeFormatted
                     )
-                    MetricCard(
-                        icon: "brain.head.profile.fill",
-                        title: "metrics_focus_time_type",
-                        value: metrics.focusTimeDurationFormatted
-                    )
-                    MetricCard(
-                        icon: "person.2.fill",
-                        title: "metrics_meeting_type",
-                        value: metrics.meetingDurationFormatted
-                    )
-                    MetricCard(
-                        icon: "tray.fill",
-                        title: "metrics_inbox_type",
-                        value: metrics.inboxDurationFormatted
-                    )
-                    MetricCard(
-                        icon: "star.fill",
-                        title: "metrics_custom_type",
-                        value: metrics.customDurationFormatted
-                    )
                 }
+
+                FocusTypeBreakdownGrid(
+                    focusTimeDuration: metrics.focusTimeDuration,
+                    meetingDuration: metrics.meetingDuration,
+                    inboxDuration: metrics.inboxDuration,
+                    customDuration: metrics.customDuration,
+                    customTypeDurations: metrics.customTypeDurations,
+                    calendarVideoCallDuration: metrics.calendarVideoCallDuration
+                )
 
                 // Export CSV placeholder (v0.10.0)
                 HStack(spacing: FocallySpacing.small) {

@@ -12,6 +12,8 @@ struct DailyMetrics: Codable, Equatable {
     let meetingDuration: TimeInterval
     let inboxDuration: TimeInterval
     let customDuration: TimeInterval
+    let customTypeDurations: [UUID: TimeInterval]
+    let calendarVideoCallDuration: TimeInterval
 
     var meetingTimeFormatted: String {
         Self.formatDuration(meetingTime)
@@ -37,6 +39,22 @@ struct DailyMetrics: Codable, Equatable {
         Self.formatDuration(customDuration)
     }
 
+    func durationForType(_ descriptor: FocusTypeDescriptor) -> TimeInterval {
+        switch descriptor {
+        case .builtIn(let type):
+            switch type {
+            case .focusTime: return focusTimeDuration
+            case .meeting: return meetingDuration
+            case .inbox: return inboxDuration
+            case .custom: return customDuration
+            case .calendarVideoCall: return calendarVideoCallDuration
+            case .userCustom: return 0
+            }
+        case .custom(let type):
+            return customTypeDurations[type.id, default: 0]
+        }
+    }
+
     static func formatDuration(_ seconds: TimeInterval) -> String {
         let hours = Int(seconds) / 3600
         let minutes = (Int(seconds) % 3600) / 60
@@ -57,6 +75,8 @@ struct WeeklyMetrics: Codable, Equatable {
     let meetingDuration: TimeInterval
     let inboxDuration: TimeInterval
     let customDuration: TimeInterval
+    let customTypeDurations: [UUID: TimeInterval]
+    let calendarVideoCallDuration: TimeInterval
 
     var meetingTimeFormatted: String { DailyMetrics.formatDuration(meetingTime) }
     var totalFocusTimeFormatted: String { DailyMetrics.formatDuration(totalFocusTime) }
@@ -70,6 +90,22 @@ struct WeeklyMetrics: Codable, Equatable {
     var avgDailyFocusTimeFormatted: String {
         DailyMetrics.formatDuration(avgDailyFocusTime)
     }
+
+    func durationForType(_ descriptor: FocusTypeDescriptor) -> TimeInterval {
+        switch descriptor {
+        case .builtIn(let type):
+            switch type {
+            case .focusTime: return focusTimeDuration
+            case .meeting: return meetingDuration
+            case .inbox: return inboxDuration
+            case .custom: return customDuration
+            case .calendarVideoCall: return calendarVideoCallDuration
+            case .userCustom: return 0
+            }
+        case .custom(let type):
+            return customTypeDurations[type.id, default: 0]
+        }
+    }
 }
 
 struct MonthlyMetrics: Codable, Equatable {
@@ -82,6 +118,8 @@ struct MonthlyMetrics: Codable, Equatable {
     let meetingDuration: TimeInterval
     let inboxDuration: TimeInterval
     let customDuration: TimeInterval
+    let customTypeDurations: [UUID: TimeInterval]
+    let calendarVideoCallDuration: TimeInterval
 
     var meetingTimeFormatted: String { DailyMetrics.formatDuration(meetingTime) }
     var totalFocusTimeFormatted: String { DailyMetrics.formatDuration(totalFocusTime) }
@@ -89,6 +127,22 @@ struct MonthlyMetrics: Codable, Equatable {
     var meetingDurationFormatted: String { DailyMetrics.formatDuration(meetingDuration) }
     var inboxDurationFormatted: String { DailyMetrics.formatDuration(inboxDuration) }
     var customDurationFormatted: String { DailyMetrics.formatDuration(customDuration) }
+
+    func durationForType(_ descriptor: FocusTypeDescriptor) -> TimeInterval {
+        switch descriptor {
+        case .builtIn(let type):
+            switch type {
+            case .focusTime: return focusTimeDuration
+            case .meeting: return meetingDuration
+            case .inbox: return inboxDuration
+            case .custom: return customDuration
+            case .calendarVideoCall: return calendarVideoCallDuration
+            case .userCustom: return 0
+            }
+        case .custom(let type):
+            return customTypeDurations[type.id, default: 0]
+        }
+    }
 }
 
 private struct ModeTypeBreakdown {
@@ -96,6 +150,8 @@ private struct ModeTypeBreakdown {
     let meetingDuration: TimeInterval
     let inboxDuration: TimeInterval
     let customDuration: TimeInterval
+    let calendarVideoCallDuration: TimeInterval
+    let customTypeDurations: [UUID: TimeInterval]
 }
 
 // MARK: - FocusMetricsService
@@ -161,7 +217,9 @@ final class FocusMetricsService {
             focusTimeDuration: breakdown.focusTimeDuration,
             meetingDuration: breakdown.meetingDuration,
             inboxDuration: breakdown.inboxDuration,
-            customDuration: breakdown.customDuration
+            customDuration: breakdown.customDuration,
+            customTypeDurations: breakdown.customTypeDurations,
+            calendarVideoCallDuration: breakdown.calendarVideoCallDuration
         )
     }
 
@@ -310,7 +368,9 @@ final class FocusMetricsService {
             focusTimeDuration: breakdown.focusTimeDuration,
             meetingDuration: breakdown.meetingDuration,
             inboxDuration: breakdown.inboxDuration,
-            customDuration: breakdown.customDuration
+            customDuration: breakdown.customDuration,
+            customTypeDurations: breakdown.customTypeDurations,
+            calendarVideoCallDuration: breakdown.calendarVideoCallDuration
         )
     }
 
@@ -342,16 +402,46 @@ final class FocusMetricsService {
             focusTimeDuration: breakdown.focusTimeDuration,
             meetingDuration: breakdown.meetingDuration,
             inboxDuration: breakdown.inboxDuration,
-            customDuration: breakdown.customDuration
+            customDuration: breakdown.customDuration,
+            customTypeDurations: breakdown.customTypeDurations,
+            calendarVideoCallDuration: breakdown.calendarVideoCallDuration
         )
     }
 
     private func modeTypeBreakdown(for records: [FocusSessionRecord]) -> ModeTypeBreakdown {
-        ModeTypeBreakdown(
-            focusTimeDuration: records.filter { $0.modeType == .focusTime }.reduce(0) { $0 + $1.duration },
-            meetingDuration: records.filter { $0.modeType == .meeting }.reduce(0) { $0 + $1.duration },
-            inboxDuration: records.filter { $0.modeType == .inbox }.reduce(0) { $0 + $1.duration },
-            customDuration: records.filter { $0.modeType == .custom }.reduce(0) { $0 + $1.duration }
+        var focusTime: TimeInterval = 0
+        var meeting: TimeInterval = 0
+        var inbox: TimeInterval = 0
+        var custom: TimeInterval = 0
+        var calendarVideoCall: TimeInterval = 0
+        var customTypes: [UUID: TimeInterval] = [:]
+
+        for record in records {
+            let descriptor = FocusModeStore.typeDescriptor(forModeID: record.modeID)
+                ?? .builtIn(record.modeType)
+
+            switch descriptor {
+            case .builtIn(let type):
+                switch type {
+                case .focusTime: focusTime += record.duration
+                case .meeting: meeting += record.duration
+                case .inbox: inbox += record.duration
+                case .custom: custom += record.duration
+                case .calendarVideoCall: calendarVideoCall += record.duration
+                case .userCustom: break
+                }
+            case .custom(let type):
+                customTypes[type.id, default: 0] += record.duration
+            }
+        }
+
+        return ModeTypeBreakdown(
+            focusTimeDuration: focusTime,
+            meetingDuration: meeting,
+            inboxDuration: inbox,
+            customDuration: custom,
+            calendarVideoCallDuration: calendarVideoCall,
+            customTypeDurations: customTypes
         )
     }
 }

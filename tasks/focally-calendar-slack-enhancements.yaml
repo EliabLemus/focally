@@ -1,0 +1,238 @@
+name: focally-calendar-slack-enhancements
+description: Parche Focally control calendario Slack deteccion video calls
+priority: high
+estimated_hours: 8
+
+# Parche Focally Calendar Slack Enhancements v0.9.4
+
+## Resumen
+Dar control total al usuario sobre informacion del calendario en Slack.
+Control de mostrar titulo de eventos por FocusMode.
+Deteccion automatica de video calls con DND opcional.
+Extraccion de emojis del titulo del evento para status Slack.
+Configuracion global de Slack para calendar integration.
+
+## Requerimientos funcionales
+
+### 1. Control de mostrar titulo por FocusMode
+
+Nuevo enum CalendarTitleDisplay.
+  - showFullTitle titulo completo de la reunion.
+  - showVideoCallOnly solo En video llamada.
+  - hideTitle no mostrar titulo.
+
+UI en FocusModeEditSheet.
+  Section Calendario con Picker para las 3 opciones.
+
+Logica.
+  - showFullTitle usa titulo completo del evento de EventKit.
+  - showVideoCallOnly muestra En video llamada si es video call y En reunion si no.
+  - hideTitle solo muestra emoji sin texto de titulo.
+
+### 2. Deteccion de video calls y DND opcional
+
+Nuevo servicio CalendarEventAnalyzer.
+  - analyzeMeetingType event detecta tipo de reunion.
+  - isVideoCall event boolean si es video call.
+
+Criterios de deteccion prioridad.
+  - 1. EventKit location contiene URL de video call.
+  - 2. EventKit URL property.
+  - 3. Keywords en titulo meet zoom call video teams meet.
+
+Nuevo toggle global en Slack settings.
+  - activateDNDForVideoCalls Bool false.
+
+UI en Slack Settings.
+  Section Calendario con Toggle Activar DND para video calls.
+
+Logica de DND.
+  - Si activateDNDForVideoCalls es true.
+    - Detectar evento activo al iniciar sesion.
+    - Si isVideoCall es true activar DND.
+    - Si evento termina desactivar DND.
+  - Si activateDNDForVideoCalls es false.
+    - Comportamiento actual DND controlado por FocusMode.
+
+### 3. Emojis del evento de calendario
+
+Nuevo servicio EmojiExtractor.
+  - extractAllEmojis from String String array.
+  - concatenate emojis String array String.
+
+Logica.
+  - Parsear texto buscando emojis Unicode.
+  - Mantener orden de aparicion.
+  - NO extraer emojis de Discord solo Unicode.
+
+Comportamiento.
+  - Evento con emojis multiple extrae todos.
+  - Evento sin emojis resultado vacio.
+  - Evento con un emoji extrae ese emoji.
+
+Nuevo toggle global en Slack settings.
+  - useEventEmojisForStatus Bool false.
+
+UI en Slack Settings.
+  Section Calendario con Toggle Usar emojis del evento.
+
+Logica de emoji en status.
+  - Si useEventEmojisForStatus es true.
+    - Extraer emojis del evento.
+    - Si emojis isEmpty NO mostrar emoji status sin emoji.
+    - Si emojis isNotEmpty usar emojis concatenados como emoji de status.
+  - Si useEventEmojisForStatus es false.
+    - Comportamiento actual usar emoji del FocusMode.
+
+### 4. Configuracion global Slack
+
+Nueva seccion en Slack Settings.
+  - Calendario.
+    - Toggle Mostrar titulo del evento.
+    - Toggle Activar DND para video calls.
+    - Toggle Usar emojis del evento.
+
+Nuevo modelo SlackCalendarSettings.
+  - showEventTitle Bool false.
+  - activateDNDForVideoCalls Bool false.
+  - useEventEmojisForStatus Bool false.
+
+### 5. Comportamiento default
+
+Sin configuracion nueva.
+  - Mostrar emoji del FocusMode y En reunion.
+  - Sin deteccion de video calls.
+  - Sin emojis del evento.
+
+Con configuracion.
+  - Respetar los toggles globales.
+  - Per FocusMode control de mostrar titulo.
+
+## Arquitectura tecnica
+
+### Nuevos archivos
+
+Focally Services CalendarEventAnalyzer.swift.
+Focally Services EmojiExtractor.swift.
+Focally Services SlackCalendarService.swift.
+Focally Models FocusMode.swift modificar.
+Focally Views Settings SlackSettingsView.swift modificar.
+Focally Resources en lproj Localizable.strings modificar.
+Focally Resources es lproj Localizable.strings modificar.
+Focally Resources pt lproj Localizable.strings modificar.
+
+### Modificaciones a modelos
+
+FocusMode.
+  - Agregar campo calendarTitleDisplay CalendarTitleDisplay hideTitle.
+  - Enum CalendarTitleDisplay con 3 casos.
+
+SlackSettings.
+  - Agregar campo calendarSettings SlackCalendarSettings SlackCalendarSettings.
+
+### UI Changes
+
+FocusModeEditSheet.
+  - Agregar Section Calendario con Picker para calendarTitleDisplay.
+
+SlackSettingsView.
+  - Agregar Section Calendario con 3 toggles.
+    - Mostrar titulo del evento.
+    - Activar DND para video calls.
+    - Usar emojis del evento.
+
+### Localization
+
+Keys a agregar EN ES PT.
+  - calendar_title_display_full.
+  - calendar_title_display_video.
+  - calendar_title_display_hide.
+  - calendar_section_header.
+  - show_event_title.
+  - activate_dnd_video_calls.
+  - use_event_emojis.
+  - use_event_emojis_help.
+  - in_video_call.
+  - in_meeting.
+
+## Test cases
+
+### Test 1 Video call detection
+  - Evento Team Standup zoom link isVideoCall es true.
+  - Evento In-person meeting isVideoCall es false.
+  - Evento 1:1 Video Review isVideoCall es true.
+
+### Test 2 Emoji extraction
+  - Evento con emojis extrae correctamente.
+  - Evento sin emojis vacio.
+  - Evento con un emoji extrae ese emoji.
+
+### Test 3 Title display behavior
+  - showFullTitle muestra titulo completo.
+  - showVideoCallOnly video call muestra En video llamada.
+  - showVideoCallOnly in-person muestra En reunion.
+  - hideTitle nil.
+
+### Test 4 DND activation
+  - activateDNDForVideoCalls es true y video call DND activado.
+  - activateDNDForVideoCalls es true e in-person DND NO activado.
+  - activateDNDForVideoCalls es false comportamiento actual.
+
+## Migration plan
+
+Backward compatibility.
+  - calendarTitleDisplay default hideTitle no title.
+  - calendarSettings defaults all false comportamiento actual.
+
+No requiere migration code defaults preservan comportamiento actual.
+
+## Security and Privacy considerations
+
+  - EventKit permissions ya implementadas.
+  - Solo lectura de eventos no modificacion.
+  - URLs solo para deteccion no se envian a Slack.
+
+## Dependencies
+
+  - EventKit ya existente.
+  - Sin dependencias externas nuevas.
+
+## Performance considerations
+
+  - Emoji extraction O n donde n es length of title tipico menos 100 chars.
+  - Video call detection O 1 checks.
+  - Calendar polling sin cambios.
+
+## Rollback plan
+
+Si hay bugs criticos.
+  - Deshabilitar toggles nuevos default a false.
+  - Revertir comportamiento actual en FocusTimerService.
+  - Hotfix release v0.9.4.1.
+
+## Definition of Done
+
+  - Todos los nuevos archivos creados.
+  - Modelos actualizados con backward compatibility.
+  - UI agregada en FocusModeEditSheet y SlackSettingsView.
+  - Localizaciones EN ES PT completas.
+  - Test cases unitarios pasando.
+  - Integration test Evento con video call detectado correctamente.
+  - Integration test Emojis extraidos correctamente.
+  - Integration test Status en Slack muestra configuracion correcta.
+  - No regresiones en comportamiento existente.
+  - Build exitoso en Release.
+  - DMG generado.
+  - Release v0.9.4 publicado.
+
+## Notes
+
+  - Los emojis de Discord NO se extraen solo Unicode.
+  - Si el evento no tiene emojis y useEventEmojisForStatus es true no se muestra emoji no fallback.
+  - La deteccion de video calls es best effort puede tener falsos positivos negativos.
+  - Los settings globales de Slack se aplican a todos los eventos independientemente del FocusMode.
+
+## Questions remaining
+
+1. DND para video calls debe activar DND de macOS tambien o solo Slack?
+2. Que pasa si hay multiples eventos superpuestos en el calendario?

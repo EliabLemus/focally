@@ -61,12 +61,16 @@ struct DailyMetricsView: View {
                         title: "metrics_total_focus_time",
                         value: metrics.totalFocusTimeFormatted
                     )
-                    MetricCard(
-                        icon: "brain.head.profile.fill",
-                        title: "metrics_focus_time_type",
-                        value: metrics.focusTimeDurationFormatted
-                    )
                 }
+
+                FocusTypeBreakdownGrid(
+                    focusTimeDuration: metrics.focusTimeDuration,
+                    meetingDuration: metrics.meetingDuration,
+                    inboxDuration: metrics.inboxDuration,
+                    customDuration: metrics.customDuration,
+                    customTypeDurations: metrics.customTypeDurations,
+                    calendarVideoCallDuration: metrics.calendarVideoCallDuration
+                )
             } else {
                 // Empty state
                 VStack(spacing: FocallySpacing.medium) {
@@ -92,6 +96,77 @@ struct DailyMetricsView: View {
     }
 }
 
+// MARK: - Focus Type Breakdown
+
+struct FocusTypeBreakdownGrid: View {
+    let focusTimeDuration: TimeInterval
+    let meetingDuration: TimeInterval
+    let inboxDuration: TimeInterval
+    let customDuration: TimeInterval
+    let customTypeDurations: [UUID: TimeInterval]
+    let calendarVideoCallDuration: TimeInterval
+
+    private let columns = [
+        GridItem(.flexible(), spacing: FocallySpacing.medium),
+        GridItem(.flexible(), spacing: FocallySpacing.medium),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: FocallySpacing.medium) {
+            LocalizedText("metrics_built_in_types")
+                .font(.focallyBodyBold)
+                .foregroundStyle(Color.focallyOnSurface)
+
+            LazyVGrid(columns: columns, spacing: FocallySpacing.medium) {
+                durationCard(icon: "brain.head.profile.fill", title: "focus_mode_type_focus_time", duration: focusTimeDuration)
+                durationCard(icon: "person.2.fill", title: "focus_mode_type_meeting", duration: meetingDuration)
+                durationCard(icon: "tray.fill", title: "focus_mode_type_inbox", duration: inboxDuration)
+                durationCard(icon: "star.fill", title: "focus_mode_type_custom", duration: customDuration)
+            }
+
+            if !customTypeDurations.isEmpty {
+                LocalizedText("metrics_my_types")
+                    .font(.focallyBodyBold)
+                    .foregroundStyle(Color.focallyOnSurface)
+
+                LazyVGrid(columns: columns, spacing: FocallySpacing.medium) {
+                    ForEach(FocusTypesService.shared.customTypes) { type in
+                        let duration = customTypeDurations[type.id, default: 0]
+                        if duration > 0 {
+                            MetricCard(
+                                icon: "tag.fill",
+                                title: "\(type.emoji) \(type.name)",
+                                value: DailyMetrics.formatDuration(duration),
+                                isLocalizedTitle: false
+                            )
+                        }
+                    }
+                }
+            }
+
+            if calendarVideoCallDuration > 0 {
+                LocalizedText("calendar_video_calls")
+                    .font(.focallyBodyBold)
+                    .foregroundStyle(Color.focallyOnSurface)
+
+                MetricCard(
+                    icon: "video.fill",
+                    title: "calendar_video_call_label",
+                    value: DailyMetrics.formatDuration(calendarVideoCallDuration)
+                )
+            }
+        }
+    }
+
+    private func durationCard(icon: String, title: String, duration: TimeInterval) -> some View {
+        MetricCard(
+            icon: icon,
+            title: title,
+            value: DailyMetrics.formatDuration(duration)
+        )
+    }
+}
+
 // MARK: - MetricCard (shared component)
 
 struct MetricCard: View {
@@ -100,6 +175,7 @@ struct MetricCard: View {
     let icon: String
     let title: String
     let value: String
+    var isLocalizedTitle = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: FocallySpacing.extraSmall) {
@@ -108,7 +184,7 @@ struct MetricCard: View {
                     .font(.system(size: 14))
                     .foregroundStyle(Color.focallyTertiary)
 
-                Text(appLanguage.localizedString(title))
+                Text(isLocalizedTitle ? appLanguage.localizedString(title) : title)
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }

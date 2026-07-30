@@ -8,6 +8,7 @@ final class CalendarSlackIntegrationService {
     static let enabledDefaultsKey = "calendarEnabled"
     static let showMeetingTitleDefaultsKey = "calendarShowMeetingTitle"
     static let dndForMeetingsDefaultsKey = "calendarDndForMeetings"
+    private static let slackSettingsDefaultsKey = "focally.calendar.slackSettings"
 
     var isEnabled: Bool {
         didSet {
@@ -18,16 +19,42 @@ final class CalendarSlackIntegrationService {
     private var events: [CalendarMeeting] = []
     private(set) var currentMeeting: CalendarMeeting?
     var connectionError: String?
-    var showMeetingTitle: Bool {
+    var calendarSettings: SlackCalendarSettings {
         didSet {
-            UserDefaults.standard.set(showMeetingTitle, forKey: Self.showMeetingTitleDefaultsKey)
-        }
-    }
-    var dndForMeetings: Bool {
-        didSet {
-            UserDefaults.standard.set(dndForMeetings, forKey: Self.dndForMeetingsDefaultsKey)
+            saveCalendarSettings()
+            publishCurrentMeetingToSlack()
             updateDNDForCurrentMeeting()
         }
+    }
+
+    var showCalendarInSlack: Bool {
+        get { calendarSettings.showCalendarInSlack }
+        set { calendarSettings.showCalendarInSlack = newValue }
+    }
+
+    var titleDisplay: CalendarTitleDisplay {
+        get { calendarSettings.titleDisplay }
+        set { calendarSettings.titleDisplay = newValue }
+    }
+
+    var useEventEmojisForStatus: Bool {
+        get { calendarSettings.useEventEmojisForStatus }
+        set { calendarSettings.useEventEmojisForStatus = newValue }
+    }
+
+    var activateDNDForVideoCalls: Bool {
+        get { calendarSettings.activateDNDForVideoCalls }
+        set { calendarSettings.activateDNDForVideoCalls = newValue }
+    }
+
+    var showMeetingTitle: Bool {
+        get { titleDisplay == .showFullTitle }
+        set { titleDisplay = newValue ? .showFullTitle : .showVideoCallOnly }
+    }
+
+    var dndForMeetings: Bool {
+        get { activateDNDForVideoCalls }
+        set { activateDNDForVideoCalls = newValue }
     }
 
     private let eventStore: EKEventStore
@@ -35,6 +62,9 @@ final class CalendarSlackIntegrationService {
     private let dndService: DNDService
     private var timer: Timer?
     private var didActivateDNDForMeeting = false
+    private var didActivateSlackDNDForMeeting = false
+    private var recordedVideoCallIDs: Set<String> = []
+    private var focusChannelObserver: NSObjectProtocol?
 
     init(
         eventStore: EKEventStore = EKEventStore(),
@@ -45,9 +75,31 @@ final class CalendarSlackIntegrationService {
         self.slackService = slackService
         self.dndService = dndService
         isEnabled = UserDefaults.standard.bool(forKey: Self.enabledDefaultsKey)
-        showMeetingTitle = UserDefaults.standard.bool(forKey: Self.showMeetingTitleDefaultsKey)
-        dndForMeetings = UserDefaults.standard.bool(forKey: Self.dndForMeetingsDefaultsKey)
+        if let data = UserDefaults.standard.data(forKey: Self.slackSettingsDefaultsKey),
+           let settings = try? JSONDecoder().decode(SlackCalendarSettings.self, from: data) {
+            calendarSettings = settings
+        } else {
+            calendarSettings = SlackCalendarSettings(
+                showCalendarInSlack: UserDefaults.standard.bool(forKey: Self.enabledDefaultsKey),
+                titleDisplay: UserDefaults.standard.bool(forKey: Self.showMeetingTitleDefaultsKey)
+                    ? .showFullTitle
+                    : .showVideoCallOnly,
+                useEventEmojisForStatus: false,
+                activateDNDForVideoCalls: UserDefaults.standard.bool(forKey: Self.dndForMeetingsDefaultsKey)
+            )
+        }
         hasCalendarAccess = EKEventStore.authorizationStatus(for: .event) == .fullAccess
+
+        focusChannelObserver = NotificationCenter.default.addObserver(
+            forName: .focallyFocusChannelDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.publishCurrentMeetingToSlack()
+                self?.updateDNDForCurrentMeeting()
+            }
+        }
     }
 
     func startIfEnabled() {
@@ -112,6 +164,11 @@ final class CalendarSlackIntegrationService {
         transition(to: nil)
     }
 
+    private func saveCalendarSettings() {
+        guard let data = try? JSONEncoder().encode(calendarSettings) else { return }
+        UserDefaults.standard.set(data, forKey: Self.slackSettingsDefaultsKey)
+    }
+
     private func startPeriodicCheck() {
         timer?.invalidate()
         checkForActiveMeeting()
@@ -138,22 +195,72 @@ final class CalendarSlackIntegrationService {
         }
 
         if meeting == nil, currentMeeting != nil {
-            slackService.clearStatus()
+            if !FocusIntegrationService.shared.isFocusModeActive {
+                slackService.clearStatus()
+            }
         }
 
         currentMeeting = meeting
-        if let meeting {
-            slackService.setStatus(
-                text: showMeetingTitle ? meeting.title : "In a meeting",
-                expirationTimestamp: Int(meeting.endTime.timeIntervalSince1970),
-                fallbackEmoji: ":calendar:"
-            )
-        }
+        publishCurrentMeetingToSlack()
+        recordVideoCallIfNeeded()
         updateDNDForCurrentMeeting()
     }
 
+    private func publishCurrentMeetingToSlack() {
+        guard !FocusIntegrationService.shared.isFocusModeActive else { return }
+        guard calendarSettings.showCalendarInSlack, let meeting = currentMeeting else {
+            slackService.clearStatus()
+            return
+        }
+
+        let text: String
+        switch calendarSettings.titleDisplay {
+        case .showFullTitle:
+            text = meeting.title
+        case .showVideoCallOnly:
+            text = AppLanguage.shared.localizedString(
+                meeting.hasVideoCall ? "calendar_in_video_call" : "calendar_in_meeting"
+            )
+        case .hideTitle:
+            text = ""
+        }
+
+        let extractedEmojis = EmojiExtractor.shared.extractAllEmojis(from: meeting.title)
+        let eventEmoji = calendarSettings.useEventEmojisForStatus && !extractedEmojis.isEmpty
+            ? EmojiExtractor.shared.concatenate(emojis: extractedEmojis)
+            : nil
+
+        slackService.setStatus(
+            text: text,
+            expirationTimestamp: Int(meeting.endTime.timeIntervalSince1970),
+            taskEmoji: eventEmoji,
+            fallbackEmoji: nil
+        )
+    }
+
+    private func recordVideoCallIfNeeded() {
+        guard calendarSettings.showCalendarInSlack,
+              let meeting = currentMeeting,
+              meeting.hasVideoCall,
+              recordedVideoCallIDs.insert(meeting.id).inserted else {
+            return
+        }
+
+        FocusMetricsService.shared.recordSession(
+            FocusSessionRecord(
+                modeType: .calendarVideoCall,
+                modeID: FocusModeType.calendarVideoCall.id,
+                startTime: meeting.startTime,
+                endTime: meeting.endTime,
+                duration: meeting.endTime.timeIntervalSince(meeting.startTime)
+            )
+        )
+    }
+
     private func updateDNDForCurrentMeeting() {
-        let shouldActivate = dndForMeetings && currentMeeting?.hasVideoCall == true
+        let shouldActivate = calendarSettings.activateDNDForVideoCalls
+            && currentMeeting?.hasVideoCall == true
+            && !FocusIntegrationService.shared.isFocusModeActive
         if shouldActivate, !dndService.isDNDActive {
             dndService.activateDND()
             didActivateDNDForMeeting = true
@@ -161,7 +268,20 @@ final class CalendarSlackIntegrationService {
             dndService.deactivateDND()
             didActivateDNDForMeeting = false
         }
+
+        if shouldActivate, !didActivateSlackDNDForMeeting, let meeting = currentMeeting {
+            let remainingMinutes = max(1, Int(ceil(meeting.endTime.timeIntervalSinceNow / 60)))
+            slackService.setSlackDNDSnooze(minutes: remainingMinutes)
+            didActivateSlackDNDForMeeting = true
+        } else if !shouldActivate, didActivateSlackDNDForMeeting {
+            slackService.disableSlackDND()
+            didActivateSlackDNDForMeeting = false
+        }
     }
+}
+
+extension Notification.Name {
+    static let focallyFocusChannelDidChange = Notification.Name("focally.focusChannelDidChange")
 }
 
 struct CalendarMeeting: Identifiable, Equatable {
@@ -179,10 +299,6 @@ struct CalendarMeeting: Identifiable, Equatable {
         endTime = event.endDate
         isAllDay = event.isAllDay
 
-        let searchableText = [event.location, event.url?.absoluteString, event.notes]
-            .compactMap { $0?.lowercased() }
-            .joined(separator: " ")
-        hasVideoCall = ["meet.google.com", "zoom.us", "teams.microsoft.com", "webex.com"]
-            .contains { searchableText.contains($0) }
+        hasVideoCall = CalendarEventAnalyzer.shared.isVideoCall(event)
     }
 }

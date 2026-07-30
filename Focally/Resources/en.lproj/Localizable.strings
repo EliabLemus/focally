@@ -234,3 +234,43 @@
 /* ========== Update Notification ========== */
 "notification_update_title" = "New Version Available";
 "notification_update_body" = "Focally %@ is now available. Click to download.";
+
+/* ========== Calendar & Custom Focus Types ========== */
+"settings_focus_types" = "Focus Types";
+"focus_types_built_in_header" = "Built-in Types";
+"focus_types_my_types_header" = "My Types";
+"focus_types_add_new" = "Add new type";
+"focus_types_empty" = "No custom types yet.";
+"focus_type_new_header" = "New Focus Type";
+"focus_type_edit_header" = "Edit Focus Type";
+"focus_type_name" = "Name";
+"focus_type_emoji" = "Emoji";
+"focus_type_color" = "Color";
+"focus_type_create" = "Create";
+"focus_type_read_only" = "Built-in type, read only";
+"focus_type_edit_accessibility" = "Edit %@";
+"focus_type_delete_accessibility" = "Delete %@";
+"focus_mode_type_section" = "Type";
+"focus_mode_type_picker" = "Focus type";
+"calendar_section_header" = "Calendar";
+"show_calendar_in_slack" = "Show calendar events in Slack";
+"show_calendar_in_slack_help" = "Shows the active event in Slack when no focus mode is active.";
+"calendar_show_full_title" = "Full title";
+"calendar_show_video_call_only" = "Meeting or video call only";
+"calendar_hide_title" = "Hide title";
+"calendar_title_display" = "Show title";
+"use_event_emojis" = "Use event emojis";
+"use_event_emojis_help" = "Uses emojis found in the event title for the Slack status.";
+"activate_dnd_video_calls" = "Activate DND for video calls";
+"calendar_in_video_call" = "In video call";
+"calendar_in_meeting" = "In meeting";
+"calendar_video_calls" = "Video Calls";
+"calendar_video_call_label" = "Video Calls";
+"focus_mode_type_focus_time" = "Focus Time";
+"focus_mode_type_meeting" = "Meeting";
+"focus_mode_type_inbox" = "Inbox";
+"focus_mode_type_custom" = "Custom";
+"focus_mode_type_calendar_video_call" = "Calendar Video Call";
+"focus_mode_type_user_custom" = "Custom Type";
+"metrics_built_in_types" = "Built-in Types";
+"metrics_my_types" = "My Types";

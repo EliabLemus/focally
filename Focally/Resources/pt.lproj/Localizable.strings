@@ -234,3 +234,43 @@
 /* ========== Update Notification ========== */
 "notification_update_title" = "Nova Versão Disponível";
 "notification_update_body" = "Focally %@ está disponível. Clique para baixar.";
+
+/* ========== Calendário e Tipos de Foco ========== */
+"settings_focus_types" = "Tipos de foco";
+"focus_types_built_in_header" = "Tipos integrados";
+"focus_types_my_types_header" = "Meus tipos";
+"focus_types_add_new" = "Adicionar novo tipo";
+"focus_types_empty" = "Ainda não há tipos personalizados.";
+"focus_type_new_header" = "Novo tipo de foco";
+"focus_type_edit_header" = "Editar tipo de foco";
+"focus_type_name" = "Nome";
+"focus_type_emoji" = "Emoji";
+"focus_type_color" = "Cor";
+"focus_type_create" = "Criar";
+"focus_type_read_only" = "Tipo integrado, somente leitura";
+"focus_type_edit_accessibility" = "Editar %@";
+"focus_type_delete_accessibility" = "Excluir %@";
+"focus_mode_type_section" = "Tipo";
+"focus_mode_type_picker" = "Tipo de foco";
+"calendar_section_header" = "Calendário";
+"show_calendar_in_slack" = "Mostrar eventos do calendário no Slack";
+"show_calendar_in_slack_help" = "Mostra o evento ativo no Slack quando nenhum modo de foco está ativo.";
+"calendar_show_full_title" = "Título completo";
+"calendar_show_video_call_only" = "Somente reunião ou videochamada";
+"calendar_hide_title" = "Ocultar título";
+"calendar_title_display" = "Mostrar título";
+"use_event_emojis" = "Usar emojis do evento";
+"use_event_emojis_help" = "Usa os emojis do título do evento no status do Slack.";
+"activate_dnd_video_calls" = "Ativar Não Perturbar para videochamadas";
+"calendar_in_video_call" = "Em videochamada";
+"calendar_in_meeting" = "Em reunião";
+"calendar_video_calls" = "Videochamadas";
+"calendar_video_call_label" = "Videochamadas";
+"focus_mode_type_focus_time" = "Tempo de foco";
+"focus_mode_type_meeting" = "Reunião";
+"focus_mode_type_inbox" = "Caixa de entrada";
+"focus_mode_type_custom" = "Personalizado";
+"focus_mode_type_calendar_video_call" = "Videochamada do calendário";
+"focus_mode_type_user_custom" = "Tipo personalizado";
+"metrics_built_in_types" = "Tipos integrados";
+"metrics_my_types" = "Meus tipos";

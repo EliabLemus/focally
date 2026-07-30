@@ -6,6 +6,19 @@ enum FocusModeType: String, Codable, CaseIterable {
     case meeting = "meeting"
     case inbox = "inbox"
     case custom = "custom"
+    case calendarVideoCall = "calendar_video_call"
+    case userCustom = "user_custom"
+
+    var id: UUID {
+        switch self {
+        case .focusTime: return FocusMode.focusTimeID
+        case .meeting: return FocusMode.meetingID
+        case .inbox: return FocusMode.inboxID
+        case .custom: return UUID(uuidString: "44444444-4444-4444-4444-444444444444")!
+        case .calendarVideoCall: return UUID(uuidString: "55555555-5555-5555-5555-555555555555")!
+        case .userCustom: return UUID(uuidString: "66666666-6666-6666-6666-666666666666")!
+        }
+    }
 
     var localizedLabel: String {
         switch self {
@@ -13,6 +26,8 @@ enum FocusModeType: String, Codable, CaseIterable {
         case .meeting: return "focus_mode_type_meeting"
         case .inbox: return "focus_mode_type_inbox"
         case .custom: return "focus_mode_type_custom"
+        case .calendarVideoCall: return "focus_mode_type_calendar_video_call"
+        case .userCustom: return "focus_mode_type_user_custom"
         }
     }
 }
@@ -42,7 +57,12 @@ struct FocusMode: Identifiable, Codable, Equatable {
     var pomodoroLongBreakMinutes: Int
     var pomodoroRounds: Int
     var breakLabel: String?
-    var type: FocusModeType
+    var typeDescriptor: FocusTypeDescriptor
+
+    var type: FocusModeType {
+        get { typeDescriptor.modeType }
+        set { typeDescriptor = .builtIn(newValue) }
+    }
 
     init(id: UUID = UUID(),
          name: String = "",
@@ -57,7 +77,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
          pomodoroLongBreakMinutes: Int = 15,
          pomodoroRounds: Int = 4,
          breakLabel: String? = nil,
-         type: FocusModeType = .custom) {
+         type: FocusModeType = .custom,
+         typeDescriptor: FocusTypeDescriptor? = nil) {
         self.id = id
         self.name = name
         self.emoji = emoji
@@ -71,13 +92,13 @@ struct FocusMode: Identifiable, Codable, Equatable {
         self.pomodoroLongBreakMinutes = pomodoroLongBreakMinutes
         self.pomodoroRounds = pomodoroRounds
         self.breakLabel = breakLabel
-        self.type = type
+        self.typeDescriptor = typeDescriptor ?? .builtIn(type)
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, emoji, statusText, durationMinutes, enableMacOSDND, enableSlackDND, enablePomodoro
         case pomodoroWorkMinutes, pomodoroBreakMinutes, pomodoroLongBreakMinutes, pomodoroRounds
-        case breakLabel, type
+        case breakLabel, type, typeDescriptor
     }
 
     init(from decoder: Decoder) throws {
@@ -102,11 +123,32 @@ struct FocusMode: Identifiable, Codable, Equatable {
         breakLabel = try c.decodeIfPresent(String.self, forKey: .breakLabel)
 
         // Backward compat: infer type from ID if missing
-        if let decodedType = try? c.decode(FocusModeType.self, forKey: .type) {
-            type = decodedType
+        if let descriptor = try c.decodeIfPresent(FocusTypeDescriptor.self, forKey: .typeDescriptor) {
+            typeDescriptor = descriptor
+        } else if let decodedType = try? c.decode(FocusModeType.self, forKey: .type) {
+            typeDescriptor = .builtIn(decodedType)
         } else {
-            type = Self.inferredType(from: id)
+            typeDescriptor = .builtIn(Self.inferredType(from: id))
         }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(name, forKey: .name)
+        try c.encode(emoji, forKey: .emoji)
+        try c.encode(statusText, forKey: .statusText)
+        try c.encode(durationMinutes, forKey: .durationMinutes)
+        try c.encode(enableMacOSDND, forKey: .enableMacOSDND)
+        try c.encode(enableSlackDND, forKey: .enableSlackDND)
+        try c.encode(enablePomodoro, forKey: .enablePomodoro)
+        try c.encode(pomodoroWorkMinutes, forKey: .pomodoroWorkMinutes)
+        try c.encode(pomodoroBreakMinutes, forKey: .pomodoroBreakMinutes)
+        try c.encode(pomodoroLongBreakMinutes, forKey: .pomodoroLongBreakMinutes)
+        try c.encode(pomodoroRounds, forKey: .pomodoroRounds)
+        try c.encodeIfPresent(breakLabel, forKey: .breakLabel)
+        try c.encode(type, forKey: .type)
+        try c.encode(typeDescriptor, forKey: .typeDescriptor)
     }
 
     static let builtInModes: [FocusMode] = [
@@ -226,7 +268,8 @@ struct FocusMode: Identifiable, Codable, Equatable {
             pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,
             pomodoroRounds: sanitizedPomodoroRounds,
             breakLabel: breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? breakLabel?.trimmingCharacters(in: .whitespacesAndNewlines) : nil,
-            type: type
+            type: type,
+            typeDescriptor: typeDescriptor
         )
     }
 }
@@ -262,7 +305,7 @@ final class FocusModeStore {
     func add(_ mode: FocusMode) {
         var newMode = mode.sanitized()
         if newMode.id == UUID() {
-            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableMacOSDND: newMode.enableMacOSDND, enableSlackDND: newMode.enableSlackDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel)
+            newMode = FocusMode(id: UUID(), name: newMode.name, emoji: newMode.emoji, statusText: newMode.statusText, durationMinutes: newMode.durationMinutes, enableMacOSDND: newMode.enableMacOSDND, enableSlackDND: newMode.enableSlackDND, enablePomodoro: newMode.enablePomodoro, pomodoroWorkMinutes: newMode.pomodoroWorkMinutes, pomodoroBreakMinutes: newMode.pomodoroBreakMinutes, pomodoroLongBreakMinutes: newMode.pomodoroLongBreakMinutes, pomodoroRounds: newMode.pomodoroRounds, breakLabel: newMode.breakLabel, typeDescriptor: newMode.typeDescriptor)
         }
         modes.append(newMode)
         modes = Self.orderedModes(from: modes)
@@ -277,6 +320,12 @@ final class FocusModeStore {
 
     func mode(withID id: UUID) -> FocusMode? {
         modes.first(where: { $0.id == id })
+    }
+
+    static func typeDescriptor(forModeID id: UUID) -> FocusTypeDescriptor? {
+        loadModes(from: .standard)
+            .first(where: { $0.id == id })?
+            .typeDescriptor
     }
 
     private func saveModes() {

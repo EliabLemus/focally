@@ -37,6 +37,7 @@ final class FocusIntegrationService {
 
     var lastError: FocusIntegrationError?
     var isFocusActive = false
+    private(set) var isFocusModeActive = false
     private var activeMode: FocusMode?
 
     private init(dndService: DNDService = .shared, slackService: SlackService = SlackService()) {
@@ -49,13 +50,17 @@ final class FocusIntegrationService {
     }
 
     func activateFocus(for mode: FocusMode) {
+        isFocusModeActive = true
         activeMode = mode.sanitized()
         performCombinedFocusAction(.start, mode: activeMode)
+        NotificationCenter.default.post(name: .focallyFocusChannelDidChange, object: nil)
     }
 
     func deactivateFocus() {
         performCombinedFocusAction(.end, mode: activeMode)
         activeMode = nil
+        isFocusModeActive = false
+        NotificationCenter.default.post(name: .focallyFocusChannelDidChange, object: nil)
     }
 
     func runSlackTest(completion: ((Bool, String) -> Void)? = nil) {

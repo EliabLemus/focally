@@ -46,11 +46,42 @@ struct IntegrationsSettingsView: View {
                 calendarEnabledBinding.wrappedValue.toggle()
             }
 
-            Toggle("integrations_show_meeting_title", isOn: $calendarService.showMeetingTitle)
-                .accessibilityLabel("integrations_show_meeting_title")
+            Toggle("show_calendar_in_slack", isOn: $calendarService.showCalendarInSlack)
+                .accessibilityLabel(
+                    AppLanguage.shared.localizedString("show_calendar_in_slack")
+                )
 
-            Toggle("integrations_dnd_video_calls", isOn: $calendarService.dndForMeetings)
-                .accessibilityLabel("integrations_dnd_video_calls")
+            LocalizedText("show_calendar_in_slack_help")
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+            Picker("calendar_title_display", selection: $calendarService.titleDisplay) {
+                ForEach(CalendarTitleDisplay.allCases, id: \.self) { option in
+                    Text(option.displayName)
+                        .tag(option)
+                }
+            }
+            .disabled(!calendarService.showCalendarInSlack)
+            .accessibilityLabel(
+                AppLanguage.shared.localizedString("calendar_title_display")
+            )
+
+            Toggle("use_event_emojis", isOn: $calendarService.useEventEmojisForStatus)
+                .disabled(!calendarService.showCalendarInSlack)
+                .accessibilityLabel(AppLanguage.shared.localizedString("use_event_emojis"))
+
+            LocalizedText("use_event_emojis_help")
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+            Toggle(
+                "activate_dnd_video_calls",
+                isOn: $calendarService.activateDNDForVideoCalls
+            )
+            .disabled(!calendarService.showCalendarInSlack)
+            .accessibilityLabel(
+                AppLanguage.shared.localizedString("activate_dnd_video_calls")
+            )
 
             if let calendarError = calendarService.connectionError, !calendarError.isEmpty {
                 Text(calendarError)

@@ -234,3 +234,43 @@
 /* ========== Update Notification ========== */
 "notification_update_title" = "Nueva Versión Disponible";
 "notification_update_body" = "Focally %@ está disponible. Haz clic para descargar.";
+
+/* ========== Calendario y Tipos de Enfoque ========== */
+"settings_focus_types" = "Tipos de enfoque";
+"focus_types_built_in_header" = "Tipos incluidos";
+"focus_types_my_types_header" = "Mis tipos";
+"focus_types_add_new" = "Añadir nuevo tipo";
+"focus_types_empty" = "Aún no hay tipos personalizados.";
+"focus_type_new_header" = "Nuevo tipo de enfoque";
+"focus_type_edit_header" = "Editar tipo de enfoque";
+"focus_type_name" = "Nombre";
+"focus_type_emoji" = "Emoji";
+"focus_type_color" = "Color";
+"focus_type_create" = "Crear";
+"focus_type_read_only" = "Tipo incluido, solo lectura";
+"focus_type_edit_accessibility" = "Editar %@";
+"focus_type_delete_accessibility" = "Eliminar %@";
+"focus_mode_type_section" = "Tipo";
+"focus_mode_type_picker" = "Tipo de enfoque";
+"calendar_section_header" = "Calendario";
+"show_calendar_in_slack" = "Mostrar eventos del calendario en Slack";
+"show_calendar_in_slack_help" = "Muestra el evento activo en Slack cuando no hay un modo de enfoque activo.";
+"calendar_show_full_title" = "Título completo";
+"calendar_show_video_call_only" = "Solo reunión o videollamada";
+"calendar_hide_title" = "Ocultar título";
+"calendar_title_display" = "Mostrar título";
+"use_event_emojis" = "Usar emojis del evento";
+"use_event_emojis_help" = "Usa los emojis del título del evento para el estado de Slack.";
+"activate_dnd_video_calls" = "Activar No Molestar para videollamadas";
+"calendar_in_video_call" = "En videollamada";
+"calendar_in_meeting" = "En reunión";
+"calendar_video_calls" = "Videollamadas";
+"calendar_video_call_label" = "Videollamadas";
+"focus_mode_type_focus_time" = "Tiempo de enfoque";
+"focus_mode_type_meeting" = "Reunión";
+"focus_mode_type_inbox" = "Bandeja de entrada";
+"focus_mode_type_custom" = "Personalizado";
+"focus_mode_type_calendar_video_call" = "Videollamada de calendario";
+"focus_mode_type_user_custom" = "Tipo personalizado";
+"metrics_built_in_types" = "Tipos incluidos";
+"metrics_my_types" = "Mis tipos";
