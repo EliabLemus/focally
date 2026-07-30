@@ -2,7 +2,8 @@ import Foundation
 import Observation
 
 /// Checks GitHub releases for app updates.
-/// Uses a 24h cooldown via UserDefaults to avoid excessive API calls.
+/// Uses a 4h cooldown via UserDefaults to avoid excessive API calls.
+/// Checks on startup and then every 4 hours via Timer.
 @MainActor
 @Observable
 final class UpdateCheckerService {
@@ -14,6 +15,7 @@ final class UpdateCheckerService {
     private let defaults = UserDefaults.standard
     private let githubRepo = "EliabLemus/focally"
     private let notificationService: NotificationService
+    private var updateTimer: Timer?
 
     private static let lastCheckKey = "focally.updateChecker.lastCheck"
     private static let latestVersionKey = "focally.updateChecker.latestVersion"
@@ -61,7 +63,21 @@ final class UpdateCheckerService {
     private var shouldCheck: Bool {
         guard let lastCheck = lastCheckDate else { return true }
         let hoursSinceLastCheck = Date().timeIntervalSince(lastCheck) / 3600
-        return hoursSinceLastCheck >= 24
+        return hoursSinceLastCheck >= 4
+    }
+
+    /// Starts periodic update checking every 4 hours
+    private func startPeriodicCheck() {
+        // Check immediately on startup
+        checkForUpdates()
+
+        // Schedule periodic check every 4 hours (14400 seconds)
+        updateTimer = Timer.scheduledTimer(
+            withTimeInterval: 14400,
+            repeats: true
+        ) { [weak self] _ in
+            self?.checkForUpdates()
+        }
     }
 
     // MARK: - Init
@@ -76,9 +92,8 @@ final class UpdateCheckerService {
             updateUrl = url
         }
 
-        if shouldCheck {
-            checkForUpdates()
-        }
+        // Start checking on startup and every 4 hours
+        startPeriodicCheck()
     }
 
     // MARK: - Public Methods
@@ -131,7 +146,7 @@ final class UpdateCheckerService {
 
                     if self.isNewVersionAvailable {
                         self.logger.info("New version available: \(version) (current: \(self.currentVersion))")
-                        self.notificationService.notify(.updateAvailable(version: version))
+                        // No notification: update indicator appears in AboutSettingsView
                     } else {
                         self.logger.info("Already on latest version: \(self.currentVersion)")
                     }
