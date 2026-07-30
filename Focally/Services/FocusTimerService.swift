@@ -117,6 +117,9 @@ final class FocusTimerService {
         deactivateFocusIntegration()
         clearSessionState()
 
+        // Deactivate DND before playing sound and notifying
+        dndService.deactivateDND()
+
         if playCompletionSound {
             soundPlayer.playCompletionSound()
         }

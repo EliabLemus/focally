@@ -1,90 +1,102 @@
 import SwiftUI
 
 struct AboutSettingsView: View {
+    @Environment(\.locale) private var locale
     @Environment(UpdateCheckerService.self) private var updateChecker
 
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.5.1"
-    }
-
-    private var buildNumber: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "8"
-    }
+    let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
 
     var body: some View {
-        VStack(spacing: FocallySpacing.large) {
-            // App icon placeholder
-            RoundedRectangle(cornerRadius: FocallyRadius.large)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.focallyPrimary, Color.focallyPrimaryContainer],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 64, height: 64)
-                .overlay(
-                    Image(systemName: "timer")
-                        .font(.system(size: 28, weight: .semibold))
-                        .foregroundStyle(Color.focallyOnPrimary)
-                )
+        ScrollView {
+            VStack(spacing: 32) {
+                // App Icon + Version
+                VStack(spacing: 16) {
+                    if let icon = NSImage(named: "AppIcon") {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .frame(width: 96, height: 96)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                    } else {
+                        Image(systemName: "app.dashed")
+                            .font(.system(size: 64))
+                            .foregroundStyle(.secondary)
+                    }
 
-            VStack(spacing: FocallySpacing.extraSmall) {
-                Text("Focally")
-                    .font(.focallyH1)
-                    .foregroundStyle(Color.focallyOnSurface)
+                    VStack(spacing: 8) {
+                        Text("Focally")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(.primary)
 
-                HStack(spacing: FocallySpacing.extraSmall) {
-                    Text(String(format: AppLanguage.shared.localizedString("about_version"), appVersion))
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOutline)
+                        Text("v\(version) · build \(build)")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
 
-                    if updateChecker.isNewVersionAvailable {
-                        Button(action: {
-                            if let url = updateChecker.updateUrl {
-                                NSWorkspace.shared.open(url)
-                            }
-                        }) {
-                            HStack(spacing: 4) {
+                        if updateChecker.isNewVersionAvailable, let newVersion = updateChecker.latestVersion {
+                            HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.focallyCaption)
-                                LocalizedText("about_update_available")
-                                    .font(.focallyCaption)
+                                    .foregroundStyle(.orange)
+                                Text("⚠️ Update available: v\(newVersion)")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(.orange)
+                                Button("Get it") {
+                                    if let url = updateChecker.updateUrl {
+                                        NSWorkspace.shared.open(url)
+                                    }
+                                }
+                                .font(.system(size: 12))
+                                .buttonStyle(.bordered)
                             }
-                            .foregroundStyle(Color.focallyPrimary)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.focallyPrimaryContainer)
-                            .cornerRadius(FocallyRadius.small)
+                        }
+                    }
+                }
+                .padding(.top, 24)
+
+                Divider()
+
+                // Description
+                VStack(spacing: 12) {
+                    Text("Focus Timer & Slack Integration")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(.primary)
+
+                    Text("A beautiful focus timer for macOS with Slack status integration, Do Not Disturb automation, and detailed productivity metrics.")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: 500)
+                }
+
+                // Links
+                VStack(spacing: 8) {
+                    if let url = URL(string: "https://github.com/EliabLemus/focally") {
+                        Link(destination: url) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "link")
+                                Text("GitHub Repository")
+                            }
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.blue)
                         }
                         .buttonStyle(.plain)
                     }
+                }
 
-                    Text("·")
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOutline)
+                Divider()
 
-                    Text(String(format: AppLanguage.shared.localizedString("about_build"), buildNumber))
-                        .font(.focallyCaption)
-                        .foregroundStyle(Color.focallyOutline)
+                // Footer
+                VStack(spacing: 4) {
+                    Text("© 2024 Eliab Lemus")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+
+                    Text("MIT License")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
                 }
             }
-
-            Divider()
-                .background(Color.focallyOutlineVariant)
-                .padding(.vertical, FocallySpacing.small)
-
-            VStack(spacing: FocallySpacing.extraSmall) {
-                LocalizedText("about_developed")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOutline)
-
-                LocalizedText("about_copyright")
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOutline)
-            }
+            .padding(32)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, FocallySpacing.extraLarge)
     }
 }

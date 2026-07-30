@@ -139,15 +139,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if popover.isShown {
             popover.performClose(button)
         } else {
-            // Multi-monitor fix: Detect screen del button y forzar posicionamiento correcto
+            // Multi-monitor fix: Detect screen del mouse, no solo del button
+            let mouseLocation = NSEvent.mouseLocation
+            guard let activeScreen = NSScreen.screens.first(where: { screen in
+                screen.frame.contains(mouseLocation)
+            }) ?? NSScreen.main else {
+                logger.warning("Could not detect active screen")
+                return
+            }
+
+            // Configurar popover para el screen correcto
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            applySavedTheme()
-            
-            // Forzar key window en el screen correcto
+
+            // Forzar window en el screen detectado
             if let popoverWindow = popover.contentViewController?.view.window {
+                let screenFrame = activeScreen.visibleFrame
+                let popoverFrame = popoverWindow.frame
+
+                // Mover popover al screen correcto
+                popoverWindow.setFrame(
+                    NSRect(
+                        x: min(max(popoverFrame.minX, screenFrame.minX), screenFrame.maxX - popoverFrame.width),
+                        y: min(max(popoverFrame.minY, screenFrame.minY), screenFrame.maxY - popoverFrame.height),
+                        width: popoverFrame.width,
+                        height: popoverFrame.height
+                    ),
+                    display: true
+                )
+
                 popoverWindow.makeKey()
                 popoverWindow.orderFrontRegardless()
             }
+
+            applySavedTheme()
         }
     }
 
@@ -228,6 +252,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if let mainWindow {
+            // Move to active screen on existing window
+            moveWindowToActiveScreen(mainWindow)
             mainWindow.makeKeyAndOrderFront(nil)
             mainWindow.orderFrontRegardless()
             NSApp.activate(ignoringOtherApps: true)
@@ -254,12 +280,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 1200, height: 800))
         window.minSize = NSSize(width: 900, height: 600)
-        window.center()
+
+        // Move to active screen instead of center()
+        moveWindowToActiveScreen(window)
+
         mainWindow = window
         applySavedTheme()
         window.makeKeyAndOrderFront(nil as Any?)
         window.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// Moves window to the screen where the mouse is currently located
+    private func moveWindowToActiveScreen(_ window: NSWindow) {
+        let mouseLocation = NSEvent.mouseLocation
+        guard let activeScreen = NSScreen.screens.first(where: { screen in
+            screen.frame.contains(mouseLocation)
+        }) ?? NSScreen.main else {
+            logger.warning("Could not detect active screen for main window, using center")
+            window.center()
+            return
+        }
+
+        let screenFrame = activeScreen.visibleFrame
+        let windowFrame = window.frame
+
+        // Center window in the detected screen
+        let x = screenFrame.midX - windowFrame.width / 2
+        let y = screenFrame.midY - windowFrame.height / 2
+
+        window.setFrame(
+            NSRect(
+                x: x,
+                y: y,
+                width: windowFrame.width,
+                height: windowFrame.height
+            ),
+            display: true
+        )
     }
 
     @objc func openSetupWindow() {
