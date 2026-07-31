@@ -10,47 +10,47 @@ options:
       FONT_PROCESSORS: [ttf]
       SWIFT_VERSION: "5.9"
       PRODUCT_BUNDLE_IDENTIFIER: app.focally.mac
-      MARKETING_VERSION: "0.9.4"
-      CURRENT_PROJECT_VERSION: "77"
+      MARKETING_VERSION: "0.9.5"
+      CURRENT_PROJECT_VERSION: "78"
 
 targets:
   Focally:
     type: application
     platform: macOS
     sources:
-      - Focally
-      - path: Focally/Resources/AppIcon.icns
+      - Sources/Focally
+      - path: Sources/Focally/Resources/AppIcon.icns
         buildPhase: resources
-      - path: Focally/Resources/bell.aiff
+      - path: Sources/Focally/Resources/bell.aiff
         buildPhase: resources
-      - path: Focally/Resources/confirmation_003.aiff
+      - path: Sources/Focally/Resources/confirmation_003.aiff
         buildPhase: resources
-      - path: Focally/Resources/focally-focus-off-signed.shortcut
+      - path: Sources/Focally/Resources/focally-focus-off-signed.shortcut
         buildPhase: resources
-      - path: Focally/Resources/focally-focus-on-signed.shortcut
+      - path: Sources/Focally/Resources/focally-focus-on-signed.shortcut
         buildPhase: resources
-      - path: Focally/Resources/glass_005.aiff
+      - path: Sources/Focally/Resources/glass_005.aiff
         buildPhase: resources
-      - path: Focally/Resources/pluck_002.aiff
+      - path: Sources/Focally/Resources/pluck_002.aiff
         buildPhase: resources
-      - path: Focally/Resources/Fonts/Inter-Bold.ttf
+      - path: Sources/Focally/Resources/Fonts/Inter-Bold.ttf
         buildPhase: resources
-      - path: Focally/Resources/Fonts/Inter-Medium.ttf
+      - path: Sources/Focally/Resources/Fonts/Inter-Medium.ttf
         buildPhase: resources
-      - path: Focally/Resources/Fonts/Inter-Regular.ttf
+      - path: Sources/Focally/Resources/Fonts/Inter-Regular.ttf
         buildPhase: resources
-      - path: Focally/Resources/Fonts/Inter-SemiBold.ttf
+      - path: Sources/Focally/Resources/Fonts/Inter-SemiBold.ttf
         buildPhase: resources
-      - path: Focally/Resources/en.lproj
+      - path: Sources/Focally/Resources/en.lproj
         buildPhase: resources
-      - path: Focally/Resources/es.lproj
+      - path: Sources/Focally/Resources/es.lproj
         buildPhase: resources
-      - path: Focally/Resources/pt.lproj
+      - path: Sources/Focally/Resources/pt.lproj
         buildPhase: resources
     settings:
       base:
-        INFOPLIST_FILE: Focally/Info.plist
-        CODE_SIGN_ENTITLEMENTS: Focally/Focally.entitlements
+        INFOPLIST_FILE: Sources/Focally/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sources/Focally/Focally.entitlements
         PRODUCT_BUNDLE_NAME: Focally
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_COLOR_SET_NAME: focally
@@ -59,8 +59,8 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: true
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: false
-        MARKETING_VERSION: "0.9.4"
-        CURRENT_PROJECT_VERSION: "77"
+        MARKETING_VERSION: "0.9.5"
+        CURRENT_PROJECT_VERSION: "78"
     entitlements:
       path: Focally/Focally.entitlements
       properties:
@@ -70,19 +70,19 @@ targets:
     type: bundle.unit-test
     platform: macOS
     sources:
-      - FocallyTests
+      - Tests/FocallyTests
     resources:
-      - path: Focally/Resources/bell.aiff
-      - path: Focally/Resources/confirmation_003.aiff
-      - path: Focally/Resources/glass_005.aiff
-      - path: Focally/Resources/pluck_002.aiff
+      - path: Sources/Focally/Resources/bell.aiff
+      - path: Sources/Focally/Resources/confirmation_003.aiff
+      - path: Sources/Focally/Resources/glass_005.aiff
+      - path: Sources/Focally/Resources/pluck_002.aiff
     dependencies:
       - target: Focally
       - sdk: XCTest.framework
       - sdk: Cocoa.framework
     settings:
       base:
-        INFOPLIST_FILE: FocallyTests/Info.plist
+        INFOPLIST_FILE: Tests/FocallyTests/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: app.focally.mac.Tests
         PRODUCT_BUNDLE_NAME: FocallyTests
         CODE_SIGN_STYLE: Automatic
@@ -95,13 +95,13 @@ targets:
     platform: macOS
     productType: com.apple.product-type.bundle.ui-test
     sources:
-      - FocallyUITests
+      - Tests/FocallyUITests
     dependencies:
       - target: Focally
       - sdk: XCTest.framework
     settings:
       base:
-        INFOPLIST_FILE: FocallyUITests/Info.plist
+        INFOPLIST_FILE: Tests/FocallyUITests/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: app.focally.mac.UITests
         PRODUCT_BUNDLE_NAME: FocallyUITests
         CODE_SIGN_STYLE: Automatic

@@ -1,9 +1,0 @@
-Command line invocation:
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project Focally.xcodeproj -scheme Focally -destination platform=macOS "-only-testing:FocallyUITests" test
-
-2026-05-16 18:59:24.855 xcodebuild[98724:37213462] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
---- xcodebuild: WARNING: Using the first of multiple matching destinations:
-{ platform:macOS, arch:arm64, id:00008132-000C482A1A06401C, name:My Mac }
-{ platform:macOS, arch:x86_64, id:00008132-000C482A1A06401C, name:My Mac }
-2026-05-16 18:59:24.883 xcodebuild[98724:37213462] Writing error result bundle to /var/folders/hk/78jj_33s6fxbxjnxlmqfmyjr0000gn/T/ResultBundle_2026-16-05_18-59-0024.xcresult
-xcodebuild: error: Failed to build project Focally with scheme Focally.: Tests in the target “FocallyUITests” can’t be run because “FocallyUITests” isn’t a member of the specified test plan or scheme.
