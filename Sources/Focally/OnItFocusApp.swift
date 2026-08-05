@@ -49,7 +49,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         notificationCenter: NSWorkspace.shared.notificationCenter,
         willSleepName: NSWorkspace.willSleepNotification,
         didWakeName: NSWorkspace.didWakeNotification,
-        willSleep: { [weak self] in self?.timerService.prepareForSleep() },
+        willSleep: { [weak self] in
+            self?.timerService.prepareForSleep()
+            self?.calendarService.prepareForSystemSleep()
+        },
         didWake: { [weak self] in self?.timerService.reconcileAfterWake() }
     )
     private var timerUpdate: Timer?
@@ -611,6 +614,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         logger.info("Application terminating - forcing cleanup of active sessions and focus integration")
 
+        calendarService.prepareForTermination()
         workspaceLifecycleCoordinator.stop()
         if timerService.hasSession {
             timerService.prepareForTermination()

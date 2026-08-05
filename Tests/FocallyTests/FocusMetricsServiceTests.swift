@@ -43,6 +43,33 @@ final class FocusMetricsServiceTests: XCTestCase {
         XCTAssertEqual(daily?.totalFocusTime, 900)
     }
 
+    func testUpsertAppendsThenReplacesInPlaceAndFindsExactRecord() {
+        let first = makeRecord(duration: 10)
+        let targetID = UUID()
+        let original = FocusSessionRecord(id: targetID, modeType: .focusTime, modeID: FocusMode.focusTimeID,
+            startTime: Date(), endTime: Date().addingTimeInterval(20), duration: 20)
+        let replacement = FocusSessionRecord(id: targetID, modeType: .calendarVideoCall,
+            modeID: FocusModeType.calendarVideoCall.id, startTime: Date(),
+            endTime: Date().addingTimeInterval(30), duration: 30, source: .calendar)
+        sut.upsertSession(first)
+        sut.upsertSession(original)
+        sut.upsertSession(replacement)
+        XCTAssertEqual(sut.records.map(\.id), [first.id, targetID])
+        XCTAssertEqual(sut.session(withID: targetID), replacement)
+    }
+
+    func testUpsertRespectsFiveThousandRecordCap() throws {
+        let initial = (1...5_000).map { makeRecord(duration: TimeInterval($0)) }
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        defaults.set(try encoder.encode(initial), forKey: "focally.metrics.records")
+        sut = FocusMetricsService(defaults: defaults)
+        sut.upsertSession(makeRecord(duration: 5_001))
+        XCTAssertEqual(sut.records.count, 5_000)
+        XCTAssertEqual(sut.records.first?.duration, 2)
+        XCTAssertEqual(sut.records.last?.duration, 5_001)
+    }
+
     func testV2AggregatesUseActiveAndExposePauseAndBreakTotals() {
         let start = Date()
         sut.recordSession(FocusSessionRecord(modeType: .focusTime, modeID: FocusMode.focusTimeID,

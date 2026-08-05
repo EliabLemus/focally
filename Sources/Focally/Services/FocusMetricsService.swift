@@ -198,6 +198,22 @@ final class FocusMetricsService {
         saveRecords()
     }
 
+    func upsertSession(_ session: FocusSessionRecord) {
+        if let index = records.firstIndex(where: { $0.id == session.id }) {
+            records[index] = session
+        } else {
+            records.append(session)
+        }
+        if records.count > Self.maxRecords {
+            records.removeFirst(records.count - Self.maxRecords)
+        }
+        saveRecords()
+    }
+
+    func session(withID id: UUID) -> FocusSessionRecord? {
+        records.first { $0.id == id }
+    }
+
     // MARK: - Aggregation: Daily
 
     func getDailyMetrics(for date: Date) -> DailyMetrics? {
@@ -471,3 +487,5 @@ final class FocusMetricsService {
         )
     }
 }
+
+extension FocusMetricsService: CalendarMetricsRecording {}
