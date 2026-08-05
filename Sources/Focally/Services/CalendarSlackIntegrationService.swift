@@ -252,7 +252,8 @@ final class CalendarSlackIntegrationService {
                 modeID: FocusModeType.calendarVideoCall.id,
                 startTime: meeting.startTime,
                 endTime: meeting.endTime,
-                duration: meeting.endTime.timeIntervalSince(meeting.startTime)
+                duration: meeting.endTime.timeIntervalSince(meeting.startTime),
+                source: .calendar
             )
         )
     }
