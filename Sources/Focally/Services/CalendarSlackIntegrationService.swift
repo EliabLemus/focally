@@ -60,20 +60,25 @@ final class CalendarSlackIntegrationService {
     private let eventStore: EKEventStore
     private let slackService: SlackService
     private let dndService: DNDService
+    private let metricsTracker: CalendarMetricsTracker
     private var timer: Timer?
     private var didActivateDNDForMeeting = false
     private var didActivateSlackDNDForMeeting = false
-    private var recordedVideoCallIDs: Set<String> = []
     private var focusChannelObserver: NSObjectProtocol?
 
     init(
         eventStore: EKEventStore = EKEventStore(),
         slackService: SlackService,
-        dndService: DNDService
+        dndService: DNDService,
+        metricsTracker: CalendarMetricsTracker? = nil
     ) {
         self.eventStore = eventStore
         self.slackService = slackService
         self.dndService = dndService
+        self.metricsTracker = metricsTracker ?? CalendarMetricsTracker(
+            persistence: UserDefaultsCalendarMetricsDraftPersistence(),
+            metrics: FocusMetricsService.shared
+        )
         isEnabled = UserDefaults.standard.bool(forKey: Self.enabledDefaultsKey)
         if let data = UserDefaults.standard.data(forKey: Self.slackSettingsDefaultsKey),
            let settings = try? JSONDecoder().decode(SlackCalendarSettings.self, from: data) {
@@ -103,7 +108,10 @@ final class CalendarSlackIntegrationService {
     }
 
     func startIfEnabled() {
-        guard isEnabled else { return }
+        guard isEnabled else {
+            metricsTracker.finishBecauseMonitoringStopped()
+            return
+        }
         if hasCalendarAccess {
             startPeriodicCheck()
         } else {
@@ -161,7 +169,16 @@ final class CalendarSlackIntegrationService {
         timer?.invalidate()
         timer = nil
         events = []
+        metricsTracker.finishBecauseMonitoringStopped()
         transition(to: nil)
+    }
+
+    func prepareForTermination() {
+        metricsTracker.prepareForTermination()
+    }
+
+    func prepareForSystemSleep() {
+        metricsTracker.prepareForSystemSleep()
     }
 
     private func saveCalendarSettings() {
@@ -189,7 +206,16 @@ final class CalendarSlackIntegrationService {
     }
 
     private func transition(to meeting: CalendarMeeting?) {
-        guard meeting?.id != currentMeeting?.id else {
+        if let meeting {
+            metricsTracker.observeActiveMeeting(meeting)
+        } else {
+            metricsTracker.observeNoActiveMeeting()
+        }
+
+        guard Self.isPresenceTransition(
+            currentMeetingID: currentMeeting?.id,
+            nextMeetingID: meeting?.id
+        ) else {
             updateDNDForCurrentMeeting()
             return
         }
@@ -202,8 +228,11 @@ final class CalendarSlackIntegrationService {
 
         currentMeeting = meeting
         publishCurrentMeetingToSlack()
-        recordVideoCallIfNeeded()
         updateDNDForCurrentMeeting()
+    }
+
+    static func isPresenceTransition(currentMeetingID: String?, nextMeetingID: String?) -> Bool {
+        nextMeetingID != currentMeetingID
     }
 
     private func publishCurrentMeetingToSlack() {
@@ -235,26 +264,6 @@ final class CalendarSlackIntegrationService {
             expirationTimestamp: Int(meeting.endTime.timeIntervalSince1970),
             taskEmoji: eventEmoji,
             fallbackEmoji: nil
-        )
-    }
-
-    private func recordVideoCallIfNeeded() {
-        guard calendarSettings.showCalendarInSlack,
-              let meeting = currentMeeting,
-              meeting.hasVideoCall,
-              recordedVideoCallIDs.insert(meeting.id).inserted else {
-            return
-        }
-
-        FocusMetricsService.shared.recordSession(
-            FocusSessionRecord(
-                modeType: .calendarVideoCall,
-                modeID: FocusModeType.calendarVideoCall.id,
-                startTime: meeting.startTime,
-                endTime: meeting.endTime,
-                duration: meeting.endTime.timeIntervalSince(meeting.startTime),
-                source: .calendar
-            )
         )
     }
 
@@ -292,6 +301,15 @@ struct CalendarMeeting: Identifiable, Equatable {
     let endTime: Date
     let isAllDay: Bool
     let hasVideoCall: Bool
+
+    init(id: String, title: String, startTime: Date, endTime: Date, isAllDay: Bool, hasVideoCall: Bool) {
+        self.id = id
+        self.title = title
+        self.startTime = startTime
+        self.endTime = endTime
+        self.isAllDay = isAllDay
+        self.hasVideoCall = hasVideoCall
+    }
 
     init(event: EKEvent) {
         id = event.eventIdentifier ?? UUID().uuidString
