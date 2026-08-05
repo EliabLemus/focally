@@ -45,10 +45,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         dndService: dndService,
         focusIntegrationService: focusIntegrationService
     )
+    private lazy var workspaceLifecycleCoordinator = WorkspaceLifecycleCoordinator(
+        notificationCenter: NSWorkspace.shared.notificationCenter,
+        willSleepName: NSWorkspace.willSleepNotification,
+        didWakeName: NSWorkspace.didWakeNotification,
+        willSleep: { [weak self] in self?.timerService.prepareForSleep() },
+        didWake: { [weak self] in self?.timerService.reconcileAfterWake() }
+    )
     private var timerUpdate: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
+        timerService.restoreSessionIfNeeded()
+        workspaceLifecycleCoordinator.start()
 
         // Auto-reconnect Slack if token exists and not already attempted (post-update)
         slackService.attemptAutoReconnectionIfNeeded()
@@ -602,14 +611,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         logger.info("Application terminating - forcing cleanup of active sessions and focus integration")
 
-        // Reset any active timer session to ensure DND is deactivated
-        if timerService.isActive {
-            logger.info("Terminating active timer session")
-            timerService.resetToIdle()
+        workspaceLifecycleCoordinator.stop()
+        if timerService.hasSession {
+            timerService.prepareForTermination()
+        } else {
+            // Preserve explicit cleanup for integration state outside timer sessions.
+            focusIntegrationService.deactivateFocus()
         }
-
-        // Explicitly deactivate focus integration (macOS DND + Slack)
-        focusIntegrationService.deactivateFocus()
     }
 }
 

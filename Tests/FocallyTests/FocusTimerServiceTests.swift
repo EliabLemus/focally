@@ -3,60 +3,57 @@ import XCTest
 
 @MainActor
 final class FocusTimerServiceTests: XCTestCase {
-    private static let userDefaultsKeys = [
-        "focally.metrics.records",
-        "lastActivity",
-        "lastStatusText",
-        "lastEmoji",
-        "lastDuration"
-    ]
-
     private var sut: FocusTimerService!
     private var dndService: RecordingFocusTimerDND!
     private var notificationService: RecordingFocusTimerNotification!
     private var soundPlayer: RecordingFocusTimerSoundPlayer!
     private var focusIntegration: RecordingFocusTimerIntegration!
-    private var priorUserDefaults: [(key: String, value: Any?)] = []
+    private var persistence: RecordingSessionPersistence!
+    private var ticker: TestFocusTimerTicker!
+    private var clock: TestClock!
+    private var defaults: UserDefaults!
+    private var defaultsSuiteName: String!
+    private var metrics: RecordingFocusTimerMetrics!
 
     override func setUp() {
         super.setUp()
-        priorUserDefaults = Self.userDefaultsKeys.map {
-            (key: $0, value: UserDefaults.standard.object(forKey: $0))
-        }
-        FocusMetricsService.shared.clearAllRecords()
+        defaultsSuiteName = "FocusTimerServiceTests.\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: defaultsSuiteName)!
+        defaults.removePersistentDomain(forName: defaultsSuiteName)
+        metrics = RecordingFocusTimerMetrics()
         dndService = RecordingFocusTimerDND()
         notificationService = RecordingFocusTimerNotification()
         soundPlayer = RecordingFocusTimerSoundPlayer()
         focusIntegration = RecordingFocusTimerIntegration()
+        persistence = RecordingSessionPersistence()
+        ticker = TestFocusTimerTicker()
+        clock = TestClock(Date(timeIntervalSince1970: 2_000_000_000))
         sut = FocusTimerService(
             settingsStore: SettingsStore(),
             soundPlayer: soundPlayer,
             notificationService: notificationService,
             dndService: dndService,
-            focusIntegrationService: focusIntegration
+            focusIntegrationService: focusIntegration,
+            persistence: persistence,
+            ticker: ticker,
+            now: { [clock] in clock!.date }, defaults: defaults, metricsService: metrics
         )
     }
 
     override func tearDown() {
-        defer {
-            for entry in priorUserDefaults {
-                if let value = entry.value {
-                    UserDefaults.standard.set(value, forKey: entry.key)
-                } else {
-                    UserDefaults.standard.removeObject(forKey: entry.key)
-                }
-            }
-            priorUserDefaults = []
-            super.tearDown()
-        }
-
-        sut.resetToIdle()
-        FocusMetricsService.shared.clearAllRecords()
+        defaults.removePersistentDomain(forName: defaultsSuiteName)
         sut = nil
         dndService = nil
         notificationService = nil
         soundPlayer = nil
         focusIntegration = nil
+        persistence = nil
+        ticker = nil
+        clock = nil
+        metrics = nil
+        defaults = nil
+        defaultsSuiteName = nil
+        super.tearDown()
     }
 
     func testHasSessionOnlyForActiveWorkAndBreakStates() {
@@ -77,18 +74,18 @@ final class FocusTimerServiceTests: XCTestCase {
     func testSingleRoundNaturalCompletionRecordsOnePomodoro() {
         prepareWorkCompletion(rounds: 1, currentRound: 0)
 
-        sut.completeCurrentPhaseForTesting(sessionStartedAt: Date().addingTimeInterval(-6))
+        sut.completeCurrentPhaseForTesting(sessionStartedAt: clock.date.addingTimeInterval(-6))
 
-        XCTAssertEqual(FocusMetricsService.shared.records.last?.pomodorosCompleted, 1)
+        XCTAssertEqual(metrics.records.last?.pomodorosCompleted, 1)
         XCTAssertFalse(sut.hasSession)
     }
 
     func testFourRoundNaturalCompletionRecordsFourPomodoros() {
         prepareWorkCompletion(rounds: 4, currentRound: 3)
 
-        sut.completeCurrentPhaseForTesting(sessionStartedAt: Date().addingTimeInterval(-6))
+        sut.completeCurrentPhaseForTesting(sessionStartedAt: clock.date.addingTimeInterval(-6))
 
-        XCTAssertEqual(FocusMetricsService.shared.records.last?.pomodorosCompleted, 4)
+        XCTAssertEqual(metrics.records.last?.pomodorosCompleted, 4)
         XCTAssertFalse(sut.hasSession)
     }
 
@@ -139,6 +136,280 @@ final class FocusTimerServiceTests: XCTestCase {
         XCTAssertFalse(sut.hasSession)
     }
 
+    func testFiveMinuteClockAdvanceNeedsOnlyOneTick() {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(5 * 60)
+        ticker.fire()
+        XCTAssertEqual(sut.remainingSeconds, 20 * 60)
+    }
+
+    func testStartPersistsExactSanitizedSnapshot() throws {
+        let mode = FocusMode(name: "  Focus  ", durationMinutes: 25, enablePomodoro: true, pomodoroRounds: 3)
+        sut.startSession(mode: mode)
+        let snapshot = try XCTUnwrap(persistence.snapshot)
+        XCTAssertEqual(snapshot.modeSnapshot, mode.sanitized())
+        XCTAssertEqual(snapshot.phase, .work)
+        XCTAssertEqual(snapshot.phaseStartedAt, clock.date)
+        XCTAssertEqual(snapshot.phaseTargetEndDate, clock.date.addingTimeInterval(25 * 60))
+        XCTAssertEqual(snapshot.phaseDurationSeconds, 25 * 60)
+    }
+
+    func testPauseGapDoesNotConsumeTimeAndAccumulates() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(5 * 60)
+        sut.pauseSession()
+        clock.advance(10 * 60)
+        sut.resumeSession()
+        XCTAssertEqual(sut.remainingSeconds, 20 * 60)
+        XCTAssertEqual(try XCTUnwrap(persistence.snapshot).accumulatedPausedSeconds, 10 * 60)
+    }
+
+    func testPausedSnapshotRestoresWithoutTickerOrIntegration() {
+        sut.startSession(mode: FocusMode(name: "Original", durationMinutes: 25))
+        clock.advance(5 * 60)
+        sut.pauseSession()
+        let saved = persistence.snapshot
+        focusIntegration.activatedModes.removeAll()
+        ticker.stop()
+        persistence.snapshot = saved
+        sut = FocusTimerService(settingsStore: SettingsStore(), soundPlayer: soundPlayer,
+            notificationService: notificationService, dndService: dndService,
+            focusIntegrationService: focusIntegration, persistence: persistence, ticker: ticker,
+            now: { [clock] in clock!.date }, defaults: defaults, metricsService: metrics)
+        sut.restoreSessionIfNeeded()
+        XCTAssertTrue(sut.isPaused)
+        XCTAssertEqual(sut.currentMode?.name, "Original")
+        XCTAssertFalse(ticker.isRunning)
+        XCTAssertTrue(focusIntegration.activatedModes.isEmpty)
+    }
+
+    func testActiveRestoreIsIdempotentAndDoesNotReplayHistory() {
+        sut.startSession(mode: FocusMode(name: "Original", durationMinutes: 25))
+        focusIntegration.activatedModes.removeAll()
+        notificationService.events.removeAll()
+        soundPlayer.playedSounds.removeAll()
+        ticker.stop()
+        sut = FocusTimerService(settingsStore: SettingsStore(), soundPlayer: soundPlayer,
+            notificationService: notificationService, dndService: dndService,
+            focusIntegrationService: focusIntegration, persistence: persistence, ticker: ticker,
+            now: { [clock] in clock!.date }, defaults: defaults, metricsService: metrics)
+        sut.restoreSessionIfNeeded()
+        sut.restoreSessionIfNeeded()
+        XCTAssertEqual(focusIntegration.activatedModes.count, 1)
+        XCTAssertTrue(ticker.isRunning)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertTrue(soundPlayer.playedSounds.isEmpty)
+    }
+
+    func testExpiredPomodoroPhasesCatchUpWithoutHistoricalEffects() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 3))
+        notificationService.events.removeAll(); soundPlayer.playedSounds.removeAll()
+        focusIntegration.slackBreakActions.removeAll(); focusIntegration.activatedModes.removeAll()
+        clock.advance(12 * 60)
+        sut.reconcileAfterLifecycleGap()
+        XCTAssertEqual(sut.pomodoroState, .work)
+        XCTAssertEqual(sut.currentRound, 2)
+        XCTAssertEqual(sut.remainingSeconds, 5 * 60)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertTrue(soundPlayer.playedSounds.isEmpty)
+        XCTAssertTrue(focusIntegration.slackBreakActions.isEmpty)
+        let snapshot = try XCTUnwrap(persistence.snapshot)
+        XCTAssertEqual(snapshot.accumulatedActiveSeconds, 10 * 60)
+        XCTAssertEqual(snapshot.accumulatedBreakSeconds, 2 * 60)
+    }
+
+    func testPrepareForTerminationPreservesSnapshotWithoutEndEffects() {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        notificationService.events.removeAll(); soundPlayer.completionSoundCount = 0
+        let clearCount = persistence.clearCount
+        sut.prepareForTermination()
+        XCTAssertNotNil(persistence.snapshot)
+        XCTAssertEqual(persistence.clearCount, clearCount)
+        XCTAssertFalse(ticker.isRunning)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertEqual(soundPlayer.completionSoundCount, 0)
+        XCTAssertEqual(focusIntegration.deactivationCount, 1)
+        sut.prepareForTermination()
+        XCTAssertEqual(focusIntegration.deactivationCount, 1)
+    }
+
+    func testMultiplePauseIntervalsAccumulateExactly() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(60); sut.pauseSession(); clock.advance(120); sut.resumeSession()
+        clock.advance(60); sut.pauseSession(); clock.advance(180); sut.resumeSession()
+        XCTAssertEqual(sut.remainingSeconds, 23 * 60)
+        XCTAssertEqual(try XCTUnwrap(persistence.snapshot).accumulatedPausedSeconds, 5 * 60)
+    }
+
+    func testPausedLifecycleGapAndRestoreThenResumeDoNotDoubleCount() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(5 * 60); sut.pauseSession(); clock.advance(10 * 60)
+        sut.reconcileAfterLifecycleGap()
+        XCTAssertEqual(sut.remainingSeconds, 20 * 60)
+        reconstructAndRestore()
+        XCTAssertTrue(sut.isPaused)
+        sut.resumeSession()
+        XCTAssertEqual(try XCTUnwrap(persistence.snapshot).accumulatedPausedSeconds, 10 * 60)
+        sut.pauseSession(); clock.advance(60); sut.resumeSession()
+        XCTAssertEqual(try XCTUnwrap(persistence.snapshot).accumulatedPausedSeconds, 11 * 60)
+    }
+
+    func testActiveBreakRestorationKeepsIntegrationInactiveAndExactModeSnapshot() throws {
+        let mode = FocusMode(name: "Deleted Elsewhere", emoji: ":rocket:", statusText: "Exact",
+            enablePomodoro: true, pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 2, pomodoroRounds: 2,
+            breakLabel: ":coffee: Reset", typeDescriptor: .builtIn(.focusTime))
+        sut.startSession(mode: mode)
+        clock.advance(5 * 60); sut.reconcileAfterLifecycleGap()
+        XCTAssertEqual(sut.pomodoroState, .shortBreak)
+        let saved = try XCTUnwrap(persistence.snapshot)
+        focusIntegration.activatedModes.removeAll(); notificationService.events.removeAll()
+        reconstructAndRestore()
+        XCTAssertEqual(sut.currentMode, mode.sanitized())
+        XCTAssertTrue(ticker.isRunning)
+        XCTAssertTrue(focusIntegration.activatedModes.isEmpty)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertEqual(persistence.snapshot?.modeSnapshot, saved.modeSnapshot)
+    }
+
+    func testExpiredNonPomodoroCompletesAtLogicalTargetAndIsIdempotent() throws {
+        sut.startSession(mode: FocusMode(name: "Short", durationMinutes: 5))
+        let logicalEnd = try XCTUnwrap(persistence.snapshot?.phaseTargetEndDate)
+        clock.advance(8 * 60); sut.reconcileAfterLifecycleGap(); sut.reconcileAfterLifecycleGap()
+        XCTAssertFalse(sut.hasSession)
+        XCTAssertNil(persistence.snapshot)
+        XCTAssertEqual(metrics.records.count, 1)
+        XCTAssertEqual(metrics.records[0].endTime, logicalEnd)
+    }
+
+    func testOnePomodoroPhaseAdvancesHistoricallyWithoutEffects() {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 2, pomodoroRounds: 2))
+        notificationService.events.removeAll(); soundPlayer.playedSounds.removeAll()
+        focusIntegration.slackBreakActions.removeAll()
+        clock.advance(5 * 60); sut.reconcileAfterLifecycleGap()
+        XCTAssertEqual(sut.currentRound, 1)
+        XCTAssertEqual(sut.pomodoroState, .shortBreak)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertTrue(soundPlayer.playedSounds.isEmpty)
+        XCTAssertTrue(focusIntegration.slackBreakActions.isEmpty)
+    }
+
+    func testFullyElapsedMultiRoundCompletesWithLogicalTerminalState() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 2))
+        let start = try XCTUnwrap(persistence.snapshot?.phaseStartedAt)
+        clock.advance(20 * 60); sut.reconcileAfterLifecycleGap()
+        XCTAssertEqual(metrics.records.count, 1)
+        XCTAssertEqual(metrics.records[0].endTime, start.addingTimeInterval(11 * 60))
+        XCTAssertEqual(metrics.records[0].pomodorosCompleted, 2)
+        XCTAssertNil(persistence.snapshot)
+        sut.reconcileAfterLifecycleGap()
+        XCTAssertEqual(metrics.records.count, 1)
+    }
+
+    func testEndSessionAndResetToIdleClearPersistence() {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        sut.endSession(playCompletionSound: false)
+        XCTAssertNil(persistence.snapshot)
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        sut.resetToIdle()
+        XCTAssertNil(persistence.snapshot)
+    }
+
+    func testTickerTransitionWithinTwoSecondsEmitsLiveEffectsOnce() {
+        let mode = FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 2)
+        sut.startSession(mode: mode)
+        notificationService.events.removeAll(); soundPlayer.playedSounds.removeAll()
+        focusIntegration.slackBreakActions.removeAll()
+        clock.advance(5 * 60 + 2); ticker.fire(); ticker.fire()
+        XCTAssertEqual(soundPlayer.playedSounds, [.workEnd])
+        XCTAssertEqual(notificationService.events.count, 1)
+        guard case .breakStarted = notificationService.events[0] else {
+            return XCTFail("Expected exactly one live break-start notification")
+        }
+        XCTAssertEqual(focusIntegration.slackBreakActions.count, 1)
+    }
+
+    func testTickerTransitionBeyondTwoSecondsIsHistorical() {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 2))
+        notificationService.events.removeAll(); soundPlayer.playedSounds.removeAll()
+        focusIntegration.slackBreakActions.removeAll()
+
+        clock.advance(5 * 60 + 2.001)
+        ticker.fire()
+
+        XCTAssertEqual(sut.pomodoroState, .shortBreak)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertTrue(soundPlayer.playedSounds.isEmpty)
+        XCTAssertTrue(focusIntegration.slackBreakActions.isEmpty)
+        XCTAssertTrue(ticker.isRunning)
+    }
+
+    func testSleepStopsTickerPersistsAndIgnoresQueuedTickerCallback() {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        let savesBeforeSleep = persistence.saveCount
+        clock.advance(60)
+
+        sut.prepareForSleep()
+
+        XCTAssertFalse(ticker.isRunning)
+        XCTAssertEqual(persistence.saveCount, savesBeforeSleep + 1)
+        XCTAssertEqual(persistence.snapshot?.savedAt, clock.date)
+        XCTAssertEqual(sut.remainingSeconds, 24 * 60)
+
+        clock.advance(25 * 60)
+        ticker.fireLastScheduledCallback()
+        XCTAssertTrue(sut.hasSession)
+        XCTAssertEqual(metrics.records.count, 0)
+    }
+
+    func testWakeNearExpiryReconcilesHistoricallyAndRestartsFinalActivePhase() {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 2))
+        notificationService.events.removeAll(); soundPlayer.playedSounds.removeAll()
+        focusIntegration.slackBreakActions.removeAll(); focusIntegration.activatedModes.removeAll()
+        clock.advance(5 * 60 - 1)
+        sut.prepareForSleep()
+        clock.advance(2)
+
+        sut.reconcileAfterWake()
+
+        XCTAssertEqual(sut.pomodoroState, .shortBreak)
+        XCTAssertEqual(sut.remainingSeconds, 59)
+        XCTAssertTrue(ticker.isRunning)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertTrue(soundPlayer.playedSounds.isEmpty)
+        XCTAssertTrue(focusIntegration.slackBreakActions.isEmpty)
+        XCTAssertTrue(focusIntegration.activatedModes.isEmpty)
+    }
+
+    func testWakeAfterTerminalPhaseStaysStoppedAndSilent() {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 5))
+        notificationService.events.removeAll(); soundPlayer.completionSoundCount = 0
+        clock.advance(5 * 60 - 1)
+        sut.prepareForSleep()
+        clock.advance(2)
+
+        sut.reconcileAfterWake()
+
+        XCTAssertFalse(sut.hasSession)
+        XCTAssertFalse(ticker.isRunning)
+        XCTAssertTrue(notificationService.events.isEmpty)
+        XCTAssertEqual(soundPlayer.completionSoundCount, 0)
+    }
+
+    private func reconstructAndRestore() {
+        ticker.stop()
+        sut = FocusTimerService(settingsStore: SettingsStore(), soundPlayer: soundPlayer,
+            notificationService: notificationService, dndService: dndService,
+            focusIntegrationService: focusIntegration, persistence: persistence, ticker: ticker,
+            now: { [clock] in clock!.date }, defaults: defaults, metricsService: metrics)
+        sut.restoreSessionIfNeeded()
+    }
+
     private func prepareWorkCompletion(rounds: Int, currentRound: Int) {
         sut.currentMode = FocusMode(
             name: "Test Focus",
@@ -155,6 +426,12 @@ final class FocusTimerServiceTests: XCTestCase {
 }
 
 @MainActor
+private final class RecordingFocusTimerMetrics: FocusTimerMetrics {
+    var records: [FocusSessionRecord] = []
+    func recordSession(_ record: FocusSessionRecord) { records.append(record) }
+}
+
+@MainActor
 private final class RecordingFocusTimerDND: FocusTimerDND {
     private(set) var deactivationCount = 0
 
@@ -165,7 +442,7 @@ private final class RecordingFocusTimerDND: FocusTimerDND {
 
 @MainActor
 private final class RecordingFocusTimerNotification: FocusTimerNotification {
-    private(set) var events: [NotificationService.Event] = []
+    var events: [NotificationService.Event] = []
 
     func notify(_ event: NotificationService.Event) {
         events.append(event)
@@ -174,8 +451,8 @@ private final class RecordingFocusTimerNotification: FocusTimerNotification {
 
 @MainActor
 private final class RecordingFocusTimerSoundPlayer: FocusTimerSoundPlayer {
-    private(set) var playedSounds: [SoundPlayerService.SoundType] = []
-    private(set) var completionSoundCount = 0
+    var playedSounds: [SoundPlayerService.SoundType] = []
+    var completionSoundCount = 0
 
     func play(_ soundType: SoundPlayerService.SoundType) {
         playedSounds.append(soundType)
@@ -196,9 +473,9 @@ private final class RecordingFocusTimerIntegration: FocusTimerIntegration {
         let modeEmoji: String
     }
 
-    private(set) var activatedModes: [FocusMode] = []
+    var activatedModes: [FocusMode] = []
     private(set) var deactivationCount = 0
-    private(set) var slackBreakActions: [SlackBreakAction] = []
+    var slackBreakActions: [SlackBreakAction] = []
 
     func activateFocus(for mode: FocusMode) {
         activatedModes.append(mode)
@@ -225,4 +502,29 @@ private final class RecordingFocusTimerIntegration: FocusTimerIntegration {
             )
         )
     }
+}
+
+@MainActor private final class RecordingSessionPersistence: FocusSessionPersisting {
+    var snapshot: PersistedFocusSession?
+    private(set) var saveCount = 0
+    private(set) var clearCount = 0
+    func load() -> PersistedFocusSession? { snapshot }
+    func save(_ snapshot: PersistedFocusSession) { self.snapshot = snapshot; saveCount += 1 }
+    func clear() { snapshot = nil; clearCount += 1 }
+}
+
+@MainActor private final class TestFocusTimerTicker: FocusTimerTicker {
+    private var action: (@MainActor () -> Void)?
+    private var lastScheduledAction: (@MainActor () -> Void)?
+    var isRunning: Bool { action != nil }
+    func start(_ tick: @escaping @MainActor () -> Void) { action = tick; lastScheduledAction = tick }
+    func stop() { action = nil }
+    func fire() { action?() }
+    func fireLastScheduledCallback() { lastScheduledAction?() }
+}
+
+@MainActor private final class TestClock {
+    var date: Date
+    init(_ date: Date) { self.date = date }
+    func advance(_ seconds: TimeInterval) { date.addTimeInterval(seconds) }
 }
