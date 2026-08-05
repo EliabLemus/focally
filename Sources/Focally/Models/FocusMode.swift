@@ -262,7 +262,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
             durationMinutes: sanitizedDurationMinutes,
             enableMacOSDND: enableMacOSDND,
             enableSlackDND: enableSlackDND,
-            enablePomodoro: enableMacOSDND && enablePomodoro,
+            enablePomodoro: enablePomodoro,
             pomodoroWorkMinutes: sanitizedPomodoroWorkMinutes,
             pomodoroBreakMinutes: sanitizedPomodoroBreakMinutes,
             pomodoroLongBreakMinutes: sanitizedPomodoroLongBreakMinutes,

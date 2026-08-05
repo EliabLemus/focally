@@ -5,7 +5,7 @@ struct TimerPage: View {
 
     var body: some View {
         Group {
-            if timerService.hasSession && timerService.isWork {
+            if timerService.hasSession {
                 ActiveFocusView()
             } else {
                 IdleDashboardView()

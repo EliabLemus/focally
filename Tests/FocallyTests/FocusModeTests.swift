@@ -9,7 +9,7 @@ final class FocusModeTests: XCTestCase {
         XCTAssertEqual(FocusMode.builtInModes.map(\.durationMinutes), [25, 30, 15])
     }
 
-    func testSanitizedModeClampsAndDisablesPomodoroWhenDNDIsOff() {
+    func testSanitizedModeClampsAndKeepsPomodoroIndependentWhenDNDIsOff() {
         let mode = FocusMode(
             id: FocusMode.focusTimeID,
             name: "Focus Time",
@@ -29,7 +29,7 @@ final class FocusModeTests: XCTestCase {
         XCTAssertEqual(sanitized.emoji, ":brain:")
         XCTAssertEqual(sanitized.statusText, "Focus Time")
         XCTAssertEqual(sanitized.durationMinutes, 120)
-        XCTAssertFalse(sanitized.enablePomodoro)
+        XCTAssertTrue(sanitized.enablePomodoro)
         XCTAssertEqual(sanitized.pomodoroWorkMinutes, 5)
         XCTAssertEqual(sanitized.pomodoroBreakMinutes, 1)
         XCTAssertEqual(sanitized.pomodoroRounds, 12)

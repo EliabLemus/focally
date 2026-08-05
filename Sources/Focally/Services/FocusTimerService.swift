@@ -3,6 +3,43 @@ import Observation
 import SwiftUI
 
 @MainActor
+protocol FocusTimerDND: AnyObject {
+    func deactivateDND()
+}
+
+@MainActor
+protocol FocusTimerNotification: AnyObject {
+    func notify(_ event: NotificationService.Event)
+}
+
+@MainActor
+protocol FocusTimerSoundPlayer: AnyObject {
+    func play(_ soundType: SoundPlayerService.SoundType)
+    func playCompletionSound()
+}
+
+@MainActor
+protocol FocusTimerIntegration: AnyObject {
+    func activateFocus(for mode: FocusMode)
+    func deactivateFocus()
+    func performSlackBreakAction(
+        breakLabel: String?,
+        isLongBreak: Bool,
+        breakDurationMinutes: Int,
+        modeName: String,
+        modeEmoji: String
+    )
+}
+
+extension DNDService: FocusTimerDND {}
+extension NotificationService: FocusTimerNotification {}
+extension SoundPlayerService: FocusTimerSoundPlayer {}
+extension FocusTimerSoundPlayer where Self == SoundPlayerService {
+    static var shared: SoundPlayerService { SoundPlayerService.shared }
+}
+extension FocusIntegrationService: FocusTimerIntegration {}
+
+@MainActor
 @Observable
 final class FocusTimerService {
     static private(set) weak var shared: FocusTimerService?
@@ -31,20 +68,20 @@ final class FocusTimerService {
     private var sessionStartTime: Date?
 
     let settingsStore: SettingsStore
-    let soundPlayer: SoundPlayerService
-    let notificationService: NotificationService
-    let dndService: DNDService
-    let focusIntegrationService: FocusIntegrationService
+    let soundPlayer: any FocusTimerSoundPlayer
+    let notificationService: any FocusTimerNotification
+    let dndService: any FocusTimerDND
+    let focusIntegrationService: any FocusTimerIntegration
 
     private var timer: Timer?
     private var currentPhaseDuration = 0
     private let defaults = UserDefaults.standard
 
     init(settingsStore: SettingsStore,
-         soundPlayer: SoundPlayerService = .shared,
-         notificationService: NotificationService = NotificationService(),
-         dndService: DNDService = DNDService.shared,
-         focusIntegrationService: FocusIntegrationService) {
+         soundPlayer: any FocusTimerSoundPlayer = SoundPlayerService.shared,
+         notificationService: any FocusTimerNotification = NotificationService(),
+         dndService: any FocusTimerDND = DNDService.shared,
+         focusIntegrationService: any FocusTimerIntegration) {
         self.settingsStore = settingsStore
         self.soundPlayer = soundPlayer
         self.notificationService = notificationService
@@ -116,9 +153,6 @@ final class FocusTimerService {
         stopTimer()
         deactivateFocusIntegration()
         clearSessionState()
-
-        // Deactivate DND before playing sound and notifying
-        dndService.deactivateDND()
 
         if playCompletionSound {
             soundPlayer.playCompletionSound()
@@ -289,6 +323,7 @@ final class FocusTimerService {
                 soundPlayer.play(.workEnd)
                 startShortBreak()
             } else {
+                currentRound = completedRounds
                 endSession()
             }
         case .shortBreak:
@@ -301,6 +336,15 @@ final class FocusTimerService {
             break
         }
     }
+
+#if DEBUG
+    func completeCurrentPhaseForTesting(sessionStartedAt: Date? = nil) {
+        if let sessionStartedAt {
+            sessionStartTime = sessionStartedAt
+        }
+        handlePhaseComplete()
+    }
+#endif
 
     private func clearSessionState() {
         pomodoroState = .idle
