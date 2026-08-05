@@ -63,17 +63,14 @@ git commit -m "chore: bump version to X.Y.Z, build N"
 ### 3. Verificar Build Local
 
 ```bash
-# Build en Debug primero
-xcodebuild -scheme Focally -configuration Debug build
-
-# Si pasa, hacer build en Release
-xcodebuild -scheme Focally -configuration Release build
-
-# Verificar que el .app se creó
-find ~/Library/Developer/Xcode/DerivedData/Focally-*/Build/Products/Release -name "Focally.app"
+# Compilar la app y el DMG de release con el mismo comando que CI
+./scripts/build-release.sh vX.Y.Z
 ```
 
-**CRÍTICO**: Si el build falla local, NO hacer push. Arreglar primero.
+El script valida el tag contra `project.yml`, regenera el proyecto Xcode,
+verifica las versiones de la app compilada y crea `build/Focally-vX.Y.Z.dmg`.
+
+**CRÍTICO**: Si el build de release falla local, NO hacer push. Arreglar primero.
 
 ### 4. Push al Repo Principal
 
@@ -218,7 +215,7 @@ Antes de hacer push:
 
 - [ ] Todos los archivos modificados están commiteados
 - [ ] `project.yml` tiene versión y build bumpados
-- [ ] Build local pasa: `xcodebuild -scheme Focally -configuration Release build`
+- [ ] Build local de release pasa: `./scripts/build-release.sh vX.Y.Z`
 - [ ] Tag creado: `git tag v0.7.0 HEAD`
 - [ ] Tag verificado: `git show v0.7.0 --stat`
 - [ ] Credenciales GitHub configuradas
