@@ -164,6 +164,49 @@ final class FocusTimerServiceTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(persistence.snapshot).accumulatedPausedSeconds, 10 * 60)
     }
 
+    func testPausedWallClockDoesNotInflateRecordedFocus() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(5 * 60)
+        sut.pauseSession()
+        clock.advance(10 * 60)
+        sut.endSession(playCompletionSound: false)
+
+        let record = try XCTUnwrap(metrics.records.last)
+        XCTAssertEqual(record.recordVersion, 2)
+        XCTAssertEqual(record.source, .manual)
+        XCTAssertEqual(record.duration, 5 * 60)
+        XCTAssertEqual(record.activeDuration, 5 * 60)
+        XCTAssertEqual(record.pausedDuration, 10 * 60)
+        XCTAssertEqual(record.breakDuration, 0)
+    }
+
+    func testNonPomodoroFiveActiveMinutesRecordsOnlyManualActiveTime() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(5 * 60)
+        sut.endSession(playCompletionSound: false)
+        assertHonestManualRecord(try XCTUnwrap(metrics.records.last), active: 300, paused: 0, breaks: 0)
+        XCTAssertNil(metrics.records.last?.pomodorosCompleted)
+    }
+
+    func testEndingDuringBreakSeparatesPartialBreakFromActiveFocus() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 2, pomodoroRounds: 2))
+        clock.advance(5 * 60); sut.reconcileAfterLifecycleGap()
+        clock.advance(60); sut.endSession(playCompletionSound: false)
+
+        let record = try XCTUnwrap(metrics.records.last)
+        XCTAssertEqual(record.duration, 5 * 60)
+        XCTAssertEqual(record.activeDuration, 5 * 60)
+        XCTAssertEqual(record.breakDuration, 60)
+    }
+
+    func testBelowFiveActiveSecondsIsDiscardedDespiteLongPause() {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(4); sut.pauseSession(); clock.advance(10 * 60)
+        sut.endSession(playCompletionSound: false)
+        XCTAssertTrue(metrics.records.isEmpty)
+    }
+
     func testPausedSnapshotRestoresWithoutTickerOrIntegration() {
         sut.startSession(mode: FocusMode(name: "Original", durationMinutes: 25))
         clock.advance(5 * 60)
@@ -242,6 +285,26 @@ final class FocusTimerServiceTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(persistence.snapshot).accumulatedPausedSeconds, 5 * 60)
     }
 
+    func testMultiplePauseIntervalsRecordExactlyOnce() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
+        clock.advance(60); sut.pauseSession(); clock.advance(120); sut.resumeSession()
+        clock.advance(60); sut.pauseSession(); clock.advance(180)
+        sut.endSession(playCompletionSound: false)
+        assertHonestManualRecord(try XCTUnwrap(metrics.records.last), active: 120, paused: 300, breaks: 0)
+    }
+
+    func testRestoreThenEndPreservesAllThreeAccumulators() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 3))
+        clock.advance(6 * 60); sut.reconcileAfterLifecycleGap()
+        clock.advance(2 * 60); sut.pauseSession(); clock.advance(3 * 60)
+        sut.prepareForTermination()
+        reconstructAndRestore()
+        sut.endSession(playCompletionSound: false)
+        assertHonestManualRecord(try XCTUnwrap(metrics.records.last), active: 7 * 60,
+            paused: 3 * 60, breaks: 60)
+    }
+
     func testPausedLifecycleGapAndRestoreThenResumeDoNotDoubleCount() throws {
         sut.startSession(mode: FocusMode(name: "Focus", durationMinutes: 25))
         clock.advance(5 * 60); sut.pauseSession(); clock.advance(10 * 60)
@@ -303,9 +366,24 @@ final class FocusTimerServiceTests: XCTestCase {
         XCTAssertEqual(metrics.records.count, 1)
         XCTAssertEqual(metrics.records[0].endTime, start.addingTimeInterval(11 * 60))
         XCTAssertEqual(metrics.records[0].pomodorosCompleted, 2)
+        XCTAssertEqual(metrics.records[0].duration, 10 * 60)
+        XCTAssertEqual(metrics.records[0].activeDuration, 10 * 60)
+        XCTAssertEqual(metrics.records[0].breakDuration, 60)
         XCTAssertNil(persistence.snapshot)
         sut.reconcileAfterLifecycleGap()
         XCTAssertEqual(metrics.records.count, 1)
+    }
+
+    func testHistoricalThreeRoundCatchUpRecordsEveryWorkAndBreakComponent() throws {
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 3))
+        let logicalStart = try XCTUnwrap(persistence.snapshot?.phaseStartedAt)
+        clock.advance(30 * 60)
+        sut.reconcileAfterLifecycleGap()
+        let record = try XCTUnwrap(metrics.records.last)
+        assertHonestManualRecord(record, active: 15 * 60, paused: 0, breaks: 2 * 60)
+        XCTAssertEqual(record.pomodorosCompleted, 3)
+        XCTAssertEqual(record.endTime, logicalStart.addingTimeInterval(17 * 60))
     }
 
     func testEndSessionAndResetToIdleClearPersistence() {
@@ -422,6 +500,17 @@ final class FocusTimerServiceTests: XCTestCase {
         sut.currentRound = currentRound
         sut.pomodoroState = .work
         sut.isActive = true
+    }
+
+    private func assertHonestManualRecord(_ record: FocusSessionRecord, active: TimeInterval,
+                                          paused: TimeInterval, breaks: TimeInterval,
+                                          file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertEqual(record.recordVersion, 2, file: file, line: line)
+        XCTAssertEqual(record.source, .manual, file: file, line: line)
+        XCTAssertEqual(record.duration, active, file: file, line: line)
+        XCTAssertEqual(record.activeDuration, active, file: file, line: line)
+        XCTAssertEqual(record.pausedDuration, paused, file: file, line: line)
+        XCTAssertEqual(record.breakDuration, breaks, file: file, line: line)
     }
 }
 

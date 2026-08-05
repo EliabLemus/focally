@@ -8,6 +8,8 @@ struct DailyMetrics: Codable, Equatable {
     let pomodorosCompleted: Int
     let meetingTime: TimeInterval       // in seconds
     let totalFocusTime: TimeInterval    // in seconds
+    let totalPausedTime: TimeInterval
+    let totalBreakTime: TimeInterval
     let focusTimeDuration: TimeInterval
     let meetingDuration: TimeInterval
     let inboxDuration: TimeInterval
@@ -70,6 +72,8 @@ struct WeeklyMetrics: Codable, Equatable {
     let pomodorosCompleted: Int
     let meetingTime: TimeInterval
     let totalFocusTime: TimeInterval
+    let totalPausedTime: TimeInterval
+    let totalBreakTime: TimeInterval
     let daysWithData: Int
     let focusTimeDuration: TimeInterval
     let meetingDuration: TimeInterval
@@ -113,6 +117,8 @@ struct MonthlyMetrics: Codable, Equatable {
     let pomodorosCompleted: Int
     let meetingTime: TimeInterval
     let totalFocusTime: TimeInterval
+    let totalPausedTime: TimeInterval
+    let totalBreakTime: TimeInterval
     let weeksWithData: Int
     let focusTimeDuration: TimeInterval
     let meetingDuration: TimeInterval
@@ -161,7 +167,7 @@ private struct ModeTypeBreakdown {
 @MainActor
 @Observable
 final class FocusMetricsService {
-    static let shared = FocusMetricsService()
+    static let shared = FocusMetricsService(defaults: .standard)
 
     // MARK: - Storage Keys
 
@@ -171,10 +177,12 @@ final class FocusMetricsService {
     // MARK: - Published State
 
     private(set) var records: [FocusSessionRecord] = []
+    private let defaults: UserDefaults
 
     // MARK: - Init
 
-    private init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         loadRecords()
     }
 
@@ -182,14 +190,12 @@ final class FocusMetricsService {
 
     /// Record a completed session. Called by `FocusTimerService` on session completion.
     func recordSession(_ session: FocusSessionRecord) {
-        print("[Metrics] recordSession called with: \(session)")
         records.append(session)
         // Cap stored records to prevent unbounded growth (MVP).
         if records.count > Self.maxRecords {
             records.removeFirst(records.count - Self.maxRecords)
         }
         saveRecords()
-        print("[Metrics] Saved \(records.count) records to UserDefaults")
     }
 
     // MARK: - Aggregation: Daily
@@ -207,6 +213,8 @@ final class FocusMetricsService {
         let pomodoros = dayRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
         let meetingTime = dayRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
         let totalFocus = dayRecords.reduce(0) { $0 + $1.duration }
+        let totalPaused = dayRecords.reduce(0) { $0 + $1.pausedDuration }
+        let totalBreak = dayRecords.reduce(0) { $0 + $1.breakDuration }
         let breakdown = modeTypeBreakdown(for: dayRecords)
 
         return DailyMetrics(
@@ -214,6 +222,8 @@ final class FocusMetricsService {
             pomodorosCompleted: pomodoros,
             meetingTime: meetingTime,
             totalFocusTime: totalFocus,
+            totalPausedTime: totalPaused,
+            totalBreakTime: totalBreak,
             focusTimeDuration: breakdown.focusTimeDuration,
             meetingDuration: breakdown.meetingDuration,
             inboxDuration: breakdown.inboxDuration,
@@ -309,20 +319,28 @@ final class FocusMetricsService {
     // MARK: - Persistence (UserDefaults)
 
     private func loadRecords() {
-        guard let data = UserDefaults.standard.data(forKey: Self.recordsKey) else {
+        guard let data = defaults.data(forKey: Self.recordsKey) else {
             return
         }
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        records = (try? decoder.decode([FocusSessionRecord].self, from: data)) ?? []
+        guard let elements = try? JSONSerialization.jsonObject(with: data) as? [Any] else {
+            records = []
+            return
+        }
+        records = elements.compactMap { element in
+            guard JSONSerialization.isValidJSONObject(element),
+                  let elementData = try? JSONSerialization.data(withJSONObject: element) else { return nil }
+            return try? decoder.decode(FocusSessionRecord.self, from: elementData)
+        }
     }
 
     private func saveRecords() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         guard let data = try? encoder.encode(records) else { return }
-        UserDefaults.standard.set(data, forKey: Self.recordsKey)
+        defaults.set(data, forKey: Self.recordsKey)
     }
 
     // MARK: - Test Helpers
@@ -330,7 +348,7 @@ final class FocusMetricsService {
     /// Clears all records. Intended for tests and "reset" operations.
     func clearAllRecords() {
         records.removeAll()
-        UserDefaults.standard.removeObject(forKey: Self.recordsKey)
+        defaults.removeObject(forKey: Self.recordsKey)
     }
 
     // MARK: - Private
@@ -351,6 +369,8 @@ final class FocusMetricsService {
         let pomodoros = weekRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
         let meetingTime = weekRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
         let totalFocus = weekRecords.reduce(0) { $0 + $1.duration }
+        let totalPaused = weekRecords.reduce(0) { $0 + $1.pausedDuration }
+        let totalBreak = weekRecords.reduce(0) { $0 + $1.breakDuration }
         let breakdown = modeTypeBreakdown(for: weekRecords)
 
         var daysWithSessions: Set<DateComponents> = []
@@ -364,6 +384,8 @@ final class FocusMetricsService {
             pomodorosCompleted: pomodoros,
             meetingTime: meetingTime,
             totalFocusTime: totalFocus,
+            totalPausedTime: totalPaused,
+            totalBreakTime: totalBreak,
             daysWithData: daysWithSessions.count,
             focusTimeDuration: breakdown.focusTimeDuration,
             meetingDuration: breakdown.meetingDuration,
@@ -383,6 +405,8 @@ final class FocusMetricsService {
         let pomodoros = monthRecords.compactMap(\.pomodorosCompleted).reduce(0, +)
         let meetingTime = monthRecords.filter { $0.isMeeting }.reduce(0) { $0 + $1.duration }
         let totalFocus = monthRecords.reduce(0) { $0 + $1.duration }
+        let totalPaused = monthRecords.reduce(0) { $0 + $1.pausedDuration }
+        let totalBreak = monthRecords.reduce(0) { $0 + $1.breakDuration }
         let breakdown = modeTypeBreakdown(for: monthRecords)
 
         let iso = isoCalendar
@@ -398,6 +422,8 @@ final class FocusMetricsService {
             pomodorosCompleted: pomodoros,
             meetingTime: meetingTime,
             totalFocusTime: totalFocus,
+            totalPausedTime: totalPaused,
+            totalBreakTime: totalBreak,
             weeksWithData: weeksWithSessions.count,
             focusTimeDuration: breakdown.focusTimeDuration,
             meetingDuration: breakdown.meetingDuration,

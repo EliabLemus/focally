@@ -414,11 +414,14 @@ final class FocusTimerService {
 
     private func recordMetricsOnCompletion(endTime: Date) {
         guard let start = sessionStartTime, let mode = currentMode else { return }
-        let duration = endTime.timeIntervalSince(start)
-        guard duration >= 5 else { return }
+        let active = max(0, accumulatedActiveSeconds)
+        let paused = max(0, accumulatedPausedSeconds)
+        let breaks = max(0, accumulatedBreakSeconds)
+        guard active >= 5 else { return }
         metricsService.recordSession(FocusSessionRecord(
             modeType: mode.type, modeID: mode.id, startTime: start, endTime: endTime,
-            duration: duration, pomodorosCompleted: mode.enablePomodoro ? currentRound : nil
+            duration: active, pomodorosCompleted: mode.enablePomodoro ? currentRound : nil,
+            activeDuration: active, pausedDuration: paused, breakDuration: breaks, source: .manual
         ))
     }
 
