@@ -92,7 +92,6 @@
 		CAECDE4AC6D75573BAECAF34 /* ActiveFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */; };
 		CC6B0E5B7BD7393534E5039F /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */; };
 		CD0D4EA3E43042D61BF97784 /* WeeklyMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7814C1833FF79761439FC /* WeeklyMetricsView.swift */; };
-		D28001E5C2640DF8932E9C3D /* FocallyTesting.swift.disabled in Resources */ = {isa = PBXBuildFile; fileRef = 051BDBCD3E21F1FD15B3D7CF /* FocallyTesting.swift.disabled */; };
 		D47E178868502051F8D6A991 /* pluck_002.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C98C5639BCFE72D1706C0464 /* pluck_002.aiff */; };
 		D626EF73E0ACD103321976D9 /* FocallyRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633E55854AB377DA4F68B1CC /* FocallyRadius.swift */; };
 		D7092685F6CD40CC458A66C1 /* FocusModeEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1B83D3B0FB1DC2793D6ACF /* FocusModeEditSheet.swift */; };
@@ -137,7 +136,6 @@
 		0179E6DB0D32C6C38E33CE35 /* SlackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackService.swift; sourceTree = "<group>"; };
 		0267CB7D5ABFC1ED7C04FCAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		02A06E8000779E54DAFAFDDB /* FocallyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		051BDBCD3E21F1FD15B3D7CF /* FocallyTesting.swift.disabled */ = {isa = PBXFileReference; path = FocallyTesting.swift.disabled; sourceTree = "<group>"; };
 		09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSlackIntegrationService.swift; sourceTree = "<group>"; };
 		094ACF4CCDAE678B0F17C701 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTheme.swift; sourceTree = "<group>"; };
@@ -365,7 +363,6 @@
 			children = (
 				CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */,
 				87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */,
-				051BDBCD3E21F1FD15B3D7CF /* FocallyTesting.swift.disabled */,
 				19F711C098187E7310E8039B /* FocusMetricsServiceTests.swift */,
 				2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */,
 				335C2B031BB8F4E600F7CBF2 /* FocusTimerServiceTests.swift */,
@@ -580,7 +577,6 @@
 			buildConfigurationList = F16376535F4DDF3F59789B9D /* Build configuration list for PBXNativeTarget "FocallyTests" */;
 			buildPhases = (
 				6A996F35F08B4E809EEA6050 /* Sources */,
-				D674298428B70FF2E3C5641C /* Resources */,
 				940DAB78F702C65FEA6C9C5A /* Frameworks */,
 			);
 			buildRules = (
@@ -678,14 +674,6 @@
 				1EB7549C72A8A8EBB126ADED /* glass_005.aiff in Resources */,
 				D47E178868502051F8D6A991 /* pluck_002.aiff in Resources */,
 				51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D674298428B70FF2E3C5641C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D28001E5C2640DF8932E9C3D /* FocallyTesting.swift.disabled in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
