@@ -1,3 +1,6 @@
+superseded: true
+superseded_reason: "Product decision: update availability is shown only in Settings → About."
+
 spec_version: "1.0"
 name: "focally-update-alert-v0.9.2"
 title: "Parche Update Alert v0.9.2 - Badge + notificación nativa"

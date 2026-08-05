@@ -194,6 +194,11 @@
 "about_developed" = "Developed with ❤️ using SwiftUI";
 "about_copyright" = "© 2025-2026 Eliab Lemus";
 "about_update_available" = "Update available";
+"about_get_update" = "Get it";
+"about_tagline" = "Focus Timer & Slack Integration";
+"about_description" = "A beautiful focus timer for macOS with Slack status integration, Do Not Disturb automation, and detailed productivity metrics.";
+"about_github_link" = "GitHub Repository";
+"about_license" = "MIT License";
 
 /* Permission Service */
 "permission_notifications" = "Notifications";
@@ -227,13 +232,8 @@
 "menubar_current_meeting" = "Current Meeting";
 "active_meeting_warning" = "You have an active meeting";
 
-/* ========== Update Alert Badge ========== */
-"update_available_badge" = "Update available";
+/* ========== Update ========== */
 "update_version" = "v%@";
-
-/* ========== Update Notification ========== */
-"notification_update_title" = "New Version Available";
-"notification_update_body" = "Focally %@ is now available. Click to download.";
 
 /* ========== Calendar & Custom Focus Types ========== */
 "settings_focus_types" = "Focus Types";

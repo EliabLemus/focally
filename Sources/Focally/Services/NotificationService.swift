@@ -11,7 +11,6 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         case breakStarted
         case longBreakStarted
         case sessionEnded
-        case updateAvailable(version: String)
     }
 
     override init() {
@@ -49,9 +48,6 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         case .sessionEnded:
             content.title = "Session Ended"
             content.body = "Your focus session has finished"
-        case .updateAvailable(let version):
-            content.title = AppLanguage.shared.localizedString("notification_update_title")
-            content.body = String(format: AppLanguage.shared.localizedString("notification_update_body"), version)
         }
 
         if case .sessionEnded = event {

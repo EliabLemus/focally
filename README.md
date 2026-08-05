@@ -100,7 +100,7 @@ brew reinstall --cask focally
 3. Drag **Focally.app** to **Applications** (replace when prompted)
 4. Relaunch Focally
 
-**Update Checker**: Focally automatically checks for updates every 24 hours. If a new version is available, you'll see an "Update available" indicator in **Settings → About**. Click it to open the download page.
+**Update Checker**: Focally automatically checks for updates every 4 hours. If a new version is available, you'll see an "Update available" indicator in **Settings → About**. Click it to open the download page.
 
 ---
 
@@ -268,7 +268,7 @@ brew reinstall --cask focally
 3. Arrastra **Focally.app** a **Aplicaciones** (reemplaza cuando se solicite)
 4. Relanza Focally
 
-**Verificador de actualizaciones**: Focally verifica automáticamente actualizaciones cada 24 horas. Si hay una nueva versión disponible, verás un indicador de "Actualización disponible" en **Configuración → Acerca de**. Haz clic para abrir la página de descarga.
+**Verificador de actualizaciones**: Focally verifica automáticamente actualizaciones cada 4 horas. Si hay una nueva versión disponible, verás un indicador de "Actualización disponible" en **Configuración → Acerca de**. Haz clic para abrir la página de descarga.
 
 ---
 
@@ -436,7 +436,7 @@ brew reinstall --cask focally
 3. Arraste **Focally.app** para **Aplicativos** (substitua quando solicitado)
 4. Reinicie o Focally
 
-**Verificador de atualizações**: O Focally verifica automaticamente atualizações a cada 24 horas. Se uma nova versão estiver disponível, você verá um indicador de "Atualização disponível" em **Configurações → Sobre**. Clique para abrir a página de download.
+**Verificador de atualizações**: O Focally verifica automaticamente atualizações a cada 4 horas. Se uma nova versão estiver disponível, você verá um indicador de "Atualização disponível" em **Configurações → Sobre**. Clique para abrir a página de download.
 
 ---
 

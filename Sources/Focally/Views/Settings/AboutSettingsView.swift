@@ -1,11 +1,10 @@
 import SwiftUI
 
 struct AboutSettingsView: View {
-    @Environment(\.locale) private var locale
     @Environment(UpdateCheckerService.self) private var updateChecker
 
-    let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-    let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+    let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
 
     var body: some View {
         ScrollView {
@@ -28,18 +27,24 @@ struct AboutSettingsView: View {
                             .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(.primary)
 
-                        Text("v\(version) · build \(build)")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.secondary)
+                        HStack(spacing: 8) {
+                            Text(String(format: AppLanguage.shared.localizedString("about_version"), version))
+                            Text(String(format: AppLanguage.shared.localizedString("about_build"), build))
+                        }
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
 
                         if updateChecker.isNewVersionAvailable, let newVersion = updateChecker.latestVersion {
                             HStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(.orange)
-                                Text("⚠️ Update available: v\(newVersion)")
+                                Image(systemName: "arrow.down.circle")
+                                    .foregroundStyle(.secondary)
+                                LocalizedText("about_update_available")
                                     .font(.system(size: 12))
-                                    .foregroundStyle(.orange)
-                                Button("Get it") {
+                                    .foregroundStyle(.secondary)
+                                Text(String(format: AppLanguage.shared.localizedString("update_version"), newVersion))
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(.secondary)
+                                Button(AppLanguage.shared.localizedString("about_get_update")) {
                                     if let url = updateChecker.updateUrl {
                                         NSWorkspace.shared.open(url)
                                     }
@@ -56,11 +61,11 @@ struct AboutSettingsView: View {
 
                 // Description
                 VStack(spacing: 12) {
-                    Text("Focus Timer & Slack Integration")
+                    LocalizedText("about_tagline")
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(.primary)
 
-                    Text("A beautiful focus timer for macOS with Slack status integration, Do Not Disturb automation, and detailed productivity metrics.")
+                    LocalizedText("about_description")
                         .font(.system(size: 14))
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -74,7 +79,7 @@ struct AboutSettingsView: View {
                         Link(destination: url) {
                             HStack(spacing: 8) {
                                 Image(systemName: "link")
-                                Text("GitHub Repository")
+                                LocalizedText("about_github_link")
                             }
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.blue)
@@ -87,11 +92,11 @@ struct AboutSettingsView: View {
 
                 // Footer
                 VStack(spacing: 4) {
-                    Text("© 2024 Eliab Lemus")
+                    LocalizedText("about_copyright")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
 
-                    Text("MIT License")
+                    LocalizedText("about_license")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                 }
