@@ -17,6 +17,7 @@
 		1E17BA06DAEC282EBDA56AFD /* FocusTypesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDD8975948D7ADA1DC629EF /* FocusTypesService.swift */; };
 		1EB7549C72A8A8EBB126ADED /* glass_005.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 798F580A999292FEF45A0C39 /* glass_005.aiff */; };
 		2014D50F7122A0AFCBDA1855 /* IntegrationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */; };
+		21C5C396BB2F117E53EB1E44 /* CalendarMetricsTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */; };
 		22CE09543F47353743C5813D /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */; };
 		23343E6DF0FA805301371444 /* FocusModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */; };
 		23CA5E5D93EED629835AFEDE /* WorkspaceLifecycleCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489186597FBC47E63912C62F /* WorkspaceLifecycleCoordinator.swift */; };
@@ -48,6 +49,7 @@
 		514A298887A5C0137A1FE5FA /* SlackServiceSingletonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB15EBD18D837EBD03246513 /* SlackServiceSingletonTests.swift */; };
 		51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9D7A94AF842BA26A1156F5E9 /* pt.lproj */; };
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
+		57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */; };
 		5B72D2EA62C4AE9E2D086EF6 /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 4F41CEC41E4906B3E45ACE6B /* es.lproj */; };
 		5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */; };
 		5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440DA683BDD9156AD84D322C /* FocallyColors.swift */; };
@@ -64,6 +66,7 @@
 		71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442CEDEC7C104DB30E47CE7F /* OnItFocusApp.swift */; };
 		72C50B6FF38D05A2E9F440C5 /* FocallySpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */; };
 		77F5833236C41851956FFA35 /* DayOfMonthFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C81AE90F26064902AB1692 /* DayOfMonthFilterSheet.swift */; };
+		795128BC8517D9EDD78FB22C /* PersistedCalendarMetricsDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCD3DCC70DE5D341C87D62E /* PersistedCalendarMetricsDraft.swift */; };
 		7C262F088F990DED923716C5 /* DNDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E3F6355136EFD90EE198C8 /* DNDService.swift */; };
 		803039DD967F5D993EC45A02 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */; };
 		809EBE91F71EE7FC5E7AE0C8 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */; };
@@ -167,6 +170,7 @@
 		379E8BFD59E6CCE9B45FA35F /* Focally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Focally.entitlements; sourceTree = "<group>"; };
 		3A1B83D3B0FB1DC2793D6ACF /* FocusModeEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeEditSheet.swift; sourceTree = "<group>"; };
 		3C6B1BD2B26B3E52C801F03E /* FocusSessionRecordMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionRecordMigrationTests.swift; sourceTree = "<group>"; };
+		3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMetricsTrackerTests.swift; sourceTree = "<group>"; };
 		3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroStateTests.swift; sourceTree = "<group>"; };
 		440DA683BDD9156AD84D322C /* FocallyColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyColors.swift; sourceTree = "<group>"; };
 		4414920B6A39DCAF591E7C0D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -188,6 +192,7 @@
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
 		67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMetricsTracker.swift; sourceTree = "<group>"; };
 		6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDropdownView.swift; sourceTree = "<group>"; };
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
@@ -233,6 +238,7 @@
 		CE97A0C0BBC4E27B49C8967D /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D1284C85CCD279FD11125147 /* focally-focus-on-signed.shortcut */ = {isa = PBXFileReference; path = "focally-focus-on-signed.shortcut"; sourceTree = "<group>"; };
 		DA5FBFE134F2E3538C855A77 /* MetricsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsPage.swift; sourceTree = "<group>"; };
+		DBCD3DCC70DE5D341C87D62E /* PersistedCalendarMetricsDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistedCalendarMetricsDraft.swift; sourceTree = "<group>"; };
 		DD86686DB30D916F1B8BA083 /* PermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionService.swift; sourceTree = "<group>"; };
 		E0B0A006AE023C6292115993 /* FocusTypesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTypesSettingsView.swift; sourceTree = "<group>"; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
@@ -363,6 +369,7 @@
 		4D234CE276AA16E933B7536D /* FocallyTests */ = {
 			isa = PBXGroup;
 			children = (
+				3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */,
 				CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */,
 				87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */,
 				19F711C098187E7310E8039B /* FocusMetricsServiceTests.swift */,
@@ -391,6 +398,7 @@
 				1409BAE5B5CDE7CA90D858B5 /* FocusSessionRecord.swift */,
 				31B59FC6C76C3AC75D7864B9 /* FocusType.swift */,
 				A6CB6CB34222336A36C79677 /* FocusTypeDescriptor.swift */,
+				DBCD3DCC70DE5D341C87D62E /* PersistedCalendarMetricsDraft.swift */,
 				47C58CA0622113E115928BCB /* PersistedFocusSession.swift */,
 				C17386F3788F2D2F1263DBDD /* PomodoroState.swift */,
 				EBAABDC097244664E4B881E9 /* SlackCalendarSettings.swift */,
@@ -507,6 +515,7 @@
 			isa = PBXGroup;
 			children = (
 				997B8F1D411EBDB0ECE90EE3 /* CalendarEventAnalyzer.swift */,
+				6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */,
 				09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */,
 				F2E3F6355136EFD90EE198C8 /* DNDService.swift */,
 				E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */,
@@ -694,6 +703,7 @@
 				62800918C6A9ABAF71CE9F6C /* AppearanceSettingsView.swift in Sources */,
 				F50653D56FC8CC950F89B6B6 /* CalendarEventAnalyzer.swift in Sources */,
 				4C0A3FE7746EDEED810ABE73 /* CalendarMeetingCard.swift in Sources */,
+				21C5C396BB2F117E53EB1E44 /* CalendarMetricsTracker.swift in Sources */,
 				97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */,
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
@@ -741,6 +751,7 @@
 				6CB349FD5A20890E40E0ECC3 /* NotificationService.swift in Sources */,
 				71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */,
 				9D6DB5388C88D7DDB0AF8655 /* PermissionService.swift in Sources */,
+				795128BC8517D9EDD78FB22C /* PersistedCalendarMetricsDraft.swift in Sources */,
 				4904DB087CDE1FDE69A95334 /* PersistedFocusSession.swift in Sources */,
 				36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */,
 				67B5DD1ACE3D39898FAA43C6 /* SessionPersistenceService.swift in Sources */,
@@ -767,6 +778,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */,
 				F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */,
 				C3864524ED31392C860C9CB0 /* EmojiValidatorTests.swift in Sources */,
 				B1E9F024B14AEA542E11AEE3 /* FocusMetricsServiceTests.swift in Sources */,
