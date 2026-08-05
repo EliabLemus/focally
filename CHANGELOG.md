@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- 🔄 **Discreet Update Availability** — Updates now appear only in Settings → About, without dashboard, menu bar, or native notification alerts.
+
 ## [0.9.2] - 2026-07-24
 
 ### Fixed

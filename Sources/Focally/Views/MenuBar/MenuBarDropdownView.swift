@@ -6,41 +6,12 @@ struct MenuBarDropdownView: View {
     @Environment(DNDService.self) private var dndService
     @Environment(SlackService.self) private var slackService
     @Environment(CalendarSlackIntegrationService.self) private var calendarService
-    @Environment(UpdateCheckerService.self) private var updateChecker
     @Environment(\.colorScheme) private var colorScheme
 
     var onAddMode: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: - Update Available Badge
-            if updateChecker.isNewVersionAvailable {
-                Button(action: {
-                    if let url = updateChecker.updateUrl {
-                        NSWorkspace.shared.open(url)
-                    }
-                }) {
-                    HStack(spacing: FocallySpacing.extraSmall) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.caption2)
-                        LocalizedText("update_available_badge")
-                            .font(.focallyBodyBold)
-                        if let version = updateChecker.latestVersion {
-                            Text(String(format: AppLanguage.shared.localizedString("update_version"), version))
-                                .font(.focallyCaption)
-                        }
-                    }
-                    .foregroundStyle(Color.focallyOnPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.focallyPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: FocallyRadius.small))
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, FocallySpacing.medium)
-                .padding(.top, FocallySpacing.medium)
-            }
-
             headerRow
 
             ScrollView {

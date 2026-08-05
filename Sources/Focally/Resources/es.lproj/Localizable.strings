@@ -194,6 +194,11 @@
 "about_developed" = "Desarrollado con ❤️ usando SwiftUI";
 "about_copyright" = "© 2025-2026 Eliab Lemus";
 "about_update_available" = "Actualización disponible";
+"about_get_update" = "Obtener";
+"about_tagline" = "Temporizador de enfoque e integración con Slack";
+"about_description" = "Un atractivo temporizador de enfoque para macOS con integración del estado de Slack, automatización de No molestar y métricas detalladas de productividad.";
+"about_github_link" = "Repositorio en GitHub";
+"about_license" = "Licencia MIT";
 
 /* Permission Service */
 "permission_notifications" = "Notificaciones";
@@ -227,13 +232,8 @@
 "menubar_current_meeting" = "Reunión actual";
 "active_meeting_warning" = "Tienes una reunión activa";
 
-/* ========== Update Alert Badge ========== */
-"update_available_badge" = "Actualización disponible";
+/* ========== Actualización ========== */
 "update_version" = "v%@";
-
-/* ========== Update Notification ========== */
-"notification_update_title" = "Nueva Versión Disponible";
-"notification_update_body" = "Focally %@ está disponible. Haz clic para descargar.";
 
 /* ========== Calendario y Tipos de Enfoque ========== */
 "settings_focus_types" = "Tipos de enfoque";
