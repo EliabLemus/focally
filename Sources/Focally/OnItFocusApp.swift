@@ -25,7 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let dndService = DNDService.shared
     let focusIntegrationService = FocusIntegrationService.shared
     let shortcutsService = ManagedFocusShortcutsService.shared
-    let slackService = SlackService()
+    let slackService = SlackService.shared
     private lazy var calendarService = CalendarSlackIntegrationService(
         slackService: slackService,
         dndService: dndService

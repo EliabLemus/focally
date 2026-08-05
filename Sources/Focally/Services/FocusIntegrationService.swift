@@ -40,7 +40,10 @@ final class FocusIntegrationService {
     private(set) var isFocusModeActive = false
     private var activeMode: FocusMode?
 
-    private init(dndService: DNDService = .shared, slackService: SlackService = SlackService()) {
+    // Internal, read-only identity seam for singleton regression coverage.
+    var slackServiceForTesting: SlackService { slackService }
+
+    private init(dndService: DNDService = .shared, slackService: SlackService = .shared) {
         self.directDNDService = dndService
         self.slackService = slackService
         if defaults.object(forKey: Self.enabledKey) == nil {

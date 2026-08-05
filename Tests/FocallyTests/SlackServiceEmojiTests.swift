@@ -6,7 +6,16 @@ final class SlackServiceEmojiTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        service = SlackService()
+        service = .shared
+        service.workspaceEmojiCodes = []
+        service.workspaceEmojiImageURLs = [:]
+    }
+
+    override func tearDown() {
+        service.workspaceEmojiCodes = []
+        service.workspaceEmojiImageURLs = [:]
+        service = nil
+        super.tearDown()
     }
 
     func testValidateEmojiInWorkspace() {

@@ -4,6 +4,7 @@ import os.log
 
 @Observable
 class SlackService {
+    static let shared = SlackService()
     static let defaultStatusEmoji = ":hourglass_flowing_sand:"
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
     static let emojiListURL = URL(string: "https://slack.com/api/emoji.list")!
@@ -330,7 +331,7 @@ class SlackService {
 
     // MARK: - Init
 
-    init() {
+    private init() {
         self.isEnabled = UserDefaults.standard.bool(forKey: "slackEnabled")
         // Try to load saved token
         if let savedToken = token, !savedToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
