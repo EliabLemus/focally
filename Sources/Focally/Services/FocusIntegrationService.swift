@@ -25,10 +25,11 @@ final class FocusIntegrationService {
     static let shared = FocusIntegrationService()
 
     private let logger = Logger.slack
-    private let defaults = UserDefaults.standard
-    private let directDNDService: DNDService
+    private let defaults: UserDefaults
+    private let presenceCoordinator: PresenceCoordinating
     private let slackService: SlackService
     private let shortcutsService = ManagedFocusShortcutsService.shared
+    private let shortcutBackup: (FocusIntegrationAction) throws -> Void
     private static let enabledKey = "focusIntegrationEnabled"
 
     var isEnabled: Bool {
@@ -37,15 +38,22 @@ final class FocusIntegrationService {
 
     var lastError: FocusIntegrationError?
     var isFocusActive = false
-    private(set) var isFocusModeActive = false
+    var isFocusModeActive: Bool { presenceCoordinator.isManualFocusActive }
     private var activeMode: FocusMode?
 
     // Internal, read-only identity seam for singleton regression coverage.
     var slackServiceForTesting: SlackService { slackService }
 
-    private init(dndService: DNDService = .shared, slackService: SlackService = .shared) {
-        self.directDNDService = dndService
+    init(
+        presenceCoordinator: PresenceCoordinating = DefaultPresenceCoordinator.shared,
+        slackService: SlackService = .shared,
+        defaults: UserDefaults = .standard,
+        shortcutBackup: ((FocusIntegrationAction) throws -> Void)? = nil
+    ) {
+        self.presenceCoordinator = presenceCoordinator
         self.slackService = slackService
+        self.defaults = defaults
+        self.shortcutBackup = shortcutBackup ?? ManagedFocusShortcutsService.shared.runShortcut
         if defaults.object(forKey: Self.enabledKey) == nil {
             defaults.set(true, forKey: Self.enabledKey)
         }
@@ -53,17 +61,21 @@ final class FocusIntegrationService {
     }
 
     func activateFocus(for mode: FocusMode) {
-        isFocusModeActive = true
         activeMode = mode.sanitized()
-        performCombinedFocusAction(.start, mode: activeMode)
-        NotificationCenter.default.post(name: .focallyFocusChannelDidChange, object: nil)
+        lastError = nil
+        if let activeMode {
+            presenceCoordinator.manualFocusStarted(mode: activeMode, systemDNDEnabled: isEnabled)
+        }
+        isFocusActive = presenceCoordinator.isSystemDNDActive
+        attemptShortcutBackup(.start)
     }
 
     func deactivateFocus() {
-        performCombinedFocusAction(.end, mode: activeMode)
+        lastError = nil
+        presenceCoordinator.manualFocusEnded()
+        isFocusActive = false
+        attemptShortcutBackup(.end)
         activeMode = nil
-        isFocusModeActive = false
-        NotificationCenter.default.post(name: .focallyFocusChannelDidChange, object: nil)
     }
 
     func runSlackTest(completion: ((Bool, String) -> Void)? = nil) {
@@ -100,73 +112,27 @@ final class FocusIntegrationService {
         shortcutsService.allInstalled
     }
 
-    private func performCombinedFocusAction(_ action: FocusIntegrationAction, mode: FocusMode?) {
-        lastError = nil
-        performDirectFocusAction(action, mode: mode)
-        attemptShortcutBackup(action)
-        performSlackFocusAction(action, mode: mode)
-    }
-
-    private func performDirectFocusAction(_ action: FocusIntegrationAction, mode: FocusMode?) {
+    func performDirectFocusAction(_ action: FocusIntegrationAction, mode: FocusMode?) {
         guard isEnabled else { return }
-
-        let shouldToggleDND = mode?.enableMacOSDND == true
+        guard let mode else {
+            isFocusActive = presenceCoordinator.isManualFocusActive
+            return
+        }
         switch action {
         case .start:
-            guard shouldToggleDND else {
-                isFocusActive = false
-                return
-            }
-            directDNDService.activateDND()
-            isFocusActive = directDNDService.isDNDActive
-            logger.info("Direct DND enabled")
+            presenceCoordinator.manualFocusStarted(mode: mode)
+            isFocusActive = presenceCoordinator.isManualFocusActive
         case .end:
-            guard shouldToggleDND else {
-                isFocusActive = false
-                return
-            }
-            directDNDService.deactivateDND()
-            isFocusActive = directDNDService.isDNDActive
-            logger.info("Direct DND disabled")
+            presenceCoordinator.manualFocusEnded()
+            isFocusActive = false
         }
     }
 
     private func attemptShortcutBackup(_ action: FocusIntegrationAction) {
         do {
-            try shortcutsService.runShortcut(for: action)
+            try shortcutBackup(action)
         } catch {
             logger.warning("Shortcut backup skipped: \(error.localizedDescription)")
-        }
-    }
-
-    private func performSlackFocusAction(_ action: FocusIntegrationAction, mode: FocusMode?) {
-        guard slackService.isEnabled else { return }
-
-        switch action {
-        case .start:
-            guard let mode else { return }
-            let expiration = Int(Date().addingTimeInterval(TimeInterval(mode.sanitizedDurationMinutes * 60)).timeIntervalSince1970)
-            slackService.setStatus(
-                text: mode.statusText,
-                expirationTimestamp: expiration,
-                taskEmoji: mode.emoji,
-                fallbackEmoji: slackService.savedStatusEmoji()
-            )
-            if mode.enableSlackDND {
-                slackService.setSlackDNDSnooze(minutes: mode.sanitizedDurationMinutes)
-            }
-        case .end:
-            slackService.clearStatus()
-            if mode?.enableSlackDND == true {
-                slackService.disableSlackDND()
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            if let error = self?.slackService.connectionError {
-                self?.logger.error("Slack integration failed: \(error)")
-                self?.lastError = FocusIntegrationError.processError(error)
-            }
         }
     }
 

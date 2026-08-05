@@ -23,12 +23,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var setupWindow: NSWindow?
     private var themeObserver: NSObjectProtocol?
     let dndService = DNDService.shared
+    let presenceCoordinator = DefaultPresenceCoordinator.shared
     let focusIntegrationService = FocusIntegrationService.shared
     let shortcutsService = ManagedFocusShortcutsService.shared
     let slackService = SlackService.shared
     private lazy var calendarService = CalendarSlackIntegrationService(
-        slackService: slackService,
-        dndService: dndService
+        presenceCoordinator: presenceCoordinator
     )
     let notificationService = NotificationService()
     let focusModeStore = FocusModeStore()
