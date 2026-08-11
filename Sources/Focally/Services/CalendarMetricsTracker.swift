@@ -69,6 +69,7 @@ final class CalendarMetricsTracker {
     private let now: () -> Date
     private let maximumObservationGap: TimeInterval
     private var draft: PersistedCalendarMetricsDraft?
+    private var usesEventDrivenObservation = false
 
     init(
         persistence: CalendarMetricsDraftPersisting,
@@ -122,6 +123,35 @@ final class CalendarMetricsTracker {
         finalize(at: now(), addFinalDelta: true)
     }
 
+    func reconcileActiveMeeting(_ meeting: CalendarMeeting) {
+        guard meeting.hasVideoCall,
+              !meeting.isAllDay,
+              !meeting.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              meeting.endTime >= meeting.startTime else {
+            reconcileNoActiveMeeting()
+            return
+        }
+        let timestamp = now()
+        let id = Self.recordID(meetingID: meeting.id, occurrenceStart: meeting.startTime)
+        if let existing = draft,
+           existing.recordID == id,
+           existing.meetingID == meeting.id,
+           existing.occurrenceStart == meeting.startTime {
+            usesEventDrivenObservation = true
+            updateCurrent(at: timestamp, remainsActive: true, addFinalDelta: true, allowLongGap: true)
+            return
+        }
+        if draft != nil {
+            finalize(at: timestamp, addFinalDelta: true, allowLongGap: usesEventDrivenObservation)
+        }
+        start(meeting, recordID: id, at: timestamp)
+        usesEventDrivenObservation = true
+    }
+
+    func reconcileNoActiveMeeting() {
+        finalize(at: now(), addFinalDelta: true, allowLongGap: usesEventDrivenObservation)
+    }
+
     func prepareForTermination() {
         suspendObservationAtLifecycleBoundary()
     }
@@ -132,11 +162,16 @@ final class CalendarMetricsTracker {
 
     private func suspendObservationAtLifecycleBoundary() {
         guard draft != nil else { return }
-        updateCurrent(at: now(), remainsActive: false, addFinalDelta: true)
+        updateCurrent(
+            at: now(),
+            remainsActive: false,
+            addFinalDelta: true,
+            allowLongGap: usesEventDrivenObservation
+        )
     }
 
     func finishBecauseMonitoringStopped() {
-        finalize(at: now(), addFinalDelta: true)
+        finalize(at: now(), addFinalDelta: true, allowLongGap: usesEventDrivenObservation)
     }
 
     private func start(_ meeting: CalendarMeeting, recordID: UUID, at timestamp: Date) {
@@ -157,13 +192,18 @@ final class CalendarMetricsTracker {
         persistence.save(draft!)
     }
 
-    private func updateCurrent(at timestamp: Date, remainsActive: Bool, addFinalDelta: Bool) {
+    private func updateCurrent(
+        at timestamp: Date,
+        remainsActive: Bool,
+        addFinalDelta: Bool,
+        allowLongGap: Bool = false
+    ) {
         guard var current = draft else { return }
         let boundedNow = min(max(timestamp, current.occurrenceStart), current.scheduledEnd)
         if addFinalDelta, current.isObservationActive {
             let boundedLast = min(max(current.lastObservedAt, current.occurrenceStart), current.scheduledEnd)
             let delta = boundedNow.timeIntervalSince(boundedLast)
-            if delta >= 0, delta <= maximumObservationGap {
+            if delta >= 0, allowLongGap || delta <= maximumObservationGap {
                 current.accumulatedObservedSeconds += delta
             }
         }
@@ -176,9 +216,18 @@ final class CalendarMetricsTracker {
         persistence.save(current)
     }
 
-    private func finalize(at timestamp: Date, addFinalDelta: Bool) {
+    private func finalize(
+        at timestamp: Date,
+        addFinalDelta: Bool,
+        allowLongGap: Bool = false
+    ) {
         guard draft != nil else { return }
-        updateCurrent(at: timestamp, remainsActive: false, addFinalDelta: addFinalDelta)
+        updateCurrent(
+            at: timestamp,
+            remainsActive: false,
+            addFinalDelta: addFinalDelta,
+            allowLongGap: allowLongGap
+        )
         guard let completed = draft else { return }
         if completed.accumulatedObservedSeconds >= 5 {
             metrics.upsertSession(FocusSessionRecord(
@@ -195,6 +244,7 @@ final class CalendarMetricsTracker {
             ))
         }
         draft = nil
+        usesEventDrivenObservation = false
         persistence.clear()
     }
 

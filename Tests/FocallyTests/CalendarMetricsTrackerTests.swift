@@ -5,6 +5,113 @@ import XCTest
 final class CalendarMetricsTrackerTests: XCTestCase {
     private let occurrence = Date(timeIntervalSince1970: 2_000_000_000)
 
+    func testCalendarChangeMonitorRegistersOnceAndStopsCleanly() async {
+        let center = NotificationCenter()
+        let name = Notification.Name("CalendarMetricsTrackerTests.eventStoreChanged")
+        var callbackCount = 0
+        let monitor = CalendarChangeMonitor(notificationCenter: center, notificationName: name) {
+            callbackCount += 1
+        }
+
+        monitor.start()
+        monitor.start()
+        center.post(name: name, object: nil)
+        await Task.yield()
+        XCTAssertEqual(callbackCount, 1)
+
+        monitor.stop()
+        center.post(name: name, object: nil)
+        await Task.yield()
+        XCTAssertEqual(callbackCount, 1)
+    }
+
+    func testCalendarServiceStartIsIdempotentAndChangeNotificationRefetchesOnce() async {
+        let suiteName = "CalendarMetricsTrackerTests.monitoring.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(true, forKey: CalendarSlackIntegrationService.enabledDefaultsKey)
+
+        let center = NotificationCenter()
+        let name = Notification.Name("CalendarMetricsTrackerTests.serviceEventStoreChanged")
+        let tracker = CalendarMetricsTracker(
+            persistence: FakeCalendarDraftPersistence(),
+            metrics: FakeCalendarMetricsRecorder()
+        )
+        var fetchCount = 0
+        let service = CalendarSlackIntegrationService(
+            presenceCoordinator: InertCalendarPresenceCoordinator(),
+            metricsTracker: tracker,
+            defaults: defaults,
+            notificationCenter: center,
+            eventStoreChangedNotification: name,
+            authorizationStatusProvider: { .fullAccess },
+            eventFetcher: {
+                fetchCount += 1
+                return []
+            }
+        )
+
+        service.startIfEnabled()
+        service.startIfEnabled()
+        XCTAssertEqual(fetchCount, 1)
+
+        center.post(name: name, object: nil)
+        await Task.yield()
+        XCTAssertEqual(fetchCount, 2)
+
+        service.stopMonitoring()
+        center.post(name: name, object: nil)
+        await Task.yield()
+        XCTAssertEqual(fetchCount, 2)
+    }
+
+    func testNextCalendarBoundaryUsesStartsEndsAndDayRolloverWithoutAllDayNoise() {
+        let now = occurrence
+        let allDay = CalendarMeeting(
+            id: "all-day",
+            title: "Holiday",
+            startTime: now.addingTimeInterval(10),
+            endTime: now.addingTimeInterval(20),
+            isAllDay: true,
+            hasVideoCall: false
+        )
+        let later = CalendarMeeting(
+            id: "later",
+            title: "Later",
+            startTime: now.addingTimeInterval(600),
+            endTime: now.addingTimeInterval(1_200),
+            isAllDay: false,
+            hasVideoCall: true
+        )
+        let active = CalendarMeeting(
+            id: "active",
+            title: "Active",
+            startTime: now.addingTimeInterval(-60),
+            endTime: now.addingTimeInterval(300),
+            isAllDay: false,
+            hasVideoCall: true
+        )
+        let nextDay = now.addingTimeInterval(3_600)
+
+        XCTAssertEqual(
+            CalendarSlackIntegrationService.nextBoundary(
+                after: now,
+                events: [allDay, later, active],
+                nextDayStart: nextDay
+            ),
+            active.endTime
+        )
+        XCTAssertEqual(
+            CalendarSlackIntegrationService.nextBoundary(
+                after: now.addingTimeInterval(1_500),
+                events: [allDay, later, active],
+                nextDayStart: nextDay
+            ),
+            nextDay
+        )
+    }
+
     func testDraftPersistenceRoundTripAndInvalidPayloadClearing() throws {
         let now = occurrence.addingTimeInterval(60)
         let store = FakeCalendarDraftDataStore()
@@ -212,6 +319,34 @@ final class CalendarMetricsTrackerTests: XCTestCase {
         XCTAssertEqual(persistence.draft?.accumulatedObservedSeconds, 30)
         XCTAssertEqual(persistence.draft?.isObservationActive, false)
         XCTAssertTrue(metrics.sessions.isEmpty)
+    }
+
+    func testEventDrivenBoundaryAccumulatesLongAwakeMeetingWithoutPolling() {
+        let clock = FakeCalendarClock(occurrence.addingTimeInterval(10))
+        let persistence = FakeCalendarDraftPersistence()
+        let metrics = FakeCalendarMetricsRecorder()
+        let tracker = CalendarMetricsTracker(persistence: persistence, metrics: metrics, now: clock.now)
+
+        tracker.reconcileActiveMeeting(makeMeeting())
+        clock.advance(3_600)
+        tracker.reconcileNoActiveMeeting()
+
+        XCTAssertEqual(metrics.sessions.single?.activeDuration, 3_590)
+    }
+
+    func testEventDrivenBoundaryDoesNotCountElapsedTimeAfterSleepSuspension() {
+        let clock = FakeCalendarClock(occurrence.addingTimeInterval(10))
+        let persistence = FakeCalendarDraftPersistence()
+        let metrics = FakeCalendarMetricsRecorder()
+        let tracker = CalendarMetricsTracker(persistence: persistence, metrics: metrics, now: clock.now)
+
+        tracker.reconcileActiveMeeting(makeMeeting())
+        clock.advance(60)
+        tracker.prepareForSystemSleep()
+        clock.advance(3_600)
+        tracker.reconcileNoActiveMeeting()
+
+        XCTAssertEqual(metrics.sessions.single?.activeDuration, 60)
     }
 
     func testShortSystemSleepBelowMaximumGapIsExcluded() {
@@ -479,6 +614,20 @@ private final class FakeCalendarDraftDataStore: CalendarMetricsDraftDataStoring 
     func data(forKey key: String) -> Data? { value }
     func set(_ value: Any?, forKey key: String) { self.value = value as? Data }
     func removeObject(forKey key: String) { value = nil }
+}
+
+@MainActor
+private final class InertCalendarPresenceCoordinator: PresenceCoordinating {
+    var currentPresence: PresenceState = .idle
+    var isManualFocusActive = false
+    var currentCalendarMeeting: CalendarMeeting?
+    var isSystemDNDActive = false
+
+    func manualFocusStarted(mode: FocusMode, systemDNDEnabled: Bool) {}
+    func manualFocusEnded() {}
+    func calendarMeetingUpdated(_ meeting: CalendarMeeting?) { currentCalendarMeeting = meeting }
+    func calendarSettingsUpdated(_ settings: SlackCalendarSettings) {}
+    func reapplyActivePresence() {}
 }
 
 private extension Array {
