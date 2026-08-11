@@ -38,9 +38,11 @@
 		4013DB4168726C4BC319A849 /* UTType+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73FD9C93C410F06A3F70522 /* UTType+Shortcut.swift */; };
 		41890883893A4D5DB94888F7 /* FocusModeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */; };
 		42238CB9D8ABDFB1628167C2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ECF6F0911D78E7836F5068 /* Localizable.strings */; };
+		455B5B3F024DD1A1600E242C /* QuickStartSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C59EC7C5610A6D2D3BAA3A4 /* QuickStartSheet.swift */; };
 		470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */; };
 		4904DB087CDE1FDE69A95334 /* PersistedFocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C58CA0622113E115928BCB /* PersistedFocusSession.swift */; };
 		4918E9CBBD4CC68BA3921FA3 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7E2AD28154EB8F29CA62613D /* en.lproj */; };
+		4A4A9946E123046E0FBCFD47 /* FocusSessionDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */; };
 		4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */; };
 		4C0A3FE7746EDEED810ABE73 /* CalendarMeetingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECC6A5FE697AA23DE9211391 /* CalendarMeetingCard.swift */; };
 		4DA6D3EC99C075CD80C09883 /* confirmation_003.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */; };
@@ -51,6 +53,7 @@
 		51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9D7A94AF842BA26A1156F5E9 /* pt.lproj */; };
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
 		57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */; };
+		571CA2D1AB755DC22A237AD4 /* FocusSessionDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */; };
 		5B72D2EA62C4AE9E2D086EF6 /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 4F41CEC41E4906B3E45ACE6B /* es.lproj */; };
 		5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */; };
 		5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440DA683BDD9156AD84D322C /* FocallyColors.swift */; };
@@ -193,8 +196,10 @@
 		4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerService.swift; sourceTree = "<group>"; };
 		53488A3E81071ACFBF858568 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionDraftTests.swift; sourceTree = "<group>"; };
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
+		65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionDraft.swift; sourceTree = "<group>"; };
 		67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
 		6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMetricsTracker.swift; sourceTree = "<group>"; };
@@ -203,6 +208,7 @@
 		72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTab.swift; sourceTree = "<group>"; };
 		74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedFocusShortcutsService.swift; sourceTree = "<group>"; };
 		798F580A999292FEF45A0C39 /* glass_005.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = glass_005.aiff; sourceTree = "<group>"; };
+		7C59EC7C5610A6D2D3BAA3A4 /* QuickStartSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickStartSheet.swift; sourceTree = "<group>"; };
 		7E2AD28154EB8F29CA62613D /* en.lproj */ = {isa = PBXFileReference; path = en.lproj; sourceTree = "<group>"; };
 		7E5DB55686DFAEB6AAB22D07 /* LayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerTests.swift; sourceTree = "<group>"; };
 		80AE26497177767F58D61D45 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
@@ -380,6 +386,7 @@
 				87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */,
 				19F711C098187E7310E8039B /* FocusMetricsServiceTests.swift */,
 				2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */,
+				5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */,
 				3C6B1BD2B26B3E52C801F03E /* FocusSessionRecordMigrationTests.swift */,
 				335C2B031BB8F4E600F7CBF2 /* FocusTimerServiceTests.swift */,
 				0267CB7D5ABFC1ED7C04FCAB /* Info.plist */,
@@ -403,6 +410,7 @@
 			children = (
 				B95A80A407C1873456D6EBBF /* AppLanguage.swift */,
 				B309416511CC57079912AFE6 /* FocusMode.swift */,
+				65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */,
 				1409BAE5B5CDE7CA90D858B5 /* FocusSessionRecord.swift */,
 				31B59FC6C76C3AC75D7864B9 /* FocusType.swift */,
 				A6CB6CB34222336A36C79677 /* FocusTypeDescriptor.swift */,
@@ -441,6 +449,7 @@
 				A60EAC6650F242AB6FC011BB /* FocusModeCard.swift */,
 				3A1B83D3B0FB1DC2793D6ACF /* FocusModeEditSheet.swift */,
 				B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */,
+				7C59EC7C5610A6D2D3BAA3A4 /* QuickStartSheet.swift */,
 				1AEE7F3695EF4097CA9CAA33 /* TimerControlsView.swift */,
 				191E59EB17B55941B8BE4DFC /* TimerPage.swift */,
 			);
@@ -736,6 +745,7 @@
 				3CA50BD80850175F7912AB33 /* FocusMode.swift in Sources */,
 				41890883893A4D5DB94888F7 /* FocusModeCard.swift in Sources */,
 				D7092685F6CD40CC458A66C1 /* FocusModeEditSheet.swift in Sources */,
+				571CA2D1AB755DC22A237AD4 /* FocusSessionDraft.swift in Sources */,
 				84EF6C4BB36E75A5A9DF22B3 /* FocusSessionRecord.swift in Sources */,
 				F1D0296A1D2E03E29B5268CB /* FocusSetupView.swift in Sources */,
 				EA47EA69F07B97F12E89C9EA /* FocusTimerService.swift in Sources */,
@@ -764,6 +774,7 @@
 				4904DB087CDE1FDE69A95334 /* PersistedFocusSession.swift in Sources */,
 				36E84D8E2E026E279FB6512E /* PomodoroState.swift in Sources */,
 				2A1A9742A9362E21C2E155BB /* PresenceCoordinator.swift in Sources */,
+				455B5B3F024DD1A1600E242C /* QuickStartSheet.swift in Sources */,
 				67B5DD1ACE3D39898FAA43C6 /* SessionPersistenceService.swift in Sources */,
 				DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */,
 				93EE71221692619CD1E52FB0 /* SettingsStore.swift in Sources */,
@@ -793,6 +804,7 @@
 				C3864524ED31392C860C9CB0 /* EmojiValidatorTests.swift in Sources */,
 				B1E9F024B14AEA542E11AEE3 /* FocusMetricsServiceTests.swift in Sources */,
 				23343E6DF0FA805301371444 /* FocusModeTests.swift in Sources */,
+				4A4A9946E123046E0FBCFD47 /* FocusSessionDraftTests.swift in Sources */,
 				2F974E82EC2D138CDE570AF2 /* FocusSessionRecordMigrationTests.swift in Sources */,
 				2CED945CAF9A7201E1238792 /* FocusTimerServiceTests.swift in Sources */,
 				6F971A4BAF0AFD199B6948A1 /* LayerTests.swift in Sources */,
