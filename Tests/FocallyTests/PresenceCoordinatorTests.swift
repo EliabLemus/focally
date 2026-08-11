@@ -7,6 +7,27 @@ import Testing
 struct PresenceCoordinatorTests {
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
+    @Test func testReapplyActivePresenceDoesNothingWhileIdle() {
+        let (coordinator, slack, dnd) = makeCoordinator()
+
+        coordinator.reapplyActivePresence()
+
+        #expect(slack.allWrites.isEmpty)
+        #expect(dnd.writes.isEmpty)
+    }
+
+    @Test func testReapplyActivePresenceRestoresManualSlackStatusAfterReconnect() {
+        let (coordinator, slack, _) = makeCoordinator()
+        coordinator.manualFocusStarted(mode: makeMode(status: "Deep work", emoji: ":brain:"))
+        let statusCountBeforeReconnect = slack.statuses.count
+
+        coordinator.reapplyActivePresence()
+
+        #expect(slack.statuses.count == statusCountBeforeReconnect + 1)
+        #expect(slack.statuses.last?.text == "Deep work")
+        #expect(slack.statuses.last?.emoji == ":brain:")
+    }
+
     @Test func testCalendarMeetingPromotesFromIdle() {
         let (coordinator, slack, _) = makeCoordinator()
         coordinator.calendarSettingsUpdated(calendarSettings(show: true))

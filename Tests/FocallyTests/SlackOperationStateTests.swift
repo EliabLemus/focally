@@ -5,6 +5,46 @@ import Testing
 @MainActor
 @Suite("Slack operation state", .serialized)
 struct SlackOperationStateTests {
+    @Test func launchReconnectValidatesConfiguredTokenEvenAfterPriorConnectionState() async {
+        let transport = RecordingSlackTransport()
+        let service = SlackService(
+            tokenForTesting: "xoxp-test-token",
+            enabled: true,
+            requestPerformer: transport.perform
+        )
+        service.isConnected = true
+
+        var reconnectSucceeded: Bool?
+        service.reconnectOnLaunchIfConfigured { reconnectSucceeded = $0 }
+
+        #expect(service.connectionTestState == .working)
+        #expect(service.isConnected == false)
+        #expect(reconnectSucceeded == nil)
+        #expect(transport.requestCount(path: "/api/auth.test") == 1)
+
+        transport.complete(path: "/api/auth.test", json: ["ok": true], statusCode: 200)
+        await Task.yield()
+
+        #expect(service.connectionTestState == .success("Connected ✓"))
+        #expect(service.isConnected)
+        #expect(reconnectSucceeded == true)
+    }
+
+    @Test func launchReconnectSkipsMissingToken() {
+        let transport = RecordingSlackTransport()
+        let service = SlackService(
+            tokenForTesting: nil,
+            enabled: true,
+            requestPerformer: transport.perform
+        )
+
+        service.reconnectOnLaunchIfConfigured()
+
+        #expect(service.connectionTestState == .idle)
+        #expect(!service.isConnected)
+        #expect(transport.requestCount == 0)
+    }
+
     @Test func connectionTestTransitionsFromWorkingToSuccess() async throws {
         let transport = RecordingSlackTransport()
         let service = SlackService(

@@ -3,6 +3,46 @@ import XCTest
 
 @MainActor
 final class WorkspaceLifecycleCoordinatorTests: XCTestCase {
+    func testPopoverRoutingShowsWhenHidden() {
+        let target = CGRect(x: 0, y: 0, width: 1_920, height: 1_080)
+
+        XCTAssertEqual(
+            MenuBarPopoverRouting.action(
+                isShown: false,
+                currentScreenFrame: nil,
+                targetScreenFrame: target
+            ),
+            .show
+        )
+    }
+
+    func testPopoverRoutingClosesForSameDisplayClick() {
+        let screen = CGRect(x: 0, y: 0, width: 1_920, height: 1_080)
+
+        XCTAssertEqual(
+            MenuBarPopoverRouting.action(
+                isShown: true,
+                currentScreenFrame: screen,
+                targetScreenFrame: screen
+            ),
+            .close
+        )
+    }
+
+    func testPopoverRoutingReanchorsForDifferentDisplayClick() {
+        let primary = CGRect(x: 0, y: 0, width: 1_920, height: 1_080)
+        let secondary = CGRect(x: 1_920, y: 0, width: 2_560, height: 1_440)
+
+        XCTAssertEqual(
+            MenuBarPopoverRouting.action(
+                isShown: true,
+                currentScreenFrame: primary,
+                targetScreenFrame: secondary
+            ),
+            .reanchor
+        )
+    }
+
     func testStartRegistersBothRoutesExactlyOnceAndDoesNotDuplicateRegistration() {
         let center = NotificationCenter()
         let willSleep = Notification.Name("test.workspace.willSleep")

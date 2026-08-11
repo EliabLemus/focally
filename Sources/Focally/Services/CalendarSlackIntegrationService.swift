@@ -136,8 +136,16 @@ final class CalendarSlackIntegrationService {
     }
 
     func fetchTodayEvents() {
-        guard isEnabled, hasCalendarAccess else {
+        let authorizationStatus = EKEventStore.authorizationStatus(for: .event)
+        hasCalendarAccess = Self.canReadCalendar(
+            isEnabled: isEnabled,
+            authorizationStatus: authorizationStatus
+        )
+        guard hasCalendarAccess else {
             events = []
+            if isEnabled {
+                connectionError = "Calendar access was not granted"
+            }
             return
         }
 
@@ -166,14 +174,29 @@ final class CalendarSlackIntegrationService {
         metricsTracker.prepareForSystemSleep()
     }
 
+    func reconcileAfterWake() {
+        guard isEnabled else { return }
+        hasCalendarAccess = Self.canReadCalendar(
+            isEnabled: isEnabled,
+            authorizationStatus: EKEventStore.authorizationStatus(for: .event)
+        )
+        guard hasCalendarAccess else {
+            stopMonitoring()
+            return
+        }
+        startPeriodicCheck(reapplyCalendarSettings: false)
+    }
+
     private func saveCalendarSettings() {
         guard let data = try? JSONEncoder().encode(calendarSettings) else { return }
         defaults.set(data, forKey: Self.slackSettingsDefaultsKey)
     }
 
-    private func startPeriodicCheck() {
+    private func startPeriodicCheck(reapplyCalendarSettings: Bool = true) {
         timer?.invalidate()
-        presenceCoordinator.calendarSettingsUpdated(calendarSettings)
+        if reapplyCalendarSettings {
+            presenceCoordinator.calendarSettingsUpdated(calendarSettings)
+        }
         checkForActiveMeeting()
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             Task { @MainActor in
@@ -184,10 +207,7 @@ final class CalendarSlackIntegrationService {
 
     private func checkForActiveMeeting() {
         fetchTodayEvents()
-        let now = Date()
-        let activeMeeting = events.first { event in
-            !event.isAllDay && now >= event.startTime && now < event.endTime
-        }
+        let activeMeeting = Self.activeMeeting(at: Date(), in: events)
         transition(to: activeMeeting)
     }
 
@@ -198,12 +218,31 @@ final class CalendarSlackIntegrationService {
             metricsTracker.observeNoActiveMeeting()
         }
 
+        guard Self.isPresenceTransition(currentMeeting: currentMeeting, nextMeeting: meeting) else {
+            return
+        }
         currentMeeting = meeting
         presenceCoordinator.calendarMeetingUpdated(meeting)
     }
 
-    static func isPresenceTransition(currentMeetingID: String?, nextMeetingID: String?) -> Bool {
-        nextMeetingID != currentMeetingID
+    static func activeMeeting(at date: Date, in events: [CalendarMeeting]) -> CalendarMeeting? {
+        events.first { event in
+            !event.isAllDay && date >= event.startTime && date < event.endTime
+        }
+    }
+
+    static func canReadCalendar(
+        isEnabled: Bool,
+        authorizationStatus: EKAuthorizationStatus
+    ) -> Bool {
+        isEnabled && authorizationStatus == .fullAccess
+    }
+
+    static func isPresenceTransition(
+        currentMeeting: CalendarMeeting?,
+        nextMeeting: CalendarMeeting?
+    ) -> Bool {
+        currentMeeting != nextMeeting
     }
 
 }
