@@ -38,6 +38,7 @@ final class FocusIntegrationService {
 
     var lastError: FocusIntegrationError?
     var isFocusActive = false
+    private(set) var slackTestState: SlackOperationState = .idle
     var isFocusModeActive: Bool { presenceCoordinator.isManualFocusActive }
     private var activeMode: FocusMode?
 
@@ -79,12 +80,26 @@ final class FocusIntegrationService {
     }
 
     func runSlackTest(completion: ((Bool, String) -> Void)? = nil) {
+        guard slackTestState != .working else { return }
+
+        slackTestState = .working
         slackService.disableSlackDND()
-        slackService.setStatus(text: "Focally test", expirationTimestamp: Int(Date().addingTimeInterval(300).timeIntervalSince1970), taskEmoji: ":brain:")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            let success = self.slackService.connectionError == nil
-            let message = self.slackService.lastActionMessage ?? (success ? "Slack integration succeeded" : (self.slackService.connectionError ?? "Slack integration failed"))
-            completion?(success, message)
+        slackService.setStatus(
+            text: "Focally test",
+            expirationTimestamp: Int(Date().addingTimeInterval(300).timeIntervalSince1970),
+            taskEmoji: ":brain:"
+        ) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                let message = "Slack focus status updated"
+                slackTestState = .success(message)
+                completion?(true, message)
+            case .failure(let error):
+                let message = error.localizedDescription
+                slackTestState = .failed(message)
+                completion?(false, message)
+            }
         }
     }
 

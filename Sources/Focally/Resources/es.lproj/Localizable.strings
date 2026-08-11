@@ -172,6 +172,30 @@
 "integrations_connected" = "Conectado";
 "integrations_disconnected" = "Desconectado";
 "integrations_connected_check" = "Conectado ✓";
+"integrations_testing_connection" = "Probando la conexión con Slack";
+"integrations_testing_focus" = "Probando el estado de enfoque en Slack";
+"integrations_connection_test_succeeded" = "Conexión con Slack exitosa ✓";
+"integrations_focus_test_succeeded" = "Estado de enfoque actualizado en Slack ✓";
+"integrations_retry" = "Reintentar";
+"slack_error_integration_disabled" = "La integración con Slack está desactivada";
+"slack_error_no_token" = "No hay un token de Slack configurado";
+"slack_error_prepare_status_request" = "No se pudo preparar la solicitud de estado de Slack";
+"slack_error_prepare_connection_request" = "No se pudo preparar la solicitud de conexión con Slack";
+"slack_error_invalid_response" = "Respuesta no válida de Slack";
+"slack_error_no_internet" = "No hay conexión a internet";
+"slack_error_network_timeout" = "La solicitud de red agotó el tiempo de espera";
+"slack_error_cannot_connect" = "No se puede conectar con el servidor de Slack";
+"slack_error_cannot_find_server" = "No se encuentra el servidor de Slack";
+"slack_error_network_format" = "Error de red: %@";
+"slack_error_invalid_token" = "El token de Slack no es válido. Compruébalo e inténtalo de nuevo.";
+"slack_error_access_denied" = "Acceso denegado. Es posible que el token no tenga los permisos necesarios.";
+"slack_error_rate_limited" = "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.";
+"slack_error_missing_permissions" = "Al token le faltan permisos necesarios.";
+"slack_error_account_inactive" = "Tu cuenta de Slack está inactiva.";
+"slack_error_token_revoked" = "Tu token de Slack ha sido revocado.";
+"slack_error_workspace_login" = "Tu espacio de trabajo de Slack requiere iniciar sesión.";
+"slack_error_user_token_required" = "Las actualizaciones de estado de Slack requieren un token de usuario (xoxp-) con users.profile:write.";
+"slack_error_api_format" = "Error de la API de Slack: %@";
 
 /* ========== GeneralSettingsView ========== */
 "general_launch_login" = "Iniciar Focally al abrir sesión";
