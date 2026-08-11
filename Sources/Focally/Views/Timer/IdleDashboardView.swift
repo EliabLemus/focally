@@ -7,6 +7,7 @@ struct IdleDashboardView: View {
     @Environment(CalendarSlackIntegrationService.self) private var calendarService
 
     @State private var editingMode: FocusMode?
+    @State private var quickStartMode: FocusMode?
     @State private var isAddingMode = false
 
     var body: some View {
@@ -29,6 +30,7 @@ struct IdleDashboardView: View {
                         FocusModeCard(
                             mode: mode,
                             onStart: { start(mode) },
+                            onQuickStart: { quickStartMode = mode },
                             onEdit: { editingMode = mode }
                         )
                     }
@@ -55,6 +57,11 @@ struct IdleDashboardView: View {
                 editingMode = nil
             })
             .environment(slackService)
+        }
+        .sheet(item: $quickStartMode) { mode in
+            QuickStartSheet(mode: mode) { draft in
+                timerService.startSession(draft: draft)
+            }
         }
         .sheet(isPresented: $isAddingMode) {
             FocusModeEditSheet(mode: FocusMode(id: UUID(), name: "", emoji: ":rocket:", statusText: "", durationMinutes: 25, enableMacOSDND: true, enableSlackDND: true, enablePomodoro: false, pomodoroWorkMinutes: 25, pomodoroBreakMinutes: 5, pomodoroLongBreakMinutes: 15, pomodoroRounds: 1), onSave: { newMode in

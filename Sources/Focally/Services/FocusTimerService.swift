@@ -109,6 +109,10 @@ final class FocusTimerService {
         durationMinutes = defaults.object(forKey: "lastDuration") == nil ? 25 : min(max(defaults.integer(forKey: "lastDuration"), 1), 600)
     }
 
+    func startSession(draft: FocusSessionDraft) {
+        startSession(mode: draft.resolvedMode())
+    }
+
     func startSession(mode: FocusMode) {
         let mode = mode.sanitized()
         ticker.stop()

@@ -243,6 +243,17 @@
 "menubar_dnd_active" = "DND Ativo";
 "menubar_dnd_off" = "DND Desativado";
 
+/* ========== Início rápido da sessão ========== */
+"quick_start_title" = "Início rápido";
+"quick_start_saved_mode_unchanged" = "Personalize esta sessão. Seu modo salvo não será alterado.";
+"quick_start_activity" = "Em que você vai trabalhar?";
+"quick_start_activity_placeholder" = "Atividade opcional";
+"quick_start_duration" = "Duração";
+"quick_start_duration_value" = "%d min";
+"quick_start_start_session" = "Iniciar sessão";
+"quick_start_open_accessibility" = "Personalizar %@";
+"quick_start_default_hint" = "Inicia imediatamente com os valores salvos.";
+
 /* ========== General Buttons ========== */
 "general_done" = "Concluído";
 "general_cancel" = "Cancelar";
