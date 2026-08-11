@@ -7,6 +7,7 @@ struct MenuBarDropdownView: View {
     @Environment(SlackService.self) private var slackService
     @Environment(CalendarSlackIntegrationService.self) private var calendarService
     @Environment(\.colorScheme) private var colorScheme
+    @State private var quickStartMode: FocusMode?
 
     var onAddMode: (() -> Void)?
 
@@ -51,6 +52,11 @@ struct MenuBarDropdownView: View {
             slackService.refreshEmojiCatalogIfPossible()
             calendarService.startIfEnabled()
         }
+        .sheet(item: $quickStartMode) { mode in
+            QuickStartSheet(mode: mode) { draft in
+                timerService.startSession(draft: draft)
+            }
+        }
     }
 
     private var headerRow: some View {
@@ -72,39 +78,7 @@ struct MenuBarDropdownView: View {
                 .foregroundStyle(Color.focallyOnSurface)
 
             ForEach(focusModeStore.modes) { mode in
-                Button(action: { timerService.startSession(mode: mode) }) {
-                    HStack(spacing: 12) {
-                        EmojiView(
-                            mode.emoji,
-                            customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
-                            workspaceEmojiCodes: slackService.workspaceEmojiCodes,
-                            font: .system(size: 22),
-                            dimension: 22
-                        )
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(mode.name)
-                                .font(.focallyBodyBold)
-                                .foregroundStyle(Color.focallyOnSurface)
-                            Text("\(mode.durationMinutes) min")
-                                .font(.focallyCaption)
-                                .foregroundStyle(Color.focallyOnSurfaceVariant)
-                        }
-
-                        Spacer()
-
-                        if mode.enableMacOSDND {
-                            Image(systemName: "moon.fill")
-                                .foregroundStyle(Color.focallyPrimary)
-                        }
-                    }
-                    .padding(12)
-                    .contentShape(Rectangle())
-                    .background(Color.focallySurfaceContainerLow)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .contentShape(Rectangle())
-                .buttonStyle(.plain)
+                quickStartRow(mode)
             }
 
             if let onAddMode {
@@ -124,6 +98,65 @@ struct MenuBarDropdownView: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    private func quickStartRow(_ mode: FocusMode) -> some View {
+        HStack(spacing: 4) {
+            Button(action: { timerService.startSession(mode: mode) }) {
+                HStack(spacing: 12) {
+                    EmojiView(
+                        mode.emoji,
+                        customEmojiImageURLs: slackService.workspaceEmojiImageURLs,
+                        workspaceEmojiCodes: slackService.workspaceEmojiCodes,
+                        font: .system(size: 22),
+                        dimension: 22
+                    )
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(mode.name)
+                            .font(.focallyBodyBold)
+                            .foregroundStyle(Color.focallyOnSurface)
+                        Text("\(mode.durationMinutes) min")
+                            .font(.focallyCaption)
+                            .foregroundStyle(Color.focallyOnSurfaceVariant)
+                    }
+
+                    Spacer()
+
+                    if mode.enableMacOSDND {
+                        Image(systemName: "moon.fill")
+                            .foregroundStyle(Color.focallyPrimary)
+                    }
+                }
+                .padding(.leading, 12)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(mode.name)
+            .accessibilityHint(AppLanguage.shared.localizedString("quick_start_default_hint"))
+
+            Button(action: { quickStartMode = mode }) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+                    .padding(10)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(quickStartLabel(for: mode))
+            .help(quickStartLabel(for: mode))
+        }
+        .padding(.trailing, 4)
+        .background(Color.focallySurfaceContainerLow)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func quickStartLabel(for mode: FocusMode) -> String {
+        String(
+            format: AppLanguage.shared.localizedString("quick_start_open_accessibility"),
+            mode.name
+        )
     }
 
     private var activeSessionCard: some View {

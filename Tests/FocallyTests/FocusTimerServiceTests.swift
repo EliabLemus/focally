@@ -125,6 +125,40 @@ final class FocusTimerServiceTests: XCTestCase {
         XCTAssertEqual(focusIntegration.activatedModes.first?.durationMinutes, 5)
     }
 
+    func testStartSessionDraftPersistsResolvedSnapshotWithoutMutatingBaseMode() throws {
+        let baseMode = FocusMode(
+            id: UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC")!,
+            name: "Focus Time",
+            emoji: ":brain:",
+            statusText: "In focus mode",
+            durationMinutes: 25,
+            enableMacOSDND: true,
+            enableSlackDND: true,
+            enablePomodoro: true,
+            pomodoroWorkMinutes: 25,
+            pomodoroBreakMinutes: 5,
+            pomodoroLongBreakMinutes: 15,
+            pomodoroRounds: 4,
+            typeDescriptor: .builtIn(.focusTime)
+        )
+        let original = baseMode
+        var draft = FocusSessionDraft(mode: baseMode)
+        draft.activity = "  Prepare launch  "
+        draft.durationMinutes = 40
+        let expected = draft.resolvedMode()
+
+        sut.startSession(draft: draft)
+
+        XCTAssertEqual(sut.currentActivity, "Prepare launch")
+        XCTAssertEqual(sut.durationMinutes, 40)
+        XCTAssertEqual(sut.workDurationMinutes, 40)
+        XCTAssertEqual(sut.remainingSeconds, 40 * 60)
+        XCTAssertEqual(sut.currentMode, expected)
+        XCTAssertEqual(try XCTUnwrap(persistence.snapshot).modeSnapshot, expected)
+        XCTAssertEqual(focusIntegration.activatedModes, [expected])
+        XCTAssertEqual(baseMode, original)
+    }
+
     func testEndSessionDeactivatesOnlyInjectedIntegration() {
         prepareWorkCompletion(rounds: 1, currentRound: 0)
 
