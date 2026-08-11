@@ -93,6 +93,7 @@
 		B83B768C2CF5BCC948DBD75B /* DesignSystemTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C2677CB56C06B2FD04DCAF2 /* DesignSystemTestView.swift */; };
 		B85765DC57360EB88FC07D4F /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */; };
 		BB40A5E3AF07A27BBAD14850 /* DailyMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89097339EC6F280CD7AF1427 /* DailyMetricsView.swift */; };
+		BF998B6FDF2F7AFBE2309B75 /* SlackOperationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F788EADA3D23ADE8FB8420A /* SlackOperationStateTests.swift */; };
 		C3864524ED31392C860C9CB0 /* EmojiValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */; };
 		C8E3101214D8C67323091F56 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */; };
 		CAECDE4AC6D75573BAECAF34 /* ActiveFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */; };
@@ -188,6 +189,7 @@
 		4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveFocusView.swift; sourceTree = "<group>"; };
 		4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		4F41CEC41E4906B3E45ACE6B /* es.lproj */ = {isa = PBXFileReference; path = es.lproj; sourceTree = "<group>"; };
+		4F788EADA3D23ADE8FB8420A /* SlackOperationStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackOperationStateTests.swift; sourceTree = "<group>"; };
 		4FA3DCAA5E8BBB08B4F07FBC /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerService.swift; sourceTree = "<group>"; };
 		53488A3E81071ACFBF858568 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -386,6 +388,7 @@
 				AAA4827B88BFD89DE59D72D3 /* PresenceCoordinatorTests.swift */,
 				4A3435CC028CEF24160086E2 /* SessionPersistenceServiceTests.swift */,
 				1C18F5B206E8657516539F2E /* SimpleTests.swift */,
+				4F788EADA3D23ADE8FB8420A /* SlackOperationStateTests.swift */,
 				F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */,
 				CB15EBD18D837EBD03246513 /* SlackServiceSingletonTests.swift */,
 				494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */,
@@ -797,6 +800,7 @@
 				8865D6127309077D66FEEF6E /* PresenceCoordinatorTests.swift in Sources */,
 				611D1558627CFBC662CC3EC2 /* SessionPersistenceServiceTests.swift in Sources */,
 				B089356893019F08B27B5734 /* SimpleTests.swift in Sources */,
+				BF998B6FDF2F7AFBE2309B75 /* SlackOperationStateTests.swift in Sources */,
 				4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */,
 				514A298887A5C0137A1FE5FA /* SlackServiceSingletonTests.swift in Sources */,
 				5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */,
