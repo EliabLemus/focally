@@ -173,7 +173,7 @@ struct IntegrationsSettingsView: View {
                             .font(.focallyCaption)
                             .foregroundStyle(Color.focallyTertiary)
                         Button("integrations_reload") {
-                            slackService.refreshEmojiCatalogIfPossible()
+                            slackService.refreshEmojiCatalogIfPossible(force: true)
                         }
                         .font(.focallyCaption)
                         .buttonStyle(.plain)

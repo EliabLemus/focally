@@ -5,6 +5,73 @@ import Testing
 @MainActor
 @Suite("Slack operation state", .serialized)
 struct SlackOperationStateTests {
+    @Test func emojiCatalogRefreshDeduplicatesInFlightAndFreshRequests() async {
+        let transport = RecordingSlackTransport()
+        var now = Date(timeIntervalSince1970: 2_000_000_000)
+        let service = SlackService(
+            tokenForTesting: "«redacted:xox…»",
+            enabled: true,
+            requestPerformer: transport.perform,
+            now: { now },
+            emojiCatalogFreshnessInterval: 3_600
+        )
+
+        service.refreshEmojiCatalogIfPossible()
+        service.refreshEmojiCatalogIfPossible()
+        service.refreshEmojiCatalogIfPossible(force: true)
+        #expect(transport.requestCount(path: "/api/emoji.list") == 1)
+
+        transport.complete(path: "/api/emoji.list", json: [
+            "ok": true,
+            "emoji": ["focus": "https://emoji.slack-edge.com/focus.png"]
+        ], statusCode: 200)
+        await Task.yield()
+
+        service.refreshEmojiCatalogIfPossible()
+        #expect(transport.requestCount(path: "/api/emoji.list") == 1)
+
+        service.refreshEmojiCatalogIfPossible(force: true)
+        #expect(transport.requestCount(path: "/api/emoji.list") == 2)
+        now.addTimeInterval(1)
+    }
+
+    @Test func emojiCatalogHonorsRetryAfterEvenForForcedReload() async {
+        let transport = RecordingSlackTransport()
+        var now = Date(timeIntervalSince1970: 2_000_000_000)
+        let service = SlackService(
+            tokenForTesting: "«redacted:xox…»",
+            enabled: true,
+            requestPerformer: transport.perform,
+            now: { now },
+            emojiCatalogFreshnessInterval: 0
+        )
+
+        service.workspaceEmojiCodes = [":existing:"]
+        service.workspaceEmojiImageURLs = [":existing:": "https://emoji.slack-edge.com/existing.png"]
+        service.refreshEmojiCatalogIfPossible(force: true)
+        transport.complete(
+            path: "/api/emoji.list",
+            json: ["ok": false, "error": "ratelimited"],
+            statusCode: 429,
+            headers: ["Retry-After": "120"]
+        )
+        await Task.yield()
+        #expect(service.workspaceEmojiCodes == [":existing:"])
+        #expect(service.workspaceEmojiImageURLs[":existing:"] != nil)
+
+        service.refreshEmojiCatalogIfPossible(force: true)
+        #expect(transport.requestCount(path: "/api/emoji.list") == 1)
+
+        now.addTimeInterval(119)
+        service.refreshEmojiCatalogIfPossible(force: true)
+        #expect(transport.requestCount(path: "/api/emoji.list") == 1)
+
+        now.addTimeInterval(1)
+        service.refreshEmojiCatalogIfPossible(force: true)
+        #expect(transport.requestCount(path: "/api/emoji.list") == 2)
+        #expect(service.connectionError == "Too many requests. Please wait a moment and try again.")
+    }
+
     @Test func launchReconnectValidatesConfiguredTokenEvenAfterPriorConnectionState() async {
         let transport = RecordingSlackTransport()
         let service = SlackService(
@@ -347,13 +414,29 @@ private final class RecordingSlackTransport {
         complete(completion: completion, json: json, statusCode: statusCode)
     }
 
-    private func complete(completion: Completion, json: [String: Any], statusCode: Int) {
+    func complete(
+        path: String,
+        json: [String: Any],
+        statusCode: Int,
+        headers: [String: String]
+    ) {
+        let index = completions.firstIndex { $0.request.url?.path == path }!
+        let completion = completions.remove(at: index).completion
+        complete(completion: completion, json: json, statusCode: statusCode, headers: headers)
+    }
+
+    private func complete(
+        completion: Completion,
+        json: [String: Any],
+        statusCode: Int,
+        headers: [String: String] = [:]
+    ) {
         let data = try! JSONSerialization.data(withJSONObject: json)
         let response = HTTPURLResponse(
             url: URL(string: "https://slack.test/api")!,
             statusCode: statusCode,
             httpVersion: nil,
-            headerFields: nil
+            headerFields: headers
         )
         completion(data, response, nil)
     }

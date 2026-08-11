@@ -48,6 +48,12 @@ class SlackService {
     private let requestPerformer: RequestPerformer?
     private let emojiUsageRecorder: EmojiUsageRecorder
     private let testTokenOverride: String??
+    private let now: () -> Date
+    private let emojiCatalogFreshnessInterval: TimeInterval
+    private var emojiRefreshInFlight = false
+    private var lastEmojiRefreshAt: Date?
+    private var lastEmojiRefreshToken: String?
+    private var emojiRefreshBlockedUntil: Date?
 
     var token: String? {
         get {
@@ -57,6 +63,11 @@ class SlackService {
             return KeychainHelper.load(key: keychainKey)
         }
         set {
+            lastEmojiRefreshAt = nil
+            lastEmojiRefreshToken = nil
+            emojiRefreshBlockedUntil = nil
+            workspaceEmojiCodes = []
+            workspaceEmojiImageURLs = [:]
             if let value = newValue {
                 KeychainHelper.save(key: keychainKey, value: value)
             } else {
@@ -387,6 +398,8 @@ class SlackService {
             }
         }
         self.testTokenOverride = nil
+        self.now = Date.init
+        self.emojiCatalogFreshnessInterval = 3_600
         self.suppressEnabledPersistence = true
         self.isEnabled = UserDefaults.standard.bool(forKey: "slackEnabled")
         self.suppressEnabledPersistence = false
@@ -410,18 +423,22 @@ class SlackService {
         enabled: Bool = false,
         enabledDefaults: UserDefaults = .standard,
         requestPerformer: @escaping RequestPerformer,
-        emojiUsageRecorder: @escaping EmojiUsageRecorder = { _ in }
+        emojiUsageRecorder: @escaping EmojiUsageRecorder = { _ in },
+        now: @escaping () -> Date = Date.init,
+        emojiCatalogFreshnessInterval: TimeInterval = 3_600
     ) {
         self.enabledDefaults = enabledDefaults
         self.requestPerformer = requestPerformer
         self.emojiUsageRecorder = emojiUsageRecorder
         self.testTokenOverride = .some(tokenForTesting)
+        self.now = now
+        self.emojiCatalogFreshnessInterval = emojiCatalogFreshnessInterval
         self.suppressEnabledPersistence = true
         self.isEnabled = enabled
         self.suppressEnabledPersistence = false
     }
 
-    func refreshEmojiCatalogIfPossible() {
+    func refreshEmojiCatalogIfPossible(force: Bool = false) {
         guard let token, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             logger.info("Skipping emoji catalog refresh: no token available")
             workspaceEmojiCodes = []
@@ -429,63 +446,96 @@ class SlackService {
             return
         }
 
+        let timestamp = now()
+        if let blockedUntil = emojiRefreshBlockedUntil, blockedUntil > timestamp {
+            connectionError = "Too many requests. Please wait a moment and try again."
+            logger.info("Skipping Slack emoji catalog refresh until Retry-After deadline")
+            return
+        }
+        guard !emojiRefreshInFlight else {
+            logger.info("Skipping Slack emoji catalog refresh: request already in flight")
+            return
+        }
+        if !force,
+           let lastEmojiRefreshAt,
+           lastEmojiRefreshToken == token,
+           timestamp.timeIntervalSince(lastEmojiRefreshAt) < emojiCatalogFreshnessInterval {
+            logger.info("Skipping Slack emoji catalog refresh: cached catalog is fresh")
+            return
+        }
+
         logger.info("Refreshing Slack emoji catalog (enabled=\(self.isEnabled), token length=\(token.count))...")
 
         guard let request = makeSlackRequest(url: Self.emojiListURL, token: token, formFields: [:]) else {
             logger.error("Failed to prepare Slack emoji.list request")
-            DispatchQueue.main.async {
-                self.connectionError = "Failed to prepare emoji catalog request"
-            }
+            connectionError = "Failed to prepare emoji catalog request"
             return
         }
 
-        performSlackRequest(request) { [weak self] data, _, error in
-            guard let self else { return }
-
-            if let error {
-                let errorType = SlackService.categorizeNetworkError(error)
-                self.logger.error("Slack emoji.list request failed: \(error.localizedDescription), categorized as: \(errorType)")
-                DispatchQueue.main.async {
-                    self.connectionError = errorType
-                }
-                return
-            }
-
-            guard let json = self.decodeSlackResponseBody(data) else {
-                self.logger.error("Slack emoji.list failed to decode response")
-                DispatchQueue.main.async {
-                    self.connectionError = "Emoji catalog: failed to decode response"
-                }
-                return
-            }
-
-            guard let responseOK = json["ok"] as? Bool, responseOK else {
-                let errorDetail: String = json["error"] as? String ?? "Unknown error"
-                let statusCode = 200 // Assuming 200 since we got a response
-                let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorDetail)
-                self.logger.error("Slack emoji.list returned not ok: \(errorDetail), userMessage: \(userFriendlyError)")
-                DispatchQueue.main.async {
-                    self.connectionError = userFriendlyError
-                }
-                return
-            }
-
-            guard let emojiMap = json["emoji"] as? [String: String] else {
-                self.logger.error("Slack emoji.list missing emoji field")
-                DispatchQueue.main.async {
-                    self.connectionError = "Emoji catalog response missing emoji field"
-                }
-                return
-            }
-
-            let codes = emojiMap.keys
-                .map { ":\($0):" }
-                .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
-            let imageURLs = Self.workspaceEmojiImageURLs(from: emojiMap)
-
+        emojiRefreshInFlight = true
+        performSlackRequest(request) { [weak self] data, response, error in
             DispatchQueue.main.async {
+                guard let self else { return }
+                self.emojiRefreshInFlight = false
+
+                guard self.token == token else {
+                    self.logger.info("Discarding Slack emoji catalog response because the token changed")
+                    self.refreshEmojiCatalogIfPossible(force: true)
+                    return
+                }
+
+                if let error {
+                    let errorType = SlackService.categorizeNetworkError(error)
+                    self.logger.error("Slack emoji.list request failed: \(error.localizedDescription), categorized as: \(errorType)")
+                    self.connectionError = errorType
+                    return
+                }
+
+                let httpResponse = response as? HTTPURLResponse
+                let statusCode = httpResponse?.statusCode ?? -1
+                if statusCode == 429 {
+                    let retryAfter = TimeInterval(httpResponse?.value(forHTTPHeaderField: "Retry-After") ?? "") ?? 60
+                    self.emojiRefreshBlockedUntil = self.now().addingTimeInterval(max(1, retryAfter))
+                    self.connectionError = SlackService.userFriendlyError(for: statusCode, slackError: "ratelimited")
+                    self.logger.warning("Slack emoji.list rate limited; honoring Retry-After=\(retryAfter) seconds")
+                    return
+                }
+
+                guard let json = self.decodeSlackResponseBody(data) else {
+                    self.logger.error("Slack emoji.list failed to decode response")
+                    self.connectionError = "Emoji catalog: failed to decode response"
+                    return
+                }
+
+                guard let responseOK = json["ok"] as? Bool,
+                      responseOK,
+                      (200...299).contains(statusCode) else {
+                    let errorDetail: String = json["error"] as? String ?? "Unknown error"
+                    let userFriendlyError = SlackService.userFriendlyError(
+                        for: statusCode,
+                        slackError: errorDetail
+                    )
+                    self.logger.error("Slack emoji.list returned not ok: \(errorDetail), httpStatus=\(statusCode), userMessage=\(userFriendlyError)")
+                    self.connectionError = userFriendlyError
+                    return
+                }
+
+                guard let emojiMap = json["emoji"] as? [String: String] else {
+                    self.logger.error("Slack emoji.list missing emoji field")
+                    self.connectionError = "Emoji catalog response missing emoji field"
+                    return
+                }
+
+                let codes = emojiMap.keys
+                    .map { ":\($0):" }
+                    .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+                let imageURLs = Self.workspaceEmojiImageURLs(from: emojiMap)
+
                 self.workspaceEmojiCodes = codes
                 self.workspaceEmojiImageURLs = imageURLs
+                self.lastEmojiRefreshAt = self.now()
+                self.lastEmojiRefreshToken = token
+                self.emojiRefreshBlockedUntil = nil
                 self.connectionError = nil
                 self.logger.info("Loaded \(codes.count) Slack workspace emojis successfully (\(imageURLs.count) image URLs)")
             }

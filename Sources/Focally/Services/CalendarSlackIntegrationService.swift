@@ -3,6 +3,43 @@ import Foundation
 import Observation
 
 @MainActor
+final class CalendarChangeMonitor {
+    private let notificationCenter: NotificationCenter
+    private let notificationName: Notification.Name
+    private let onChange: @MainActor () -> Void
+    private var observer: NSObjectProtocol?
+
+    init(
+        notificationCenter: NotificationCenter,
+        notificationName: Notification.Name,
+        onChange: @escaping @MainActor () -> Void
+    ) {
+        self.notificationCenter = notificationCenter
+        self.notificationName = notificationName
+        self.onChange = onChange
+    }
+
+    func start() {
+        guard observer == nil else { return }
+        observer = notificationCenter.addObserver(
+            forName: notificationName,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.onChange()
+            }
+        }
+    }
+
+    func stop() {
+        guard let observer else { return }
+        notificationCenter.removeObserver(observer)
+        self.observer = nil
+    }
+}
+
+@MainActor
 @Observable
 final class CalendarSlackIntegrationService {
     static let enabledDefaultsKey = "calendarEnabled"
@@ -60,17 +97,38 @@ final class CalendarSlackIntegrationService {
     private let presenceCoordinator: PresenceCoordinating
     private let metricsTracker: CalendarMetricsTracker
     private let defaults: UserDefaults
-    private var timer: Timer?
+    private let notificationCenter: NotificationCenter
+    private let eventStoreChangedNotification: Notification.Name
+    private let authorizationStatusProvider: () -> EKAuthorizationStatus
+    private let eventFetcher: (() -> [CalendarMeeting])?
+    private var boundaryTimer: Timer?
+    private var isMonitoring = false
+    @ObservationIgnored private lazy var changeMonitor = CalendarChangeMonitor(
+        notificationCenter: notificationCenter,
+        notificationName: eventStoreChangedNotification
+    ) { [weak self] in
+        self?.reconcileCalendar()
+    }
 
     init(
         eventStore: EKEventStore = EKEventStore(),
         presenceCoordinator: PresenceCoordinating,
         metricsTracker: CalendarMetricsTracker? = nil,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        notificationCenter: NotificationCenter = .default,
+        eventStoreChangedNotification: Notification.Name = .EKEventStoreChanged,
+        authorizationStatusProvider: @escaping () -> EKAuthorizationStatus = {
+            EKEventStore.authorizationStatus(for: .event)
+        },
+        eventFetcher: (() -> [CalendarMeeting])? = nil
     ) {
         self.eventStore = eventStore
         self.presenceCoordinator = presenceCoordinator
         self.defaults = defaults
+        self.notificationCenter = notificationCenter
+        self.eventStoreChangedNotification = eventStoreChangedNotification
+        self.authorizationStatusProvider = authorizationStatusProvider
+        self.eventFetcher = eventFetcher
         self.metricsTracker = metricsTracker ?? CalendarMetricsTracker(
             persistence: UserDefaultsCalendarMetricsDraftPersistence(),
             metrics: FocusMetricsService.shared
@@ -89,7 +147,7 @@ final class CalendarSlackIntegrationService {
                 activateDNDForVideoCalls: defaults.bool(forKey: Self.dndForMeetingsDefaultsKey)
             )
         }
-        hasCalendarAccess = EKEventStore.authorizationStatus(for: .event) == .fullAccess
+        hasCalendarAccess = authorizationStatusProvider() == .fullAccess
     }
 
     func startIfEnabled() {
@@ -97,8 +155,14 @@ final class CalendarSlackIntegrationService {
             metricsTracker.finishBecauseMonitoringStopped()
             return
         }
+        hasCalendarAccess = Self.canReadCalendar(
+            isEnabled: isEnabled,
+            authorizationStatus: authorizationStatusProvider()
+        )
         if hasCalendarAccess {
-            startPeriodicCheck()
+            startMonitoring()
+        } else if isMonitoring {
+            stopMonitoring()
         } else {
             requestCalendarAccess()
         }
@@ -123,7 +187,7 @@ final class CalendarSlackIntegrationService {
                 hasCalendarAccess = granted
                 connectionError = granted ? nil : "Calendar access was not granted"
                 if granted {
-                    startPeriodicCheck()
+                    startMonitoring()
                 } else {
                     stopMonitoring()
                 }
@@ -136,7 +200,7 @@ final class CalendarSlackIntegrationService {
     }
 
     func fetchTodayEvents() {
-        let authorizationStatus = EKEventStore.authorizationStatus(for: .event)
+        let authorizationStatus = authorizationStatusProvider()
         hasCalendarAccess = Self.canReadCalendar(
             isEnabled: isEnabled,
             authorizationStatus: authorizationStatus
@@ -149,28 +213,40 @@ final class CalendarSlackIntegrationService {
             return
         }
 
-        let start = Calendar.current.startOfDay(for: Date())
-        let end = Calendar.current.date(byAdding: .day, value: 1, to: start) ?? Date()
-        let predicate = eventStore.predicateForEvents(withStart: start, end: end, calendars: nil)
-        events = eventStore.events(matching: predicate)
-            .map(CalendarMeeting.init(event:))
-            .sorted { $0.startTime < $1.startTime }
+        if let eventFetcher {
+            events = eventFetcher().sorted { $0.startTime < $1.startTime }
+        } else {
+            let start = Calendar.current.startOfDay(for: Date())
+            let end = Calendar.current.date(byAdding: .day, value: 1, to: start) ?? Date()
+            let predicate = eventStore.predicateForEvents(withStart: start, end: end, calendars: nil)
+            events = eventStore.events(matching: predicate)
+                .map(CalendarMeeting.init(event:))
+                .sorted { $0.startTime < $1.startTime }
+        }
         connectionError = nil
     }
 
     func stopMonitoring() {
-        timer?.invalidate()
-        timer = nil
+        boundaryTimer?.invalidate()
+        boundaryTimer = nil
+        changeMonitor.stop()
+        isMonitoring = false
         events = []
         metricsTracker.finishBecauseMonitoringStopped()
         transition(to: nil)
     }
 
     func prepareForTermination() {
+        boundaryTimer?.invalidate()
+        boundaryTimer = nil
+        changeMonitor.stop()
+        isMonitoring = false
         metricsTracker.prepareForTermination()
     }
 
     func prepareForSystemSleep() {
+        boundaryTimer?.invalidate()
+        boundaryTimer = nil
         metricsTracker.prepareForSystemSleep()
     }
 
@@ -178,13 +254,15 @@ final class CalendarSlackIntegrationService {
         guard isEnabled else { return }
         hasCalendarAccess = Self.canReadCalendar(
             isEnabled: isEnabled,
-            authorizationStatus: EKEventStore.authorizationStatus(for: .event)
+            authorizationStatus: authorizationStatusProvider()
         )
         guard hasCalendarAccess else {
             stopMonitoring()
             return
         }
-        startPeriodicCheck(reapplyCalendarSettings: false)
+        isMonitoring = true
+        changeMonitor.start()
+        reconcileCalendar()
     }
 
     private func saveCalendarSettings() {
@@ -192,30 +270,58 @@ final class CalendarSlackIntegrationService {
         defaults.set(data, forKey: Self.slackSettingsDefaultsKey)
     }
 
-    private func startPeriodicCheck(reapplyCalendarSettings: Bool = true) {
-        timer?.invalidate()
+    private func startMonitoring(reapplyCalendarSettings: Bool = true) {
+        guard !isMonitoring else { return }
+        isMonitoring = true
+        changeMonitor.start()
         if reapplyCalendarSettings {
             presenceCoordinator.calendarSettingsUpdated(calendarSettings)
         }
-        checkForActiveMeeting()
-        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+        reconcileCalendar()
+    }
+
+    private func reconcileCalendar() {
+        fetchTodayEvents()
+        guard hasCalendarAccess else {
+            stopMonitoring()
+            return
+        }
+        let now = Date()
+        transition(to: Self.activeMeeting(at: now, in: events))
+        scheduleNextBoundary(after: now)
+    }
+
+    private func scheduleNextBoundary(after date: Date) {
+        boundaryTimer?.invalidate()
+        let calendar = Calendar.current
+        let nextDayStart = calendar.date(
+            byAdding: .day,
+            value: 1,
+            to: calendar.startOfDay(for: date)
+        ) ?? date.addingTimeInterval(86_400)
+        guard let boundary = Self.nextBoundary(
+            after: date,
+            events: events,
+            nextDayStart: nextDayStart
+        ) else {
+            boundaryTimer = nil
+            return
+        }
+        boundaryTimer = Timer.scheduledTimer(
+            withTimeInterval: max(0.1, boundary.timeIntervalSince(date)),
+            repeats: false
+        ) { [weak self] _ in
             Task { @MainActor in
-                self?.checkForActiveMeeting()
+                self?.reconcileCalendar()
             }
         }
     }
 
-    private func checkForActiveMeeting() {
-        fetchTodayEvents()
-        let activeMeeting = Self.activeMeeting(at: Date(), in: events)
-        transition(to: activeMeeting)
-    }
-
     private func transition(to meeting: CalendarMeeting?) {
         if let meeting {
-            metricsTracker.observeActiveMeeting(meeting)
+            metricsTracker.reconcileActiveMeeting(meeting)
         } else {
-            metricsTracker.observeNoActiveMeeting()
+            metricsTracker.reconcileNoActiveMeeting()
         }
 
         guard Self.isPresenceTransition(currentMeeting: currentMeeting, nextMeeting: meeting) else {
@@ -229,6 +335,18 @@ final class CalendarSlackIntegrationService {
         events.first { event in
             !event.isAllDay && date >= event.startTime && date < event.endTime
         }
+    }
+
+    static func nextBoundary(
+        after date: Date,
+        events: [CalendarMeeting],
+        nextDayStart: Date
+    ) -> Date? {
+        let eventBoundaries = events
+            .filter { !$0.isAllDay }
+            .flatMap { [$0.startTime, $0.endTime] }
+            .filter { $0 > date }
+        return (eventBoundaries + [nextDayStart].filter { $0 > date }).min()
     }
 
     static func canReadCalendar(
