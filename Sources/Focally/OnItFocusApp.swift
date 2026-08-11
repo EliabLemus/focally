@@ -13,6 +13,24 @@ struct FocallyApp: App {
     }
 }
 
+enum MenuBarPopoverRouting {
+    enum Action: Equatable {
+        case show
+        case close
+        case reanchor
+    }
+
+    static func action(
+        isShown: Bool,
+        currentScreenFrame: CGRect?,
+        targetScreenFrame: CGRect
+    ) -> Action {
+        guard isShown else { return .show }
+        guard currentScreenFrame == targetScreenFrame else { return .reanchor }
+        return .close
+    }
+}
+
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let logger = Logger.app
@@ -53,7 +71,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.timerService.prepareForSleep()
             self?.calendarService.prepareForSystemSleep()
         },
-        didWake: { [weak self] in self?.timerService.reconcileAfterWake() }
+        didWake: { [weak self] in
+            self?.timerService.reconcileAfterWake()
+            self?.calendarService.reconcileAfterWake()
+        }
     )
     private var timerUpdate: Timer?
 
@@ -62,8 +83,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         timerService.restoreSessionIfNeeded()
         workspaceLifecycleCoordinator.start()
 
-        // Auto-reconnect Slack if token exists and not already attempted (post-update)
-        slackService.attemptAutoReconnectionIfNeeded()
+        // Validate Slack on every launch when a configured integration exists.
+        slackService.reconnectOnLaunchIfConfigured { [weak self] succeeded in
+            guard succeeded else { return }
+            self?.presenceCoordinator.reapplyActivePresence()
+        }
 
         // Check permissions post-update (detect if lost)
         permissionService.checkAllPermissions()
@@ -148,43 +172,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        if popover.isShown {
-            popover.performClose(button)
-        } else {
-            // Multi-monitor fix: Detect screen del mouse, no solo del button
-            let mouseLocation = NSEvent.mouseLocation
-            guard let activeScreen = NSScreen.screens.first(where: { screen in
-                screen.frame.contains(mouseLocation)
-            }) ?? NSScreen.main else {
-                logger.warning("Could not detect active screen")
-                return
-            }
-
-            // Configurar popover para el screen correcto
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-
-            // Forzar window en el screen detectado
-            if let popoverWindow = popover.contentViewController?.view.window {
-                let screenFrame = activeScreen.visibleFrame
-                let popoverFrame = popoverWindow.frame
-
-                // Mover popover al screen correcto
-                popoverWindow.setFrame(
-                    NSRect(
-                        x: min(max(popoverFrame.minX, screenFrame.minX), screenFrame.maxX - popoverFrame.width),
-                        y: min(max(popoverFrame.minY, screenFrame.minY), screenFrame.maxY - popoverFrame.height),
-                        width: popoverFrame.width,
-                        height: popoverFrame.height
-                    ),
-                    display: true
-                )
-
-                popoverWindow.makeKey()
-                popoverWindow.orderFrontRegardless()
-            }
-
-            applySavedTheme()
+        let mouseLocation = NSEvent.mouseLocation
+        guard let targetScreen = NSScreen.screens.first(where: { $0.frame.contains(mouseLocation) })
+            ?? button.window?.screen
+            ?? NSScreen.main else {
+            logger.warning("Could not detect target screen for menu-bar popover")
+            return
         }
+
+        let action = MenuBarPopoverRouting.action(
+            isShown: popover.isShown,
+            currentScreenFrame: popover.contentViewController?.view.window?.screen?.frame,
+            targetScreenFrame: targetScreen.frame
+        )
+
+        switch action {
+        case .close:
+            popover.performClose(button)
+        case .reanchor:
+            popover.close()
+            showPopover(popover, relativeTo: button)
+        case .show:
+            showPopover(popover, relativeTo: button)
+        }
+    }
+
+    private func showPopover(_ popover: NSPopover, relativeTo button: NSStatusBarButton) {
+        // Keep AppKit's native anchor relationship. Moving the popover window after
+        // `show` can strand it on another display or detach its arrow from the item.
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        applySavedTheme()
     }
 
     private func showContextMenu(button: NSButton) {

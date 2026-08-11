@@ -60,19 +60,114 @@ final class CalendarMetricsTrackerTests: XCTestCase {
         XCTAssertTrue(metrics.sessions.isEmpty)
     }
 
-    func testPresenceTransitionIdentityUsesOnlyMeetingID() {
+    func testCalendarReadEligibilityRequiresEnabledFullAccess() {
+        XCTAssertTrue(CalendarSlackIntegrationService.canReadCalendar(
+            isEnabled: true,
+            authorizationStatus: .fullAccess
+        ))
+        XCTAssertFalse(CalendarSlackIntegrationService.canReadCalendar(
+            isEnabled: false,
+            authorizationStatus: .fullAccess
+        ))
+        XCTAssertFalse(CalendarSlackIntegrationService.canReadCalendar(
+            isEnabled: true,
+            authorizationStatus: .denied
+        ))
+    }
+
+    func testPresenceTransitionRequiresObservableMeetingChange() {
+        let original = CalendarMeeting(
+            id: "recurring",
+            title: "Planning",
+            startTime: occurrence,
+            endTime: occurrence.addingTimeInterval(3_600),
+            isAllDay: false,
+            hasVideoCall: true
+        )
+        let changedEnd = CalendarMeeting(
+            id: "recurring",
+            title: "Planning",
+            startTime: occurrence,
+            endTime: occurrence.addingTimeInterval(5_400),
+            isAllDay: false,
+            hasVideoCall: true
+        )
+
         XCTAssertFalse(CalendarSlackIntegrationService.isPresenceTransition(
-            currentMeetingID: "recurring",
-            nextMeetingID: "recurring"
+            currentMeeting: nil,
+            nextMeeting: nil
+        ))
+        XCTAssertFalse(CalendarSlackIntegrationService.isPresenceTransition(
+            currentMeeting: original,
+            nextMeeting: original
         ))
         XCTAssertTrue(CalendarSlackIntegrationService.isPresenceTransition(
-            currentMeetingID: "recurring",
-            nextMeetingID: "different"
+            currentMeeting: original,
+            nextMeeting: changedEnd
         ))
         XCTAssertTrue(CalendarSlackIntegrationService.isPresenceTransition(
-            currentMeetingID: "recurring",
-            nextMeetingID: nil
+            currentMeeting: original,
+            nextMeeting: nil
         ))
+    }
+
+    func testActiveMeetingUsesHalfOpenIntervalAndExcludesAllDayEvents() {
+        let active = CalendarMeeting(
+            id: "active",
+            title: "Active",
+            startTime: occurrence,
+            endTime: occurrence.addingTimeInterval(3_600),
+            isAllDay: false,
+            hasVideoCall: false
+        )
+        let allDay = CalendarMeeting(
+            id: "all-day",
+            title: "All day",
+            startTime: occurrence.addingTimeInterval(-3_600),
+            endTime: occurrence.addingTimeInterval(7_200),
+            isAllDay: true,
+            hasVideoCall: false
+        )
+
+        XCTAssertEqual(
+            CalendarSlackIntegrationService.activeMeeting(at: occurrence, in: [allDay, active]),
+            active
+        )
+        XCTAssertEqual(
+            CalendarSlackIntegrationService.activeMeeting(
+                at: occurrence.addingTimeInterval(3_599),
+                in: [active]
+            ),
+            active
+        )
+        XCTAssertNil(CalendarSlackIntegrationService.activeMeeting(
+            at: occurrence.addingTimeInterval(3_600),
+            in: [active]
+        ))
+    }
+
+    func testOverlappingActiveMeetingsSelectFirstSourceOrderedEvent() {
+        let first = CalendarMeeting(
+            id: "first",
+            title: "First",
+            startTime: occurrence.addingTimeInterval(-600),
+            endTime: occurrence.addingTimeInterval(1_800),
+            isAllDay: false,
+            hasVideoCall: false
+        )
+        let second = CalendarMeeting(
+            id: "second",
+            title: "Second",
+            startTime: occurrence.addingTimeInterval(-300),
+            endTime: occurrence.addingTimeInterval(3_600),
+            isAllDay: false,
+            hasVideoCall: true
+        )
+
+        XCTAssertEqual(
+            CalendarSlackIntegrationService.activeMeeting(at: occurrence, in: [first, second]),
+            first
+        )
     }
 
     func testFirstObservationAndBoundedAccumulationThenFinalization() {

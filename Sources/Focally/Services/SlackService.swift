@@ -73,26 +73,19 @@ class SlackService {
         return trimmed.isEmpty ? Self.defaultStatusEmoji : trimmed
     }
 
-    // MARK: - Auto-Reconnection Post-Update
+    // MARK: - Launch Reconnection
 
-    private static let connectionAttemptedKey = "slack.connectionAttempted"
+    func reconnectOnLaunchIfConfigured(completion: ((Bool) -> Void)? = nil) {
+        guard isEnabled,
+              let token,
+              !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            completion?(false)
+            return
+        }
 
-    func attemptAutoReconnectionIfNeeded() {
-        let connectionAttempted = UserDefaults.standard.bool(forKey: Self.connectionAttemptedKey)
-        let hasToken = token != nil
-
-        guard hasToken && !connectionAttempted else { return }
-
-        logger.info("Attempting Slack auto-reconnection post-update. token=\(maskedToken(token))")
-
-        // Marcar como intentado para evitar reintentos infinitos
-        UserDefaults.standard.set(true, forKey: Self.connectionAttemptedKey)
-
-        testConnection()
-    }
-
-    func resetConnectionAttemptedFlag() {
-        UserDefaults.standard.set(false, forKey: Self.connectionAttemptedKey)
+        logger.info("Validating configured Slack connection on launch. token=\(maskedToken(token))")
+        isConnected = false
+        testConnection(completion: completion)
     }
 
     func disableSlackDND() {
@@ -365,7 +358,7 @@ class SlackService {
         }
     }
 
-    func testConnection() {
+    func testConnection(completion: ((Bool) -> Void)? = nil) {
         guard connectionTestState != .working else { return }
         connectionTestState = .working
 
@@ -375,10 +368,11 @@ class SlackService {
             isConnected = false
             connectionTestState = .failed("No token configured")
             logger.error("Slack testConnection failed because no token is configured")
+            completion?(false)
             return
         }
 
-        validateToken()
+        validateToken(completion: completion)
     }
 
     // MARK: - Init
@@ -396,10 +390,9 @@ class SlackService {
         self.suppressEnabledPersistence = true
         self.isEnabled = UserDefaults.standard.bool(forKey: "slackEnabled")
         self.suppressEnabledPersistence = false
-        // Try to load saved token
+        // Load the saved token, but do not claim connectivity before launch auth.test.
         if let savedToken = token, !savedToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            // Don't auto-test, just mark as potentially connected
-            self.isConnected = true
+            self.isConnected = false
             // Auto-enable if disabled but token exists
             if !self.isEnabled {
                 logger.info("Auto-enabling Slack: token exists but was disabled")
@@ -592,12 +585,13 @@ class SlackService {
         }
     }
 
-    func validateToken() {
+    func validateToken(completion: ((Bool) -> Void)? = nil) {
         guard let token else {
             connectionError = "No token configured"
             isConnected = false
             connectionTestState = .failed("No token configured")
             logger.error("validateToken called without a token")
+            completion?(false)
             return
         }
 
@@ -607,6 +601,7 @@ class SlackService {
             connectionError = "Failed to prepare Slack auth.test request"
             isConnected = false
             connectionTestState = .failed("Failed to prepare Slack auth.test request")
+            completion?(false)
             return
         }
 
@@ -618,6 +613,7 @@ class SlackService {
                     self?.isConnected = false
                     self?.connectionTestState = .failed(errorType)
                     self?.logger.error("Slack auth.test request failed: \(error.localizedDescription), categorized as: \(errorType)")
+                    completion?(false)
                     return
                 }
 
@@ -628,6 +624,7 @@ class SlackService {
                     self?.connectionError = "Invalid response from Slack"
                     self?.isConnected = false
                     self?.connectionTestState = .failed("Invalid response from Slack")
+                    completion?(false)
                     return
                 }
 
@@ -639,11 +636,13 @@ class SlackService {
                         self?.connectionTestState = .success("Connected ✓")
                         self?.refreshEmojiCatalogIfPossible()
                         self?.logger.info("Slack auth.test succeeded for a user token")
+                        completion?(true)
                     } else {
                         self?.isConnected = false
                         self?.connectionError = "Slack status updates require a user token (xoxp-) with users.profile:write"
                         self?.connectionTestState = .failed("Slack status updates require a user token (xoxp-) with users.profile:write")
                         self?.logger.error("Slack auth.test succeeded but token type is not a user token")
+                        completion?(false)
                     }
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
@@ -652,6 +651,7 @@ class SlackService {
                     self?.isConnected = false
                     self?.connectionTestState = .failed(userFriendlyError)
                     self?.logger.error("Slack auth.test failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
+                    completion?(false)
                 }
             }
         }

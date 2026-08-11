@@ -17,12 +17,15 @@ protocol PresenceCoordinating: AnyObject {
     func manualFocusEnded()
     func calendarMeetingUpdated(_ meeting: CalendarMeeting?)
     func calendarSettingsUpdated(_ settings: SlackCalendarSettings)
+    func reapplyActivePresence()
 }
 
 extension PresenceCoordinating {
     func manualFocusStarted(mode: FocusMode) {
         manualFocusStarted(mode: mode, systemDNDEnabled: true)
     }
+
+    func reapplyActivePresence() {}
 }
 
 @MainActor
@@ -129,6 +132,11 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     func calendarSettingsUpdated(_ settings: SlackCalendarSettings) {
         calendarSettings = settings
         guard manualMode == nil else { return }
+        applyWinningPresence()
+    }
+
+    func reapplyActivePresence() {
+        guard manualMode != nil || rememberedMeeting != nil else { return }
         applyWinningPresence()
     }
 
