@@ -2,7 +2,7 @@
 
 ## Status
 
-`pending_visual_approval`
+`done`
 
 ## Challenger pre-mortem and Driver synthesis
 
@@ -196,7 +196,7 @@ unverified_assumptions: []
 
 ## Result
 
-- Implementation status: complete in isolated branch; local integration intentionally pending Human Owner visual approval.
+- Implementation status: complete and integrated into local `main` after explicit Human Owner visual approval.
 - Driver: `openai-codex/gpt-5.6-sol`; Challenger: `zai/glm-5.2`; Judge: deterministic host gates.
 - TDD evidence:
   - Slice 1 RED: `FocusSessionDraftTests` exited 65 because `FocusSessionDraft` did not exist.
@@ -216,5 +216,6 @@ unverified_assumptions: []
   - pre-mortem `deleg_9017200c`: timeout without verdict; not counted as approval;
   - first final review `deleg_393cff38`: API timeout without structured verdict; not counted as approval;
   - bounded blocker-only final review `deleg_25ddf1bd`: `PASS`, zero blocker/high findings.
-- Visual evidence: representative preview rendered from the implemented layout and Focally color assets at `/tmp/focally-task053-preview.png`; no clipping or overlap observed. It was shown to the Human Owner before integration.
+- Visual evidence: representative preview rendered from the implemented layout and Focally color assets at `/tmp/focally-task053-preview.png`; no clipping or overlap observed. The Human Owner approved it before local integration.
+- Local integration: feature merge `fa215f5`; generated-project merge `ca66587`.
 - Publication: no push, PR, tag, release, version bump, or external action.
