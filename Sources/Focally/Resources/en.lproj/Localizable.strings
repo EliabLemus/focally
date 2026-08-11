@@ -172,6 +172,30 @@
 "integrations_connected" = "Connected";
 "integrations_disconnected" = "Disconnected";
 "integrations_connected_check" = "Connected ✓";
+"integrations_testing_connection" = "Testing Slack connection";
+"integrations_testing_focus" = "Testing Slack focus status";
+"integrations_connection_test_succeeded" = "Slack connection succeeded ✓";
+"integrations_focus_test_succeeded" = "Slack focus status updated ✓";
+"integrations_retry" = "Retry";
+"slack_error_integration_disabled" = "Slack integration is disabled";
+"slack_error_no_token" = "No Slack token configured";
+"slack_error_prepare_status_request" = "Failed to prepare Slack status request";
+"slack_error_prepare_connection_request" = "Failed to prepare Slack connection request";
+"slack_error_invalid_response" = "Invalid response from Slack";
+"slack_error_no_internet" = "No internet connection";
+"slack_error_network_timeout" = "Network request timed out";
+"slack_error_cannot_connect" = "Cannot connect to Slack server";
+"slack_error_cannot_find_server" = "Cannot find Slack server";
+"slack_error_network_format" = "Network error: %@";
+"slack_error_invalid_token" = "Invalid Slack token. Please check your token and try again.";
+"slack_error_access_denied" = "Access denied. Your token may not have the required permissions.";
+"slack_error_rate_limited" = "Too many requests. Please wait a moment and try again.";
+"slack_error_missing_permissions" = "Your token is missing required permissions.";
+"slack_error_account_inactive" = "Your Slack account is inactive.";
+"slack_error_token_revoked" = "Your Slack token has been revoked.";
+"slack_error_workspace_login" = "Your Slack workspace requires login.";
+"slack_error_user_token_required" = "Slack status updates require a user token (xoxp-) with users.profile:write.";
+"slack_error_api_format" = "Slack API error: %@";
 
 /* ========== GeneralSettingsView ========== */
 "general_launch_login" = "Launch Focally at login";

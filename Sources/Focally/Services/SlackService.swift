@@ -2,16 +2,30 @@ import Foundation
 import Observation
 import os.log
 
+enum SlackOperationState: Equatable {
+    case idle
+    case working
+    case success(String)
+    case failed(String)
+}
+
 @Observable
 class SlackService {
+    typealias RequestPerformer = (URLRequest, @escaping (Data?, URLResponse?, Error?) -> Void) -> Void
+    typealias EmojiUsageRecorder = (String) -> Void
+
     static let shared = SlackService()
     static let defaultStatusEmoji = ":hourglass_flowing_sand:"
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
     static let emojiListURL = URL(string: "https://slack.com/api/emoji.list")!
 
+    private let enabledDefaults: UserDefaults
+    @ObservationIgnored private var suppressEnabledPersistence = false
+
     var isEnabled: Bool = false {
         didSet {
-            UserDefaults.standard.set(isEnabled, forKey: "slackEnabled")
+            guard !suppressEnabledPersistence else { return }
+            enabledDefaults.set(isEnabled, forKey: "slackEnabled")
             if isEnabled && token != nil {
                 refreshEmojiCatalogIfPossible()
             }
@@ -19,6 +33,7 @@ class SlackService {
     }
     var isConnected: Bool = false
     var connectionError: String?
+    var connectionTestState: SlackOperationState = .idle
     var lastStatusText: String?
     var workspaceEmojiCodes: [String] = []
     var workspaceEmojiImageURLs: [String: String] = [:]
@@ -30,9 +45,17 @@ class SlackService {
     private let authTestURL = URL(string: "https://slack.com/api/auth.test")!
     private let endDndURL = URL(string: "https://slack.com/api/dnd.endSnooze")!
     private let dndSetSnoozeURL = URL(string: "https://slack.com/api/dnd.setSnooze")!
+    private let requestPerformer: RequestPerformer?
+    private let emojiUsageRecorder: EmojiUsageRecorder
+    private let testTokenOverride: String??
 
     var token: String? {
-        get { KeychainHelper.load(key: keychainKey) }
+        get {
+            if let testTokenOverride {
+                return testTokenOverride
+            }
+            return KeychainHelper.load(key: keychainKey)
+        }
         set {
             if let value = newValue {
                 KeychainHelper.save(key: keychainKey, value: value)
@@ -197,25 +220,45 @@ class SlackService {
         }
     }
 
-    func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String? = nil, fallbackEmoji: String? = nil) {
+    func setStatus(
+        text: String,
+        expirationTimestamp: Int,
+        taskEmoji: String? = nil,
+        fallbackEmoji: String? = nil
+    ) {
+        setStatus(
+            text: text,
+            expirationTimestamp: expirationTimestamp,
+            taskEmoji: taskEmoji,
+            fallbackEmoji: fallbackEmoji,
+            completion: nil
+        )
+    }
+
+    func setStatus(
+        text: String,
+        expirationTimestamp: Int,
+        taskEmoji: String? = nil,
+        fallbackEmoji: String? = nil,
+        completion: ((Result<Void, Error>) -> Void)?
+    ) {
         let maskedToken = maskedToken(token)
         logger.info("setStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), text=\(text), taskEmoji=\(taskEmoji ?? "nil"), fallbackEmoji=\(fallbackEmoji ?? "nil"), expirationTimestamp=\(expirationTimestamp)")
         guard isEnabled else {
             logger.info("Skipping setStatus because Slack integration is disabled")
+            completion?(.failure(SlackRequestError(message: "Slack integration is disabled")))
             return
         }
         guard let token else {
             logger.error("Skipping setStatus because no Slack token is configured")
             connectionError = "No Slack token configured"
             isConnected = false
+            completion?(.failure(SlackRequestError(message: "No Slack token configured")))
             return
         }
         let statusEmoji = normalizedStatusEmoji(in: text, taskEmoji: taskEmoji, fallbackEmoji: fallbackEmoji)
 
-        // Registrar uso del emoji (async para evitar conflicto con @MainActor)
-        Task { @MainActor in
-            EmojiUsageTracker.shared.recordUsage(statusEmoji)
-        }
+        emojiUsageRecorder(statusEmoji)
 
         let profile: [String: String] = [
             "status_text": text,
@@ -228,6 +271,7 @@ class SlackService {
         ]) else {
             connectionError = "Failed to prepare Slack status request"
             isConnected = false
+            completion?(.failure(SlackRequestError(message: "Failed to prepare Slack status request")))
             return
         }
 
@@ -238,6 +282,7 @@ class SlackService {
                     self?.connectionError = errorType
                     self?.isConnected = false
                     self?.logger.error("Slack setStatus request failed: \(error.localizedDescription), categorized as: \(errorType)")
+                    completion?(.failure(SlackRequestError(message: errorType)))
                     return
                 }
 
@@ -247,6 +292,7 @@ class SlackService {
                 guard let json = self?.decodeSlackResponseBody(data) else {
                     self?.connectionError = "Invalid response from Slack"
                     self?.isConnected = false
+                    completion?(.failure(SlackRequestError(message: "Invalid response from Slack")))
                     return
                 }
 
@@ -256,12 +302,14 @@ class SlackService {
                     self?.connectionError = nil
                     self?.lastStatusText = text
                     self?.logger.info("Slack status set successfully: \(statusEmoji) \(text)")
+                    completion?(.success(()))
                 } else {
                     let errorMsg: String = json["error"] as? String ?? "Unknown error"
                     let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
                     self?.connectionError = userFriendlyError
                     self?.isConnected = false
                     self?.logger.error("Slack setStatus failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
+                    completion?(.failure(SlackRequestError(message: userFriendlyError)))
                 }
             }
         }
@@ -318,10 +366,14 @@ class SlackService {
     }
 
     func testConnection() {
+        guard connectionTestState != .working else { return }
+        connectionTestState = .working
+
         logger.info("testConnection called. isEnabled=\(self.isEnabled), token=\(self.maskedToken(self.token))")
         guard token != nil else {
             connectionError = "No token configured"
             isConnected = false
+            connectionTestState = .failed("No token configured")
             logger.error("Slack testConnection failed because no token is configured")
             return
         }
@@ -332,7 +384,18 @@ class SlackService {
     // MARK: - Init
 
     private init() {
+        self.enabledDefaults = .standard
+        self.requestPerformer = nil
+        self.emojiUsageRecorder = { statusEmoji in
+            // Registrar uso del emoji (async para evitar conflicto con @MainActor)
+            Task { @MainActor in
+                EmojiUsageTracker.shared.recordUsage(statusEmoji)
+            }
+        }
+        self.testTokenOverride = nil
+        self.suppressEnabledPersistence = true
         self.isEnabled = UserDefaults.standard.bool(forKey: "slackEnabled")
+        self.suppressEnabledPersistence = false
         // Try to load saved token
         if let savedToken = token, !savedToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             // Don't auto-test, just mark as potentially connected
@@ -347,6 +410,22 @@ class SlackService {
                 self?.refreshEmojiCatalogIfPossible()
             }
         }
+    }
+
+    init(
+        tokenForTesting: String?,
+        enabled: Bool = false,
+        enabledDefaults: UserDefaults = .standard,
+        requestPerformer: @escaping RequestPerformer,
+        emojiUsageRecorder: @escaping EmojiUsageRecorder = { _ in }
+    ) {
+        self.enabledDefaults = enabledDefaults
+        self.requestPerformer = requestPerformer
+        self.emojiUsageRecorder = emojiUsageRecorder
+        self.testTokenOverride = .some(tokenForTesting)
+        self.suppressEnabledPersistence = true
+        self.isEnabled = enabled
+        self.suppressEnabledPersistence = false
     }
 
     func refreshEmojiCatalogIfPossible() {
@@ -517,6 +596,7 @@ class SlackService {
         guard let token else {
             connectionError = "No token configured"
             isConnected = false
+            connectionTestState = .failed("No token configured")
             logger.error("validateToken called without a token")
             return
         }
@@ -526,6 +606,7 @@ class SlackService {
         guard let request = makeSlackRequest(url: authTestURL, token: token, formFields: [:]) else {
             connectionError = "Failed to prepare Slack auth.test request"
             isConnected = false
+            connectionTestState = .failed("Failed to prepare Slack auth.test request")
             return
         }
 
@@ -535,6 +616,7 @@ class SlackService {
                     let errorType = SlackService.categorizeNetworkError(error)
                     self?.connectionError = errorType
                     self?.isConnected = false
+                    self?.connectionTestState = .failed(errorType)
                     self?.logger.error("Slack auth.test request failed: \(error.localizedDescription), categorized as: \(errorType)")
                     return
                 }
@@ -545,6 +627,7 @@ class SlackService {
                 guard let json = self?.decodeSlackResponseBody(data) else {
                     self?.connectionError = "Invalid response from Slack"
                     self?.isConnected = false
+                    self?.connectionTestState = .failed("Invalid response from Slack")
                     return
                 }
 
@@ -553,11 +636,13 @@ class SlackService {
                     if token.hasPrefix("xoxp-") {
                         self?.isConnected = true
                         self?.connectionError = nil
+                        self?.connectionTestState = .success("Connected ✓")
                         self?.refreshEmojiCatalogIfPossible()
                         self?.logger.info("Slack auth.test succeeded for a user token")
                     } else {
                         self?.isConnected = false
                         self?.connectionError = "Slack status updates require a user token (xoxp-) with users.profile:write"
+                        self?.connectionTestState = .failed("Slack status updates require a user token (xoxp-) with users.profile:write")
                         self?.logger.error("Slack auth.test succeeded but token type is not a user token")
                     }
                 } else {
@@ -565,6 +650,7 @@ class SlackService {
                     let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
                     self?.connectionError = userFriendlyError
                     self?.isConnected = false
+                    self?.connectionTestState = .failed(userFriendlyError)
                     self?.logger.error("Slack auth.test failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
                 }
             }
@@ -648,6 +734,11 @@ class SlackService {
         logger.info("Slack request headers: \(self.maskedHeaders(for: request))")
         if let body = request.httpBody, let bodyString = String(data: body, encoding: .utf8) {
             logger.info("Slack request body: \(bodyString)")
+        }
+
+        if let requestPerformer {
+            requestPerformer(request, completion)
+            return
         }
 
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
@@ -783,6 +874,65 @@ class SlackService {
         // Generic errors
         return "Slack API error: \(slackError)"
     }
+
+    static func localizedOperationError(
+        _ message: String,
+        localizedString: (String) -> String
+    ) -> String {
+        let exactKeys: [String: String] = [
+            "Slack integration is disabled": "slack_error_integration_disabled",
+            "No Slack token configured": "slack_error_no_token",
+            "No token configured": "slack_error_no_token",
+            "Failed to prepare Slack status request": "slack_error_prepare_status_request",
+            "Failed to prepare Slack auth.test request": "slack_error_prepare_connection_request",
+            "Invalid response from Slack": "slack_error_invalid_response",
+            "No internet connection": "slack_error_no_internet",
+            "Network request timed out": "slack_error_network_timeout",
+            "Cannot connect to Slack server": "slack_error_cannot_connect",
+            "Cannot find Slack server": "slack_error_cannot_find_server",
+            "Invalid Slack token. Please check your token and try again.": "slack_error_invalid_token",
+            "Access denied. Your token may not have the required permissions.": "slack_error_access_denied",
+            "Too many requests. Please wait a moment and try again.": "slack_error_rate_limited",
+            "Your token is missing required permissions.": "slack_error_missing_permissions",
+            "Your Slack account is inactive.": "slack_error_account_inactive",
+            "Your Slack token has been revoked.": "slack_error_token_revoked",
+            "Your Slack workspace requires login.": "slack_error_workspace_login",
+            "Slack status updates require a user token (xoxp-) with users.profile:write": "slack_error_user_token_required"
+        ]
+
+        if let key = exactKeys[message] {
+            return localizedString(key)
+        }
+
+        return localizedOperationError(
+            message,
+            prefix: "Network error: ",
+            key: "slack_error_network_format",
+            localizedString: localizedString
+        ) ?? localizedOperationError(
+            message,
+            prefix: "Slack API error: ",
+            key: "slack_error_api_format",
+            localizedString: localizedString
+        ) ?? message
+    }
+
+    private static func localizedOperationError(
+        _ message: String,
+        prefix: String,
+        key: String,
+        localizedString: (String) -> String
+    ) -> String? {
+        guard message.hasPrefix(prefix) else { return nil }
+        let detail = String(message.dropFirst(prefix.count))
+        return String(format: localizedString(key), detail)
+    }
+}
+
+private struct SlackRequestError: LocalizedError {
+    let message: String
+
+    var errorDescription: String? { message }
 }
 
 // MARK: - Emoji Validator

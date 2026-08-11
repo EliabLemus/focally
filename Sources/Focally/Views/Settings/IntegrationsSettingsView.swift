@@ -8,7 +8,6 @@ struct IntegrationsSettingsView: View {
     @Environment(AppLanguage.self) private var appLanguage
 
     @State private var slackToken = ""
-    @State private var slackTestFeedback: String?
 
     var body: some View {
         VStack(spacing: FocallySpacing.large) {
@@ -134,16 +133,34 @@ struct IntegrationsSettingsView: View {
             HStack(spacing: FocallySpacing.small) {
                 primaryButton(appLanguage.localizedString("integrations_save_token"), action: saveSlackToken)
                 secondaryButton(appLanguage.localizedString("integrations_test_connection"), action: testSlackConnection)
-                    .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(
+                        slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        slackService.connectionTestState == .working
+                    )
+                if slackService.connectionTestState == .working {
+                    compactProgressView(labelKey: "integrations_testing_connection")
+                }
                 secondaryButton(appLanguage.localizedString("integrations_test_focus"), action: testSlackFocusIntegration)
-                    .disabled(slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(
+                        slackToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        focusIntegrationService.slackTestState == .working
+                    )
+                if focusIntegrationService.slackTestState == .working {
+                    compactProgressView(labelKey: "integrations_testing_focus")
+                }
             }
 
-            if let slackError = slackService.connectionError, !slackError.isEmpty {
-                Text(slackError)
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyError)
-            }
+            operationFeedback(
+                state: slackService.connectionTestState,
+                successKey: "integrations_connection_test_succeeded",
+                retry: testSlackConnection
+            )
+
+            operationFeedback(
+                state: focusIntegrationService.slackTestState,
+                successKey: "integrations_focus_test_succeeded",
+                retry: testSlackFocusIntegration
+            )
 
             if slackService.isEnabled {
                 if slackService.workspaceEmojiCodes.isEmpty {
@@ -165,11 +182,6 @@ struct IntegrationsSettingsView: View {
                 }
             }
 
-            if let slackTestFeedback, !slackTestFeedback.isEmpty {
-                Text(slackTestFeedback)
-                    .font(.focallyCaption)
-                    .foregroundStyle(Color.focallyOnSurfaceVariant)
-            }
         }
         .padding(FocallySpacing.large)
         .focallyGlassCard()
@@ -273,12 +285,42 @@ struct IntegrationsSettingsView: View {
 
     private func testSlackConnection() {
         slackService.testConnection()
-        slackTestFeedback = slackService.isConnected ? appLanguage.localizedString("integrations_connected_check") : "Connection failed: \(slackService.connectionError ?? "Unknown error")"
     }
 
     private func testSlackFocusIntegration() {
-        focusIntegrationService.runSlackTest { _, message in
-            slackTestFeedback = message
+        focusIntegrationService.runSlackTest()
+    }
+
+    private func compactProgressView(labelKey: String) -> some View {
+        ProgressView()
+            .controlSize(.small)
+            .accessibilityLabel(appLanguage.localizedString(labelKey))
+    }
+
+    @ViewBuilder
+    private func operationFeedback(
+        state: SlackOperationState,
+        successKey: String,
+        retry: @escaping () -> Void
+    ) -> some View {
+        switch state {
+        case .idle, .working:
+            EmptyView()
+        case .success:
+            LocalizedText(successKey)
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyPrimary)
+        case .failed(let message):
+            HStack(spacing: FocallySpacing.extraSmall) {
+                Text(SlackService.localizedOperationError(message, localizedString: appLanguage.localizedString))
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyError)
+
+                Button(appLanguage.localizedString("integrations_retry"), action: retry)
+                    .font(.focallyCaption)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Color.focallyPrimary)
+            }
         }
     }
 

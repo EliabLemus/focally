@@ -172,6 +172,30 @@
 "integrations_connected" = "Conectado";
 "integrations_disconnected" = "Desconectado";
 "integrations_connected_check" = "Conectado ✓";
+"integrations_testing_connection" = "Testando a conexão com o Slack";
+"integrations_testing_focus" = "Testando o status de foco no Slack";
+"integrations_connection_test_succeeded" = "Conexão com o Slack bem-sucedida ✓";
+"integrations_focus_test_succeeded" = "Status de foco atualizado no Slack ✓";
+"integrations_retry" = "Tentar novamente";
+"slack_error_integration_disabled" = "A integração com o Slack está desativada";
+"slack_error_no_token" = "Nenhum token do Slack foi configurado";
+"slack_error_prepare_status_request" = "Não foi possível preparar a solicitação de status do Slack";
+"slack_error_prepare_connection_request" = "Não foi possível preparar a solicitação de conexão com o Slack";
+"slack_error_invalid_response" = "Resposta inválida do Slack";
+"slack_error_no_internet" = "Sem conexão com a internet";
+"slack_error_network_timeout" = "A solicitação de rede atingiu o tempo limite";
+"slack_error_cannot_connect" = "Não foi possível conectar ao servidor do Slack";
+"slack_error_cannot_find_server" = "Não foi possível encontrar o servidor do Slack";
+"slack_error_network_format" = "Erro de rede: %@";
+"slack_error_invalid_token" = "Token do Slack inválido. Verifique o token e tente novamente.";
+"slack_error_access_denied" = "Acesso negado. Talvez o token não tenha as permissões necessárias.";
+"slack_error_rate_limited" = "Muitas solicitações. Aguarde um momento e tente novamente.";
+"slack_error_missing_permissions" = "O token não tem as permissões necessárias.";
+"slack_error_account_inactive" = "Sua conta do Slack está inativa.";
+"slack_error_token_revoked" = "Seu token do Slack foi revogado.";
+"slack_error_workspace_login" = "Seu workspace do Slack exige login.";
+"slack_error_user_token_required" = "As atualizações de status do Slack exigem um token de usuário (xoxp-) com users.profile:write.";
+"slack_error_api_format" = "Erro da API do Slack: %@";
 
 /* ========== GeneralSettingsView ========== */
 "general_launch_login" = "Iniciar Focally no login";
