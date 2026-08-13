@@ -99,6 +99,13 @@ final class DNDService {
         }
     }
 
+    @discardableResult
+    func refreshDNDStatus() -> Bool {
+        let active = Self.checkDNDStatus()
+        isDNDActive = active
+        return active
+    }
+
     private static func setPreference(_ key: String, value: CFPropertyList?) {
         CFPreferencesSetValue(
             key as CFString,
@@ -135,14 +142,12 @@ final class DNDService {
             object: nil,
             deliverImmediately: true
         )
-        Thread.sleep(forTimeInterval: 0.2)
         return true
     }
 
     private static func restoreMenubarIcon() {
         setPreference("dndStart", value: 0 as CFPropertyList)
         setPreference("dndEnd", value: 1440 as CFPropertyList)
-        Thread.sleep(forTimeInterval: 0.4)
         setPreference("dndStart", value: nil)
         setPreference("dndEnd", value: nil)
         _ = commitChanges()

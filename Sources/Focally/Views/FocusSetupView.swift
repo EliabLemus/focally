@@ -3,6 +3,7 @@ import SwiftUI
 struct FocusSetupView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var dontShowAgain = true
+    @State private var accessibilityGranted = AXIsProcessTrusted()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -28,6 +29,18 @@ struct FocusSetupView: View {
                     titleKey: "setup_step3_title",
                     detailKey: "setup_step3_detail"
                 )
+                setupRow(
+                    titleKey: "setup_accessibility_title",
+                    detailKey: "setup_accessibility_detail"
+                )
+                Button(accessibilityGranted ? "setup_accessibility_granted" : "setup_accessibility_action") {
+                    accessibilityGranted = PermissionService.shared.requestAccessibility()
+                    if !accessibilityGranted {
+                        PermissionService.shared.openAccessibilitySettings()
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
             .padding(18)
             .background(Color.focallySurfaceContainerLow)
@@ -47,7 +60,7 @@ struct FocusSetupView: View {
             }
         }
         .padding(24)
-        .frame(width: 500, height: 340)
+        .frame(width: 520, height: 460)
         .background(Color.focallyBackground)
     }
 

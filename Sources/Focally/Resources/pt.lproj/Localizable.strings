@@ -7,6 +7,10 @@
 "setup_step2_detail" = "Tempo de Foco (ativa DND), Reunião e Caixa de Entrada (DND desativado). Cada modo tem duração, emoji e mensagem de status configuráveis.";
 "setup_step3_title" = "3. Integração com Slack (Opcional)";
 "setup_step3_detail" = "Cole seu token do Slack em Configurações para atualizar seu status automaticamente. O Focally define o status para todos os modos e DND apenas para Tempo de Foco.";
+"setup_accessibility_title" = "4. Acessibilidade para a Central de Notificações";
+"setup_accessibility_detail" = "O Focally usa Acessibilidade para abrir a Central de Notificações durante as pausas e fechá-la ao voltar ao foco. O Focally não lê nem armazena suas notificações.";
+"setup_accessibility_action" = "Permitir Acessibilidade";
+"setup_accessibility_granted" = "Acessibilidade Permitida";
 "setup_dont_show_again" = "Não mostrar novamente";
 
 /* ========== FocallyTab ========== */

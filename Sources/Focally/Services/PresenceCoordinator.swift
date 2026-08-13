@@ -12,6 +12,9 @@ protocol PresenceCoordinating: AnyObject {
     var isManualFocusActive: Bool { get }
     var currentCalendarMeeting: CalendarMeeting? { get }
     var isSystemDNDActive: Bool { get }
+    var ownsSystemDND: Bool { get }
+    var wantsSystemDND: Bool { get }
+    func refreshSystemDNDStatus() -> Bool
 
     func manualFocusStarted(mode: FocusMode, systemDNDEnabled: Bool)
     func manualFocusEnded()
@@ -21,6 +24,10 @@ protocol PresenceCoordinating: AnyObject {
 }
 
 extension PresenceCoordinating {
+    var ownsSystemDND: Bool { false }
+    var wantsSystemDND: Bool { false }
+    func refreshSystemDNDStatus() -> Bool { isSystemDNDActive }
+
     func manualFocusStarted(mode: FocusMode) {
         manualFocusStarted(mode: mode, systemDNDEnabled: true)
     }
@@ -42,8 +49,14 @@ protocol PresenceSlackServicing: AnyObject {
 @MainActor
 protocol PresenceDNDServicing: AnyObject {
     var isDNDActive: Bool { get }
+    @discardableResult func refreshDNDStatus() -> Bool
     func activateDND()
     func deactivateDND()
+}
+
+extension PresenceDNDServicing {
+    @discardableResult
+    func refreshDNDStatus() -> Bool { isDNDActive }
 }
 
 extension SlackService: PresenceSlackServicing {
@@ -89,14 +102,15 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private var manualSystemDNDEnabled = true
     private var rememberedMeeting: CalendarMeeting?
     private var calendarSettings = SlackCalendarSettings()
-    private var ownsSystemDND = false
-    private var wantsSystemDND = false
+    private(set) var ownsSystemDND = false
+    private(set) var wantsSystemDND = false
     private var ownedSlackDNDRequest: SlackDNDRequest?
 
     private(set) var currentPresence: PresenceState = .idle
     var isManualFocusActive: Bool { manualMode != nil }
     var currentCalendarMeeting: CalendarMeeting? { rememberedMeeting }
     var isSystemDNDActive: Bool { dndService.isDNDActive }
+    func refreshSystemDNDStatus() -> Bool { dndService.refreshDNDStatus() }
 
     init(
         slackService: PresenceSlackServicing,

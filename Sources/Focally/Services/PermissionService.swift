@@ -112,7 +112,7 @@ final class PermissionService {
     private func checkCalendar() {
         let status = EKEventStore.authorizationStatus(for: .event)
         switch status {
-        case .authorized, .fullAccess:
+        case .authorized, .fullAccess, .writeOnly:
             calendarStatus = .granted
         case .denied:
             calendarStatus = .denied
@@ -141,7 +141,7 @@ final class PermissionService {
     func requestNotifications() async -> Bool {
         let center = UNUserNotificationCenter.current()
         let granted = try? await center.requestAuthorization(options: [.alert, .sound])
-        await checkNotifications()
+        checkNotifications()
         return granted ?? false
     }
 
@@ -149,6 +149,13 @@ final class PermissionService {
         let granted = try? await eventStore.requestFullAccessToEvents()
         checkCalendar()
         return granted ?? false
+    }
+
+    func requestAccessibility() -> Bool {
+        let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
+        let trusted = AXIsProcessTrustedWithOptions([promptKey: true] as CFDictionary)
+        accessibilityStatus = trusted ? .granted : .denied
+        return trusted
     }
 
     func openAccessibilitySettings() {
