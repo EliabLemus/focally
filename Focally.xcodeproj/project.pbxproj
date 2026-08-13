@@ -102,12 +102,14 @@
 		CAECDE4AC6D75573BAECAF34 /* ActiveFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4F3C46236A4B727B225E9D /* ActiveFocusView.swift */; };
 		CC6B0E5B7BD7393534E5039F /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */; };
 		CD0D4EA3E43042D61BF97784 /* WeeklyMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7814C1833FF79761439FC /* WeeklyMetricsView.swift */; };
+		D23ACFE696980A0CC6C2DB20 /* NotificationCenterPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B5970FA7EF557D967A4558 /* NotificationCenterPresenter.swift */; };
 		D47E178868502051F8D6A991 /* pluck_002.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C98C5639BCFE72D1706C0464 /* pluck_002.aiff */; };
 		D626EF73E0ACD103321976D9 /* FocallyRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633E55854AB377DA4F68B1CC /* FocallyRadius.swift */; };
 		D7092685F6CD40CC458A66C1 /* FocusModeEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1B83D3B0FB1DC2793D6ACF /* FocusModeEditSheet.swift */; };
 		D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B5ECDE2CC6A65C42B3D2A /* MainWindow.swift */; };
 		D9CA31F63FDF043AE3F4D10C /* FocusIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */; };
 		DD17CDE1096E671F174DE5C0 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80AE26497177767F58D61D45 /* SettingsPage.swift */; };
+		E027B93AC42F4CB17A141F4E /* NotificationCenterPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F97C7FD0EFBC170712D1F75 /* NotificationCenterPresenterTests.swift */; };
 		E10209BE84D6B1820856B74D /* ShortcutDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */; };
 		E5668B1A5B138A46B622466A /* AddFocusTypeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5FB366DF1C54F926DB356A /* AddFocusTypeSheet.swift */; };
 		E7E1B631AF43E94BE5D1A213 /* EmojiExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3202E9542B465D61E67F7FCD /* EmojiExtractor.swift */; };
@@ -119,6 +121,7 @@
 		F1D0296A1D2E03E29B5268CB /* FocusSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2167F2F8ABA98F76A15B12B /* FocusSetupView.swift */; };
 		F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */; };
 		F2B8CBD723F1F53867939192 /* FocallyTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126D47EF69130589A232D146 /* FocallyTypography.swift */; };
+		F2EF731B17C170C18B197D7B /* FocusIntegrationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FD09F9ADB10EAAE5ABC82B /* FocusIntegrationServiceTests.swift */; };
 		F40DF10DF8C6C9AE7C7004D7 /* FocusTypeDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6CB6CB34222336A36C79677 /* FocusTypeDescriptor.swift */; };
 		F50653D56FC8CC950F89B6B6 /* CalendarEventAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 997B8F1D411EBDB0ECE90EE3 /* CalendarEventAnalyzer.swift */; };
 		F94CE01D65F077489B5FCEC0 /* MenuBarDropdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */; };
@@ -163,6 +166,7 @@
 		1C18F5B206E8657516539F2E /* SimpleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTests.swift; sourceTree = "<group>"; };
 		1C383A748971397AA67CDC87 /* FocusIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusIntegrationService.swift; sourceTree = "<group>"; };
 		1ED848256E51CF79ED15AE0E /* DayOfWeekFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfWeekFilterSheet.swift; sourceTree = "<group>"; };
+		1F97C7FD0EFBC170712D1F75 /* NotificationCenterPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterPresenterTests.swift; sourceTree = "<group>"; };
 		1FC2FFB5F85CDDA3E70224E8 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeTests.swift; sourceTree = "<group>"; };
 		24AE78AD7DB1C41AF3546103 /* ShortcutDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutDropHandler.swift; sourceTree = "<group>"; };
@@ -232,10 +236,12 @@
 		A6CB6CB34222336A36C79677 /* FocusTypeDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTypeDescriptor.swift; sourceTree = "<group>"; };
 		A7C81AE90F26064902AB1692 /* DayOfMonthFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfMonthFilterSheet.swift; sourceTree = "<group>"; };
 		AAA4827B88BFD89DE59D72D3 /* PresenceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceCoordinatorTests.swift; sourceTree = "<group>"; };
+		B2B5970FA7EF557D967A4558 /* NotificationCenterPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterPresenter.swift; sourceTree = "<group>"; };
 		B309416511CC57079912AFE6 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
 		B3380D59838114A5E74EC8FB /* LanguageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSettingsView.swift; sourceTree = "<group>"; };
 		B5043C8ECE27D0D64ACE0515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B684F97343BEF991F6AC0F71 /* EmojiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiView.swift; sourceTree = "<group>"; };
+		B6FD09F9ADB10EAAE5ABC82B /* FocusIntegrationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusIntegrationServiceTests.swift; sourceTree = "<group>"; };
 		B7294FD9B10CC42662103B9B /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleDashboardView.swift; sourceTree = "<group>"; };
 		B872379B2018EE66D478415E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -384,6 +390,7 @@
 				3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */,
 				CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */,
 				87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */,
+				B6FD09F9ADB10EAAE5ABC82B /* FocusIntegrationServiceTests.swift */,
 				19F711C098187E7310E8039B /* FocusMetricsServiceTests.swift */,
 				2262AAC6B20B8D409E0E1122 /* FocusModeTests.swift */,
 				5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */,
@@ -391,6 +398,7 @@
 				335C2B031BB8F4E600F7CBF2 /* FocusTimerServiceTests.swift */,
 				0267CB7D5ABFC1ED7C04FCAB /* Info.plist */,
 				7E5DB55686DFAEB6AAB22D07 /* LayerTests.swift */,
+				1F97C7FD0EFBC170712D1F75 /* NotificationCenterPresenterTests.swift */,
 				3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */,
 				AAA4827B88BFD89DE59D72D3 /* PresenceCoordinatorTests.swift */,
 				4A3435CC028CEF24160086E2 /* SessionPersistenceServiceTests.swift */,
@@ -544,6 +552,7 @@
 				0BDD8975948D7ADA1DC629EF /* FocusTypesService.swift */,
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
 				74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */,
+				B2B5970FA7EF557D967A4558 /* NotificationCenterPresenter.swift */,
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
 				DD86686DB30D916F1B8BA083 /* PermissionService.swift */,
 				440185BF6EEED5174BBEEE9F /* PresenceCoordinator.swift */,
@@ -767,6 +776,7 @@
 				B451FACCAC9DBC96264B7812 /* Metrics.swift in Sources */,
 				0E041FFD0374DC4E0391F641 /* MetricsPage.swift in Sources */,
 				91620130CF7F160A52EED66A /* MonthlyMetricsView.swift in Sources */,
+				D23ACFE696980A0CC6C2DB20 /* NotificationCenterPresenter.swift in Sources */,
 				6CB349FD5A20890E40E0ECC3 /* NotificationService.swift in Sources */,
 				71297668B2A2B4A07624D8FC /* OnItFocusApp.swift in Sources */,
 				9D6DB5388C88D7DDB0AF8655 /* PermissionService.swift in Sources */,
@@ -802,12 +812,14 @@
 				57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */,
 				F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */,
 				C3864524ED31392C860C9CB0 /* EmojiValidatorTests.swift in Sources */,
+				F2EF731B17C170C18B197D7B /* FocusIntegrationServiceTests.swift in Sources */,
 				B1E9F024B14AEA542E11AEE3 /* FocusMetricsServiceTests.swift in Sources */,
 				23343E6DF0FA805301371444 /* FocusModeTests.swift in Sources */,
 				4A4A9946E123046E0FBCFD47 /* FocusSessionDraftTests.swift in Sources */,
 				2F974E82EC2D138CDE570AF2 /* FocusSessionRecordMigrationTests.swift in Sources */,
 				2CED945CAF9A7201E1238792 /* FocusTimerServiceTests.swift in Sources */,
 				6F971A4BAF0AFD199B6948A1 /* LayerTests.swift in Sources */,
+				E027B93AC42F4CB17A141F4E /* NotificationCenterPresenterTests.swift in Sources */,
 				FDCE61CA17F494E3B712ACB5 /* PomodoroStateTests.swift in Sources */,
 				8865D6127309077D66FEEF6E /* PresenceCoordinatorTests.swift in Sources */,
 				611D1558627CFBC662CC3EC2 /* SessionPersistenceServiceTests.swift in Sources */,

@@ -86,35 +86,38 @@ final class ManagedFocusShortcutsService {
     }
 
     func refreshInstallationState() {
-        do {
-            let result = try runShortcutsCommand(arguments: ["list", "--show-identifiers"])
-            let haystack = result.combinedOutput.lowercased()
-
-            installedShortcutNames = Set(
-                ShortcutKind.allCases
-                    .map(\.installedShortcutName)
-                    .filter { haystack.contains($0.lowercased()) }
-            )
-        } catch {
-            installedShortcutNames = []
+        Task { @MainActor [weak self] in
+            let names = await Task.detached(priority: .utility) { () -> Set<String> in
+                do {
+                    let result = try Self.runShortcutsCommand(arguments: ["list", "--show-identifiers"])
+                    let haystack = result.combinedOutput.lowercased()
+                    return Set(
+                        ShortcutKind.allCases
+                            .map(\.installedShortcutName)
+                            .filter { haystack.contains($0.lowercased()) }
+                    )
+                } catch {
+                    return []
+                }
+            }.value
+            self?.installedShortcutNames = names
         }
     }
 
-    func runShortcut(for action: FocusIntegrationAction) throws {
+    func runShortcut(for action: FocusIntegrationAction) async throws {
         let kind: ShortcutKind = action == .start ? .focusOn : .focusOff
 
-        if !isInstalled(kind) {
-            refreshInstallationState()
-        }
-
         guard isInstalled(kind) else {
+            refreshInstallationState()
             return // Silently skip if not installed — DND direct is the primary method
         }
 
-        let result = try runShortcutsCommand(arguments: ["run", kind.installedShortcutName])
+        let shortcutName = kind.installedShortcutName
+        let result = try await Task.detached(priority: .userInitiated) {
+            try Self.runShortcutsCommand(arguments: ["run", shortcutName])
+        }.value
 
         if result.terminationStatus != 0 {
-            // Log but don't throw — DND direct is the primary method
             logger.warning("Managed shortcut backup failed for \(kind.displayName)")
         }
     }
@@ -128,23 +131,29 @@ final class ManagedFocusShortcutsService {
             .appendingPathComponent("Focally/ManagedShortcuts", isDirectory: true)
     }
 
-    private struct CommandResult {
+    private struct CommandResult: Sendable {
         let combinedOutput: String
         let terminationStatus: Int32
     }
 
-    private func runShortcutsCommand(arguments: [String]) throws -> CommandResult {
+    nonisolated private static func runShortcutsCommand(arguments: [String]) throws -> CommandResult {
         let process = Process()
         let stdoutPipe = Pipe()
         let stderrPipe = Pipe()
+        let completion = DispatchSemaphore(value: 0)
 
         process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
         process.arguments = arguments
         process.standardOutput = stdoutPipe
         process.standardError = stderrPipe
+        process.terminationHandler = { _ in completion.signal() }
 
         try process.run()
-        process.waitUntilExit()
+        guard completion.wait(timeout: .now() + 8) == .success else {
+            process.terminate()
+            _ = completion.wait(timeout: .now() + 1)
+            throw FocusIntegrationError.processError("Shortcuts command timed out")
+        }
 
         let stdout = String(bytes: stdoutPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
         let stderr = String(bytes: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""

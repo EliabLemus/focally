@@ -7,6 +7,10 @@
 "setup_step2_detail" = "Focus Time (enables DND), Meeting & Inbox (leave DND off). Each mode has configurable duration, emoji, and status message.";
 "setup_step3_title" = "3. Slack Integration (Optional)";
 "setup_step3_detail" = "Paste your Slack token in Settings to auto-update your status. Focally sets status for all modes and DND only for Focus Time.";
+"setup_accessibility_title" = "4. Accessibility for Notification Center";
+"setup_accessibility_detail" = "Focally uses Accessibility to open Notification Center during breaks and close it when you return to focus. Focally does not read or store your notifications.";
+"setup_accessibility_action" = "Allow Accessibility";
+"setup_accessibility_granted" = "Accessibility Allowed";
 "setup_dont_show_again" = "Don't show this again";
 
 /* ========== FocallyTab ========== */
