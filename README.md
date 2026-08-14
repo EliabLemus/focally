@@ -10,7 +10,7 @@ A minimal macOS menu bar app that handles Do Not Disturb, Slack status, and time
 
 [![Build](https://github.com/EliabLemus/focally/actions/workflows/release.yml/badge.svg)](https://github.com/EliabLemus/focally/actions)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](https://github.com/EliabLemus/focally)
-[![Release](https://img.shields.io/badge/release-v0.9.0-green)](https://github.com/EliabLemus/focally/releases/latest)
+[![Release](https://img.shields.io/badge/release-v0.9.9-green)](https://github.com/EliabLemus/focally/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 </div>
@@ -42,7 +42,7 @@ Focally is one thing: **start a timer, get in the zone, let the app handle the r
 |---------|-------------|
 | Direct System DND | Toggles macOS Do Not Disturb via CFPreferences — no setup needed |
 | Signed Apple Shortcuts | Pre-signed `.shortcut` files for DND backup — one-button install |
-| App Intents | Start / Pause / Resume / End Focus via Shortcuts, Spotlight & Siri |
+| App Intents | Pause / Resume / End Focus via Shortcuts, Spotlight & Siri |
 | Slack Status Sync | Updates status + emoji per focus mode |
 | macOS Calendar | Detects meetings through EventKit with no OAuth setup |
 | Calendar → Slack + DND | Updates Slack status during meetings and enables DND for video calls |
@@ -136,10 +136,10 @@ Focally uses a layered approach to focus integration:
 **2. Signed Apple Shortcuts (Backup)**
 - Pre-signed `.shortcut` files bundled with the app
 - One-button install from Settings → Integrations
-- Fires automatically alongside direct DND as redundancy
+- Runs only as a fallback when the direct DND transition cannot be verified
 
 **3. App Intents (System-wide)**
-- Exposes Start, Pause, Resume, and End Focus actions
+- Exposes Pause, Resume, and End Focus actions
 - Available in Shortcuts app, Spotlight, and Siri
 - Assign keyboard shortcuts via System Settings → Keyboard Shortcuts → App Shortcuts
 
@@ -210,7 +210,7 @@ Focally es una sola cosa: **inicia un temporizador, entra en la zona, deja que l
 |----------------|-------------|
 | DND Directo del Sistema | Activa No Molestar de macOS vía CFPreferences — sin configuración necesaria |
 | Shortcuts de Apple Firmados | Archivos `.shortcut` pre-firmados para respaldo de DND — instalación con un clic |
-| App Intents | Iniciar / Pausar / Reanudar / Terminar Enfoque vía Shortcuts, Spotlight y Siri |
+| App Intents | Pausar / Reanudar / Terminar Enfoque vía Shortcuts, Spotlight y Siri |
 | Sincronización de Estado en Slack | Actualiza estado + emoji por modo de enfoque |
 | Calendario de macOS | Detecta reuniones a través de EventKit sin configuración OAuth |
 | Calendario → Slack + DND | Actualiza estado de Slack durante reuniones y activa DND para videollamadas |
@@ -304,10 +304,10 @@ Focally usa un enfoque por capas para la integración de enfoque:
 **2. Shortcuts de Apple Firmados (Respaldo)**
 - Archivos `.shortcut` pre-firmados incluidos con la app
 - Instalación con un clic desde Configuración → Integraciones
-- Se dispara automáticamente junto con el DND directo como redundancia
+- Se ejecuta solo como respaldo cuando la transición directa de DND no puede verificarse
 
 **3. App Intents (En todo el sistema)**
-- Expone acciones de Iniciar, Pausar, Reanudar y Terminar Enfoque
+- Expone acciones de Pausar, Reanudar y Terminar Enfoque
 - Disponible en la app de Shortcuts, Spotlight y Siri
 - Asigna atajos de teclado vía Configuración del Sistema → Atajos de Teclado → Atajos de App
 
@@ -378,7 +378,7 @@ Focally é uma coisa só: **inicie um temporizador, entre na zona, deixe o app c
 |---------|-----------|
 | DND Direto do Sistema | Ativa Não Perturbe do macOS via CFPreferences — sem configuração necessária |
 | Shortcuts da Apple Assinados | Arquivos `.shortcut` pré-assinados para backup de DND — instalação com um clique |
-| App Intents | Iniciar / Pausar / Retomar / Encerrar Foco via Shortcuts, Spotlight e Siri |
+| App Intents | Pausar / Retomar / Encerrar Foco via Shortcuts, Spotlight e Siri |
 | Sincronização de Status no Slack | Atualiza status + emoji por modo de foco |
 | Calendário do macOS | Detecta reuniões através do EventKit sem configuração OAuth |
 | Calendário → Slack + DND | Atualiza status do Slack durante reuniões e ativa DND para videochamadas |
@@ -472,10 +472,10 @@ O Focally usa uma abordagem em camadas para a integração de foco:
 **2. Shortcuts da Apple Assinados (Backup)**
 - Arquivos `.shortcut` pré-assinados incluídos com o app
 - Instalação com um clique a partir de Configurações → Integrações
-- Dispara automaticamente junto com o DND direto como redundância
+- É executado apenas como fallback quando a transição direta de DND não pode ser verificada
 
 **3. App Intents (Em todo o sistema)**
-- Expõe ações de Iniciar, Pausar, Retomar e Encerrar Foco
+- Expõe ações de Pausar, Retomar e Encerrar Foco
 - Disponível no app de Shortcuts, Spotlight e Siri
 - Atribua atalhos de teclado via Configurações do Sistema → Atalhos de Teclado → Atalhos de App
 
