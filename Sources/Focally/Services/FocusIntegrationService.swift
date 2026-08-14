@@ -326,18 +326,6 @@ final class FocusIntegrationService {
 }
 
 @available(macOS 14.0, *)
-struct StartFocusAppIntent: AppIntent {
-    static var title: LocalizedStringResource = "Resume Focus"
-    static var description = IntentDescription("Resumes the current paused Focally session.")
-    static var openAppWhenRun = false
-
-    func perform() async throws -> some IntentResult & ProvidesDialog {
-        try await FocusIntegrationService.performFromAppIntent(.start)
-        return .result(dialog: "Focus resumed.")
-    }
-}
-
-@available(macOS 14.0, *)
 struct EndFocusAppIntent: AppIntent {
     static var title: LocalizedStringResource = "End Focus"
     static var description = IntentDescription("Ends the current Focally session and releases its integrations.")
@@ -376,13 +364,6 @@ struct ResumeFocusAppIntent: AppIntent {
 @available(macOS 14.0, *)
 struct FocallyAppShortcutsProvider: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
-        AppShortcut(
-            intent: StartFocusAppIntent(),
-            phrases: ["Start focus with \(.applicationName)"],
-            shortTitle: "Start Focus",
-            systemImageName: "moon.circle.fill"
-        )
-
         AppShortcut(
             intent: PauseFocusAppIntent(),
             phrases: ["Pause focus with \(.applicationName)"],
