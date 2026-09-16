@@ -31,6 +31,8 @@ struct MainWindow: View {
                     switch selectedTab {
                     case .timer:
                         TimerPage()
+                    case .tasks:
+                        TasksPage()
                     case .metrics:
                         MetricsPage()
                     case .settings:

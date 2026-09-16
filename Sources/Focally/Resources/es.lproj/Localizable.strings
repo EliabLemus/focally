@@ -313,3 +313,22 @@
 "focus_mode_type_user_custom" = "Tipo personalizado";
 "metrics_built_in_types" = "Tipos incluidos";
 "metrics_my_types" = "Mis tipos";
+
+/* Tasks (SPEC-001) */
+"tab_tasks" = "Tareas";
+"tasks_new_task_placeholder" = "¿Qué hay que hacer?";
+"tasks_add_accessibility" = "Agregar tarea";
+"tasks_has_due_date" = "Programar recordatorio";
+"tasks_due_date" = "Fecha límite";
+"tasks_session_in_progress" = "Sesión de enfoque en curso";
+"tasks_overdue_section" = "Vencidas";
+"tasks_empty_state" = "Sin tareas pendientes. Agrega una para empezar a enfocarte.";
+"tasks_completed_section" = "Completadas";
+"tasks_toggle_complete_accessibility" = "Cambiar estado de la tarea";
+"tasks_start_pomodoro_accessibility" = "Iniciar pomodoro para esta tarea";
+"tasks_task_running" = "En curso";
+"tasks_pomodoro_sheet_title" = "Iniciar pomodoro";
+"tasks_pomodoro_sheet_detail" = "El tiempo de enfoque se atribuirá a esta tarea.";
+"tasks_cancel" = "Cancelar";
+"tasks_start" = "Iniciar";
+"task_reminder_body" = "La tarea vence ahora";

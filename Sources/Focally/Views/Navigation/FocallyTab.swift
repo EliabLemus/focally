@@ -2,10 +2,11 @@ import SwiftUI
 
 enum FocallyTab: CaseIterable, Identifiable {
     case timer
+    case tasks
     case metrics
     case settings
 
-    static let visibleTabs: [FocallyTab] = [.timer, .metrics, .settings]
+    static let visibleTabs: [FocallyTab] = [.timer, .tasks, .metrics, .settings]
 
     var id: String { localizationKey }
 
@@ -13,6 +14,8 @@ enum FocallyTab: CaseIterable, Identifiable {
         switch self {
         case .timer:
             return "tab_timer"
+        case .tasks:
+            return "tab_tasks"
         case .metrics:
             return "tab_metrics"
         case .settings:
@@ -28,6 +31,8 @@ enum FocallyTab: CaseIterable, Identifiable {
         switch self {
         case .timer:
             return "timer"
+        case .tasks:
+            return "checklist"
         case .metrics:
             return "chart.bar.fill"
         case .settings:

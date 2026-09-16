@@ -127,6 +127,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(usageTracker)
             .environment(updateChecker)
             .environment(appLanguage)
+            .environment(TaskService.shared)
+            .environment(FocusMetricsService.shared)
             .environment(\.locale, appLanguage.locale)
         popover.contentViewController = NSHostingController(rootView: contentView)
         self.popover = popover
@@ -302,6 +304,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(usageTracker)
             .environment(updateChecker)
             .environment(appLanguage)
+            .environment(TaskService.shared)
+            .environment(FocusMetricsService.shared)
             .environment(\.locale, appLanguage.locale)
         let window = NSWindow(contentViewController: NSHostingController(rootView: hostingView))
         window.title = "Focally Settings"

@@ -313,3 +313,22 @@
 "focus_mode_type_user_custom" = "Custom Type";
 "metrics_built_in_types" = "Built-in Types";
 "metrics_my_types" = "My Types";
+
+/* Tasks (SPEC-001) */
+"tab_tasks" = "Tasks";
+"tasks_new_task_placeholder" = "What needs to be done?";
+"tasks_add_accessibility" = "Add task";
+"tasks_has_due_date" = "Set a reminder";
+"tasks_due_date" = "Due date";
+"tasks_session_in_progress" = "Focus session in progress";
+"tasks_overdue_section" = "Overdue";
+"tasks_empty_state" = "No pending tasks. Add one to start focusing.";
+"tasks_completed_section" = "Completed";
+"tasks_toggle_complete_accessibility" = "Toggle task completion";
+"tasks_start_pomodoro_accessibility" = "Start pomodoro for this task";
+"tasks_task_running" = "Running";
+"tasks_pomodoro_sheet_title" = "Start pomodoro";
+"tasks_pomodoro_sheet_detail" = "Focus time will be attributed to this task.";
+"tasks_cancel" = "Cancel";
+"tasks_start" = "Start";
+"task_reminder_body" = "Task due now";
