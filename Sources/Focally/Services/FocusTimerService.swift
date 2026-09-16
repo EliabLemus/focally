@@ -75,6 +75,7 @@ final class FocusTimerService {
     private var accumulatedBreakSeconds: TimeInterval = 0
     private var accumulatedPausedSeconds: TimeInterval = 0
     private var didAttemptRestore = false
+    private(set) var activeTaskID: UUID?
     private var isPreparedForTermination = false
     private var isLifecycleSuspended = false
 
@@ -109,14 +110,15 @@ final class FocusTimerService {
         durationMinutes = defaults.object(forKey: "lastDuration") == nil ? 25 : min(max(defaults.integer(forKey: "lastDuration"), 1), 600)
     }
 
-    func startSession(draft: FocusSessionDraft) {
-        startSession(mode: draft.resolvedMode())
+    func startSession(draft: FocusSessionDraft, taskID: UUID? = nil) {
+        startSession(mode: draft.resolvedMode(), taskID: taskID)
     }
 
-    func startSession(mode: FocusMode) {
+    func startSession(mode: FocusMode, taskID: UUID? = nil) {
         let mode = mode.sanitized()
         ticker.stop()
         currentMode = mode
+        activeTaskID = taskID
         currentActivity = mode.name
         currentStatusText = mode.statusText
         currentEmoji = mode.emoji
@@ -394,6 +396,7 @@ final class FocusTimerService {
         pausedRemainingSeconds = s.pausedRemainingSeconds; currentRound = s.currentRound; pomodoroRounds = s.pomodoroRounds
         accumulatedActiveSeconds = s.accumulatedActiveSeconds; accumulatedBreakSeconds = s.accumulatedBreakSeconds
         accumulatedPausedSeconds = s.accumulatedPausedSeconds; isActive = true
+        activeTaskID = s.taskID
         let mode = s.modeSnapshot
         workDurationMinutes = mode.enablePomodoro ? mode.sanitizedPomodoroWorkMinutes : mode.sanitizedDurationMinutes
         shortBreakDurationMinutes = mode.sanitizedPomodoroBreakMinutes
@@ -412,7 +415,7 @@ final class FocusTimerService {
             phaseDurationSeconds: currentPhaseDuration, isPaused: isPaused, pausedAt: pausedAt,
             pausedRemainingSeconds: pausedRemainingSeconds, currentRound: currentRound, pomodoroRounds: pomodoroRounds,
             accumulatedActiveSeconds: accumulatedActiveSeconds, accumulatedBreakSeconds: accumulatedBreakSeconds,
-            accumulatedPausedSeconds: accumulatedPausedSeconds, savedAt: date
+            accumulatedPausedSeconds: accumulatedPausedSeconds, savedAt: date, taskID: activeTaskID
         ))
     }
 
@@ -425,7 +428,8 @@ final class FocusTimerService {
         metricsService.recordSession(FocusSessionRecord(
             modeType: mode.type, modeID: mode.id, startTime: start, endTime: endTime,
             duration: active, pomodorosCompleted: mode.enablePomodoro ? currentRound : nil,
-            activeDuration: active, pausedDuration: paused, breakDuration: breaks, source: .manual
+            activeDuration: active, pausedDuration: paused, breakDuration: breaks, source: .manual,
+            taskID: activeTaskID
         ))
     }
 
@@ -441,6 +445,7 @@ final class FocusTimerService {
         currentActivity = ""; currentStatusText = ""; currentEmoji = ":brain:"; currentMode = nil
         sessionID = nil; sessionStartTime = nil; phaseStartedAt = nil; phaseTargetEndDate = nil
         pausedAt = nil; pausedRemainingSeconds = nil; currentPhaseDuration = 0
+        activeTaskID = nil
         accumulatedActiveSeconds = 0; accumulatedBreakSeconds = 0; accumulatedPausedSeconds = 0
         isPreparedForTermination = false
         isLifecycleSuspended = false

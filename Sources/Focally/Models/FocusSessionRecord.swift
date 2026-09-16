@@ -21,6 +21,9 @@ struct FocusSessionRecord: Codable, Identifiable, Equatable {
     let pausedDuration: TimeInterval
     let breakDuration: TimeInterval
     let source: FocusSessionSource
+    /// Task this session was attributed to, when started from the Tasks tab.
+    /// Optional so legacy records (v1/v2 schema) decode as `nil`.
+    let taskID: UUID?
 
     init(
         id: UUID = UUID(),
@@ -34,7 +37,8 @@ struct FocusSessionRecord: Codable, Identifiable, Equatable {
         activeDuration: TimeInterval? = nil,
         pausedDuration: TimeInterval = 0,
         breakDuration: TimeInterval = 0,
-        source: FocusSessionSource = .manual
+        source: FocusSessionSource = .manual,
+        taskID: UUID? = nil
     ) {
         let active = Self.normalized(activeDuration ?? duration)
         self.id = id
@@ -49,11 +53,12 @@ struct FocusSessionRecord: Codable, Identifiable, Equatable {
         self.pausedDuration = Self.normalized(pausedDuration)
         self.breakDuration = Self.normalized(breakDuration)
         self.source = source
+        self.taskID = taskID
     }
 
     private enum CodingKeys: String, CodingKey {
         case id, modeType, modeID, startTime, endTime, duration, pomodorosCompleted
-        case recordVersion, activeDuration, pausedDuration, breakDuration, source
+        case recordVersion, activeDuration, pausedDuration, breakDuration, source, taskID
     }
 
     init(from decoder: Decoder) throws {
@@ -92,6 +97,7 @@ struct FocusSessionRecord: Codable, Identifiable, Equatable {
             pausedDuration = 0
             breakDuration = 0
             source = modeType == .calendarVideoCall ? .calendar : .manual
+            taskID = nil
             return
         }
 
@@ -113,6 +119,7 @@ struct FocusSessionRecord: Codable, Identifiable, Equatable {
         pausedDuration = paused
         breakDuration = breaks
         source = try container.decode(FocusSessionSource.self, forKey: .source)
+        taskID = try container.decodeIfPresent(UUID.self, forKey: .taskID)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -129,6 +136,7 @@ struct FocusSessionRecord: Codable, Identifiable, Equatable {
         try container.encode(pausedDuration, forKey: .pausedDuration)
         try container.encode(breakDuration, forKey: .breakDuration)
         try container.encode(source, forKey: .source)
+        try container.encodeIfPresent(taskID, forKey: .taskID)
     }
 
     private static func isValid(_ duration: TimeInterval) -> Bool {

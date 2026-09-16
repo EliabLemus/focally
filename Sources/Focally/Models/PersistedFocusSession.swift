@@ -24,6 +24,9 @@ struct PersistedFocusSession: Codable, Equatable {
     var accumulatedBreakSeconds: TimeInterval
     var accumulatedPausedSeconds: TimeInterval
     var savedAt: Date
+    /// Task this session is attributed to (started from the Tasks tab). Optional so
+    /// snapshots written before this field existed decode as `nil` — schema stays v1.
+    var taskID: UUID? = nil
 
     func isValid(at now: Date) -> Bool {
         guard schemaVersion == Self.currentSchemaVersion,
