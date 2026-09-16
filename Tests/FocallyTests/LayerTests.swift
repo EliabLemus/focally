@@ -91,7 +91,7 @@ final class LayerTests: XCTestCase {
             return
         }
         
-        let servicesPath: String = "\(projectPath)/Focally/Services"
+        let servicesPath: String = "\(projectPath)/Sources/Focally/Services"
         guard let files = try? FileManager.default.contentsOfDirectory(atPath: servicesPath) else {
             XCTFail("No se pudo leer Services/")
             return
@@ -126,7 +126,7 @@ final class LayerTests: XCTestCase {
             return
         }
         
-        let modelsPath: String = "\(projectPath)/Focally/Models"
+        let modelsPath: String = "\(projectPath)/Sources/Focally/Models"
         guard let files = try? FileManager.default.contentsOfDirectory(atPath: modelsPath) else {
             XCTFail("No se pudo leer Models/")
             return
@@ -158,7 +158,7 @@ final class LayerTests: XCTestCase {
             return
         }
         
-        let viewModelsPath: String = "\(projectPath)/Focally/ViewModels"
+        let viewModelsPath: String = "\(projectPath)/Sources/Focally/ViewModels"
         guard FileManager.default.fileExists(atPath: viewModelsPath) else {
             // ViewModels puede no existir si aún no se usa
             return
