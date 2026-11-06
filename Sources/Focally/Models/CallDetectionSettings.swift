@@ -50,13 +50,13 @@ final class CallDetectionSettingsStore {
 
     private let defaults: UserDefaults
 
-    init(defaults: UserDefaults = .standard) {
+    nonisolated init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 
     /// Reads current values on every access: toggles and messages changed in the
     /// settings panel apply to the next call with no restart.
-    func currentSettings() -> CallDetectionSettings {
+    nonisolated func currentSettings() -> CallDetectionSettings {
         var settings = CallDetectionSettings()
         if defaults.object(forKey: Key.callStatusEnabled) != nil {
             settings.callStatusEnabled = defaults.bool(forKey: Key.callStatusEnabled)

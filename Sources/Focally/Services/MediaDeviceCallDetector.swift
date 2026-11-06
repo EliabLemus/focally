@@ -1,3 +1,4 @@
+import AppKit
 import CoreAudio
 import CoreMediaIO
 import Foundation
@@ -257,7 +258,7 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
     private var registeredVideoIDs: [UInt32] = []
 
     private final class HandlerBox: @unchecked Sendable {
-        let handler: @MainActor () -> Void
+        var handler: @MainActor () -> Void
         init(handler: @escaping @MainActor () -> Void) { self.handler = handler }
     }
 
@@ -292,7 +293,7 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
                 guard let box else { return }
                 Task { @MainActor in box.handler() }
             }
-            Self.addVideoListener(deviceID: device.systemID, queue: queue) { [weak self] in
+            addVideoListener(deviceID: device.systemID, queue: queue) { [weak self] in
                 self?.cmioCallbacks[$0]?()
             }
         }
@@ -303,43 +304,37 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         switch token.device.kind {
         case .audioInput:
             audioCallbacks.removeValue(forKey: token.device.systemID)
-            Self.removeAudioListener(deviceID: token.device.systemID) { [weak self] in
+            removeAudioListener(deviceID: token.device.systemID) { [weak self] in
                 self?.audioCallbacks[$0]?()
             }
         case .video:
             cmioCallbacks.removeValue(forKey: token.device.systemID)
-            Self.removeVideoListener(deviceID: token.device.systemID) { [weak self] in
+            removeVideoListener(deviceID: token.device.systemID) { [weak self] in
                 self?.cmioCallbacks[$0]?()
             }
         }
     }
 
     func isDeviceRunning(_ device: MediaDeviceID) -> Bool {
-        var address = Self.runningPropertyAddress(for: device)
         var running: UInt32 = 0
         var size = UInt32(MemoryLayout<UInt32>.size)
         switch device.kind {
         case .audioInput:
+            var address = AudioObjectPropertyAddress(
+                mSelector: kAudioDevicePropertyDeviceIsRunningSomewhere,
+                mScope: kAudioObjectPropertyScopeGlobal,
+                mElement: kAudioObjectPropertyElementMain
+            )
             guard AudioObjectGetPropertyData(device.systemID, &address, 0, nil, &size, &running) == noErr else { return false }
         case .video:
-            guard CMIOObjectGetPropertyData(device.systemID, &address, 0, nil, &size, &running) == 0 else { return false }
+            var address = CMIOObjectPropertyAddress(
+                mSelector: CMIOObjectPropertySelector(0x676F696E), // 'goin' — DeviceIsRunningSomewhere
+                mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
+                mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
+            )
+            guard CMIOObjectGetPropertyData(device.systemID, &address, 0, nil, size, &size, &running) == 0 else { return false }
         }
         return running != 0
-    }
-
-    // MARK: CoreAudio plumbing
-
-    private static func runningPropertyAddress(for device: MediaDeviceID) -> AudioObjectPropertyAddress {
-        var selector: AudioObjectPropertySelector {
-            device.kind == .audioInput
-                ? kAudioDevicePropertyDeviceIsRunningSomewhere
-                : kCMIOHardwarePropertyDeviceIsRunningSomewhere
-        }
-        return AudioObjectPropertyAddress(
-            mSelector: selector,
-            mScope: device.kind == .audioInput ? kAudioObjectPropertyScopeGlobal : kCMIOObjectPropertyScopeGlobal,
-            mElement: device.kind == .audioInput ? kAudioObjectPropertyElementMain : kCMIOObjectPropertyElementMain
-        )
     }
 
     private static func audioDeviceIDs() -> [UInt32] {
@@ -365,22 +360,22 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         return deviceIDs.filter { id in
             var streams: UInt32 = 0
             var streamSize = UInt32(MemoryLayout<UInt32>.size)
-            return AudioObjectGetPropertyDataSize(id, &inputAddress, 0, nil, &streamSize, &streams) == noErr && streams > 0
+            return AudioObjectGetPropertyDataSize(id, &inputAddress, 0, nil, &streamSize) == noErr && streamSize > 0
         }
     }
 
     private static func videoDeviceIDs() -> [UInt32] {
         var address = CMIOObjectPropertyAddress(
-            mSelector: kCMIOHardwarePropertyDevices,
-            mScope: kCMIOObjectPropertyScopeGlobal,
-            mElement: kCMIOObjectPropertyElementMain
+            mSelector: CMIOObjectPropertySelector(kCMIOHardwarePropertyDevices),
+            mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
+            mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
         )
         var size: UInt32 = 0
         guard CMIOObjectGetPropertyDataSize(CMIOObjectID(kCMIOObjectSystemObject), &address, 0, nil, &size) == 0, size > 0 else {
             return []
         }
         var deviceIDs = [CMIOObjectID](repeating: 0, count: Int(size) / MemoryLayout<CMIOObjectID>.size)
-        guard CMIOObjectGetPropertyData(CMIOObjectID(kCMIOObjectSystemObject), &address, 0, nil, &size, &deviceIDs) == 0 else {
+        guard CMIOObjectGetPropertyData(CMIOObjectID(kCMIOObjectSystemObject), &address, 0, nil, size, &size, &deviceIDs) == 0 else {
             return []
         }
         return deviceIDs
@@ -397,7 +392,7 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         }
     }
 
-    private static func removeAudioListener(deviceID: AudioObjectID, fire: @escaping (UInt32) -> Void) {
+    private func removeAudioListener(deviceID: AudioObjectID, fire: @escaping (UInt32) -> Void) {
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioDevicePropertyDeviceIsRunningSomewhere,
             mScope: kAudioObjectPropertyScopeGlobal,
@@ -408,22 +403,22 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         }
     }
 
-    private static func addVideoListener(deviceID: CMIOObjectID, queue: DispatchQueue, fire: @escaping (UInt32) -> Void) {
+    private func addVideoListener(deviceID: CMIOObjectID, queue: DispatchQueue, fire: @escaping (UInt32) -> Void) {
         var address = CMIOObjectPropertyAddress(
-            mSelector: kCMIOHardwarePropertyDeviceIsRunningSomewhere,
-            mScope: kCMIOObjectPropertyScopeGlobal,
-            mElement: kCMIOObjectPropertyElementMain
+            mSelector: CMIOObjectPropertySelector(0x676F696E), // 'goin'
+            mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
+            mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
         )
         CMIOObjectAddPropertyListenerBlock(deviceID, &address, queue) { _, _ in
             fire(deviceID)
         }
     }
 
-    private static func removeVideoListener(deviceID: CMIOObjectID, fire: @escaping (UInt32) -> Void) {
+    private func removeVideoListener(deviceID: CMIOObjectID, fire: @escaping (UInt32) -> Void) {
         var address = CMIOObjectPropertyAddress(
-            mSelector: kCMIOHardwarePropertyDeviceIsRunningSomewhere,
-            mScope: kCMIOObjectPropertyScopeGlobal,
-            mElement: kCMIOObjectPropertyElementMain
+            mSelector: CMIOObjectPropertySelector(0x676F696E), // 'goin'
+            mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
+            mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
         )
         CMIOObjectRemovePropertyListenerBlock(deviceID, &address, queue) { _, _ in
             fire(deviceID)
@@ -444,7 +439,7 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
     func capturingBundleIdentifiers() -> [String] {
         guard #available(macOS 14.2, *) else { return [] }
         var address = AudioObjectPropertyAddress(
-            mSelector: kAudioHardwarePropertyProcessObjects,
+            mSelector: AudioObjectPropertySelector(0x706F626A), // 'pobj' = kAudioHardwarePropertyProcessObjects
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain
         )

@@ -188,3 +188,7 @@ final class ManagedFocusShortcutsService {
         )
     }
 }
+
+// MARK: - TASK-057 DND Layer 3 escalation
+
+extension ManagedFocusShortcutsService: FocusShortcutEscalating {}

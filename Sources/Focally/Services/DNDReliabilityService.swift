@@ -41,7 +41,7 @@ final class DNDReliabilityService {
         case deactivationRequested
     }
 
-    static let defaultFocusModeName = "Do Not Disturb"
+    nonisolated static let defaultFocusModeName = "Do Not Disturb"
     static let verificationDelaySeconds: UInt64 = 1_000_000_000
 
     private let logger = Logger.dnd
@@ -129,9 +129,9 @@ final class DNDReliabilityService {
         lastEvent = event
         eventHistory.append(event)
         if case .escalationFailed = event {
-            logger.error("DND escalation failed: \(String(describing: event), privacy: .public)")
+            logger.error("DND escalation failed: \(String(describing: event))")
         } else {
-            logger.info("DND reliability event: \(String(describing: event), privacy: .public)")
+            logger.info("DND reliability event: \(String(describing: event))")
         }
     }
 }

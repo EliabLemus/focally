@@ -46,7 +46,6 @@ enum CallClientCatalog {
 
 /// Attributes capturing processes to call clients. Pure and injectable so tests
 /// never touch real process object APIs.
-@MainActor
 final class CallProcessAttributor {
     let ownBundleIdentifier: String
 
