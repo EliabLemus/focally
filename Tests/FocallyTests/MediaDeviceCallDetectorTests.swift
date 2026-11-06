@@ -227,4 +227,36 @@ final class MediaDeviceCallDetectorTests {
         #expect(ends == 0)
         #expect(detector.isCallActive)
     }
+
+    // MARK: - TASK-057 attribution fallback (macOS 15.x 'pobj' failure)
+
+    @Test("fallback: query failed + device running reports unknown capture sentinel")
+    func fallbackQueryFailedWithDeviceRunningReportsUnknown() {
+        let bundles = SystemCallProcessAttributor.fallbackClients(
+            queryFailed: true, anyInputDeviceRunning: true)
+        #expect(bundles == [SystemCallProcessAttributor.unknownCaptureSentinel])
+    }
+
+    @Test("fallback: query failed + nothing running reports no clients")
+    func fallbackQueryFailedWithoutDeviceRunningReportsEmpty() {
+        let bundles = SystemCallProcessAttributor.fallbackClients(
+            queryFailed: true, anyInputDeviceRunning: false)
+        #expect(bundles.isEmpty)
+    }
+
+    @Test("fallback: query succeeded never returns sentinel from fallback")
+    func fallbackQuerySucceededReturnsEmpty() {
+        let bundles = SystemCallProcessAttributor.fallbackClients(
+            queryFailed: false, anyInputDeviceRunning: true)
+        #expect(bundles.isEmpty)
+    }
+
+    @Test("fallback: sentinel maps to unknown client with :phone: emoji")
+    func sentinelMapsToUnknownClient() {
+        let attributor = CallProcessAttributor(ownBundleIdentifier: "app.focally.mac")
+        let clients = attributor.attributedClients(
+            fromBundleIdentifiers: [SystemCallProcessAttributor.unknownCaptureSentinel])
+        #expect(clients.count == 1)
+        #expect(clients.first?.emoji == ":phone:")
+    }
 }

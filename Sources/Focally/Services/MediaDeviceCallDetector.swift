@@ -436,6 +436,8 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
         self.baseAttributor = baseAttributor
     }
 
+    static let unknownCaptureSentinel = "unknown.capture"
+
     func capturingBundleIdentifiers() -> [String] {
         guard #available(macOS 14.2, *) else { return [] }
         var address = AudioObjectPropertyAddress(
@@ -445,11 +447,15 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
         )
         var size: UInt32 = 0
         guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size) == noErr, size > 0 else {
-            return []
+            // TASK-057 fallback: some systems (observed on macOS 15.7) fail the
+            // process-objects query outright. If a device IS running, something
+            // is capturing — report the unknown client (:phone:) instead of
+            // silently missing the call.
+            return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
         }
         var processIDs = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
         guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &processIDs) == noErr else {
-            return []
+            return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
         }
 
         var inputAddress = AudioObjectPropertyAddress(
@@ -468,7 +474,48 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
                 bundleIDs.append(bundleID)
             }
         }
+        if bundleIDs.isEmpty, Self.anyInputDeviceRunning() {
+            // Processes exist but attribution yielded nothing while a device is
+            // capturing (e.g. process bundle extraction blocked by TCC).
+            bundleIDs = [Self.unknownCaptureSentinel]
+        }
         return bundleIDs
+    }
+
+    /// Pure decision core of the attribution fallback (unit-testable):
+    /// - query failed + device running  → unknown client sentinel
+    /// - query failed + nothing running → no clients (no call)
+    static func fallbackClients(queryFailed: Bool, anyInputDeviceRunning: Bool) -> [String] {
+        guard queryFailed else { return [] }
+        return anyInputDeviceRunning ? [unknownCaptureSentinel] : []
+    }
+
+    /// True when at least one audio input device is currently running somewhere.
+    nonisolated static func anyInputDeviceRunning() -> Bool {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var size: UInt32 = 0
+        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size) == noErr, size > 0 else {
+            return false
+        }
+        var deviceIDs = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
+        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &deviceIDs) == noErr else {
+            return false
+        }
+        var runningAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyDeviceIsRunningSomewhere,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        return deviceIDs.contains { id in
+            var isRunning: UInt32 = 0
+            var runningSize = UInt32(MemoryLayout<UInt32>.size)
+            return AudioObjectGetPropertyData(id, &runningAddress, 0, nil, &runningSize, &isRunning) == noErr
+                && isRunning != 0
+        }
     }
 
     private nonisolated static func bundleIdentifier(for processObjectID: AudioObjectID) -> String? {
