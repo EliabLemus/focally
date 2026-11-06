@@ -342,3 +342,8 @@
 "calls_help" = "Focally detecta cuando te unes a una llamada de audio o video usando el micrófono o la cámara de tu Mac, y actualiza tu presencia automáticamente.";
 "calendar_sync_toggle" = "Mostrar reuniones del calendario en Slack";
 "calendar_sync_help" = "La detección de llamadas por dispositivo ya cubre la actividad real de llamadas. Actívalo solo si también quieres que las reuniones del calendario cambien tu presencia en Slack.";
+"calls_emoji_by_app" = "Emoji por app";
+"calls_emoji_unknown_client" = "App desconocida";
+"calls_emoji_placeholder" = ":emoji:";
+"calls_emoji_not_in_workspace" = "Este emoji no se encontró en la lista de emojis de tu workspace; Slack podría ignorarlo.";
+"calls_emoji_help" = "Personaliza el emoji de Slack que se muestra en tu estado para cada app de llamada (p. ej. :google-meet:).";

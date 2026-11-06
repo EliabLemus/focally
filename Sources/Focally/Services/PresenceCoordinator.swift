@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 enum PresenceState: Equatable {
     case idle
@@ -68,12 +69,19 @@ extension PresenceCoordinating {
 @MainActor
 protocol PresenceSlackServicing: AnyObject {
     var isEnabled: Bool { get }
+    var workspaceEmojiCodes: [String] { get }
     func savedStatusEmoji() -> String
     func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String?, fallbackEmoji: String?)
     func clearStatus()
     @discardableResult
     func requestSlackDNDSnooze(minutes: Int) -> Bool
     func disableSlackDND()
+}
+
+extension PresenceSlackServicing {
+    /// Default for test fakes: no workspace emoji list loaded, so the
+    /// unknown-shortcode warning (TASK-058) is silently skipped.
+    var workspaceEmojiCodes: [String] { [] }
 }
 
 @MainActor
@@ -137,6 +145,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private var callPausedSessionByCallDetection = false
     private let sessionController: (any CallFocusSessionControlling)?
     private let callSettingsProvider: () -> CallDetectionSettings
+    private let callEmojiLogger = Logger.callDetection
     private(set) var ownsSystemDND = false
     private(set) var wantsSystemDND = false
     private var ownedSlackDNDRequest: SlackDNDRequest?
@@ -272,15 +281,31 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private func applyActiveCall(_ client: CallClient) {
         let settings = callSettingsProvider()
         if settings.callStatusEnabled, slackService.isEnabled {
+            // TASK-058: apply the user's per-client emoji overrides (emoji only;
+            // attribution and display name stay code-defined).
+            let resolved = client.applyingEmojiOverrides(
+                settings.callClientEmojiOverrides,
+                unknownEmoji: settings.unknownCallClientEmoji
+            )
+            warnIfEmojiNotInWorkspace(resolved.emoji)
             let expiration = Int(now().addingTimeInterval(4 * 3600).timeIntervalSince1970)
             slackService.setStatus(
                 text: settings.sanitizedStatusMessage,
                 expirationTimestamp: expiration,
-                taskEmoji: client.emoji,
+                taskEmoji: resolved.emoji,
                 fallbackEmoji: slackService.savedStatusEmoji()
             )
         }
         applySystemDND(shouldActivate: settings.enableDNDDuringCalls)
+    }
+
+    /// Best-effort warning (TASK-058): if the workspace emoji list is loaded and
+    /// does not contain the shortcode, log so the user can debug an emoji Slack
+    /// silently dropped. Not blocking — the workspace list can be partial.
+    private func warnIfEmojiNotInWorkspace(_ emoji: String) {
+        let codes = slackService.workspaceEmojiCodes
+        guard !codes.isEmpty, !codes.contains(emoji) else { return }
+        callEmojiLogger.warning("Call emoji \(emoji) not found in the loaded workspace emoji list; Slack may drop it.")
     }
 
     private func applyIdle() {

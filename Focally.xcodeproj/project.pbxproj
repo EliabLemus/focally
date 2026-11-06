@@ -62,6 +62,7 @@
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
 		57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */; };
 		571CA2D1AB755DC22A237AD4 /* FocusSessionDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */; };
+		5B17AB1DE2ECBE9BE629812B /* CallClientOverrideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */; };
 		5B72D2EA62C4AE9E2D086EF6 /* es.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 4F41CEC41E4906B3E45ACE6B /* es.lproj */; };
 		5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */; };
 		5F838DC6DC730CF3D6EA46D9 /* FocallyColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440DA683BDD9156AD84D322C /* FocallyColors.swift */; };
@@ -293,6 +294,7 @@
 		DBCD3DCC70DE5D341C87D62E /* PersistedCalendarMetricsDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistedCalendarMetricsDraft.swift; sourceTree = "<group>"; };
 		DD86686DB30D916F1B8BA083 /* PermissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionService.swift; sourceTree = "<group>"; };
 		E0B0A006AE023C6292115993 /* FocusTypesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTypesSettingsView.swift; sourceTree = "<group>"; };
+		E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallClientOverrideTests.swift; sourceTree = "<group>"; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
 		E4F7814C1833FF79761439FC /* WeeklyMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyMetricsView.swift; sourceTree = "<group>"; };
 		E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCacheService.swift; sourceTree = "<group>"; };
@@ -426,6 +428,7 @@
 			children = (
 				3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */,
 				EE81A1130E07A81DA2ECB59C /* CalendarSyncDefaultTests.swift */,
+				E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */,
 				C12D9826E005A1441D06B376 /* CallPresenceCoordinatorTests.swift */,
 				1EDAA38B7B05CE5FA61616AF /* DNDReliabilityTests.swift */,
 				CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */,
@@ -884,6 +887,7 @@
 			files = (
 				57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */,
 				8CD18238F903C570D48FDD99 /* CalendarSyncDefaultTests.swift in Sources */,
+				5B17AB1DE2ECBE9BE629812B /* CallClientOverrideTests.swift in Sources */,
 				4FB5438F682F7F45FE34DD9D /* CallPresenceCoordinatorTests.swift in Sources */,
 				249269B71EE06E5256DEE7F9 /* DNDReliabilityTests.swift in Sources */,
 				F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */,

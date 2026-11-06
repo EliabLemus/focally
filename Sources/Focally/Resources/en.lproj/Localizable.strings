@@ -342,3 +342,8 @@
 "calls_help" = "Focally detects when you join an audio or video call using your Mac's microphone or camera, and updates your presence automatically.";
 "calendar_sync_toggle" = "Show calendar meetings in Slack";
 "calendar_sync_help" = "Device-based call detection already covers real call activity. Enable this only if you want upcoming calendar meetings to set your Slack presence too.";
+"calls_emoji_by_app" = "Emoji per app";
+"calls_emoji_unknown_client" = "Unknown app";
+"calls_emoji_placeholder" = ":emoji:";
+"calls_emoji_not_in_workspace" = "This emoji was not found in your workspace emoji list; Slack may ignore it.";
+"calls_emoji_help" = "Customize the Slack emoji shown in your status for each call app (e.g. :google-meet:).";
