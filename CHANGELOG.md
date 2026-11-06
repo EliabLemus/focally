@@ -5,6 +5,12 @@ All notable changes to Focally will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-11-06
+
+### Added
+- 📞 **Custom call emojis** — per-client Slack emoji overrides in Call Detection Settings (picker with workspace emoji search) plus an override for Unknown Client calls.
+- 🌐 **Arc support** — Google Meet calls in Arc now resolve to `:google-meet:` instead of falling back to `:phone:`.
+
 ## [0.11.1] - 2026-11-06
 
 ### Fixed
