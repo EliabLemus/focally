@@ -3,6 +3,7 @@ import SwiftUI
 enum SettingsSubpage: CaseIterable, Identifiable {
     case general
     case focusTypes
+    case calls
     case integrations
     case appearance
     case language
@@ -14,6 +15,7 @@ enum SettingsSubpage: CaseIterable, Identifiable {
         switch self {
         case .general: return "settings_general"
         case .focusTypes: return "settings_focus_types"
+        case .calls: return "settings_calls"
         case .integrations: return "settings_integrations"
         case .appearance: return "settings_appearance"
         case .language: return "settings_language"
@@ -29,6 +31,7 @@ enum SettingsSubpage: CaseIterable, Identifiable {
         switch self {
         case .general: return "gearshape"
         case .focusTypes: return "tag"
+        case .calls: return "phone"
         case .integrations: return "message.fill"
         case .appearance: return "paintbrush"
         case .language: return "globe"
@@ -110,6 +113,8 @@ struct SettingsPage: View {
             GeneralSettingsView()
         case .focusTypes:
             FocusTypesSettingsView()
+        case .calls:
+            CallDetectionSettingsView()
         case .integrations:
             IntegrationsSettingsView()
         case .appearance:

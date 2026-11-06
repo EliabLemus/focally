@@ -45,6 +45,10 @@ final class CalendarSlackIntegrationService {
     static let enabledDefaultsKey = "calendarEnabled"
     static let showMeetingTitleDefaultsKey = "calendarShowMeetingTitle"
     static let dndForMeetingsDefaultsKey = "calendarDndForMeetings"
+    /// TASK-057: calendar → Slack presence sync is OFF by default; device-based
+    /// call detection is the accurate signal.
+    static let syncEnabledDefaultsKey = "calendarSlackSyncEnabled"
+    static let syncMigratedDefaultsKey = "calendarSlackSyncMigrated"
     private static let slackSettingsDefaultsKey = "focally.calendar.slackSettings"
 
     var isEnabled: Bool {
@@ -134,6 +138,7 @@ final class CalendarSlackIntegrationService {
             metrics: FocusMetricsService.shared
         )
         isEnabled = defaults.bool(forKey: Self.enabledDefaultsKey)
+        Self.migrateCalendarSlackSyncDefault(defaults: defaults)
         if let data = defaults.data(forKey: Self.slackSettingsDefaultsKey),
            let settings = try? JSONDecoder().decode(SlackCalendarSettings.self, from: data) {
             calendarSettings = settings
@@ -150,13 +155,35 @@ final class CalendarSlackIntegrationService {
         hasCalendarAccess = authorizationStatusProvider() == .fullAccess
     }
 
+    // MARK: - TASK-057 calendar sync default off
+
+    /// Whether calendar events may set Slack presence. Default OFF: device-based
+    /// call detection is the accurate signal for real call activity.
+    var calendarSlackSyncEnabled: Bool {
+        get { defaults.bool(forKey: Self.syncEnabledDefaultsKey) }
+        set { defaults.set(newValue, forKey: Self.syncEnabledDefaultsKey) }
+    }
+
+    /// One-time migration: existing installs keep the behavior they had (the
+    /// sync followed the calendar toggle). Fresh installs default to `false`.
+    /// Runs only when `calendarSlackSyncMigrated` is absent.
+    static func migrateCalendarSlackSyncDefault(defaults: UserDefaults) {
+        guard defaults.object(forKey: syncMigratedDefaultsKey) == nil else { return }
+        let priorBehavior = defaults.bool(forKey: enabledDefaultsKey)
+        defaults.set(priorBehavior, forKey: syncEnabledDefaultsKey)
+        defaults.set(true, forKey: syncMigratedDefaultsKey)
+    }
+
     func startIfEnabled() {
-        guard isEnabled else {
+        // TASK-057: `calendarSlackSyncEnabled` is the master gate. Monitoring
+        // only runs while the sync is on; with it off, calendar events never
+        // reach presence (call detection owns presence instead).
+        guard calendarSlackSyncEnabled else {
             metricsTracker.finishBecauseMonitoringStopped()
             return
         }
         hasCalendarAccess = Self.canReadCalendar(
-            isEnabled: isEnabled,
+            isEnabled: calendarSlackSyncEnabled,
             authorizationStatus: authorizationStatusProvider()
         )
         if hasCalendarAccess {
@@ -201,13 +228,16 @@ final class CalendarSlackIntegrationService {
 
     func fetchTodayEvents() {
         let authorizationStatus = authorizationStatusProvider()
+        // TASK-057: the master sync gate decides calendar access, not the
+        // legacy per-feature flag.
+        let syncEnabled = calendarSlackSyncEnabled
         hasCalendarAccess = Self.canReadCalendar(
-            isEnabled: isEnabled,
+            isEnabled: syncEnabled,
             authorizationStatus: authorizationStatus
         )
         guard hasCalendarAccess else {
             events = []
-            if isEnabled {
+            if syncEnabled {
                 connectionError = "Calendar access was not granted"
             }
             return
@@ -251,9 +281,9 @@ final class CalendarSlackIntegrationService {
     }
 
     func reconcileAfterWake() {
-        guard isEnabled else { return }
+        guard calendarSlackSyncEnabled else { return }
         hasCalendarAccess = Self.canReadCalendar(
-            isEnabled: isEnabled,
+            isEnabled: calendarSlackSyncEnabled,
             authorizationStatus: authorizationStatusProvider()
         )
         guard hasCalendarAccess else {
@@ -328,6 +358,9 @@ final class CalendarSlackIntegrationService {
             return
         }
         currentMeeting = meeting
+        // calendarSlackSyncEnabled gate: with the sync off, calendar events
+        // never set Slack presence (call detection owns presence instead).
+        guard defaults.bool(forKey: Self.syncEnabledDefaultsKey) else { return }
         presenceCoordinator.calendarMeetingUpdated(meeting)
     }
 

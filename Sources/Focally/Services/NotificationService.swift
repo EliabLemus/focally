@@ -29,7 +29,24 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func notify(_ event: Event) {
+        var callActive = false
+        if Thread.isMainThread {
+            callActive = MainActor.assumeIsolated { CallActivityTracker.shared.isCallActive }
+        }
+        let content = Self.makeContent(for: event, callActive: callActive)
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         let center = UNUserNotificationCenter.current()
+        center.add(request) { error in
+            if let error {
+                self.logger.error("Failed to post notification: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Builds the notification content. Layer 4 (TASK-057): while a call is
+    /// active Focally's own deliveries use interruption level `.passive` so the
+    /// app never breaks the DND silence it set for the call.
+    static func makeContent(for event: Event, callActive: Bool) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
 
         switch event {
@@ -55,12 +72,8 @@ class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         } else {
             content.sound = .default
         }
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-        center.add(request) { error in
-            if let error {
-                self.logger.error("Failed to post notification: \(error.localizedDescription)")
-            }
-        }
+        content.interruptionLevel = callActive ? .passive : .active
+        return content
     }
 
     // MARK: - UNUserNotificationCenterDelegate

@@ -332,3 +332,13 @@
 "tasks_cancel" = "Cancel";
 "tasks_start" = "Start";
 "task_reminder_body" = "Task due now";
+
+/* TASK-057: Call detection */
+"settings_calls" = "Calls";
+"calls_update_slack_status" = "Update Slack status during calls";
+"calls_status_message_help" = "Status shown in Slack while you are in a call (max 256 characters).";
+"calls_enable_dnd" = "Enable Do Not Disturb during calls";
+"calls_pause_focus" = "Pause focus session during calls";
+"calls_help" = "Focally detects when you join an audio or video call using your Mac's microphone or camera, and updates your presence automatically.";
+"calendar_sync_toggle" = "Show calendar meetings in Slack";
+"calendar_sync_help" = "Device-based call detection already covers real call activity. Enable this only if you want upcoming calendar meetings to set your Slack presence too.";

@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - 🔄 **Discreet Update Availability** — Updates now appear only in Settings → About, without dashboard, menu bar, or native notification alerts.
 
+## [0.11.0] - 2026-11-06
+
+### Added
+- 📞 **Call Detection** — Event-driven mic/camera monitoring (no polling): joining any call (Google Meet in Chrome, Slack, Zoom, Teams and more) automatically pauses your focus/Pomodoro, sets Slack status with a per-client emoji (default `In a Call - Powered by Focally`), and enables Do Not Disturb. Everything restores on hang-up.
+- ⚙️ **Calls Settings Panel** — Toggle Slack status during calls, customize the status message (256-char limit), toggle DND and session pause per call.
+- 🛡️ **DND Reliability Layers** — Legacy write → verify via Control Center → at-most-once escalation through the signed generic Focus-by-Name shortcut; Focally's own notifications go passive during calls.
+- 📅 **Calendar → Slack Sync now off by default** — with one-time migration for existing installs; re-enable it in Settings → Integrations. Real call activity now drives presence instead.
+
 ## [0.9.2] - 2026-07-24
 
 ### Fixed

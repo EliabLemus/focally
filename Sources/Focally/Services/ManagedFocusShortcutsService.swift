@@ -126,6 +126,30 @@ final class ManagedFocusShortcutsService {
         installedShortcutNames.contains(kind.installedShortcutName)
     }
 
+    // MARK: - Generic "Set Focus by Name" shortcut (TASK-057 Layer 3)
+
+    /// Bundled resource name of the single pre-signed generic shortcut that
+    /// receives a Focus mode name as input and enables/disables it.
+    static let focusByNameShortcutName = "focally-focus-by-name-signed"
+    static let focusByNameRunTimeout: TimeInterval = 5
+
+    /// Programmatic `shortcuts run` of the signed generic Focus shortcut.
+    /// Bounded at 5 s; throws on timeout or non-zero exit — the caller
+    /// (DNDReliabilityService) never retries.
+    func runFocusByName(_ modeName: String) async throws {
+        let shortcutName = Self.focusByNameShortcutName
+        let input = modeName
+        let timeout = Self.focusByNameRunTimeout
+        let result = try await Task.detached(priority: .userInitiated) {
+            try Self.runShortcutsCommand(arguments: ["run", shortcutName, "--input", input], timeout: timeout)
+        }.value
+        guard result.terminationStatus == 0 else {
+            throw FocusIntegrationError.processError(
+                "Focus-by-name shortcut exited with status \(result.terminationStatus)"
+            )
+        }
+    }
+
     private static var stagingDirectory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Focally/ManagedShortcuts", isDirectory: true)
@@ -136,7 +160,7 @@ final class ManagedFocusShortcutsService {
         let terminationStatus: Int32
     }
 
-    nonisolated private static func runShortcutsCommand(arguments: [String]) throws -> CommandResult {
+    nonisolated private static func runShortcutsCommand(arguments: [String], timeout: TimeInterval = 8) throws -> CommandResult {
         let process = Process()
         let stdoutPipe = Pipe()
         let stderrPipe = Pipe()
@@ -149,7 +173,7 @@ final class ManagedFocusShortcutsService {
         process.terminationHandler = { _ in completion.signal() }
 
         try process.run()
-        guard completion.wait(timeout: .now() + 8) == .success else {
+        guard completion.wait(timeout: .now() + timeout) == .success else {
             process.terminate()
             _ = completion.wait(timeout: .now() + 1)
             throw FocusIntegrationError.processError("Shortcuts command timed out")
@@ -164,3 +188,7 @@ final class ManagedFocusShortcutsService {
         )
     }
 }
+
+// MARK: - TASK-057 DND Layer 3 escalation
+
+extension ManagedFocusShortcutsService: FocusShortcutEscalating {}

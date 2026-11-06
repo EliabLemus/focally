@@ -10,6 +10,10 @@ final class DNDService {
 
     private let logger = Logger.dnd
 
+    /// TASK-057 Layer 2/3: when set, every activation/deactivation write is
+    /// followed by a verify → escalate-at-most-once pass.
+    var reliabilityService: DNDReliabilityService?
+
     var isDNDActive: Bool = false
     var lastError: String?
     init() {
@@ -41,6 +45,7 @@ final class DNDService {
             lastError = errorMsg
             return
         }
+        notifyReliabilityActivation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
@@ -82,6 +87,7 @@ final class DNDService {
             lastError = errorMsg
             return
         }
+        notifyReliabilityDeactivation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
@@ -104,6 +110,22 @@ final class DNDService {
         let active = Self.checkDNDStatus()
         isDNDActive = active
         return active
+    }
+
+    // MARK: - DND reliability (TASK-057)
+
+    private func notifyReliabilityActivation() {
+        guard let reliabilityService else { return }
+        if Thread.isMainThread {
+            MainActor.assumeIsolated { reliabilityService.activationRequested() }
+        }
+    }
+
+    private func notifyReliabilityDeactivation() {
+        guard let reliabilityService else { return }
+        if Thread.isMainThread {
+            MainActor.assumeIsolated { reliabilityService.deactivationRequested() }
+        }
     }
 
     private static func setPreference(_ key: String, value: CFPropertyList?) {
