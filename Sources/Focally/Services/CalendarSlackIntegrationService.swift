@@ -205,7 +205,9 @@ final class CalendarSlackIntegrationService {
     }
 
     func requestCalendarAccess() {
-        guard isEnabled else { return }
+        // TASK-057: the master sync gate owns calendar prompting, not the
+        // legacy per-feature flag.
+        guard calendarSlackSyncEnabled else { return }
 
         Task { [weak self] in
             guard let self else { return }

@@ -180,4 +180,15 @@ final class PermissionService {
         checkAllPermissions()
         return hasProblematicPermissions
     }
+
+    /// Same as `detectPermissionLoss()` but ignores calendar: used when
+    /// Calendar → Slack sync is off so an unsigned-app TCC reset does not
+    /// prompt about a disabled feature.
+    func detectPermissionLoss(excludingCalendar: Bool) -> Bool {
+        guard permissionsHaveBeenVerified else { return false }
+        checkAllPermissions()
+        if !excludingCalendar { return hasProblematicPermissions }
+        return notificationsStatus.isProblematic || accessibilityStatus.isProblematic
+            || dndStatus.isProblematic
+    }
 }

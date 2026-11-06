@@ -111,10 +111,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.presenceCoordinator.reapplyActivePresence()
         }
 
-        // Check permissions post-update (detect if lost)
+        // Check permissions post-update (detect if lost). Calendar is excluded
+        // unless the user actually uses Calendar → Slack sync: an unsigned-app
+        // TCC reset must not nag about a feature that is off (TASK-057).
         permissionService.checkAllPermissions()
-        if permissionService.detectPermissionLoss() {
+        if calendarService.calendarSlackSyncEnabled,
+           permissionService.detectPermissionLoss() {
             logger.info("Permissions lost post-update detected. Showing permission alert.")
+            showPermissionLossAlert()
+        } else if permissionService.detectPermissionLoss(excludingCalendar: true) {
+            logger.info("Non-calendar permissions lost post-update detected. Showing permission alert.")
             showPermissionLossAlert()
         } else {
             permissionService.markPermissionsVerified()
