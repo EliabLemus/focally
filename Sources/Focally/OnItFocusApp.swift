@@ -56,6 +56,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let permissionService = PermissionService.shared
     private lazy var settingsStore = SettingsStore()
     let appLanguage = AppLanguage.shared
+    private lazy var dndReliabilityService = DNDReliabilityService(
+        core: dndService,
+        verifier: ControlCenterFocusVerifier(),
+        escalator: shortcutsService
+    )
+    private lazy var callDetector = MediaDeviceCallDetector(
+        deviceListener: SystemMediaDeviceListener(),
+        attributor: SystemCallProcessAttributor(),
+        clientFilter: CallProcessAttributor(
+            ownBundleIdentifier: Bundle.main.bundleIdentifier ?? "app.focally.mac"
+        )
+    )
     private lazy var timerService = FocusTimerService(
         settingsStore: settingsStore,
         soundPlayer: .shared,
@@ -82,6 +94,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
         timerService.restoreSessionIfNeeded()
         workspaceLifecycleCoordinator.start()
+
+        // TASK-057: media-device call detection wiring.
+        dndService.reliabilityService = dndReliabilityService
+        callDetector.onCallStarted = { [weak self] client in
+            self?.presenceCoordinator.callStarted(client)
+        }
+        callDetector.onCallEnded = { [weak self] in
+            self?.presenceCoordinator.callEnded()
+        }
+        callDetector.start()
 
         // Validate Slack on every launch when a configured integration exists.
         slackService.reconnectOnLaunchIfConfigured { [weak self] succeeded in
@@ -635,6 +657,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         logger.info("Application terminating - forcing cleanup of active sessions and focus integration")
 
+        callDetector.stop()
+        presenceCoordinator.callDetectionCleanupOnTerminate()
         calendarService.prepareForTermination()
         workspaceLifecycleCoordinator.stop()
         if timerService.hasSession {

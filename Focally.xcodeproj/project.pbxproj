@@ -14,6 +14,7 @@
 		151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824FFB84C09F608FF1A0E65B /* TopBarView.swift */; };
 		1546EA3A0E314D00A7465E21 /* SoundPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */; };
 		15484DE81EA7074873C79B21 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5722B76D495A722143C67D73 /* TaskRowView.swift */; };
+		16F7B7869819BCD32F32E749 /* CallDetectionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EFA0650559AC9F8F0E3D21B /* CallDetectionSettings.swift */; };
 		1CDEA207B423CA61E8D21033 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1825FA0D4F141DB46F655310 /* Cocoa.framework */; };
 		1E17BA06DAEC282EBDA56AFD /* FocusTypesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDD8975948D7ADA1DC629EF /* FocusTypesService.swift */; };
 		1EB7549C72A8A8EBB126ADED /* glass_005.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 798F580A999292FEF45A0C39 /* glass_005.aiff */; };
@@ -47,6 +48,7 @@
 		4918E9CBBD4CC68BA3921FA3 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7E2AD28154EB8F29CA62613D /* en.lproj */; };
 		4A4A9946E123046E0FBCFD47 /* FocusSessionDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */; };
 		4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */; };
+		4BD8672C0AA290BF3E1314AE /* MediaDeviceCallDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C42647B8773EC22F9893DA /* MediaDeviceCallDetector.swift */; };
 		4C0A3FE7746EDEED810ABE73 /* CalendarMeetingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECC6A5FE697AA23DE9211391 /* CalendarMeetingCard.swift */; };
 		4DA6D3EC99C075CD80C09883 /* confirmation_003.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */; };
 		4DEE05BD15C92AF20B72BBBA /* WorkspaceLifecycleCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D026F9E503A07EBDCF3D330 /* WorkspaceLifecycleCoordinatorTests.swift */; };
@@ -90,10 +92,13 @@
 		970D3C8AD2A7D59A0BB95DCC /* FocallyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C970E080ECA16E573C5DB4 /* FocallyTheme.swift */; };
 		97DD6CBC31149C9D2AA59EDF /* EstimatedTimeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FCE523D9EFCCD10CFBD8794 /* EstimatedTimeCard.swift */; };
 		97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */; };
+		99C49A6A97E0A50348B5B80C /* DNDReliabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B301A9C51825B582FF1BC7 /* DNDReliabilityService.swift */; };
 		9BED537420F05DA734F06B44 /* StartPomodoroSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F285E162AEBD02846125E8D5 /* StartPomodoroSheet.swift */; };
 		9D6DB5388C88D7DDB0AF8655 /* PermissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD86686DB30D916F1B8BA083 /* PermissionService.swift */; };
+		A2A63082CABD524DF29ADA0B /* CallDetectionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C235CB595E612453EEA911 /* CallDetectionSettingsView.swift */; };
 		A4BCEF88FB16AD5D962BFACC /* TaskService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F244847761F27693DC9848 /* TaskService.swift */; };
 		A5C5DDFD64A5AA925679A34B /* AboutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */; };
+		A9F5BE2EACA5842550643E95 /* CallClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5A10AF6D400717E42C7D19 /* CallClient.swift */; };
 		AAB08AFF8D55115118E12B39 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DF9DEEC76304DC26DB445F /* SidebarView.swift */; };
 		ADAA439E664426F93640E1CC /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */; };
 		ADF6E6ACAE531242A66946CB /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = B7294FD9B10CC42662103B9B /* AppIcon.icns */; };
@@ -164,6 +169,7 @@
 		0BDD8975948D7ADA1DC629EF /* FocusTypesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTypesService.swift; sourceTree = "<group>"; };
 		0DEA92C31BB1683C614672E5 /* focally-focus-off-signed.shortcut */ = {isa = PBXFileReference; path = "focally-focus-off-signed.shortcut"; sourceTree = "<group>"; };
 		1032F662E9204A6D804DD2EF /* FocusTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTimerService.swift; sourceTree = "<group>"; };
+		11B301A9C51825B582FF1BC7 /* DNDReliabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDReliabilityService.swift; sourceTree = "<group>"; };
 		11CF66CA2C1C34A303919F6C /* TaskItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItem.swift; sourceTree = "<group>"; };
 		126D47EF69130589A232D146 /* FocallyTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyTypography.swift; sourceTree = "<group>"; };
 		1409BAE5B5CDE7CA90D858B5 /* FocusSessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionRecord.swift; sourceTree = "<group>"; };
@@ -192,6 +198,7 @@
 		3A1B83D3B0FB1DC2793D6ACF /* FocusModeEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeEditSheet.swift; sourceTree = "<group>"; };
 		3C6B1BD2B26B3E52C801F03E /* FocusSessionRecordMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionRecordMigrationTests.swift; sourceTree = "<group>"; };
 		3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMetricsTrackerTests.swift; sourceTree = "<group>"; };
+		3EFA0650559AC9F8F0E3D21B /* CallDetectionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDetectionSettings.swift; sourceTree = "<group>"; };
 		3FC0021CE8C96398C8B96A45 /* PomodoroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroStateTests.swift; sourceTree = "<group>"; };
 		440185BF6EEED5174BBEEE9F /* PresenceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceCoordinator.swift; sourceTree = "<group>"; };
 		440DA683BDD9156AD84D322C /* FocallyColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyColors.swift; sourceTree = "<group>"; };
@@ -217,9 +224,11 @@
 		5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionDraftTests.swift; sourceTree = "<group>"; };
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
+		63C42647B8773EC22F9893DA /* MediaDeviceCallDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDeviceCallDetector.swift; sourceTree = "<group>"; };
 		65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionDraft.swift; sourceTree = "<group>"; };
 		67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		6A5A10AF6D400717E42C7D19 /* CallClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallClient.swift; sourceTree = "<group>"; };
 		6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMetricsTracker.swift; sourceTree = "<group>"; };
 		6E1B7C50E674FBFB62FE9DF9 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		6F7066639935ACD7D7D50E24 /* MenuBarDropdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDropdownView.swift; sourceTree = "<group>"; };
@@ -264,6 +273,7 @@
 		B95A80A407C1873456D6EBBF /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		C17386F3788F2D2F1263DBDD /* PomodoroState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroState.swift; sourceTree = "<group>"; };
 		C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModifier.swift; sourceTree = "<group>"; };
+		C7C235CB595E612453EEA911 /* CallDetectionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDetectionSettingsView.swift; sourceTree = "<group>"; };
 		C7D115240ADBD4E68FF12E23 /* TaskItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTests.swift; sourceTree = "<group>"; };
 		C7E61C75E38A608F61F0D844 /* confirmation_003.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = confirmation_003.aiff; sourceTree = "<group>"; };
 		C98C5639BCFE72D1706C0464 /* pluck_002.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = pluck_002.aiff; sourceTree = "<group>"; };
@@ -439,6 +449,8 @@
 			isa = PBXGroup;
 			children = (
 				B95A80A407C1873456D6EBBF /* AppLanguage.swift */,
+				6A5A10AF6D400717E42C7D19 /* CallClient.swift */,
+				3EFA0650559AC9F8F0E3D21B /* CallDetectionSettings.swift */,
 				B309416511CC57079912AFE6 /* FocusMode.swift */,
 				65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */,
 				1409BAE5B5CDE7CA90D858B5 /* FocusSessionRecord.swift */,
@@ -575,6 +587,7 @@
 				997B8F1D411EBDB0ECE90EE3 /* CalendarEventAnalyzer.swift */,
 				6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */,
 				09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */,
+				11B301A9C51825B582FF1BC7 /* DNDReliabilityService.swift */,
 				F2E3F6355136EFD90EE198C8 /* DNDService.swift */,
 				E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */,
 				3202E9542B465D61E67F7FCD /* EmojiExtractor.swift */,
@@ -585,6 +598,7 @@
 				0BDD8975948D7ADA1DC629EF /* FocusTypesService.swift */,
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
 				74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */,
+				63C42647B8773EC22F9893DA /* MediaDeviceCallDetector.swift */,
 				B2B5970FA7EF557D967A4558 /* NotificationCenterPresenter.swift */,
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
 				DD86686DB30D916F1B8BA083 /* PermissionService.swift */,
@@ -616,6 +630,7 @@
 			children = (
 				FADCCBBE20EDDDB13F223879 /* AboutSettingsView.swift */,
 				F09389E957ADEB70D2BD6A48 /* AppearanceSettingsView.swift */,
+				C7C235CB595E612453EEA911 /* CallDetectionSettingsView.swift */,
 				E0B0A006AE023C6292115993 /* FocusTypesSettingsView.swift */,
 				333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */,
 				31D39D966FFC20A42278A9DC /* IntegrationsSettingsView.swift */,
@@ -767,7 +782,11 @@
 				4C0A3FE7746EDEED810ABE73 /* CalendarMeetingCard.swift in Sources */,
 				21C5C396BB2F117E53EB1E44 /* CalendarMetricsTracker.swift in Sources */,
 				97E3AD06B833C445DDDAA2B4 /* CalendarSlackIntegrationService.swift in Sources */,
+				A9F5BE2EACA5842550643E95 /* CallClient.swift in Sources */,
+				16F7B7869819BCD32F32E749 /* CallDetectionSettings.swift in Sources */,
+				A2A63082CABD524DF29ADA0B /* CallDetectionSettingsView.swift in Sources */,
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
+				99C49A6A97E0A50348B5B80C /* DNDReliabilityService.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
 				BB40A5E3AF07A27BBAD14850 /* DailyMetricsView.swift in Sources */,
 				77F5833236C41851956FFA35 /* DayOfMonthFilterSheet.swift in Sources */,
@@ -807,6 +826,7 @@
 				63A648A7E8ACFA991912B86D /* Logger.swift in Sources */,
 				D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */,
 				470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */,
+				4BD8672C0AA290BF3E1314AE /* MediaDeviceCallDetector.swift in Sources */,
 				F94CE01D65F077489B5FCEC0 /* MenuBarDropdownView.swift in Sources */,
 				B451FACCAC9DBC96264B7812 /* Metrics.swift in Sources */,
 				0E041FFD0374DC4E0391F641 /* MetricsPage.swift in Sources */,

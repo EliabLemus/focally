@@ -50,6 +50,19 @@ struct IntegrationsSettingsView: View {
                     AppLanguage.shared.localizedString("show_calendar_in_slack")
                 )
 
+            Toggle(
+                "calendar_sync_toggle",
+                isOn: Binding(
+                    get: { calendarService.calendarSlackSyncEnabled },
+                    set: { calendarService.calendarSlackSyncEnabled = $0 }
+                )
+            )
+            .accessibilityLabel(AppLanguage.shared.localizedString("calendar_sync_toggle"))
+
+            LocalizedText("calendar_sync_help")
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
+
             LocalizedText("show_calendar_in_slack_help")
                 .font(.focallyCaption)
                 .foregroundStyle(Color.focallyOnSurfaceVariant)

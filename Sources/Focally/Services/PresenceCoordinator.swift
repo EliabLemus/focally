@@ -4,6 +4,29 @@ enum PresenceState: Equatable {
     case idle
     case calendarMeeting(CalendarMeeting)
     case manualFocus(FocusMode)
+    case activeCall(CallClient)
+}
+
+/// Seam for the session pause/resume ownership of the call detector.
+@MainActor
+protocol CallFocusSessionControlling: AnyObject {
+    var hasActiveSession: Bool { get }
+    var isSessionPaused: Bool { get }
+    func pauseSession()
+    func resumeSession()
+}
+
+extension FocusTimerService: CallFocusSessionControlling {
+    var hasActiveSession: Bool { hasSession }
+    var isSessionPaused: Bool { isPaused }
+}
+
+/// Shared, testable flag for "a call is active right now" — consulted by
+/// NotificationService for Layer 4 self-notification suppression.
+@MainActor
+final class CallActivityTracker {
+    static let shared = CallActivityTracker()
+    var isCallActive = false
 }
 
 @MainActor
@@ -21,6 +44,9 @@ protocol PresenceCoordinating: AnyObject {
     func calendarMeetingUpdated(_ meeting: CalendarMeeting?)
     func calendarSettingsUpdated(_ settings: SlackCalendarSettings)
     func reapplyActivePresence()
+    func callStarted(_ client: CallClient)
+    func callEnded()
+    func callDetectionCleanupOnTerminate()
 }
 
 extension PresenceCoordinating {
@@ -33,6 +59,10 @@ extension PresenceCoordinating {
     }
 
     func reapplyActivePresence() {}
+
+    func callStarted(_ client: CallClient) {}
+    func callEnded() {}
+    func callDetectionCleanupOnTerminate() {}
 }
 
 @MainActor
@@ -102,6 +132,11 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private var manualSystemDNDEnabled = true
     private var rememberedMeeting: CalendarMeeting?
     private var calendarSettings = SlackCalendarSettings()
+    private(set) var activeCallClients: [CallClient] = []
+    private var callStartedUnderCalendarPresence = false
+    private var callPausedSessionByCallDetection = false
+    private let sessionController: (any CallFocusSessionControlling)?
+    private let callSettingsProvider: () -> CallDetectionSettings
     private(set) var ownsSystemDND = false
     private(set) var wantsSystemDND = false
     private var ownedSlackDNDRequest: SlackDNDRequest?
@@ -118,12 +153,16 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         now: @escaping () -> Date = Date.init,
         scheduleDNDReconciliation: @escaping (@escaping @MainActor () -> Void) -> Void = { action in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { action() }
-        }
+        },
+        sessionController: (any CallFocusSessionControlling)? = nil,
+        callSettingsProvider: @escaping () -> CallDetectionSettings = { CallDetectionSettingsStore().currentSettings() }
     ) {
         self.slackService = slackService
         self.dndService = dndService
         self.now = now
         self.scheduleDNDReconciliation = scheduleDNDReconciliation
+        self.sessionController = sessionController
+        self.callSettingsProvider = callSettingsProvider
     }
 
     func manualFocusStarted(mode: FocusMode, systemDNDEnabled: Bool) {
@@ -150,12 +189,71 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     }
 
     func reapplyActivePresence() {
-        guard manualMode != nil || rememberedMeeting != nil else { return }
+        guard manualMode != nil || rememberedMeeting != nil || !activeCallClients.isEmpty else { return }
         applyWinningPresence()
     }
 
+    // MARK: Call detection presence
+
+    func callStarted(_ client: CallClient) {
+        guard !activeCallClients.contains(where: { $0.bundlePrefix == client.bundlePrefix }) else { return }
+        let isFirstCapture = activeCallClients.isEmpty
+        activeCallClients.append(client)
+        // Calendar presence already showing when the call starts is richer
+        // (title); the call must not overwrite it, but still pauses the session.
+        callStartedUnderCalendarPresence = isFirstCapture && manualMode == nil && rememberedMeeting != nil
+        guard isFirstCapture else { return }
+
+        let settings = callSettingsProvider()
+        if settings.pauseFocusDuringCalls, sessionController?.hasActiveSession == true {
+            // A session the USER paused manually must never be resumed by us.
+            callPausedSessionByCallDetection = !(sessionController?.isSessionPaused ?? false)
+            sessionController?.pauseSession()
+        }
+        CallActivityTracker.shared.isCallActive = true
+        applyWinningPresence()
+    }
+
+    func callEnded() {
+        guard !activeCallClients.isEmpty else { return }
+        activeCallClients = []
+        callStartedUnderCalendarPresence = false
+        CallActivityTracker.shared.isCallActive = false
+        let hadOwnedPause = callPausedSessionByCallDetection
+        callPausedSessionByCallDetection = false
+        // Only resume a session the detector paused; if the session ended while
+        // the call was active there is nothing to resume.
+        if hadOwnedPause, let sessionController,
+           sessionController.hasActiveSession, sessionController.isSessionPaused {
+            sessionController.resumeSession()
+        }
+        applyWinningPresence()
+    }
+
+    func callDetectionCleanupOnTerminate() {
+        guard !activeCallClients.isEmpty else { return }
+        activeCallClients = []
+        callStartedUnderCalendarPresence = false
+        callPausedSessionByCallDetection = false
+        CallActivityTracker.shared.isCallActive = false
+        slackService.clearStatus()
+        releaseOwnedDND()
+    }
+
+    /// While a call is active the call presence wins — except when the call
+    /// started under an already-showing calendar meeting (calendar keeps the
+    /// presence until the meeting ends).
+    private var winningCallClient: CallClient? {
+        guard let client = activeCallClients.first else { return nil }
+        if callStartedUnderCalendarPresence, rememberedMeeting != nil { return nil }
+        return client
+    }
+
     private func applyWinningPresence() {
-        if let manualMode {
+        if let client = winningCallClient {
+            currentPresence = .activeCall(client)
+            applyActiveCall(client)
+        } else if let manualMode {
             currentPresence = .manualFocus(manualMode)
             applyManualFocus(manualMode)
         } else if let rememberedMeeting {
@@ -165,6 +263,20 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
             currentPresence = .idle
             applyIdle()
         }
+    }
+
+    private func applyActiveCall(_ client: CallClient) {
+        let settings = callSettingsProvider()
+        if settings.callStatusEnabled, slackService.isEnabled {
+            let expiration = Int(now().addingTimeInterval(4 * 3600).timeIntervalSince1970)
+            slackService.setStatus(
+                text: settings.sanitizedStatusMessage,
+                expirationTimestamp: expiration,
+                taskEmoji: client.emoji,
+                fallbackEmoji: slackService.savedStatusEmoji()
+            )
+        }
+        applySystemDND(shouldActivate: settings.enableDNDDuringCalls)
     }
 
     private func applyIdle() {

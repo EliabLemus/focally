@@ -332,3 +332,13 @@
 "tasks_cancel" = "Cancelar";
 "tasks_start" = "Iniciar";
 "task_reminder_body" = "A tarefa vence agora";
+
+/* TASK-057: Detecção de chamadas */
+"settings_calls" = "Chamadas";
+"calls_update_slack_status" = "Atualizar o status do Slack durante chamadas";
+"calls_status_message_help" = "Status exibido no Slack enquanto você está em uma chamada (máx. 256 caracteres).";
+"calls_enable_dnd" = "Ativar Não Perturbe durante chamadas";
+"calls_pause_focus" = "Pausar a sessão de foco durante chamadas";
+"calls_help" = "O Focally detecta quando você entra em uma chamada de áudio ou vídeo usando o microfone ou a câmera do seu Mac e atualiza sua presença automaticamente.";
+"calendar_sync_toggle" = "Mostrar reuniões do calendário no Slack";
+"calendar_sync_help" = "A detecção de chamadas por dispositivo já cobre a atividade real de chamadas. Ative apenas se você também quiser que reuniões do calendário alterem sua presença no Slack.";

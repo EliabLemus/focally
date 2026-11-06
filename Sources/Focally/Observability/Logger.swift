@@ -22,6 +22,9 @@ final class Logger {
     /// Logger para DND Service
     static let dnd = Logger(subsystem: "app.focally.mac", category: "DND")
 
+    /// Logger para detección de llamadas (TASK-057)
+    static let callDetection = Logger(subsystem: "app.focally.mac", category: "CallDetection")
+
     /// Logger para Analytics
     static let analytics = Logger(subsystem: "app.focally.mac", category: "Analytics")
 
