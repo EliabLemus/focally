@@ -6,7 +6,7 @@ final class TaskServiceTests: XCTestCase {
     private var tempDirectory: URL!
     private var fileURL: URL!
     private var scheduler: FakeReminderScheduler!
-    private var nowDate: Date!
+    private var nowDate = Date(timeIntervalSince1970: 1_789_000_000) // fixed instant
 
     override func setUp() async throws {
         tempDirectory = FileManager.default.temporaryDirectory
@@ -79,8 +79,8 @@ final class TaskServiceTests: XCTestCase {
 
     func testOpenTasksAreReorderedByDueDateAfterAdd() {
         let service = makeService()
-        let late = service.addTask(title: "late", dueDate: nowDate!.addingTimeInterval(86400 * 3))!
-        let soon = service.addTask(title: "soon", dueDate: nowDate!.addingTimeInterval(3600))!
+        let late = service.addTask(title: "late", dueDate: nowDate.addingTimeInterval(86400 * 3))!
+        let soon = service.addTask(title: "soon", dueDate: nowDate.addingTimeInterval(3600))!
         XCTAssertEqual(service.tasks.map(\.title), ["soon", "late"])
         _ = late; _ = soon
     }
@@ -89,7 +89,7 @@ final class TaskServiceTests: XCTestCase {
 
     func testAddingTaskWithFutureDueDateSchedulesReminder() {
         let service = makeService()
-        let due = nowDate!.addingTimeInterval(3600)
+        let due = nowDate.addingTimeInterval(3600)
         let task = service.addTask(title: "with reminder", dueDate: due)!
         XCTAssertEqual(scheduler.scheduled[task.id]?.title, "with reminder")
         XCTAssertEqual(scheduler.scheduled[task.id]?.dueDate, due)
@@ -97,16 +97,16 @@ final class TaskServiceTests: XCTestCase {
 
     func testCompletingTaskCancelsReminder() {
         let service = makeService()
-        let task = service.addTask(title: "task", dueDate: nowDate!.addingTimeInterval(3600))!
+        let task = service.addTask(title: "task", dueDate: nowDate.addingTimeInterval(3600))!
         service.toggleComplete(task.id)
         XCTAssertTrue(scheduler.cancelledTaskIDs.contains(task.id))
     }
 
     func testUpdatingDueDateReschedulesInsteadOfDuplicating() {
         let service = makeService()
-        let task = service.addTask(title: "task", dueDate: nowDate!.addingTimeInterval(3600))!
+        let task = service.addTask(title: "task", dueDate: nowDate.addingTimeInterval(3600))!
         var updated = task
-        let newDue = nowDate!.addingTimeInterval(7200)
+        let newDue = nowDate.addingTimeInterval(7200)
         updated.dueDate = newDue
         service.updateTask(updated)
         XCTAssertEqual(scheduler.scheduled[task.id]?.dueDate, newDue)
@@ -141,8 +141,8 @@ final class TaskServiceTests: XCTestCase {
     }
 
     func testInvalidStoredTasksAreFilteredOut() throws {
-        let valid = TaskItem(title: "keep me", createdAt: nowDate!)
-        let invalid = TaskItem(title: "   ", createdAt: nowDate!)
+        let valid = TaskItem(title: "keep me", createdAt: nowDate)
+        let invalid = TaskItem(title: "   ", createdAt: nowDate)
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         try encoder.encode([valid, invalid]).write(to: fileURL)
@@ -154,7 +154,7 @@ final class TaskServiceTests: XCTestCase {
     // MARK: - Helpers
 
     private func record(taskID: UUID?, active: TimeInterval, pomodoros: Int?) -> FocusSessionRecord {
-        let start = nowDate!.addingTimeInterval(-3600)
+        let start = nowDate.addingTimeInterval(-3600)
         let end = start.addingTimeInterval(active)
         return FocusSessionRecord(
             modeType: .focusTime,

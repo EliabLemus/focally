@@ -38,8 +38,9 @@ struct CallDetectionSettings: Equatable {
     }
 }
 
-/// UserDefaults-backed store for `CallDetectionSettings`.
-@MainActor
+/// UserDefaults-backed store for `CallDetectionSettings`. Deliberately not
+/// actor-isolated: UserDefaults is thread-safe and the store must be callable
+/// from nonisolated contexts (presence coordinator, detector callbacks).
 final class CallDetectionSettingsStore {
     enum Key {
         static let callStatusEnabled = "callStatusEnabled"
@@ -50,13 +51,13 @@ final class CallDetectionSettingsStore {
 
     private let defaults: UserDefaults
 
-    nonisolated init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 
     /// Reads current values on every access: toggles and messages changed in the
     /// settings panel apply to the next call with no restart.
-    nonisolated func currentSettings() -> CallDetectionSettings {
+    func currentSettings() -> CallDetectionSettings {
         var settings = CallDetectionSettings()
         if defaults.object(forKey: Key.callStatusEnabled) != nil {
             settings.callStatusEnabled = defaults.bool(forKey: Key.callStatusEnabled)
