@@ -175,12 +175,15 @@ final class CalendarSlackIntegrationService {
     }
 
     func startIfEnabled() {
-        guard isEnabled else {
+        // TASK-057: `calendarSlackSyncEnabled` is the master gate. Monitoring
+        // only runs while the sync is on; with it off, calendar events never
+        // reach presence (call detection owns presence instead).
+        guard calendarSlackSyncEnabled else {
             metricsTracker.finishBecauseMonitoringStopped()
             return
         }
         hasCalendarAccess = Self.canReadCalendar(
-            isEnabled: isEnabled,
+            isEnabled: calendarSlackSyncEnabled,
             authorizationStatus: authorizationStatusProvider()
         )
         if hasCalendarAccess {
@@ -225,13 +228,16 @@ final class CalendarSlackIntegrationService {
 
     func fetchTodayEvents() {
         let authorizationStatus = authorizationStatusProvider()
+        // TASK-057: the master sync gate decides calendar access, not the
+        // legacy per-feature flag.
+        let syncEnabled = calendarSlackSyncEnabled
         hasCalendarAccess = Self.canReadCalendar(
-            isEnabled: isEnabled,
+            isEnabled: syncEnabled,
             authorizationStatus: authorizationStatus
         )
         guard hasCalendarAccess else {
             events = []
-            if isEnabled {
+            if syncEnabled {
                 connectionError = "Calendar access was not granted"
             }
             return
@@ -275,9 +281,9 @@ final class CalendarSlackIntegrationService {
     }
 
     func reconcileAfterWake() {
-        guard isEnabled else { return }
+        guard calendarSlackSyncEnabled else { return }
         hasCalendarAccess = Self.canReadCalendar(
-            isEnabled: isEnabled,
+            isEnabled: calendarSlackSyncEnabled,
             authorizationStatus: authorizationStatusProvider()
         )
         guard hasCalendarAccess else {

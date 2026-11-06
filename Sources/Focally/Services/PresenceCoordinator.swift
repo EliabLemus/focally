@@ -205,10 +205,14 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         guard isFirstCapture else { return }
 
         let settings = callSettingsProvider()
-        if settings.pauseFocusDuringCalls, sessionController?.hasActiveSession == true {
-            // A session the USER paused manually must never be resumed by us.
-            callPausedSessionByCallDetection = !(sessionController?.isSessionPaused ?? false)
-            sessionController?.pauseSession()
+        if settings.pauseFocusDuringCalls, let sessionController, sessionController.hasActiveSession {
+            // A session the USER paused manually must never be resumed by us —
+            // and is not paused again (double-pause would double-count pause time).
+            let alreadyPausedByUser = sessionController.isSessionPaused
+            callPausedSessionByCallDetection = !alreadyPausedByUser
+            if !alreadyPausedByUser {
+                sessionController.pauseSession()
+            }
         }
         CallActivityTracker.shared.isCallActive = true
         applyWinningPresence()
