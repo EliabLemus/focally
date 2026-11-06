@@ -440,24 +440,37 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
 
     func capturingBundleIdentifiers() -> [String] {
         guard #available(macOS 14.2, *) else { return [] }
+        // Documented API (AudioHardware.h): kAudioHardwarePropertyProcessObjectList
+        // ('prs#'). The 'pobj' selector does NOT exist in the SDK — it only
+        // aliases on some macOS versions and fails outright on macOS 15.x.
         var address = AudioObjectPropertyAddress(
-            mSelector: AudioObjectPropertySelector(0x706F626A), // 'pobj' = kAudioHardwarePropertyProcessObjects
+            mSelector: kAudioHardwarePropertyProcessObjectList,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain
         )
-        var size: UInt32 = 0
-        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size) == noErr, size > 0 else {
-            // TASK-057 fallback: some systems (observed on macOS 15.7) fail the
-            // process-objects query outright. If a device IS running, something
-            // is capturing — report the unknown client (:phone:) instead of
-            // silently missing the call.
-            return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
+        // coreaudiod on 15.7 can return transient '!obj'/'!sz?' for fresh state —
+        // retry a few times before giving up.
+        for attempt in 0..<3 {
+            var size: UInt32 = 0
+            let sizeStatus = AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size)
+            guard sizeStatus == noErr else {
+                if attempt == 2 {
+                    return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
+                }
+                usleep(20_000)
+                continue
+            }
+            guard size > 0 else { return [] }
+            var processIDs = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
+            if AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &processIDs) == noErr {
+                return Self.capturingBundles(processIDs: processIDs)
+            }
+            usleep(20_000)
         }
-        var processIDs = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
-        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &processIDs) == noErr else {
-            return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
-        }
+        return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
+    }
 
+    private static func capturingBundles(processIDs: [AudioObjectID]) -> [String] {
         var inputAddress = AudioObjectPropertyAddress(
             mSelector: kAudioProcessPropertyIsRunningInput,
             mScope: kAudioObjectPropertyScopeGlobal,
@@ -519,9 +532,31 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
     }
 
     private nonisolated static func bundleIdentifier(for processObjectID: AudioObjectID) -> String? {
-        // The process object id equals the BSD pid for process objects.
-        let pid = pid_t(processObjectID)
-        guard pid > 0 else { return nil }
+        // Documented path (AudioHardware.h): kAudioProcessPropertyBundleID
+        // ('pbid') returns the CFString bundle id for a process object. The
+        // "process object id == pid" assumption is NOT part of the API contract;
+        // keep the pid lookup only as a fallback.
+        var bundleAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioProcessPropertyBundleID,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var bundle: CFString? = nil
+        var bundleSize = UInt32(MemoryLayout<CFString?>.size)
+        if AudioObjectGetPropertyData(processObjectID, &bundleAddress, 0, nil, &bundleSize, &bundle) == noErr,
+           let bundleID = bundle as String? {
+            return bundleID
+        }
+        var pidAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioProcessPropertyPID,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var pid: pid_t = -1
+        var pidSize = UInt32(MemoryLayout<pid_t>.size)
+        guard AudioObjectGetPropertyData(processObjectID, &pidAddress, 0, nil, &pidSize, &pid) == noErr, pid > 0 else {
+            return nil
+        }
         return NSRunningApplication(processIdentifier: pid)?.bundleIdentifier
     }
 
