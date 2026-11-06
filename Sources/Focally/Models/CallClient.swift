@@ -19,6 +19,7 @@ enum CallClientCatalog {
     /// this table stays code-defined for TASK-057.
     static let defaultClients: [CallClient] = [
         CallClient(bundlePrefix: "com.google.chrome", displayName: "Google Meet (Chrome)", emoji: ":google-meet:"),
+        CallClient(bundlePrefix: "company.thebrowser", displayName: "Arc", emoji: ":google-meet:"),
         CallClient(bundlePrefix: "org.mozilla.firefox", displayName: "Firefox Call", emoji: ":phone:"),
         CallClient(bundlePrefix: "com.microsoft.edgemac", displayName: "Edge Call", emoji: ":phone:"),
         CallClient(bundlePrefix: "com.tinyspeck.slackmacgap", displayName: "Slack Call", emoji: ":slack-call:"),
@@ -42,6 +43,34 @@ enum CallClientCatalog {
             .max(by: { $0.bundlePrefix.count < $1.bundlePrefix.count })
         return match ?? unknownClient
     }
+
+    /// Pure resolution with user emoji overrides (TASK-058): the override
+    /// replaces ONLY `emoji` — `bundlePrefix` and `displayName` stay
+    /// code-defined. An empty override string is treated as "no override".
+    static func client(
+        for bundleIdentifier: String,
+        emojiOverrides: [String: String],
+        unknownEmoji: String?
+    ) -> CallClient {
+        client(for: bundleIdentifier)
+            .applyingEmojiOverrides(emojiOverrides, unknownEmoji: unknownEmoji)
+    }
+}
+
+extension CallClient {
+    /// Applies per-client emoji overrides. Keyed by `bundlePrefix`; the unknown
+    /// client uses the dedicated `unknownEmoji` override instead.
+    func applyingEmojiOverrides(
+        _ overrides: [String: String],
+        unknownEmoji: String? = nil
+    ) -> CallClient {
+        if bundlePrefix == CallClientCatalog.unknownClient.bundlePrefix {
+            guard let unknownEmoji, !unknownEmoji.isEmpty else { return self }
+            return CallClient(bundlePrefix: bundlePrefix, displayName: displayName, emoji: unknownEmoji)
+        }
+        guard let override = overrides[bundlePrefix], !override.isEmpty else { return self }
+        return CallClient(bundlePrefix: bundlePrefix, displayName: displayName, emoji: override)
+    }
 }
 
 /// Attributes capturing processes to call clients. Pure and injectable so tests
@@ -55,7 +84,11 @@ final class CallProcessAttributor {
 
     /// Filters out Focally's own bundle and Apple-owned processes, then maps the
     /// remaining capturing bundle ids to call clients (deduped).
-    func attributedClients(fromBundleIdentifiers bundleIDs: [String]) -> [CallClient] {
+    func attributedClients(
+        fromBundleIdentifiers bundleIDs: [String],
+        emojiOverrides: [String: String] = [:],
+        unknownEmoji: String? = nil
+    ) -> [CallClient] {
         var seen = Set<String>()
         var clients: [CallClient] = []
         for bundleID in bundleIDs {
@@ -63,7 +96,11 @@ final class CallProcessAttributor {
             guard !lowered.isEmpty else { continue }
             guard lowered != ownBundleIdentifier.lowercased() else { continue }
             guard !lowered.hasPrefix(CallClientCatalog.excludedPrefix) else { continue }
-            let client = CallClientCatalog.client(for: lowered)
+            let client = CallClientCatalog.client(
+                for: lowered,
+                emojiOverrides: emojiOverrides,
+                unknownEmoji: unknownEmoji
+            )
             guard seen.insert(client.bundlePrefix).inserted else { continue }
             clients.append(client)
         }

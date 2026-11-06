@@ -11,17 +11,25 @@ struct CallDetectionSettings: Equatable {
     var callStatusMessage: String
     var enableDNDDuringCalls: Bool
     var pauseFocusDuringCalls: Bool
+    /// TASK-058: per-client Slack emoji overrides (bundlePrefix → shortcode).
+    var callClientEmojiOverrides: [String: String]
+    /// TASK-058: Slack emoji override for the unknown call client.
+    var unknownCallClientEmoji: String?
 
     init(
         callStatusEnabled: Bool = true,
         callStatusMessage: String = CallDetectionSettings.defaultStatusMessage,
         enableDNDDuringCalls: Bool = true,
-        pauseFocusDuringCalls: Bool = true
+        pauseFocusDuringCalls: Bool = true,
+        callClientEmojiOverrides: [String: String] = [:],
+        unknownCallClientEmoji: String? = nil
     ) {
         self.callStatusEnabled = callStatusEnabled
         self.callStatusMessage = callStatusMessage
         self.enableDNDDuringCalls = enableDNDDuringCalls
         self.pauseFocusDuringCalls = pauseFocusDuringCalls
+        self.callClientEmojiOverrides = callClientEmojiOverrides
+        self.unknownCallClientEmoji = unknownCallClientEmoji
     }
 
     /// Slack statuses are capped at 256 characters; an empty/whitespace message
@@ -47,6 +55,8 @@ final class CallDetectionSettingsStore {
         static let callStatusMessage = "callStatusMessage"
         static let enableDNDDuringCalls = "enableDNDDuringCalls"
         static let pauseFocusDuringCalls = "pauseFocusDuringCalls"
+        static let callClientEmojiOverrides = "callClientEmojiOverrides"
+        static let unknownCallClientEmoji = "unknownCallClientEmoji"
     }
 
     private let defaults: UserDefaults
@@ -71,6 +81,14 @@ final class CallDetectionSettingsStore {
         if defaults.object(forKey: Key.pauseFocusDuringCalls) != nil {
             settings.pauseFocusDuringCalls = defaults.bool(forKey: Key.pauseFocusDuringCalls)
         }
+        if let json = defaults.string(forKey: Key.callClientEmojiOverrides),
+           let data = json.data(using: .utf8),
+           let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
+            settings.callClientEmojiOverrides = decoded
+        }
+        if defaults.object(forKey: Key.unknownCallClientEmoji) != nil {
+            settings.unknownCallClientEmoji = defaults.string(forKey: Key.unknownCallClientEmoji)
+        }
         return settings
     }
 
@@ -79,6 +97,17 @@ final class CallDetectionSettingsStore {
         defaults.set(CallDetectionSettings.sanitizedStatusMessage(settings.callStatusMessage), forKey: Key.callStatusMessage)
         defaults.set(settings.enableDNDDuringCalls, forKey: Key.enableDNDDuringCalls)
         defaults.set(settings.pauseFocusDuringCalls, forKey: Key.pauseFocusDuringCalls)
+        if settings.callClientEmojiOverrides.isEmpty {
+            defaults.removeObject(forKey: Key.callClientEmojiOverrides)
+        } else if let data = try? JSONEncoder().encode(settings.callClientEmojiOverrides),
+                  let json = String(data: data, encoding: .utf8) {
+            defaults.set(json, forKey: Key.callClientEmojiOverrides)
+        }
+        if let unknownEmoji = settings.unknownCallClientEmoji, !unknownEmoji.isEmpty {
+            defaults.set(unknownEmoji, forKey: Key.unknownCallClientEmoji)
+        } else {
+            defaults.removeObject(forKey: Key.unknownCallClientEmoji)
+        }
     }
 
     var callStatusEnabled: Bool {
@@ -99,5 +128,15 @@ final class CallDetectionSettingsStore {
     var pauseFocusDuringCalls: Bool {
         get { currentSettings().pauseFocusDuringCalls }
         set { var s = currentSettings(); s.pauseFocusDuringCalls = newValue; save(s) }
+    }
+
+    var callClientEmojiOverrides: [String: String] {
+        get { currentSettings().callClientEmojiOverrides }
+        set { var s = currentSettings(); s.callClientEmojiOverrides = newValue; save(s) }
+    }
+
+    var unknownCallClientEmoji: String? {
+        get { currentSettings().unknownCallClientEmoji }
+        set { var s = currentSettings(); s.unknownCallClientEmoji = newValue; save(s) }
     }
 }
