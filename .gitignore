@@ -6,3 +6,4 @@ xcuserdata/
 .DS_Store
 .hermes/
 build/
+.worktrees/
