@@ -5,7 +5,12 @@ All notable changes to Focally will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.11.1] - 2026-11-06
+
+### Fixed
+- 📞 **Call detection on macOS 15.x** — attribution now uses the documented `kAudioHardwarePropertyProcessObjectList` ('prs#') API (the legacy 'pobj' selector does not exist in the SDK and fails on macOS 15), reads bundle IDs directly from CoreAudio, and retries transient coreaudiod errors.
+- 📞 **Attribution fallback** — if process attribution fails while a mic device is actively capturing, the call is still detected as an Unknown Client (`:phone:`) instead of being silently missed.
+- 📅 **Calendar permission nag** — calendar access is only requested when calendar→Slack sync is enabled; permission-loss alerts no longer flag the disabled calendar integration.
 
 ### Changed
 - 🔄 **Discreet Update Availability** — Updates now appear only in Settings → About, without dashboard, menu bar, or native notification alerts.
