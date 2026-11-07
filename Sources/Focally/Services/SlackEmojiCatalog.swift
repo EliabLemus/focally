@@ -2373,12 +2373,16 @@ public final class EmojiUsageTracker {
 
     private func loadRecentEmojis() {
         if let data = defaults.data(forKey: Self.usageKey),
+           // TASK-062 (c): decode fallido solo significa lista vacía de recientes;
+           // no hay dato crítico que perder y el valor default [] es correcto.
            let decoded = try? JSONDecoder().decode([String].self, from: data) {
             recentEmojis = decoded
         }
     }
 
     private func saveRecentEmojis() {
+        // TASK-062 (a): encoding [String] no puede fallar en la práctica; el
+        // silencio degrada a "recientes no actualizados", sin pérdida de estado.
         if let encoded = try? JSONEncoder().encode(recentEmojis) {
             defaults.set(encoded, forKey: Self.usageKey)
         }

@@ -5,6 +5,17 @@ All notable changes to Focally will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-11-06
+
+### Fixed
+- 🎛️ **DND que sí funciona en macOS moderno** — la activación usa el shortcut firmado como vía primaria en macOS 14+ (la escritura legacy de preferencias que el sistema ignora quedó como fallback ≤13) y la verificación ya no se auto-valida leyendo lo que ella misma escribió.
+- 💾 **Errores de persistencia visibles** — fallos de E/S se registran y un JSON corrupto se pone en cuarentena (`.corrupt-<timestamp>`) y se regenera, en lugar de fallar silenciosamente en cada lanzamiento.
+
+### Changed
+- ⚡ **Ticker de UI eficiente** — timer de 1 Hz anclado al segundo de pared con `tolerance` (mejor batería), valor derivado del reloj (título correcto al despertar del sleep en el primer tick) y re-dibujo solo cuando el texto cambia.
+- 📅 **Sincronización de calendario con debounce** — ráfagas de cambios del calendario coalescen en un solo refetch (~2s).
+- 🏗️ **SlackService en capas** — refactor interno con rate limiting por método (respeta `Retry-After` en todas las rutas, protege el token de bloqueos por 429) y Keychain con update-or-add. Sin cambios visibles.
+
 ## [0.12.0] - 2026-11-06
 
 ### Added
