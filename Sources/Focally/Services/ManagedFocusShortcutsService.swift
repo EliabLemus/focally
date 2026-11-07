@@ -56,9 +56,11 @@ final class ManagedFocusShortcutsService {
                 return nil
             }
             // Stage to Application Support so Shortcuts.app can read it
+            // TASK-062 (c): staging prep is best-effort; the copy below has a
+            // do/catch that reports the real failure path.
             let stagedURL = Self.stagingDirectory.appendingPathComponent("\(kind.bundleResourceName).shortcut")
             try? fileManager.createDirectory(at: Self.stagingDirectory, withIntermediateDirectories: true)
-            try? fileManager.removeItem(at: stagedURL)
+            try? fileManager.removeItem(at: stagedURL) // (c) removeItem tolerates a missing staged file.
             do {
                 try fileManager.copyItem(at: resourceURL, to: stagedURL)
                 return stagedURL

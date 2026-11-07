@@ -4,30 +4,55 @@ import Observation
 
 @MainActor
 final class CalendarChangeMonitor {
+    /// TASK-063: EventKit fires EKEventStoreChanged in bursts; coalesce them
+    /// into a single refetch ~2s after the last notification of the burst.
+    static let defaultDebounceInterval: TimeInterval = 2.0
+
     private let notificationCenter: NotificationCenter
     private let notificationName: Notification.Name
     private let onChange: @MainActor () -> Void
+    private let debounceInterval: TimeInterval
+    private let schedule: (TimeInterval, @escaping @MainActor () -> Void) -> Void
+    private let cancel: (UUID) -> Void
     private var observer: NSObjectProtocol?
+    private var pendingDebounceID: UUID?
 
     init(
         notificationCenter: NotificationCenter,
         notificationName: Notification.Name,
+        debounceInterval: TimeInterval = CalendarChangeMonitor.defaultDebounceInterval,
+        schedule: @escaping (TimeInterval, @escaping @MainActor () -> Void) -> Void = { delay, action in
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { action() }
+        },
+        cancel: @escaping (UUID) -> Void = { _ in },
         onChange: @escaping @MainActor () -> Void
     ) {
         self.notificationCenter = notificationCenter
         self.notificationName = notificationName
+        self.debounceInterval = debounceInterval
+        self.schedule = schedule
+        self.cancel = cancel
         self.onChange = onChange
     }
 
     func start() {
         guard observer == nil else { return }
+        // Entrega en .main: el bloque corre en el main thread, así que el estado
+        // @MainActor se accede sincrónicamente con assumeIsolated (sin Task, que
+        // puede morir de hambre bajo Swift Testing).
         observer = notificationCenter.addObserver(
             forName: notificationName,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
-                self?.onChange()
+            if Thread.isMainThread, #available(macOS 14.0, *) {
+                MainActor.assumeIsolated {
+                    self?.handleChangeNotification()
+                }
+            } else {
+                Task { @MainActor in
+                    self?.handleChangeNotification()
+                }
             }
         }
     }
@@ -36,6 +61,24 @@ final class CalendarChangeMonitor {
         guard let observer else { return }
         notificationCenter.removeObserver(observer)
         self.observer = nil
+        if let pendingDebounceID {
+            cancel(pendingDebounceID)
+            self.pendingDebounceID = nil
+        }
+    }
+
+    /// Debounced entry point: N notifications inside the window collapse into
+    /// one `onChange` fired after the last one (same pattern as
+    /// MediaDeviceCallDetector.handleDeviceEvent).
+    private func handleChangeNotification() {
+        if let existing = pendingDebounceID { cancel(existing) }
+        let id = UUID()
+        pendingDebounceID = id
+        schedule(debounceInterval) { [weak self] in
+            guard let self, self.pendingDebounceID == id else { return }
+            self.pendingDebounceID = nil
+            self.onChange()
+        }
     }
 }
 
@@ -49,6 +92,8 @@ final class CalendarSlackIntegrationService {
     /// call detection is the accurate signal.
     static let syncEnabledDefaultsKey = "calendarSlackSyncEnabled"
     static let syncMigratedDefaultsKey = "calendarSlackSyncMigrated"
+    /// TASK-063: burst window for EKEventStoreChanged notifications.
+    static let eventStoreChangedDebounceInterval: TimeInterval = 2.0
     private static let slackSettingsDefaultsKey = "focally.calendar.slackSettings"
 
     var isEnabled: Bool {
@@ -107,9 +152,15 @@ final class CalendarSlackIntegrationService {
     private let eventFetcher: (() -> [CalendarMeeting])?
     private var boundaryTimer: Timer?
     private var isMonitoring = false
+    private let eventStoreDebounceInterval: TimeInterval
+    private let scheduleDebounce: (TimeInterval, @escaping @MainActor () -> Void) -> Void
+    private let cancelDebounce: (UUID) -> Void
     @ObservationIgnored private lazy var changeMonitor = CalendarChangeMonitor(
         notificationCenter: notificationCenter,
-        notificationName: eventStoreChangedNotification
+        notificationName: eventStoreChangedNotification,
+        debounceInterval: eventStoreDebounceInterval,
+        schedule: scheduleDebounce,
+        cancel: cancelDebounce
     ) { [weak self] in
         self?.reconcileCalendar()
     }
@@ -121,6 +172,11 @@ final class CalendarSlackIntegrationService {
         defaults: UserDefaults = .standard,
         notificationCenter: NotificationCenter = .default,
         eventStoreChangedNotification: Notification.Name = .EKEventStoreChanged,
+        debounceInterval: TimeInterval = CalendarSlackIntegrationService.eventStoreChangedDebounceInterval,
+        schedule: @escaping (TimeInterval, @escaping @MainActor () -> Void) -> Void = { delay, action in
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { action() }
+        },
+        cancel: @escaping (UUID) -> Void = { _ in },
         authorizationStatusProvider: @escaping () -> EKAuthorizationStatus = {
             EKEventStore.authorizationStatus(for: .event)
         },
@@ -133,6 +189,9 @@ final class CalendarSlackIntegrationService {
         self.eventStoreChangedNotification = eventStoreChangedNotification
         self.authorizationStatusProvider = authorizationStatusProvider
         self.eventFetcher = eventFetcher
+        self.eventStoreDebounceInterval = debounceInterval
+        self.scheduleDebounce = schedule
+        self.cancelDebounce = cancel
         self.metricsTracker = metricsTracker ?? CalendarMetricsTracker(
             persistence: UserDefaultsCalendarMetricsDraftPersistence(),
             metrics: FocusMetricsService.shared

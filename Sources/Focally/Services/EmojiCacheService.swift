@@ -62,6 +62,8 @@ final class EmojiCacheService {
     }
 
     func clearCache() {
+        // TASK-062 (c): user-initiated wipe; a failed removal is retried by
+        // ensureCacheDirectory() below and next writes re-create the dir.
         try? fileManager.removeItem(at: cacheDirectory)
         ensureCacheDirectory()
         cachedEmojis = [:]
@@ -69,6 +71,8 @@ final class EmojiCacheService {
     }
 
     private func loadCachedEmojis() {
+        // TASK-062 (c): an unreadable cache dir just means zero cached emojis;
+        // regeneration is the designed recovery.
         guard let files = try? fileManager.contentsOfDirectory(
             at: cacheDirectory,
             includingPropertiesForKeys: nil,
@@ -86,6 +90,8 @@ final class EmojiCacheService {
     }
 
     private func ensureCacheDirectory() {
+        // TASK-062 (c): if creation fails, the next image write fails with a
+        // real error surfaced by its caller; log-spamming here adds nothing.
         try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
     }
 

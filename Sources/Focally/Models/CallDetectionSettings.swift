@@ -83,6 +83,8 @@ final class CallDetectionSettingsStore {
         }
         if let json = defaults.string(forKey: Key.callClientEmojiOverrides),
            let data = json.data(using: .utf8),
+           // TASK-062 (b): decode failure → overrides stay empty (regeneration
+           // via settings UI); only hand-edited defaults can trigger this.
            let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
             settings.callClientEmojiOverrides = decoded
         }
@@ -99,7 +101,7 @@ final class CallDetectionSettingsStore {
         defaults.set(settings.pauseFocusDuringCalls, forKey: Key.pauseFocusDuringCalls)
         if settings.callClientEmojiOverrides.isEmpty {
             defaults.removeObject(forKey: Key.callClientEmojiOverrides)
-        } else if let data = try? JSONEncoder().encode(settings.callClientEmojiOverrides),
+        } else if let data = try? JSONEncoder().encode(settings.callClientEmojiOverrides), // TASK-062 (a): encoding [String: String] cannot fail in practice.
                   let json = String(data: data, encoding: .utf8) {
             defaults.set(json, forKey: Key.callClientEmojiOverrides)
         }

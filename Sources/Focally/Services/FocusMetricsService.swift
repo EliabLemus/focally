@@ -341,11 +341,15 @@ final class FocusMetricsService {
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
+        // TASK-062 (b): corrupt metrics records fall back to an empty history
+        // (regeneration) rather than crashing on launch; per-element decoding
+        // below skips individual bad records.
         guard let elements = try? JSONSerialization.jsonObject(with: data) as? [Any] else {
             records = []
             return
         }
         records = elements.compactMap { element in
+            // TASK-062 (b): skip individual corrupt records, keep the rest.
             guard JSONSerialization.isValidJSONObject(element),
                   let elementData = try? JSONSerialization.data(withJSONObject: element) else { return nil }
             return try? decoder.decode(FocusSessionRecord.self, from: elementData)
@@ -355,6 +359,8 @@ final class FocusMetricsService {
     private func saveRecords() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
+        // TASK-062 (a): encoding Codable structs cannot fail in practice;
+        // UserDefaults.set is the actual (non-throwing) persistence step.
         guard let data = try? encoder.encode(records) else { return }
         defaults.set(data, forKey: Self.recordsKey)
     }
