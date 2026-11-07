@@ -9,18 +9,15 @@ protocol FocusTimerTicker: AnyObject {
 
 @MainActor
 final class FoundationFocusTimerTicker: FocusTimerTicker {
-    private var timer: Timer?
-    var isRunning: Bool { timer != nil }
+    private var anchoredTimer = SecondAnchoredTimer()
+    var isRunning: Bool { anchoredTimer.isRunning }
 
     func start(_ tick: @escaping @MainActor () -> Void) {
         stop()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            Task { @MainActor in tick() }
-        }
+        anchoredTimer.start(tick)
     }
 
     func stop() {
-        timer?.invalidate()
-        timer = nil
+        anchoredTimer.stop()
     }
 }

@@ -88,7 +88,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.calendarService.reconcileAfterWake()
         }
     )
-    private var timerUpdate: Timer?
+    private var timerUpdate = SecondAnchoredTimer()
+    private var statusTitleAssigner = StatusTitleAssigner()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         SoundPlayerService.shared.syncFromSettingsStore(settingsStore)
@@ -399,6 +400,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.action = #selector(togglePopover)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
+        statusTitleAssigner.reset()
         updateStatusBar()
     }
 
@@ -440,14 +442,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 isPaused: timerService.isPaused
             )
             button.image = composite
-            button.title = "  \(timerService.currentActivity)"
+            if let title = statusTitleAssigner.title(for: "  \(timerService.currentActivity)") {
+                button.title = title
+            }
         } else {
             let timerIcon = NSImage(systemSymbolName: "timer", accessibilityDescription: "Focally")
             timerIcon?.isTemplate = true
             // Set appropriate size for status bar (menu bar icons are typically 16-20px)
             let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
             button.image = timerIcon?.withSymbolConfiguration(config)
-            button.title = ""
+            if let title = statusTitleAssigner.title(for: "") {
+                button.title = title
+            }
         }
 
         statusItem?.length = NSStatusItem.variableLength
@@ -536,7 +542,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if timerService.pomodoroState == .idle {
             stopStatusBarUpdates()
             updateStatusBar()
-        } else if timerUpdate == nil {
+        } else if !timerUpdate.isRunning {
             startStatusBarUpdates()
         }
     }
@@ -563,8 +569,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func startStatusBarUpdates() {
-        guard timerUpdate == nil else { return }
-        timerUpdate = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        guard !timerUpdate.isRunning else { return }
+        timerUpdate.start { [weak self] in
             Task { @MainActor [weak self] in
                 self?.updateStatusBar()
             }
@@ -572,8 +578,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func stopStatusBarUpdates() {
-        timerUpdate?.invalidate()
-        timerUpdate = nil
+        timerUpdate.stop()
     }
 
     private func applySavedTheme() {

@@ -513,6 +513,28 @@ final class FocusTimerServiceTests: XCTestCase {
         XCTAssertEqual(soundPlayer.completionSoundCount, 0)
     }
 
+    func testFirstTickAfterWakeWithPastTargetShowsCorrectRemaining() {
+        // Sleep mid-work-phase, wake with the phase target already in the past:
+        // reconcile advances to the break, and the first live tick must display
+        // the clock-derived remaining (not a stale/double-decremented value).
+        sut.startSession(mode: FocusMode(name: "Focus", enablePomodoro: true,
+            pomodoroWorkMinutes: 5, pomodoroBreakMinutes: 1, pomodoroRounds: 2))
+        clock.advance(5 * 60 - 1)
+        sut.prepareForSleep()
+        clock.advance(2) // phase target is now 1s in the past
+
+        sut.reconcileAfterWake()
+
+        XCTAssertEqual(sut.pomodoroState, .shortBreak)
+        XCTAssertEqual(sut.remainingSeconds, 59, "Reconciliation must derive remaining from the wall clock")
+
+        clock.advance(1)
+        ticker.fireLastScheduledCallback()
+
+        XCTAssertEqual(sut.remainingSeconds, 58, "First tick after wake must show the clock-derived value")
+        XCTAssertTrue(sut.hasSession)
+    }
+
     private func reconstructAndRestore() {
         ticker.stop()
         sut = FocusTimerService(settingsStore: SettingsStore(), soundPlayer: soundPlayer,

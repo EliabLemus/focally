@@ -58,21 +58,29 @@ final class DNDReliabilityTests {
     private func makeService(
         core: FakeDNDCore,
         verifier: FakeFocusVerifier,
-        escalator: FakeShortcutEscalator
+        escalator: FakeShortcutEscalator,
+        shortcutsFirstOS: Bool = false
     ) -> DNDReliabilityService {
         DNDReliabilityService(
             core: core,
             verifier: verifier,
             escalator: escalator,
-            verificationDelay: { await Task.yield() }
+            verificationDelay: { await Task.yield() },
+            isShortcutsFirstOS: { shortcutsFirstOS }
         )
     }
 
     private func makeService(
         verifier: FakeFocusVerifier,
-        escalator: FakeShortcutEscalator
+        escalator: FakeShortcutEscalator,
+        shortcutsFirstOS: Bool = false
     ) -> DNDReliabilityService {
-        makeService(core: FakeDNDCore(), verifier: verifier, escalator: escalator)
+        makeService(
+            core: FakeDNDCore(),
+            verifier: verifier,
+            escalator: escalator,
+            shortcutsFirstOS: shortcutsFirstOS
+        )
     }
 
     // MARK: Test 15a — verification confirmed → no escalation
@@ -202,7 +210,8 @@ final class DNDReliabilityTests {
                 continuation = gate.continuation
                 _ = await gate.stream.first
                 await Task.yield()
-            }
+            },
+            isShortcutsFirstOS: { false } // legacy tier under test
         )
 
         service.activationRequested()
@@ -214,5 +223,122 @@ final class DNDReliabilityTests {
 
         _ = await waitUntil { false } // drain a few ticks
         #expect(service.lastEvent == DNDReliabilityService.ObservabilityEvent.activationRequested) // never verified/escalated
+    }
+
+    // MARK: TASK-060 — shortcut-first tier (macOS 14+)
+
+    @Test func modernTierActivationUsesShortcutAsFirstLayerNeverWritesCore() async {
+        let core = FakeDNDCore()
+        let verifier = FakeFocusVerifier()
+        let escalator = FakeShortcutEscalator()
+        let service = makeService(
+            core: core, verifier: verifier, escalator: escalator, shortcutsFirstOS: true
+        )
+
+        verifier.isFocusActive = true
+        service.activationRequested()
+
+        let settled = await waitUntil { service.lastEvent == .verificationConfirmed(targetActive: true) }
+        #expect(settled)
+        #expect(escalator.invocations == [DNDReliabilityService.defaultFocusModeName]) // shortcut IS Layer 1
+        #expect(core.activations == 0) // CFPreferences never written on macOS 14+
+        #expect(service.eventHistory.contains { if case .shortcutSucceeded = $0 { return true }; return false })
+    }
+
+    @Test func modernTierShortcutFailureNeverDegradesToCFPreferences() async {
+        let core = FakeDNDCore()
+        let escalator = FakeShortcutEscalator()
+        escalator.shouldFail = true
+        let verifier = FakeFocusVerifier()
+        let service = makeService(
+            core: core, verifier: verifier, escalator: escalator, shortcutsFirstOS: true
+        )
+
+        service.activationRequested()
+
+        let failed = await waitUntil {
+            if case .escalationFailed = service.lastEvent { return true }
+            return false
+        }
+        #expect(failed)
+        #expect(escalator.invocations.count == 1) // no retry loop
+        #expect(core.activations == 0) // silent degrade to CFPreferences forbidden
+        #expect(verifier.readCount == 0) // no verification after shortcut failure
+    }
+
+    @Test func modernTierVerificationIsIndependentOfWrittenPreference() async {
+        // Shortcut succeeded but Layer 2 (Control Center) still reports false:
+        // the mismatch must surface through verification, never be masked by
+        // the value a layer wrote.
+        let core = FakeDNDCore()
+        let verifier = FakeFocusVerifier() // stays false
+        let escalator = FakeShortcutEscalator()
+        let service = makeService(
+            core: core, verifier: verifier, escalator: escalator, shortcutsFirstOS: true
+        )
+
+        service.activationRequested()
+        let verified = await waitUntil { verifier.readCount >= 1 }
+        #expect(verified)
+        #expect(escalator.invocations.count == 1) // at-most-once, no second shortcut run
+        #expect(core.activations == 0)
+        #expect(service.lastEvent == .verificationConfirmed(targetActive: true) || service.lastEvent == .shortcutSucceeded(targetActive: true))
+        // Mismatch observed: no confirmation event recorded.
+        #expect(!service.eventHistory.contains { if case .verificationConfirmed = $0 { return true }; return false })
+    }
+
+    @Test func modernTierDeactivationUsesShortcutFirst() async {
+        let core = FakeDNDCore()
+        let verifier = FakeFocusVerifier()
+        let escalator = FakeShortcutEscalator()
+        let service = makeService(
+            core: core, verifier: verifier, escalator: escalator, shortcutsFirstOS: true
+        )
+
+        verifier.isFocusActive = false
+        service.deactivationRequested()
+
+        let settled = await waitUntil { service.lastEvent == .verificationConfirmed(targetActive: false) }
+        #expect(settled)
+        #expect(escalator.invocations.count == 1)
+        #expect(core.deactivations == 0)
+    }
+
+    // MARK: TASK-060 — legacy tier (macOS ≤ 13) keeps CFPreferences primary
+
+    @Test func legacyTierKeepsCFPreferencesPrimaryWithShortcutEscalation() async {
+        let core = FakeDNDCore()
+        let verifier = FakeFocusVerifier()
+        let escalator = FakeShortcutEscalator()
+        let service = makeService(
+            core: core, verifier: verifier, escalator: escalator, shortcutsFirstOS: false
+        )
+
+        core.activateDND() // legacy caller performs the core write first
+        verifier.isFocusActive = false // pref write didn't take
+        service.activationRequested()
+
+        let escalated = await waitUntil { !escalator.invocations.isEmpty }
+        #expect(escalated)
+        #expect(escalator.invocations.count == 1) // shortcut remains the escalation layer
+        #expect(core.activations == 1) // legacy core written exactly once
+        #expect(service.lastEvent == .escalationInvoked(targetActive: true))
+    }
+
+    @Test func legacyTierConfirmedVerificationSkipsShortcut() async {
+        let core = FakeDNDCore()
+        let verifier = FakeFocusVerifier()
+        let escalator = FakeShortcutEscalator()
+        let service = makeService(
+            core: core, verifier: verifier, escalator: escalator, shortcutsFirstOS: false
+        )
+
+        core.activateDND()
+        verifier.isFocusActive = true
+        service.activationRequested()
+
+        let settled = await waitUntil { service.lastEvent == .verificationConfirmed(targetActive: true) }
+        #expect(settled)
+        #expect(escalator.invocations.isEmpty)
     }
 }
