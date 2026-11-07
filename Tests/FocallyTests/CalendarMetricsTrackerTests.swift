@@ -5,23 +5,43 @@ import XCTest
 final class CalendarMetricsTrackerTests: XCTestCase {
     private let occurrence = Date(timeIntervalSince1970: 2_000_000_000)
 
+    /// Poll instead of Task.yield: the monitor's handler runs as a MainActor
+    /// task after main-queue notification delivery, which Task.yield does not
+    /// reliably interleave with.
+    private func waitUntil(
+        _ condition: @MainActor () -> Bool,
+        timeout: TimeInterval = 2.0
+    ) async -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return true }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        return condition()
+    }
+
     func testCalendarChangeMonitorRegistersOnceAndStopsCleanly() async {
         let center = NotificationCenter()
         let name = Notification.Name("CalendarMetricsTrackerTests.eventStoreChanged")
         var callbackCount = 0
-        let monitor = CalendarChangeMonitor(notificationCenter: center, notificationName: name) {
+        // Short real-time window: exercises the actual asyncAfter debounce path.
+        let monitor = CalendarChangeMonitor(
+            notificationCenter: center,
+            notificationName: name,
+            debounceInterval: 0.05
+        ) {
             callbackCount += 1
         }
 
         monitor.start()
         monitor.start()
         center.post(name: name, object: nil)
-        await Task.yield()
-        XCTAssertEqual(callbackCount, 1)
+        let monitor1 = await waitUntil { callbackCount == 1 }
+        XCTAssertTrue(monitor1)
 
         monitor.stop()
         center.post(name: name, object: nil)
-        await Task.yield()
+        try? await Task.sleep(nanoseconds: 150_000_000)
         XCTAssertEqual(callbackCount, 1)
     }
 
@@ -45,6 +65,7 @@ final class CalendarMetricsTrackerTests: XCTestCase {
             defaults: defaults,
             notificationCenter: center,
             eventStoreChangedNotification: name,
+            debounceInterval: 0.05,
             authorizationStatusProvider: { .fullAccess },
             eventFetcher: {
                 fetchCount += 1
@@ -57,12 +78,12 @@ final class CalendarMetricsTrackerTests: XCTestCase {
         XCTAssertEqual(fetchCount, 1)
 
         center.post(name: name, object: nil)
-        await Task.yield()
-        XCTAssertEqual(fetchCount, 2)
+        let refetched = await waitUntil { fetchCount == 2 }
+        XCTAssertTrue(refetched)
 
         service.stopMonitoring()
         center.post(name: name, object: nil)
-        await Task.yield()
+        try? await Task.sleep(nanoseconds: 150_000_000)
         XCTAssertEqual(fetchCount, 2)
     }
 
