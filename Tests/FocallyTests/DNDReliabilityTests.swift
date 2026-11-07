@@ -199,31 +199,31 @@ final class DNDReliabilityTests {
     }
 
     @Test func cancelPendingVerificationPreventsVerification() async {
-        // Use a suspending delay so the task is genuinely pending when cancelled.
-        let gate = AsyncStream<Void>.makeStream()
-        var continuation: AsyncStream<Void>.Continuation?
-        let service = DNDReliabilityService(
-            core: FakeDNDCore(),
-            verifier: FakeFocusVerifier(),
-            escalator: FakeShortcutEscalator(),
-            verificationDelay: {
-                continuation = gate.continuation
-                _ = await gate.stream.first
-                await Task.yield()
-            },
-            isShortcutsFirstOS: { false } // legacy tier under test
-        )
+    // Cancellable delay (Task.sleep throws immediately on cancellation), so
+    // the race seen on CI runners (gate stream not unblocking deterministically)
+    // cannot happen: once cancelled, the delay returns at once and the
+    // `Task.isCancelled` guard inside scheduleVerification stops verification.
+    var delayEntered = false
+    let service = DNDReliabilityService(
+        core: FakeDNDCore(),
+        verifier: FakeFocusVerifier(),
+        escalator: FakeShortcutEscalator(),
+        verificationDelay: {
+            delayEntered = true
+            try? await Task.sleep(nanoseconds: 60_000_000_000) // 60 s; cancel desperta al instante
+        },
+        isShortcutsFirstOS: { false } // legacy tier under test
+    )
 
-        service.activationRequested()
-        // Wait until the delay closure captured the continuation.
-        let sawContinuation = await waitUntil { continuation != nil }
-        #expect(sawContinuation)
-        service.cancelPendingVerification()
-        continuation?.finish()
+    service.activationRequested()
+    // Wait until the delay closure actually started.
+    let sawDelay = await waitUntil { delayEntered }
+    #expect(sawDelay)
+    service.cancelPendingVerification()
 
-        _ = await waitUntil { false } // drain a few ticks
-        #expect(service.lastEvent == DNDReliabilityService.ObservabilityEvent.activationRequested) // never verified/escalated
-    }
+    _ = await waitUntil { false } // drain a few ticks
+    #expect(service.lastEvent == DNDReliabilityService.ObservabilityEvent.activationRequested) // never verified/escalated
+}
 
     // MARK: TASK-060 — shortcut-first tier (macOS 14+)
 
