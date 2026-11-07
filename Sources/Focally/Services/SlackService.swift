@@ -751,7 +751,7 @@ class SlackService {
 
     private func firstSlackEmojiCode(in text: String) -> String? {
         let pattern: String = #":[a-z0-9_+\-]+:"#
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { // TASK-062 (c): static valid pattern; failure is impossible by construction.
             return nil
         }
 
@@ -810,6 +810,8 @@ class SlackService {
     }
 
     private func encodedJSONString(for object: [String: String]) -> String {
+        // TASK-062 (a): encoding [String: String] cannot fail in practice; the
+        // "{}" fallback keeps the API payload valid.
         guard let jsonData = try? JSONEncoder().encode(object),
               let jsonString = String(data: jsonData, encoding: .utf8) else {
             return "{}"
@@ -3357,6 +3359,7 @@ public final class EmojiUsageTracker {
     }
 
     private func loadRecentEmojis() {
+        // TASK-062 (b): corrupt recent-emoji list → empty (regeneration via use).
         if let data = defaults.data(forKey: Self.usageKey),
            let decoded = try? JSONDecoder().decode([String].self, from: data) {
             recentEmojis = decoded
@@ -3364,6 +3367,7 @@ public final class EmojiUsageTracker {
     }
 
     private func saveRecentEmojis() {
+        // TASK-062 (a): encoding [String] cannot fail in practice.
         if let encoded = try? JSONEncoder().encode(recentEmojis) {
             defaults.set(encoded, forKey: Self.usageKey)
         }

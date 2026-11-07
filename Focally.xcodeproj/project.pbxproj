@@ -107,6 +107,7 @@
 		AAB08AFF8D55115118E12B39 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DF9DEEC76304DC26DB445F /* SidebarView.swift */; };
 		ADAA439E664426F93640E1CC /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333B9C2677E37101A21C54C8 /* GeneralSettingsView.swift */; };
 		ADF6E6ACAE531242A66946CB /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = B7294FD9B10CC42662103B9B /* AppIcon.icns */; };
+		AF7E9E64A362E99F4A3E731A /* CalendarChangeDebounceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6537FE48383B60AE2C68DF98 /* CalendarChangeDebounceTests.swift */; };
 		B089356893019F08B27B5734 /* SimpleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C18F5B206E8657516539F2E /* SimpleTests.swift */; };
 		B1E9F024B14AEA542E11AEE3 /* FocusMetricsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F711C098187E7310E8039B /* FocusMetricsServiceTests.swift */; };
 		B451FACCAC9DBC96264B7812 /* Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92387AD9F889C1D3B3C1E65 /* Metrics.swift */; };
@@ -231,6 +232,7 @@
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
 		63C42647B8773EC22F9893DA /* MediaDeviceCallDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDeviceCallDetector.swift; sourceTree = "<group>"; };
+		6537FE48383B60AE2C68DF98 /* CalendarChangeDebounceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarChangeDebounceTests.swift; sourceTree = "<group>"; };
 		65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionDraft.swift; sourceTree = "<group>"; };
 		67D595C270A8FFD564B6ADF4 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
 		69BA6A62FBD191361AA67F13 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
@@ -426,6 +428,7 @@
 		4D234CE276AA16E933B7536D /* FocallyTests */ = {
 			isa = PBXGroup;
 			children = (
+				6537FE48383B60AE2C68DF98 /* CalendarChangeDebounceTests.swift */,
 				3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */,
 				EE81A1130E07A81DA2ECB59C /* CalendarSyncDefaultTests.swift */,
 				E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */,
@@ -885,6 +888,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF7E9E64A362E99F4A3E731A /* CalendarChangeDebounceTests.swift in Sources */,
 				57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */,
 				8CD18238F903C570D48FDD99 /* CalendarSyncDefaultTests.swift in Sources */,
 				5B17AB1DE2ECBE9BE629812B /* CallClientOverrideTests.swift in Sources */,

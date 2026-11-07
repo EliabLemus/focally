@@ -51,10 +51,12 @@ final class FocusTypesService {
 
     private func loadCustomTypes() {
         guard let data = UserDefaults.standard.data(forKey: Self.customTypesKey) else { return }
-        customTypes = (try? JSONDecoder().decode([FocusType].self, from: data)) ?? []
+        customTypes = (try? JSONDecoder().decode([FocusType].self, from: data)) ?? [] // TASK-062 (b): falls back to empty list (regeneration); decode errors here only come from hand-edited defaults.
     }
 
     private func saveCustomTypes() {
+        // TASK-062 (a): encoding a plain array of Codable structs cannot fail
+        // in practice; log+recover would leave the UI in an undefined state.
         guard let data = try? JSONEncoder().encode(customTypes) else { return }
         UserDefaults.standard.set(data, forKey: Self.customTypesKey)
     }

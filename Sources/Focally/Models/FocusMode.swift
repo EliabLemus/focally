@@ -125,7 +125,7 @@ struct FocusMode: Identifiable, Codable, Equatable {
         // Backward compat: infer type from ID if missing
         if let descriptor = try c.decodeIfPresent(FocusTypeDescriptor.self, forKey: .typeDescriptor) {
             typeDescriptor = descriptor
-        } else if let decodedType = try? c.decode(FocusModeType.self, forKey: .type) {
+        } else if let decodedType = try? c.decode(FocusModeType.self, forKey: .type) { // TASK-062 (c): backward-compat decode; falls through to inferred type below.
             typeDescriptor = .builtIn(decodedType)
         } else {
             typeDescriptor = .builtIn(Self.inferredType(from: id))
@@ -329,6 +329,8 @@ final class FocusModeStore {
     }
 
     private func saveModes() {
+        // TASK-062 (a): encoding Codable structs cannot fail in practice; the
+        // disk write below is the fallible step (best-effort by design).
         guard let data = try? JSONEncoder().encode(modes) else { return }
         defaults.set(data, forKey: FocusMode.defaultsKey)
         Self.saveToDisk(data)
@@ -336,6 +338,8 @@ final class FocusModeStore {
 
     private static func loadModes(from defaults: UserDefaults) -> [FocusMode] {
         // Priority: disk > UserDefaults > builtIn
+        // TASK-062 (b): each tier falls back to the next (regeneration chain
+        // ending in builtInModes), so corrupt data degrades gracefully.
         if let diskData = loadFromDisk(),
            let decoded = try? JSONDecoder().decode([FocusMode].self, from: diskData) {
             let modes = mergeWithBuiltIns(decoded)
@@ -362,6 +366,8 @@ final class FocusModeStore {
     // MARK: - Disk persistence
 
     private static func saveToDisk(_ data: Data) {
+        // TASK-062 (c): disk persistence of modes is best-effort; in-memory
+        // modes (and UserDefaults tier) remain the source of truth if I/O fails.
         let fm = FileManager.default
         let dir = diskURL.deletingLastPathComponent()
         try? fm.createDirectory(at: dir, withIntermediateDirectories: true)

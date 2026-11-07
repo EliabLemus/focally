@@ -36,6 +36,8 @@ final class UserDefaultsCalendarMetricsDraftPersistence: CalendarMetricsDraftPer
         guard let data = store.data(forKey: Self.key) else { return nil }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
+        // TASK-062 (b): corrupt/invalid draft → clear() (regeneration) on next
+        // save; keep the nil contract of the persistence protocol.
         guard let draft = try? decoder.decode(PersistedCalendarMetricsDraft.self, from: data),
               draft.isValid(at: now()) else {
             clear()
@@ -47,6 +49,7 @@ final class UserDefaultsCalendarMetricsDraftPersistence: CalendarMetricsDraftPer
     func save(_ draft: PersistedCalendarMetricsDraft) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
+        // TASK-062 (a): encoding a Codable struct cannot fail in practice.
         guard let data = try? encoder.encode(draft) else { return }
         store.set(data, forKey: Self.key)
     }

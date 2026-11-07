@@ -53,6 +53,25 @@ final class SessionPersistenceServiceTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: fileURL.path))
     }
 
+    /// TASK-062: a corrupt snapshot is quarantined (renamed, not deleted) and
+    /// the next save() regenerates a working file.
+    func testCorruptJSONIsQuarantinedAndSessionRegenerates() throws {
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data("{corrupt".utf8).write(to: fileURL)
+
+        XCTAssertNil(sut.load())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: fileURL.path))
+
+        let quarantined = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+            .filter { $0.lastPathComponent.hasPrefix("active_session.corrupt-") }
+        XCTAssertEqual(quarantined.count, 1, "corrupt snapshot should be quarantined with .corrupt-<timestamp> name")
+
+        // Regeneration: a fresh save/load cycle works on a new file.
+        let snapshot = makeSnapshot()
+        sut.save(snapshot)
+        XCTAssertEqual(sut.load(), snapshot)
+    }
+
     func testUnknownSchemaIsRejectedAndCleared() {
         var snapshot = makeSnapshot(); snapshot.schemaVersion = 2
         writeUnvalidated(snapshot)
