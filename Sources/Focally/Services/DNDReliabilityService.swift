@@ -1,8 +1,10 @@
 import Foundation
 import os.log
 
-/// Layer 1 adapter: `DNDService`'s legacy CFPreferences write path, expressed as
-/// the reliability layer's core seam.
+/// Layer 1 adapter (macOS ≤ 13): `DNDService`'s legacy CFPreferences write path,
+/// expressed as the reliability layer's core seam. On macOS 14+ the core write
+/// is NOT the first layer — the signed shortcut is — so the core is only invoked
+/// by callers for the legacy tier.
 extension DNDService: DNDCoreWriting {}
 
 /// Layer 2 — verification: reads the Control Center boolean
@@ -35,6 +37,8 @@ protocol DNDCoreWriting: AnyObject {
 final class DNDReliabilityService {
     enum ObservabilityEvent: Equatable {
         case activationRequested
+        /// TASK-060: Layer 1 (signed shortcut) completed successfully on macOS 14+.
+        case shortcutSucceeded(targetActive: Bool)
         case verificationConfirmed(targetActive: Bool)
         case escalationInvoked(targetActive: Bool)
         case escalationFailed(targetActive: Bool, detail: String)
@@ -43,6 +47,16 @@ final class DNDReliabilityService {
 
     nonisolated static let defaultFocusModeName = "Do Not Disturb"
     static let verificationDelaySeconds: UInt64 = 1_000_000_000
+    /// TASK-060: shortcut-first applies from macOS 14.0 on; CFPreferences is
+    /// the primary (and only first) layer on macOS 13 or earlier.
+    nonisolated static let shortcutFirstMinimumOSVersion = OperatingSystemVersion(
+        majorVersion: 14, minorVersion: 0, patchVersion: 0
+    )
+    nonisolated static func isOperatingSystemAtLeastShortcutsFirst(
+        _ info: ProcessInfo = .processInfo
+    ) -> Bool {
+        info.isOperatingSystemAtLeast(shortcutFirstMinimumOSVersion)
+    }
 
     private let logger = Logger.dnd
     private let core: DNDCoreWriting
@@ -50,6 +64,8 @@ final class DNDReliabilityService {
     private let escalator: FocusShortcutEscalating
     private let focusModeName: String
     private let verificationDelay: () async -> Void
+    /// TASK-060: injected so tests can exercise both OS tiers.
+    private let isShortcutsFirstOS: () -> Bool
     private(set) var lastEvent: ObservabilityEvent?
     private(set) var eventHistory: [ObservabilityEvent] = []
     /// Idempotency: at most one escalation per transition.
@@ -63,6 +79,9 @@ final class DNDReliabilityService {
         focusModeName: String = DNDReliabilityService.defaultFocusModeName,
         verificationDelay: @escaping () async -> Void = {
             try? await Task.sleep(nanoseconds: DNDReliabilityService.verificationDelaySeconds)
+        },
+        isShortcutsFirstOS: @escaping () -> Bool = {
+            DNDReliabilityService.isOperatingSystemAtLeastShortcutsFirst()
         }
     ) {
         self.core = core
@@ -70,20 +89,32 @@ final class DNDReliabilityService {
         self.escalator = escalator
         self.focusModeName = focusModeName
         self.verificationDelay = verificationDelay
+        self.isShortcutsFirstOS = isShortcutsFirstOS
     }
 
-    /// Called after the legacy write path performed an activation.
+    /// Called to request an activation. TASK-060: on macOS 14+ the signed
+    /// shortcut IS the first layer (the CFPreferences core is never written);
+    /// on macOS ≤ 13 the caller has already performed the legacy core write
+    /// and this goes straight to verification (escalating to the shortcut).
     func activationRequested() {
         record(.activationRequested)
         didEscalateCurrentTransition = false
-        scheduleVerification(targetActive: true)
+        if isShortcutsFirstOS() {
+            scheduleShortcutFirst(targetActive: true)
+        } else {
+            scheduleVerification(targetActive: true)
+        }
     }
 
-    /// Called after the legacy write path performed a deactivation.
+    /// Called to request a deactivation — same tiering as activation.
     func deactivationRequested() {
         record(.deactivationRequested)
         didEscalateCurrentTransition = false
-        scheduleVerification(targetActive: false)
+        if isShortcutsFirstOS() {
+            scheduleShortcutFirst(targetActive: false)
+        } else {
+            scheduleVerification(targetActive: false)
+        }
     }
 
     /// Stops in-flight verification without firing (cleanup-on-terminate runs
@@ -103,6 +134,38 @@ final class DNDReliabilityService {
         }
     }
 
+    /// TASK-060: macOS 14+ Layer 1 — the signed shortcut runs FIRST. The
+    /// CFPreferences core is never invoked here; on failure we surface the
+    /// event without silently degrading to the legacy write path.
+    private func scheduleShortcutFirst(targetActive: Bool) {
+        pendingVerificationTask?.cancel()
+        pendingVerificationTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            guard !Task.isCancelled else { return }
+            self.didEscalateCurrentTransition = true
+            do {
+                // Timeout policy: `shortcuts run` is bounded by the shortcuts
+                // service timeout (5 s); a failure here is never retried and
+                // never falls back to CFPreferences on macOS 14+.
+                try await self.escalator.runFocusByName(self.focusModeName)
+                guard !Task.isCancelled else { return }
+                self.record(.shortcutSucceeded(targetActive: targetActive))
+                await self.verificationDelay()
+                guard !Task.isCancelled else { return }
+                // Layer 2 verification reads the Control Center boolean —
+                // never the value any layer wrote.
+                await self.verify(targetActive: targetActive)
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.record(.escalationFailed(targetActive: targetActive, detail: error.localizedDescription))
+            }
+        }
+    }
+
+    /// Layer 2 verification: reads ONLY the external truth source (`verifier`,
+    /// the Control Center boolean in production). It never reads the legacy
+    /// CFPreferences key that the core layer writes, so a legacy write can
+    /// never self-validate.
     private func verify(targetActive: Bool) async {
         let focusActive = verifier.isAnyFocusActive()
         if focusActive == targetActive {

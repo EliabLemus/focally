@@ -10,6 +10,12 @@ final class DNDService {
 
     private let logger = Logger.dnd
 
+    /// TASK-060: on macOS 14+ the signed "Set Focus by Name" shortcut is the
+    /// primary activation layer; the CFPreferences write below is a legacy-tier
+    /// fallback (macOS ≤ 13) whose result never counts as verification.
+    nonisolated static let prefersShortcutsFirst =
+        DNDReliabilityService.isOperatingSystemAtLeastShortcutsFirst()
+
     /// TASK-057 Layer 2/3: when set, every activation/deactivation write is
     /// followed by a verify → escalate-at-most-once pass.
     var reliabilityService: DNDReliabilityService?
@@ -17,12 +23,27 @@ final class DNDService {
     var isDNDActive: Bool = false
     var lastError: String?
     init() {
-        isDNDActive = Self.checkDNDStatus()
+        isDNDActive = Self.prefersShortcutsFirst ? false : Self.checkDNDStatus()
     }
 
     func activateDND() {
         guard !isDNDActive else { return }
-        logger.info("Activating Do Not Disturb via CFPreferences")
+        // TASK-060: macOS 14+ — shortcut-first. The CFPreferences write path is
+        // NOT executed and its result never counts as success or verification.
+        if Self.prefersShortcutsFirst, reliabilityService != nil {
+            logger.info("Activating Focus via signed shortcut (macOS 14+)")
+            lastError = nil
+            isDNDActive = true
+            notifyReliabilityActivation()
+            return
+        } else if Self.prefersShortcutsFirst {
+            // Not expected: shortcut tier without a wired reliability service.
+            // Keep the legacy write as a last resort but never surface it as
+            // shortcut-verified success.
+            logger.warning("macOS 14+ without reliability service — falling back to legacy CFPreferences write")
+        } else {
+            logger.info("Activating Do Not Disturb via CFPreferences")
+        }
         lastError = nil
 
         // Attempt to set preferences
@@ -65,7 +86,17 @@ final class DNDService {
 
     func deactivateDND() {
         guard isDNDActive else { return }
-        logger.info("Deactivating Do Not Disturb via CFPreferences")
+        // TASK-060: macOS 14+ — shortcut-first (same tiering as activation).
+        if Self.prefersShortcutsFirst, reliabilityService != nil {
+            logger.info("Deactivating Focus via signed shortcut (macOS 14+)")
+            lastError = nil
+            isDNDActive = false
+            notifyReliabilityDeactivation()
+            return
+        }
+        if !Self.prefersShortcutsFirst {
+            logger.info("Deactivating Do Not Disturb via CFPreferences")
+        }
         lastError = nil
 
         Self.setPreference("doNotDisturb", value: false as CFPropertyList)
@@ -107,6 +138,9 @@ final class DNDService {
 
     @discardableResult
     func refreshDNDStatus() -> Bool {
+        // TASK-060: the legacy CFPreferences key is ignored on macOS 14+ —
+        // state there is owned by the shortcut-first flow.
+        guard !Self.prefersShortcutsFirst else { return isDNDActive }
         let active = Self.checkDNDStatus()
         isDNDActive = active
         return active
