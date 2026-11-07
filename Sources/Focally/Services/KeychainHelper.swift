@@ -1,25 +1,75 @@
 import Foundation
 import Security
 
+// MARK: - Save strategy (decisión pura, testeable sin SecItem)
+
+/// Acción de seguimiento tras el resultado de un `SecItemUpdate`.
+enum KeychainSaveStrategy: Equatable {
+    /// `SecItemUpdate` tuvo éxito; nada más que hacer.
+    case updateExisting
+    /// El ítem no existe (`errSecItemNotFound`); hacer `SecItemAdd`.
+    case addNew
+    /// Fallo real del keychain; reportar el `OSStatus`.
+    case reportFailure(OSStatus)
+}
+
 struct KeychainHelper {
-    static func save(key: String, value: String) {
-        guard let data = value.data(using: .utf8) else { return }
+    private static let logger = Logger.slack
 
-        // Delete existing first
-        delete(key: key)
+    /// Patrón recomendado por Apple: find/update primero, add solo si no existe
+    /// (evita el delete+add que pierde ACLs y metadatos).
+    /// - Returns: `errSecSuccess` si el valor quedó persistido, u otro `OSStatus` en fallo.
+    @discardableResult
+    static func save(key: String, value: String) -> OSStatus {
+        guard let data = value.data(using: .utf8) else {
+            logger.error("Keychain save failed: cannot UTF-8 encode value for key")
+            return OSStatus(paramErr)
+        }
 
-        let query: [String: Any] = [
+        let baseQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
+            kSecAttrAccount as String: key
+        ]
+        let attributesToUpdate: [String: Any] = [
             kSecValueData as String: data,
             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         ]
 
-        let status = SecItemAdd(query as CFDictionary, nil)
+        let updateStatus = SecItemUpdate(baseQuery as CFDictionary, attributesToUpdate as CFDictionary)
+        let strategy = saveStrategy(updateStatus: updateStatus)
+
+        let status: OSStatus
+        switch strategy {
+        case .updateExisting:
+            status = errSecSuccess
+            logger.info("Keychain item updated for existing key")
+        case .addNew:
+            var addQuery = baseQuery
+            addQuery[kSecValueData as String] = data
+            addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            status = SecItemAdd(addQuery as CFDictionary, nil)
+            if status == errSecSuccess {
+                logger.info("Keychain item added for new key")
+            }
+        case .reportFailure(let failureStatus):
+            status = failureStatus
+        }
+
         if status != errSecSuccess {
-            // TODO: Migrar a Logger (structured logging) cuando KeychainHelper tenga acceso
-            // logger.error("Failed to save to keychain: \(status)")
-            print("[Focally] Keychain save error: \(status)")
+            logger.error("Keychain save error: \(status)")
+        }
+        return status
+    }
+
+    /// Decisión pura update/add/fail a partir del `OSStatus` de `SecItemUpdate`.
+    static func saveStrategy(updateStatus: OSStatus) -> KeychainSaveStrategy {
+        switch updateStatus {
+        case errSecSuccess:
+            return .updateExisting
+        case errSecItemNotFound:
+            return .addNew
+        default:
+            return .reportFailure(updateStatus)
         }
     }
 
