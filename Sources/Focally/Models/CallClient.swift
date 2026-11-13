@@ -32,12 +32,38 @@ enum CallClientCatalog {
     /// Client used when a non-Apple process captures but matches no known prefix.
     static let unknownClient = CallClient(bundlePrefix: "unknown", displayName: "Unknown Client", emoji: ":phone:")
 
-    /// Apple-owned processes (dictation / CoreSpeech open the mic) never count as calls.
-    static let excludedPrefix = "com.apple."
+    /// System processes that capture input without a call (dictation, TTS,
+    /// accessibility, control center, audio mixing). Explicit list — NEVER a
+    /// `com.apple.` prefix rule: FaceTime and Safari are legitimate call apps.
+    static let systemCaptureHelpers: Set<String> = [
+        "com.apple.corespeech",
+        "com.apple.assistantd",
+        "com.apple.universalaccessd",
+        "com.apple.controlcenter",
+        "com.apple.audiomxd"
+    ]
+
+    /// Trusted native conferencing bundle prefixes: input capture alone (or
+    /// output-only, "muted but listening") counts as a full call without
+    /// calendar corroboration. Browsers are deliberately absent.
+    static let trustedNativePrefixes: [String] = [
+        "com.zoom",
+        "us.zoom",
+        "com.microsoft.teams",
+        "com.tinyspeck.slackmacgap"
+    ]
+
+    static func isSystemCaptureHelper(_ bundleIdentifier: String) -> Bool {
+        systemCaptureHelpers.contains(bundleIdentifier.lowercased())
+    }
+
+    static func isTrustedNative(_ bundleIdentifier: String) -> Bool {
+        let lowered = bundleIdentifier.lowercased()
+        return trustedNativePrefixes.contains { lowered.hasPrefix($0) }
+    }
 
     static func client(for bundleIdentifier: String) -> CallClient {
         let lowered = bundleIdentifier.lowercased()
-        guard !lowered.hasPrefix(excludedPrefix) else { return unknownClient }
         let match = defaultClients
             .filter { lowered.hasPrefix($0.bundlePrefix.lowercased()) }
             .max(by: { $0.bundlePrefix.count < $1.bundlePrefix.count })
@@ -82,8 +108,9 @@ final class CallProcessAttributor {
         self.ownBundleIdentifier = ownBundleIdentifier
     }
 
-    /// Filters out Focally's own bundle and Apple-owned processes, then maps the
-    /// remaining capturing bundle ids to call clients (deduped).
+    /// Filters out Focally's own bundle and system capture helpers (explicit
+    /// list, not an Apple-prefix rule), then maps the remaining capturing
+    /// bundle ids to call clients (deduped).
     func attributedClients(
         fromBundleIdentifiers bundleIDs: [String],
         emojiOverrides: [String: String] = [:],
@@ -95,7 +122,7 @@ final class CallProcessAttributor {
             let lowered = bundleID.lowercased()
             guard !lowered.isEmpty else { continue }
             guard lowered != ownBundleIdentifier.lowercased() else { continue }
-            guard !lowered.hasPrefix(CallClientCatalog.excludedPrefix) else { continue }
+            guard !CallClientCatalog.isSystemCaptureHelper(lowered) else { continue }
             let client = CallClientCatalog.client(
                 for: lowered,
                 emojiOverrides: emojiOverrides,

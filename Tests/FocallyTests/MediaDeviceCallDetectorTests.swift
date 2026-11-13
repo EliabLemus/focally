@@ -82,7 +82,9 @@ final class MediaDeviceCallDetectorTests {
     private func makeDetector(
         devices: [MediaDeviceID],
         bundleIDs: [String],
-        scheduler: ManualScheduler
+        scheduler: ManualScheduler,
+        outputBundles: [String] = [],
+        cameraRunning: Bool = false
     ) -> (MediaDeviceCallDetector, FakeMediaDeviceListener, FakeCallProcessAttributor) {
         let listener = FakeMediaDeviceListener(devices: devices)
         let attributor = FakeCallProcessAttributor()
@@ -90,6 +92,8 @@ final class MediaDeviceCallDetectorTests {
         let detector = MediaDeviceCallDetector(
             deviceListener: listener,
             attributor: attributor,
+            outputBundleProbe: { outputBundles },
+            cameraProbe: { cameraRunning },
             now: { Date() },
             schedule: { scheduler.schedule($0, $1) },
             cancel: { scheduler.cancel($0) }
@@ -159,14 +163,37 @@ final class MediaDeviceCallDetectorTests {
         #expect(clients == [chrome])
     }
 
-    @Test func appleProcessesAreExcludedFromAttribution() {
+    @Test func systemHelperListIsExcludedFromAttribution() {
         let filter = CallProcessAttributor(ownBundleIdentifier: "com.focally.app")
         let clients = filter.attributedClients(fromBundleIdentifiers: [
             "com.apple.corespeech",
-            "com.apple.dictation",
+            "com.apple.assistantd",
+            "com.apple.universalaccessd",
+            "com.apple.controlcenter",
+            "com.apple.audiomxd",
             chromeBundle
         ])
         #expect(clients == [chrome])
+    }
+
+    // MARK: 2.2 / 2.7 — no Apple-prefix rule; FaceTime/Safari corroborate
+
+    @Test func faceTimeAndSafariCountAsCorroboration() {
+        let filter = CallProcessAttributor(ownBundleIdentifier: "com.focally.app")
+        // FaceTime and Safari are legitimate call apps — NOT dropped by prefix.
+        #expect(filter.attributedClients(fromBundleIdentifiers: ["com.apple.FaceTime"]).count == 1)
+        #expect(filter.attributedClients(fromBundleIdentifiers: ["com.apple.Safari"]).count == 1)
+        #expect(CallClientCatalog.isSystemCaptureHelper("com.apple.FaceTime") == false)
+        #expect(CallClientCatalog.isSystemCaptureHelper("com.apple.Safari") == false)
+    }
+
+    @Test func dictationHelperProducesNoCorroborationInSnapshot() {
+        let scheduler = ManualScheduler()
+        let (detector, _, attributor) = makeDetector(devices: [audio], bundleIDs: [], scheduler: scheduler)
+        attributor.bundleIDs = ["com.apple.corespeech"]
+        let snapshot = detector.currentSnapshot()
+        #expect(snapshot.anyInput == false)
+        #expect(snapshot.clients.isEmpty)
     }
 
     @Test func longestMatchingPrefixWinsForHelperProcesses() {
@@ -258,5 +285,117 @@ final class MediaDeviceCallDetectorTests {
             fromBundleIdentifiers: [SystemCallProcessAttributor.unknownCaptureSentinel])
         #expect(clients.count == 1)
         #expect(clients.first?.emoji == ":phone:")
+    }
+
+    // MARK: - Change calendar-first-call-detection (Lane A)
+
+    // 2.1 — detector emits a boolean snapshot; bundle identity is naming only.
+    @Test("2.1: unknown browser bundle capturing yields input=true, naming only")
+    func unknownBundleSnapshotIsBooleanCorroboration() {
+        let scheduler = ManualScheduler()
+        let (detector, _, attributor) = makeDetector(devices: [audio], bundleIDs: [], scheduler: scheduler)
+        attributor.bundleIDs = ["com.acme.mysterybrowser"]
+        let snapshot = detector.currentSnapshot()
+        #expect(snapshot.anyInput == true) // corroboration regardless of bundle
+        #expect(snapshot.clients.map(\.bundlePrefix) == ["unknown"]) // cosmetic naming
+        #expect(snapshot.cameraRunning == false)
+        #expect(snapshot.anyOutputNative == false)
+    }
+
+    // 2.3 — empty attribution while device runs → unknown.capture sentinel.
+    @Test("2.3: empty bundle list + device running resolves to unknown.capture")
+    func emptyAttributionWithDeviceRunningYieldsSentinel() {
+        let bundles = SystemCallProcessAttributor.captureOutcome(
+            bundles: [], anyInputDeviceRunning: true)
+        #expect(bundles == [SystemCallProcessAttributor.unknownCaptureSentinel])
+        #expect(SystemCallProcessAttributor.captureOutcome(bundles: [], anyInputDeviceRunning: false).isEmpty)
+        #expect(SystemCallProcessAttributor.captureOutcome(bundles: ["com.zoom"], anyInputDeviceRunning: false) == ["com.zoom"])
+    }
+
+    // 2.4 — mid-call handoff: empty blip + restoration before end grace.
+    @Test("2.4: restoration during end grace cancels the pending end")
+    func midCallBlipWithRestorationBeforeEndGraceDoesNotEndCall() {
+        let scheduler = ManualScheduler()
+        let (detector, listener, attributor) = makeDetector(devices: [audio], bundleIDs: [chromeBundle], scheduler: scheduler)
+        var ends = 0
+        detector.onCallEnded = { ends += 1 }
+        detector.start()
+        listener.fire(device: audio)
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        scheduler.advance(MediaDeviceCallDetector.startGraceInterval)
+        #expect(detector.isCallActive)
+
+        // Handoff blip: capture empties, end-grace is scheduled…
+        attributor.bundleIDs = []
+        listener.fire(device: audio)
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        // …but capture is restored before the 2 s grace elapses.
+        attributor.bundleIDs = [chromeBundle]
+        listener.fire(device: audio)
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        scheduler.advance(MediaDeviceCallDetector.endGraceInterval)
+
+        #expect(ends == 0)
+        #expect(detector.isCallActive)
+        #expect(scheduler.cancelCount > 0) // pending end was really cancelled
+    }
+
+    // 2.5 — heartbeat disarms orphaned calls; idle cost is zero.
+    @Test("2.5: heartbeat ends an orphaned call within 2 cycles")
+    func heartbeatDisarmsOrphanedCallWhenEndEventLost() {
+        let scheduler = ManualScheduler()
+        let (detector, listener, attributor) = makeDetector(devices: [audio], bundleIDs: [chromeBundle], scheduler: scheduler)
+        var ends = 0
+        detector.onCallEnded = { ends += 1 }
+        detector.start()
+        listener.fire(device: audio)
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        scheduler.advance(MediaDeviceCallDetector.startGraceInterval)
+        #expect(detector.isCallActive)
+        let heartbeatScheduled = scheduler.pending.contains { $0.delay == MediaDeviceCallDetector.heartbeatInterval }
+        #expect(heartbeatScheduled)
+
+        // End event is LOST: no device event fires, capture just goes empty.
+        attributor.bundleIDs = []
+        // Cycle 1: heartbeat re-evaluates → schedules end grace.
+        scheduler.advance(MediaDeviceCallDetector.heartbeatInterval)
+        // End grace fires → confirmCallEnd.
+        scheduler.advance(MediaDeviceCallDetector.endGraceInterval)
+
+        #expect(ends == 1)
+        #expect(!detector.isCallActive)
+    }
+
+    @Test("2.5: idle detector schedules zero timers")
+    func idleDetectorRunsNoTimers() {
+        let scheduler = ManualScheduler()
+        let (detector, _, _) = makeDetector(devices: [audio], bundleIDs: [], scheduler: scheduler)
+        detector.start()
+        #expect(scheduler.pending.isEmpty)
+        #expect(detector.evaluationCount == 0)
+        #expect(!detector.isCallActive)
+    }
+
+    // 2.6 — output + camera corroborants in the snapshot.
+    @Test("2.6: trusted native output corroborates; browser output does not")
+    func outputCorroborationIsTrustedNativeOnly() {
+        #expect(CallClientCatalog.isTrustedNative("com.zoom"))
+        #expect(CallClientCatalog.isTrustedNative("us.zoom.xos"))
+        #expect(CallClientCatalog.isTrustedNative("com.microsoft.teams2"))
+        #expect(CallClientCatalog.isTrustedNative("com.tinyspeck.slackmacgap"))
+        #expect(!CallClientCatalog.isTrustedNative("com.google.chrome"))
+        #expect(!CallClientCatalog.isTrustedNative("com.apple.Safari"))
+    }
+
+    @Test("2.6: snapshot reports native output and camera booleans")
+    func snapshotIncludesOutputAndCameraSignals() {
+        let scheduler = ManualScheduler()
+        let (detector, _, _) = makeDetector(
+            devices: [audio], bundleIDs: [], scheduler: scheduler,
+            outputBundles: ["com.zoom"], cameraRunning: true)
+        let snapshot = detector.currentSnapshot()
+        #expect(snapshot.anyOutputNative == true)
+        #expect(snapshot.cameraRunning == true)
+        #expect(snapshot.anyInput == false) // muted: no input capture
     }
 }

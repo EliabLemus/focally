@@ -49,20 +49,32 @@ protocol CallProcessAttributing: AnyObject {
 /// while reacting to device property events, and every evaluation is debounced
 /// so bursts (9+ callbacks/s during a Meet join) collapse into one transition.
 @MainActor
-final class MediaDeviceCallDetector {
+final class MediaDeviceCallDetector: CaptureSignaling {
     static let debounceInterval: TimeInterval = 1.5
     static let startGraceInterval: TimeInterval = 3.0
     static let endGraceInterval: TimeInterval = 2.0
+    /// Lightweight heartbeat while a call is active. CoreAudio listeners do NOT
+    /// fire when an existing process starts/stops capturing (and on Tahoe
+    /// `IsRunningInput` listeners never fire at all), so active calls are
+    /// re-evaluated on a timer. Idle cost stays zero: no timer while idle.
+    static let heartbeatInterval: TimeInterval = 4.0
 
     private let logger = Logger.callDetection
     private let deviceListener: MediaDeviceListening
     private let attributor: CallProcessAttributing
     private let clientFilter: CallProcessAttributor
+    private let outputBundleProbe: () -> [String]
+    private let cameraProbe: () -> Bool
     private let now: () -> Date
     private let schedule: (TimeInterval, @escaping @MainActor () -> Void) -> Void
     private let cancel: (UUID) -> Void
 
+    /// DEPRECATED for decisions: call presence decisions come from the calendar
+    /// gate + `currentSnapshot()`. Kept only for test/compat consumers.
+    @available(*, deprecated, message: "Use CaptureSignaling.currentSnapshot() — detector is corroborative, not decisive")
     var onCallStarted: ((CallClient) -> Void)?
+    /// DEPRECATED for decisions: see `onCallStarted`.
+    @available(*, deprecated, message: "Use CaptureSignaling.currentSnapshot() — detector is corroborative, not decisive")
     var onCallEnded: (() -> Void)?
 
     private var tokens: [MediaListenerToken] = []
@@ -73,6 +85,7 @@ final class MediaDeviceCallDetector {
     private var pendingStartID: UUID?
     private var pendingEndID: UUID?
     private var pendingStartClient: CallClient?
+    private var heartbeatID: UUID?
     // Debug instrumentation for the idle-resource check: counts evaluations.
     private(set) var evaluationCount = 0
 
@@ -80,6 +93,8 @@ final class MediaDeviceCallDetector {
         deviceListener: MediaDeviceListening,
         attributor: CallProcessAttributing,
         clientFilter: CallProcessAttributor = CallProcessAttributor(),
+        outputBundleProbe: @escaping () -> [String] = { SystemCallProcessAttributor.outputBundleIdentifiers() },
+        cameraProbe: @escaping () -> Bool = { SystemMediaDeviceListener.anyCameraRunning() },
         now: @escaping () -> Date = Date.init,
         schedule: @escaping (TimeInterval, @escaping @MainActor () -> Void) -> Void = { delay, action in
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) { action() }
@@ -89,6 +104,8 @@ final class MediaDeviceCallDetector {
         self.deviceListener = deviceListener
         self.attributor = attributor
         self.clientFilter = clientFilter
+        self.outputBundleProbe = outputBundleProbe
+        self.cameraProbe = cameraProbe
         self.now = now
         self.schedule = schedule
         self.cancel = cancel
@@ -116,6 +133,7 @@ final class MediaDeviceCallDetector {
         cancelPending(pendingDebounceID); pendingDebounceID = nil
         cancelPending(pendingStartID); pendingStartID = nil; pendingStartClient = nil
         cancelPending(pendingEndID); pendingEndID = nil
+        cancelHeartbeat()
         lastKnownClients = []
         isCallActive = false
     }
@@ -172,6 +190,11 @@ final class MediaDeviceCallDetector {
         lastKnownClients = clients
 
         if previous.isEmpty, let first = clients.first {
+            // Capture is back — any pending end from a mid-call blip is dead.
+            if pendingEndID != nil {
+                cancelPending(pendingEndID)
+                pendingEndID = nil
+            }
             // Candidate call start: confirm after the start grace so accidental
             // mic blips shorter than 3 s never fire.
             cancelPending(pendingStartID)
@@ -197,6 +220,12 @@ final class MediaDeviceCallDetector {
             // Client composition changed while a call stays active (e.g. a second
             // capture joins). Presence semantics handle first-client persistence.
             pendingStartClient = clients.first
+            // Mid-call handoff: a pending end was scheduled on the empty blip and
+            // capture is back before the grace elapsed — cancel it for real.
+            if pendingEndID != nil {
+                cancelPending(pendingEndID)
+                pendingEndID = nil
+            }
         }
     }
 
@@ -217,6 +246,7 @@ final class MediaDeviceCallDetector {
         lastKnownClients = clients
         guard !isCallActive else { return }
         isCallActive = true
+        startHeartbeat()
         let first = clients.first ?? client
         logger.info("Call started via \(first.bundlePrefix)")
         onCallStarted?(first)
@@ -233,9 +263,53 @@ final class MediaDeviceCallDetector {
         }
         guard isCallActive else { return }
         isCallActive = false
+        cancelHeartbeat()
         lastKnownClients = []
         logger.info("Call ended")
         onCallEnded?()
+    }
+
+    // MARK: - Heartbeat (active-call only; zero idle cost)
+
+    private func startHeartbeat() {
+        guard heartbeatID == nil else { return }
+        tickHeartbeat()
+    }
+
+    private func tickHeartbeat() {
+        let id = UUID()
+        heartbeatID = id
+        schedule(Self.heartbeatInterval) { [weak self] in
+            guard let self, self.heartbeatID == id else { return }
+            self.heartbeatID = nil
+            // Re-evaluate real state: catches existing processes that started/
+            // stopped capturing without any device event, and disarms orphaned
+            // calls (empty capture → end grace → confirmCallEnd within 2 cycles).
+            self.evaluate()
+            if self.isCallActive { self.tickHeartbeat() }
+        }
+    }
+
+    private func cancelHeartbeat() {
+        guard let id = heartbeatID else { return }
+        heartbeatID = nil
+        cancel(id)
+    }
+
+    // MARK: - CaptureSignaling (corroborative boolean signal)
+
+    func currentSnapshot() -> CaptureSnapshot {
+        let bundles = attributor.capturingBundleIdentifiers()
+        let clients = clientFilter.attributedClients(fromBundleIdentifiers: bundles)
+        let anyOutputNative = outputBundleProbe().contains {
+            CallClientCatalog.isTrustedNative($0)
+        }
+        return CaptureSnapshot(
+            anyInput: !clients.isEmpty,
+            anyOutputNative: anyOutputNative,
+            cameraRunning: cameraProbe(),
+            clients: clients
+        )
     }
 
     private func cancelPending(_ id: UUID?) {
@@ -263,6 +337,23 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
     }
 
     init() {}
+
+    /// Global camera-in-use boolean: any CMIO video device reporting
+    /// DeviceIsRunningSomewhere ('goin'). CoreMediaIO offers no per-process
+    /// attribution — this is the only signal available.
+    static nonisolated func anyCameraRunning() -> Bool {
+        videoDeviceIDs().contains { id in
+            var running: UInt32 = 0
+            var size = UInt32(MemoryLayout<UInt32>.size)
+            var address = CMIOObjectPropertyAddress(
+                mSelector: CMIOObjectPropertySelector(0x676F696E), // 'goin'
+                mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
+                mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain)
+            )
+            guard CMIOObjectGetPropertyData(id, &address, 0, nil, size, &size, &running) == 0 else { return false }
+            return running != 0
+        }
+    }
 
     func enumeratedDeviceIDs() -> [MediaDeviceID] {
         var ids = Self.audioDeviceIDs().map { MediaDeviceID(systemID: $0, kind: .audioInput) }
@@ -364,7 +455,7 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         }
     }
 
-    private static func videoDeviceIDs() -> [UInt32] {
+    private nonisolated static func videoDeviceIDs() -> [UInt32] {
         var address = CMIOObjectPropertyAddress(
             mSelector: CMIOObjectPropertySelector(kCMIOHardwarePropertyDevices),
             mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal),
@@ -460,7 +551,16 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
                 usleep(20_000)
                 continue
             }
-            guard size > 0 else { return [] }
+            guard size > 0 else {
+                // ponytail: transient empty process list from coreaudiod (15.7)
+                // is indistinguishable from a failed query — retry, then fall
+                // back to the device-running heuristic. Per-query loop cap 3.
+                if attempt == 2 {
+                    return Self.fallbackClients(queryFailed: true, anyInputDeviceRunning: Self.anyInputDeviceRunning())
+                }
+                usleep(20_000)
+                continue
+            }
             var processIDs = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
             if AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &processIDs) == noErr {
                 return Self.capturingBundles(processIDs: processIDs)
@@ -491,6 +591,50 @@ final class SystemCallProcessAttributor: CallProcessAttributing {
             // Processes exist but attribution yielded nothing while a device is
             // capturing (e.g. process bundle extraction blocked by TCC).
             bundleIDs = [Self.unknownCaptureSentinel]
+        }
+        return bundleIDs
+    }
+
+    /// Pure decision for a post-query outcome (unit-testable): an empty bundle
+    /// list while an input device is running is a transient attribution miss →
+    /// unknown-capture sentinel; otherwise the list is taken as-is.
+    static func captureOutcome(bundles: [String], anyInputDeviceRunning: Bool) -> [String] {
+        guard bundles.isEmpty else { return bundles }
+        return anyInputDeviceRunning ? [unknownCaptureSentinel] : []
+    }
+
+    /// Bundle ids of processes currently running audio OUTPUT (macOS 14.2+).
+    /// Used for the "muted but listening" corroboration on trusted native apps.
+    static nonisolated func outputBundleIdentifiers() -> [String] {
+        guard #available(macOS 14.2, *) else { return [] }
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyProcessObjectList,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var size: UInt32 = 0
+        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size) == noErr, size > 0 else {
+            return []
+        }
+        var processIDs = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
+        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &processIDs) == noErr else {
+            return []
+        }
+        var outputAddress = AudioObjectPropertyAddress(
+            mSelector: kAudioProcessPropertyIsRunningOutput,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var bundleIDs: [String] = []
+        for processID in processIDs {
+            var isRunning: UInt32 = 0
+            var runningSize = UInt32(MemoryLayout<UInt32>.size)
+            guard AudioObjectGetPropertyData(processID, &outputAddress, 0, nil, &runningSize, &isRunning) == noErr, isRunning != 0 else {
+                continue
+            }
+            if let bundleID = bundleIdentifier(for: processID) {
+                bundleIDs.append(bundleID)
+            }
         }
         return bundleIDs
     }
