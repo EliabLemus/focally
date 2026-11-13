@@ -31,6 +31,7 @@
 		2A1A9742A9362E21C2E155BB /* PresenceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440185BF6EEED5174BBEEE9F /* PresenceCoordinator.swift */; };
 		2A37C62EE60CCEEBE24F3D2B /* FocusType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B59FC6C76C3AC75D7864B9 /* FocusType.swift */; };
 		2CED945CAF9A7201E1238792 /* FocusTimerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335C2B031BB8F4E600F7CBF2 /* FocusTimerServiceTests.swift */; };
+		2EBA7E69773605C544A8AA3D /* MediaCaptureSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE1A907253D663AD488BA0C /* MediaCaptureSignal.swift */; };
 		2F974E82EC2D138CDE570AF2 /* FocusSessionRecordMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C6B1BD2B26B3E52C801F03E /* FocusSessionRecordMigrationTests.swift */; };
 		3128A40B9240FF4BF6648363 /* SlackCalendarSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBAABDC097244664E4B881E9 /* SlackCalendarSettings.swift */; };
 		347C6E30DA41A08BCF67E7AE /* FocusTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B0A006AE023C6292115993 /* FocusTypesSettingsView.swift */; };
@@ -243,6 +244,7 @@
 		54F244847761F27693DC9848 /* TaskService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskService.swift; sourceTree = "<group>"; };
 		55FBAB09E40CDC3EA5F3DF20 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		5722B76D495A722143C67D73 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
+		5AE1A907253D663AD488BA0C /* MediaCaptureSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCaptureSignal.swift; sourceTree = "<group>"; };
 		5BACBE3066A4D003C7785C5B /* FocusSessionDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionDraftTests.swift; sourceTree = "<group>"; };
 		63029DDE28C7BA064F3EA0AE /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
 		633E55854AB377DA4F68B1CC /* FocallyRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallyRadius.swift; sourceTree = "<group>"; };
@@ -640,6 +642,7 @@
 				0BDD8975948D7ADA1DC629EF /* FocusTypesService.swift */,
 				4974D6DCBBEF4EDAD90D1BC8 /* KeychainHelper.swift */,
 				74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */,
+				5AE1A907253D663AD488BA0C /* MediaCaptureSignal.swift */,
 				63C42647B8773EC22F9893DA /* MediaDeviceCallDetector.swift */,
 				B2B5970FA7EF557D967A4558 /* NotificationCenterPresenter.swift */,
 				4414920B6A39DCAF591E7C0D /* NotificationService.swift */,
@@ -874,6 +877,7 @@
 				63A648A7E8ACFA991912B86D /* Logger.swift in Sources */,
 				D838842FB637F4CF25588D4E /* MainWindow.swift in Sources */,
 				470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */,
+				2EBA7E69773605C544A8AA3D /* MediaCaptureSignal.swift in Sources */,
 				4BD8672C0AA290BF3E1314AE /* MediaDeviceCallDetector.swift in Sources */,
 				F94CE01D65F077489B5FCEC0 /* MenuBarDropdownView.swift in Sources */,
 				B451FACCAC9DBC96264B7812 /* Metrics.swift in Sources */,
