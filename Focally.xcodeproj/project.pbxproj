@@ -11,6 +11,7 @@
 		0C4F5B379C1114D2F4F50C2E /* focally-focus-off-signed.shortcut in Resources */ = {isa = PBXBuildFile; fileRef = 0DEA92C31BB1683C614672E5 /* focally-focus-off-signed.shortcut */; };
 		0CB0FBE091E9FB84F36F2E5F /* TimerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AEE7F3695EF4097CA9CAA33 /* TimerControlsView.swift */; };
 		0E041FFD0374DC4E0391F641 /* MetricsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5FBFE134F2E3538C855A77 /* MetricsPage.swift */; };
+		11DB28C02DD90D2DE2D8A81C /* SlackStatusRestoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840CA61861CB7CA4F38161B0 /* SlackStatusRestoreTests.swift */; };
 		151E5A8420AFEC29524AF41F /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824FFB84C09F608FF1A0E65B /* TopBarView.swift */; };
 		1546EA3A0E314D00A7465E21 /* SoundPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */; };
 		15484DE81EA7074873C79B21 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5722B76D495A722143C67D73 /* TaskRowView.swift */; };
@@ -268,6 +269,7 @@
 		80C9694734B30E08D0813C8A /* SlackStatusService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackStatusService.swift; sourceTree = "<group>"; };
 		8106D91600D3C2013F5ACD33 /* bell.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = bell.aiff; sourceTree = "<group>"; };
 		824FFB84C09F608FF1A0E65B /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
+		840CA61861CB7CA4F38161B0 /* SlackStatusRestoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackStatusRestoreTests.swift; sourceTree = "<group>"; };
 		867AE7AACA30C0FD8D4ABA7E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiValidatorTests.swift; sourceTree = "<group>"; };
@@ -476,6 +478,7 @@
 				4F788EADA3D23ADE8FB8420A /* SlackOperationStateTests.swift */,
 				F8A166401D4CE1B53CAC830D /* SlackServiceEmojiTests.swift */,
 				CB15EBD18D837EBD03246513 /* SlackServiceSingletonTests.swift */,
+				840CA61861CB7CA4F38161B0 /* SlackStatusRestoreTests.swift */,
 				494DE7CEACDD86B5D1F6D271 /* SoundPlayerServiceTests.swift */,
 				382FFBBFCA6607343E1CA3AC /* StatusTitleAssignerTests.swift */,
 				74F5B81E3625E6C627F85B27 /* TaskBindingTests.swift */,
@@ -951,6 +954,7 @@
 				BF998B6FDF2F7AFBE2309B75 /* SlackOperationStateTests.swift in Sources */,
 				4A71B77749BFC19FA117E9D1 /* SlackServiceEmojiTests.swift in Sources */,
 				514A298887A5C0137A1FE5FA /* SlackServiceSingletonTests.swift in Sources */,
+				11DB28C02DD90D2DE2D8A81C /* SlackStatusRestoreTests.swift in Sources */,
 				5E87D1D1B723D8B59DE9F6AB /* SoundPlayerServiceTests.swift in Sources */,
 				4683E849AD08C7A96C6BE70A /* StatusTitleAssignerTests.swift in Sources */,
 				283DF8DFE65B15F0D4CBD41A /* TaskBindingTests.swift in Sources */,
