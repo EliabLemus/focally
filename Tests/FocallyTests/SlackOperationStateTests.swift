@@ -270,15 +270,9 @@ struct SlackOperationStateTests {
         #expect(transport.requestCount(path: "/api/users.profile.set") == 1)
         #expect(transport.pendingRequestCount(path: "/api/users.profile.set") == 1)
 
-        transport.complete(
-            path: "/api/dnd.endSnooze",
-            json: ["ok": true],
-            statusCode: 200
-        )
-        await Task.yield()
-
-        #expect(service.slackTestState == .working)
-        #expect(completionCount == 0)
+        // slack-presence-sync 6.3: disable is prohibited from calling
+        // dnd.endSnooze — no such request may ever be in flight.
+        #expect(transport.requestCount(path: "/api/dnd.endSnooze") == 0)
 
         try await Task.sleep(for: .milliseconds(300))
 

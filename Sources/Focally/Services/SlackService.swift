@@ -19,6 +19,7 @@ class SlackService {
     static let statusEmojiDefaultsKey = "slackStatusEmoji"
     static let emojiListURL = URL(string: "https://slack.com/api/emoji.list")!
     static let profileSetURL = URL(string: "https://slack.com/api/users.profile.set")!
+    static let usersProfileGetURL = URL(string: "https://slack.com/api/users.profile.get")!
     static let authTestURL = URL(string: "https://slack.com/api/auth.test")!
 
     private let enabledDefaults: UserDefaults
@@ -43,7 +44,6 @@ class SlackService {
 
     private let keychainKey = "slack-token"
     private let logger = Logger.slack
-    private let endDndURL = URL(string: "https://slack.com/api/dnd.endSnooze")!
     private let dndSetSnoozeURL = URL(string: "https://slack.com/api/dnd.setSnooze")!
     private let requestPerformer: RequestPerformer?
     private let apiClient: SlackAPIClient
@@ -100,58 +100,12 @@ class SlackService {
         testConnection(completion: completion)
     }
 
+    /// slack-presence-sync 6.3: releasing a Slack DND snooze is left to its
+    /// NATURAL expiration. Calling `dnd.endSnooze` as a release path is
+    /// prohibited (it would also kill a snooze the user set manually).
     func disableSlackDND() {
-        let maskedToken = maskedToken(token)
-        logger.info("disableSlackDND called. isEnabled=\(self.isEnabled), token=\(maskedToken)")
-        guard isEnabled else {
-            logger.info("Skipping disableSlackDND because Slack integration is disabled")
-            return
-        }
-        guard let token else {
-            logger.error("Skipping disableSlackDND because no Slack token is configured")
-            connectionError = "No Slack token configured"
-            isConnected = false
-            return
-        }
-
-        guard let request = SlackStatusService.makeSlackRequest(url: endDndURL, token: token, formFields: [:]) else {
-            connectionError = "Failed to prepare Slack DND request"
-            isConnected = false
-            return
-        }
-
-        performSlackRequest(request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    let errorType = SlackService.categorizeNetworkError(error)
-                    self?.connectionError = errorType
-                    self?.lastActionMessage = "Slack DND request failed"
-                    self?.logger.error("Slack disableSlackDND request failed: \(error.localizedDescription), categorized as: \(errorType)")
-                    return
-                }
-
-                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-                guard let json = self?.decodeSlackResponseBody(data) else {
-                    self?.connectionError = "Invalid response from Slack"
-                    self?.lastActionMessage = "Slack DND request failed"
-                    self?.isConnected = false
-                    return
-                }
-
-                let responseOK: Bool = json["ok"] as? Bool ?? false
-                if responseOK && (200...299).contains(statusCode) {
-                    self?.connectionError = nil
-                    self?.lastActionMessage = "Slack DND disabled"
-                } else {
-                    let errorMsg: String = json["error"] as? String ?? "Unknown error"
-                    let userFriendlyError = SlackService.userFriendlyError(for: statusCode, slackError: errorMsg)
-                    self?.connectionError = userFriendlyError
-                    self?.lastActionMessage = "Slack DND request failed"
-                    self?.isConnected = false
-                    self?.logger.error("Slack disableSlackDND failed. httpStatus=\(statusCode), error=\(errorMsg), userMessage=\(userFriendlyError)")
-                }
-            }
-        }
+        logger.info("disableSlackDND: letting Slack snooze expire naturally (endSnooze forbidden as release)")
+        lastActionMessage = "Slack notifications resume when the snooze expires"
     }
 
     func setSlackFocusStatus(text: String = "In focus", emoji: String = "🎯", expirationTimestamp: Int? = nil) {
@@ -262,13 +216,21 @@ class SlackService {
             return
         }
         let statusEmoji = normalizedStatusEmoji(in: text, taskEmoji: taskEmoji, fallbackEmoji: fallbackEmoji)
+        // slack-presence-sync 6.5: Slack caps status_text at 100 chars.
+        let effectiveText = Self.truncatedStatusText(text)
+        // 6.5: backup expiration so the status never outlives the call even if
+        // Focally dies: any past timestamp becomes now + margin.
+        let nowEpoch = Int(now().timeIntervalSince1970)
+        let effectiveExpiration = expirationTimestamp > nowEpoch
+            ? expirationTimestamp
+            : nowEpoch + Self.backupExpirationMarginSeconds
 
         emojiUsageRecorder(statusEmoji)
 
         let profile: [String: String] = [
-            "status_text": text,
+            "status_text": effectiveText,
             "status_emoji": statusEmoji,
-            "status_expiration": "\(expirationTimestamp)"
+            "status_expiration": "\(effectiveExpiration)"
         ]
 
         statusService.setProfile(profile: profile, token: token) { [weak self] result in
@@ -284,8 +246,15 @@ class SlackService {
                 case .success:
                     self.isConnected = true
                     self.connectionError = nil
-                    self.lastStatusText = text
-                    self.logger.info("Slack status set successfully: \(statusEmoji) \(text)")
+                    self.lastStatusText = effectiveText
+                    // 6.1: remember what Focally set — restore only ever runs
+                    // while this exact status is still live on the profile.
+                    self.focallySetStatus = SlackStatusSnapshot(
+                        statusText: effectiveText,
+                        statusEmoji: statusEmoji,
+                        statusExpiration: effectiveExpiration
+                    )
+                    self.logger.info("Slack status set successfully: \(statusEmoji) \(effectiveText)")
                     completion?(.success(()))
                 }
             }
@@ -293,8 +262,19 @@ class SlackService {
     }
 
     func clearStatus() {
+        clearStatus(attempt: 1)
+    }
+
+    /// call-reliability 4.4: `clearStatus` retries with a short backoff (≥2
+    /// attempts) on network/rate-limit failure before giving up.
+    static let clearStatusMaxAttempts = 2
+    static let clearStatusRetryDelaySeconds: TimeInterval = 2
+    /// 4.4: injectable backoff sleep between clearStatus retries (tests zero it).
+    private let clearStatusRetryDelay: (TimeInterval) async -> Void
+
+    private func clearStatus(attempt: Int) {
         let maskedToken = maskedToken(token)
-        logger.info("clearStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken)")
+        logger.info("clearStatus called. isEnabled=\(self.isEnabled), token=\(maskedToken), attempt=\(attempt)")
         guard isEnabled else {
             logger.info("Skipping clearStatus because Slack integration is disabled")
             return
@@ -314,12 +294,144 @@ class SlackService {
                 guard let self else { return }
                 switch result {
                 case .failure(let error):
-                    self.logger.error("Slack clearStatus failed. userMessage=\(error.displayMessage)")
+                    self.logger.error("Slack clearStatus failed. userMessage=\(error.displayMessage), attempt=\(attempt)")
+                    if attempt < Self.clearStatusMaxAttempts {
+                        Task { [weak self] in
+                            await self?.clearStatusRetryDelay(Self.clearStatusRetryDelaySeconds)
+                            self?.clearStatus(attempt: attempt + 1)
+                        }
+                    }
                 case .success:
                     self.lastStatusText = nil
+                    // 6.1: an empty profile is still a status Focally owns —
+                    // restore is allowed from here.
+                    self.focallySetStatus = SlackStatusSnapshot(
+                        statusText: "",
+                        statusEmoji: "",
+                        statusExpiration: nil
+                    )
                     self.logger.info("Slack status cleared")
                 }
             }
+        }
+    }
+
+    // MARK: slack-presence-sync 6.1 — save & restore the user's status
+
+    struct SlackStatusSnapshot: Equatable {
+        let statusText: String
+        let statusEmoji: String
+        let statusExpiration: Int?
+    }
+
+    /// Slack API cap on `status_text` (slack-presence-sync 6.5).
+    static let statusTextLimit = 100
+    /// Backup expiration margin when the estimated end is already past (6.5).
+    static let backupExpirationMarginSeconds = 300
+
+    static func truncatedStatusText(_ text: String, limit: Int = statusTextLimit) -> String {
+        String(text.prefix(limit))
+    }
+
+    /// 6.5: only user tokens (xoxp-) may write profiles. Logged as a warning —
+    /// Slack itself rejects workspace/bot tokens with a user-facing error.
+    static func isValidUserToken(_ token: String) -> Bool {
+        token.hasPrefix("xoxp-")
+    }
+
+    /// The status currently saved for restore (the user's own status at call start).
+    private(set) var savedStatusSnapshot: SlackStatusSnapshot?
+    /// The status Focally itself last set ("" / "" once cleared). Restore only
+    /// runs while the live profile still matches this — a manual mid-call
+    /// change by the user is never overwritten.
+    private(set) var focallySetStatus: SlackStatusSnapshot?
+
+    /// 6.1: fetch and remember the current status before Focally overwrites it.
+    func saveCurrentStatus(completion: ((SlackStatusSnapshot?) -> Void)? = nil) {
+        fetchCurrentProfile { [weak self] snapshot in
+            DispatchQueue.main.async {
+                self?.savedStatusSnapshot = snapshot
+                completion?(snapshot)
+            }
+        }
+    }
+
+    /// 6.1: restore the saved status, but ONLY if the live profile is still the
+    /// status Focally set (check before restore).
+    func restoreSavedStatus(completion: ((Bool) -> Void)? = nil) {
+        guard let saved = savedStatusSnapshot else {
+            completion?(false)
+            return
+        }
+        fetchCurrentProfile { [weak self] current in
+            DispatchQueue.main.async {
+                guard let self else { completion?(false); return }
+                guard current == self.focallySetStatus else {
+                    self.logger.info("Slack status restore skipped: live status was changed after Focally set it")
+                    completion?(false)
+                    return
+                }
+                var profile = [
+                    "status_text": saved.statusText,
+                    "status_emoji": saved.statusEmoji
+                ]
+                if let expiration = saved.statusExpiration {
+                    profile["status_expiration"] = "\(expiration)"
+                }
+                guard let token = self.token else { completion?(false); return }
+                self.statusService.setProfile(profile: profile, token: token) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .failure(let error):
+                            self.logger.error("Slack status restore failed. userMessage=\(error.displayMessage)")
+                            completion?(false)
+                        case .success:
+                            self.lastStatusText = saved.statusText.isEmpty ? nil : saved.statusText
+                            self.focallySetStatus = saved
+                            self.logger.info("Slack status restored: \(saved.statusEmoji) \(saved.statusText)")
+                            completion?(true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func fetchCurrentProfile(completion: @escaping (SlackStatusSnapshot?) -> Void) {
+        guard isEnabled, let token else {
+            completion(nil)
+            return
+        }
+        guard let request = SlackStatusService.makeSlackRequest(url: Self.usersProfileGetURL, token: token, formFields: [:]) else {
+            completion(nil)
+            return
+        }
+        performSlackRequest(request) { [weak self] data, response, error in
+            guard let self else { completion(nil); return }
+            if let error = error {
+                self.logger.error("Slack users.profile.get failed: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            guard (200...299).contains(statusCode),
+                  let data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  json["ok"] as? Bool == true,
+                  let profile = json["profile"] as? [String: Any] else {
+                self.logger.error("Slack users.profile.get returned invalid response. httpStatus=\(statusCode)")
+                completion(nil)
+                return
+            }
+            completion(SlackStatusSnapshot(
+                statusText: profile["status_text"] as? String ?? "",
+                statusEmoji: profile["status_emoji"] as? String ?? "",
+                // Slack encodes status_expiration as a JSON number, but it may
+                // arrive as a numeric string (e.g. echoed from a form-encoded
+                // profile.set) — accept both or snapshot comparisons break.
+                statusExpiration: (profile["status_expiration"] as? Int)
+                    ?? (profile["status_expiration"] as? String).flatMap(Int.init)
+            ))
         }
     }
 
@@ -356,6 +468,9 @@ class SlackService {
         self.testTokenOverride = nil
         self.now = Date.init
         self.emojiCatalogFreshnessInterval = 3_600
+        self.clearStatusRetryDelay = { seconds in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+        }
         self.suppressEnabledPersistence = true
         self.isEnabled = UserDefaults.standard.bool(forKey: "slackEnabled")
         self.suppressEnabledPersistence = false
@@ -381,7 +496,10 @@ class SlackService {
         requestPerformer: @escaping RequestPerformer,
         emojiUsageRecorder: @escaping EmojiUsageRecorder = { _ in },
         now: @escaping () -> Date = Date.init,
-        emojiCatalogFreshnessInterval: TimeInterval = 3_600
+        emojiCatalogFreshnessInterval: TimeInterval = 3_600,
+        clearStatusRetryDelay: @escaping (TimeInterval) async -> Void = { seconds in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+        }
     ) {
         self.enabledDefaults = enabledDefaults
         self.requestPerformer = requestPerformer
@@ -391,6 +509,7 @@ class SlackService {
         self.testTokenOverride = .some(tokenForTesting)
         self.now = now
         self.emojiCatalogFreshnessInterval = emojiCatalogFreshnessInterval
+        self.clearStatusRetryDelay = clearStatusRetryDelay
         self.suppressEnabledPersistence = true
         self.isEnabled = enabled
         self.suppressEnabledPersistence = false

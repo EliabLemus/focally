@@ -43,7 +43,15 @@ final class DNDReliabilityService {
         case escalationInvoked(targetActive: Bool)
         case escalationFailed(targetActive: Bool, detail: String)
         case deactivationRequested
+        /// call-reliability 4.1: scheduled attempt N of the release-retry loop,
+        /// after waiting `delaySeconds` (fake sleep advances the fake clock).
+        case deactivationRetryScheduled(attempt: Int, delaySeconds: TimeInterval)
+        /// call-reliability 4.1: a retry deactivating DND was verified externally.
+        case deactivationRetrySucceeded
     }
+
+    /// 4.1: backoff schedule for failed de-escalation — ≥3 attempts, first ≤10 s.
+    static let deactivationRetryDelaysSeconds: [TimeInterval] = [5, 10, 20]
 
     nonisolated static let defaultFocusModeName = "Do Not Disturb"
     static let verificationDelaySeconds: UInt64 = 1_000_000_000
@@ -71,6 +79,25 @@ final class DNDReliabilityService {
     /// Idempotency: at most one escalation per transition.
     private var didEscalateCurrentTransition = false
     private var pendingVerificationTask: Task<Void, Never>?
+    /// 4.1: true while a deactivation has been requested but NOT yet externally
+    /// verified — callers (PresenceCoordinator) must retain `ownsSystemDND`
+    /// while this is set so the failed release is never orphaned.
+    private(set) var hasPendingDeactivationRelease = false
+    private var isRetryingDeactivation = false
+    /// 4.2: who owns the system DND right now. `.external` DND (user's manual
+    /// Focus at call start) is never released by Focally; a retained
+    /// `.ownedByFocally` (orphan of a failed release) is reused, not duplicated.
+    enum SystemDNDOwnership: Equatable {
+        case none
+        case ownedByFocally
+        case external
+    }
+
+    private(set) var systemDNDOwnership: SystemDNDOwnership = .none
+    /// 4.3: injectable blocking sleep for the terminate-path cleanup.
+    private let cleanupPollSleep: (TimeInterval) -> Void
+    /// 4.1: injectable backoff sleep between release retries.
+    private let retryDelay: (TimeInterval) async -> Void
 
     init(
         core: DNDCoreWriting,
@@ -82,7 +109,11 @@ final class DNDReliabilityService {
         },
         isShortcutsFirstOS: @escaping () -> Bool = {
             DNDReliabilityService.isOperatingSystemAtLeastShortcutsFirst()
-        }
+        },
+        retryDelay: @escaping (TimeInterval) async -> Void = { seconds in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+        },
+        cleanupPollSleep: @escaping (TimeInterval) -> Void = { Thread.sleep(forTimeInterval: $0) }
     ) {
         self.core = core
         self.verifier = verifier
@@ -90,6 +121,8 @@ final class DNDReliabilityService {
         self.focusModeName = focusModeName
         self.verificationDelay = verificationDelay
         self.isShortcutsFirstOS = isShortcutsFirstOS
+        self.retryDelay = retryDelay
+        self.cleanupPollSleep = cleanupPollSleep
     }
 
     /// Called to request an activation. TASK-060: on macOS 14+ the signed
@@ -122,6 +155,101 @@ final class DNDReliabilityService {
     func cancelPendingVerification() {
         pendingVerificationTask?.cancel()
         pendingVerificationTask = nil
+    }
+
+    // MARK: call-reliability 4.1 — release retries with backoff
+
+    /// Schedules the deactivation retry loop after a failed release escalation.
+    /// `hasPendingDeactivationRelease` (and thus the caller's ownership) is
+    /// retained until the Control Center boolean confirms DND is off.
+    private func scheduleDeactivationReleaseRetries() {
+        guard !isRetryingDeactivation else { return }
+        isRetryingDeactivation = true
+        hasPendingDeactivationRelease = true
+        pendingVerificationTask?.cancel()
+        pendingVerificationTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            for (index, delay) in Self.deactivationRetryDelaysSeconds.enumerated() {
+                await self.retryDelay(delay) // tests: fake sleep advances fake clock
+                guard !Task.isCancelled else { return }
+                self.record(.deactivationRetryScheduled(attempt: index + 1, delaySeconds: delay))
+                do {
+                    try await self.escalator.runFocusByName(self.focusModeName)
+                } catch {
+                    self.record(.escalationFailed(targetActive: false, detail: error.localizedDescription))
+                    continue
+                }
+                await self.verificationDelay()
+                guard !Task.isCancelled else { return }
+                if !self.verifier.isAnyFocusActive() {
+                    // Externally verified: only now is ownership cleared.
+                    self.record(.verificationConfirmed(targetActive: false))
+                    self.record(.deactivationRetrySucceeded)
+                    self.finishDeactivationRelease()
+                    return
+                }
+                self.record(.escalationFailed(targetActive: false, detail: "retry verification mismatch"))
+            }
+            self.isRetryingDeactivation = false
+            // Ownership stays retained: the release remains pending for a later
+            // call/launch to reconcile (spec: never leave an owned DND orphaned
+            // silently).
+        }
+    }
+
+    private func finishDeactivationRelease() {
+        hasPendingDeactivationRelease = false
+        isRetryingDeactivation = false
+        if systemDNDOwnership == .ownedByFocally {
+            systemDNDOwnership = .none
+        }
+    }
+
+    // MARK: call-reliability 4.2 — ownership ledger
+
+    /// Registers an activation performed by Focally. Reuse rule: a retained
+    /// ownership from a previous failed release is reused — never a second one.
+    func registerOwnedSystemDND() {
+        guard systemDNDOwnership == .none else { return }
+        systemDNDOwnership = .ownedByFocally
+    }
+
+    /// Registers DND found active at call start that Focally did NOT activate.
+    /// External DND is never released by Focally and never claimed as owned.
+    func registerExternalSystemDND() {
+        guard systemDNDOwnership == .none else { return }
+        systemDNDOwnership = .external
+    }
+
+    /// Releases ownership only when Focally owns it AND the deactivation was
+    /// externally verified (no pending release). External DND is untouched.
+    func releaseOwnedSystemDNDAfterVerifiedDeactivation() {
+        guard systemDNDOwnership == .ownedByFocally, !hasPendingDeactivationRelease else { return }
+        systemDNDOwnership = .none
+    }
+
+    // MARK: call-reliability 4.3 — synchronous cleanup on terminate
+
+    /// Blocking cleanup for app termination with an active call: deactivates
+    /// DND and polls the external verifier until confirmed or `timeoutSeconds`
+    /// elapse. Blocks the calling thread (by design — the process is dying).
+    /// ponytail: busy-polls at 100 ms; a condition-variable would be overkill
+    /// for a ≤3 s quit path.
+    func performSynchronousDeactivationCleanup(timeoutSeconds: TimeInterval = 3) -> Bool {
+        cancelPendingVerification()
+        core.deactivateDND()
+        let deadline = Date().addingTimeInterval(timeoutSeconds)
+        while Date() < deadline {
+            if !verifier.isAnyFocusActive() {
+                record(.verificationConfirmed(targetActive: false))
+                finishDeactivationRelease()
+                return true
+            }
+            cleanupPollSleep(0.1)
+        }
+        // Unverified within timeout: retain ownership for launch reconciliation.
+        hasPendingDeactivationRelease = true
+        return false
     }
 
     private func scheduleVerification(targetActive: Bool) {
@@ -158,6 +286,9 @@ final class DNDReliabilityService {
             } catch {
                 guard !Task.isCancelled else { return }
                 self.record(.escalationFailed(targetActive: targetActive, detail: error.localizedDescription))
+                if targetActive == false {
+                    self.scheduleDeactivationReleaseRetries()
+                }
             }
         }
     }
@@ -183,8 +314,13 @@ final class DNDReliabilityService {
             try await escalator.runFocusByName(focusModeName)
         } catch {
             // Layer 3 failed: surface an observability event, keep app state
-            // consistent, never retry-loop. The call flow continues.
+            // consistent. For deactivations (targetActive: false) the release
+            // is NOT abandoned — retries with backoff are scheduled and the
+            // ownership is retained until verification confirms (4.1).
             record(.escalationFailed(targetActive: targetActive, detail: error.localizedDescription))
+            if targetActive == false {
+                scheduleDeactivationReleaseRetries()
+            }
         }
     }
 

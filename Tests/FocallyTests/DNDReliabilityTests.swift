@@ -20,10 +20,14 @@ private final class FakeDNDCore: DNDCoreWriting {
 private final class FakeFocusVerifier: DNDVerifying {
     /// Truth reported by Layer 2 (Control Center boolean in production).
     var isFocusActive = false
+    /// After this many reads, the verifier reports DND off (fake "user/system
+    /// settled" behavior — deterministic, no sleeps).
+    var becomesInactiveAfterReads = Int.max
     private(set) var readCount = 0
 
     func isAnyFocusActive() -> Bool {
         readCount += 1
+        if readCount > becomesInactiveAfterReads { return false }
         return isFocusActive
     }
 }
@@ -31,10 +35,16 @@ private final class FakeFocusVerifier: DNDVerifying {
 @MainActor
 private final class FakeShortcutEscalator: FocusShortcutEscalating {
     var shouldFail = false
+    /// Fails the first N invocations deterministically, then succeeds.
+    var failFirstCount = 0
     private(set) var invocations: [String] = []
 
     func runFocusByName(_ modeName: String) async throws {
         invocations.append(modeName)
+        if failFirstCount > 0 {
+            failFirstCount -= 1
+            throw NSError(domain: "FakeShortcutEscalator", code: 1, userInfo: [NSLocalizedDescriptionKey: "shortcuts run timed out"])
+        }
         if shouldFail {
             throw NSError(domain: "FakeShortcutEscalator", code: 1, userInfo: [NSLocalizedDescriptionKey: "shortcuts run timed out"])
         }
@@ -340,5 +350,171 @@ final class DNDReliabilityTests {
         let settled = await waitUntil { service.lastEvent == .verificationConfirmed(targetActive: true) }
         #expect(settled)
         #expect(escalator.invocations.isEmpty)
+    }
+
+    // MARK: call-reliability 4.1 — release retries with backoff
+
+    private func makeService(
+        verifier: FakeFocusVerifier,
+        escalator: FakeShortcutEscalator,
+        recordedDelays: DelayRecorder,
+        shortcutsFirstOS: Bool = false
+    ) -> DNDReliabilityService {
+        DNDReliabilityService(
+            core: FakeDNDCore(),
+            verifier: verifier,
+            escalator: escalator,
+            verificationDelay: { await Task.yield() },
+            isShortcutsFirstOS: { shortcutsFirstOS },
+            retryDelay: { seconds in recordedDelays.append(seconds) } // fake sleep ADVANCES the fake clock
+        )
+    }
+
+    private final class DelayRecorder {
+        private(set) var delays: [TimeInterval] = []
+        func append(_ d: TimeInterval) { delays.append(d) }
+    }
+
+    @Test func failedDeactivationRetriesWithBackoffUntilVerified() async {
+        let verifier = FakeFocusVerifier()
+        verifier.isFocusActive = true // DND stuck on after the call ends
+        verifier.becomesInactiveAfterReads = 1 // read 2 (post-retry) reports off
+        let escalator = FakeShortcutEscalator()
+        escalator.failFirstCount = 1 // initial release attempt fails, retry succeeds
+        let clock = DelayRecorder()
+        let service = makeService(verifier: verifier, escalator: escalator, recordedDelays: clock)
+
+        service.deactivationRequested()
+
+        let succeeded = await waitUntil {
+            service.eventHistory.contains { if case .deactivationRetrySucceeded = $0 { return true }; return false }
+        }
+        #expect(succeeded)
+        // ≥3 attempts scheduled, first ≤10 s, fake clock advanced in order.
+        let scheduled = service.eventHistory.compactMap {
+            if case let .deactivationRetryScheduled(attempt, delay) = $0 { return (attempt, delay) }
+            return nil
+        }
+        #expect(scheduled.count == 1)
+        #expect(scheduled.first?.1 == DNDReliabilityService.deactivationRetryDelaysSeconds[0])
+        #expect(clock.delays == [5.0])
+        #expect(service.lastEvent == .deactivationRetrySucceeded)
+        // Ownership cleared ONLY after external verification.
+        #expect(!service.hasPendingDeactivationRelease)
+        #expect(service.systemDNDOwnership == .none)
+    }
+
+    @Test func exhaustedRetriesRetainOwnershipUntilLaterVerification() async {
+        let verifier = FakeFocusVerifier()
+        verifier.isFocusActive = true // never confirms deactivation
+        let escalator = FakeShortcutEscalator()
+        escalator.failFirstCount = .max // every attempt fails
+        let clock = DelayRecorder()
+        let service = makeService(verifier: verifier, escalator: escalator, recordedDelays: clock)
+
+        service.deactivationRequested()
+        service.registerOwnedSystemDND()
+
+        let exhausted = await waitUntil {
+            service.eventHistory.filter {
+                if case .deactivationRetryScheduled = $0 { return true }
+                return false
+            }.count == DNDReliabilityService.deactivationRetryDelaysSeconds.count
+        }
+        #expect(exhausted)
+        // Full backoff schedule ran: 5, 10, 20 — fake clock advanced thrice.
+        #expect(clock.delays == DNDReliabilityService.deactivationRetryDelaysSeconds)
+        #expect(escalator.invocations.count == DNDReliabilityService.deactivationRetryDelaysSeconds.count + 1)
+        // Ownership retained — never orphaned silently.
+        #expect(service.hasPendingDeactivationRelease)
+        #expect(service.systemDNDOwnership == .ownedByFocally)
+    }
+
+    // MARK: call-reliability 4.2 — ownership ledger
+
+    @Test func externalDNDIsNeverReleasedOrClaimed() async {
+        let service = makeService(verifier: FakeFocusVerifier(), escalator: FakeShortcutEscalator(), recordedDelays: DelayRecorder())
+
+        service.registerExternalSystemDND() // user's manual Focus at call start
+        #expect(service.systemDNDOwnership == .external)
+
+        service.releaseOwnedSystemDNDAfterVerifiedDeactivation()
+        #expect(service.systemDNDOwnership == .external) // untouched
+
+        service.registerOwnedSystemDND() // call flow must not claim over it
+        #expect(service.systemDNDOwnership == .external)
+    }
+
+    @Test func orphanedOwnershipIsReusedNotDuplicated() async {
+        let service = makeService(verifier: FakeFocusVerifier(), escalator: FakeShortcutEscalator(), recordedDelays: DelayRecorder())
+
+        service.registerOwnedSystemDND() // previous call's release failed → retained orphan
+        service.registerOwnedSystemDND() // next call start
+        #expect(service.systemDNDOwnership == .ownedByFocally) // same single ownership
+
+        service.releaseOwnedSystemDNDAfterVerifiedDeactivation()
+        #expect(service.systemDNDOwnership == .none) // released exactly once
+    }
+
+    @Test func releaseIsBlockedWhileDeactivationUnverified() async {
+        let verifier = FakeFocusVerifier()
+        verifier.isFocusActive = true // deactivation never verifies
+        let escalator = FakeShortcutEscalator()
+        escalator.shouldFail = true // every release attempt fails
+        let service = makeService(verifier: verifier, escalator: escalator, recordedDelays: DelayRecorder())
+        service.registerOwnedSystemDND()
+        service.deactivationRequested()
+
+        let pending = await waitUntil { service.hasPendingDeactivationRelease }
+        #expect(pending)
+
+        service.releaseOwnedSystemDNDAfterVerifiedDeactivation()
+        #expect(service.systemDNDOwnership == .ownedByFocally) // retained until verified
+    }
+
+    // MARK: call-reliability 4.3 — synchronous cleanup on terminate
+
+    @Test func synchronousCleanupCompletesBeforeReturning() {
+        let core = FakeDNDCore()
+        core.activateDND()
+        let verifier = FakeFocusVerifier()
+        verifier.isFocusActive = true
+        verifier.becomesInactiveAfterReads = 2 // DND drops after a couple polls
+        var sleepCalls: [TimeInterval] = []
+        let service = DNDReliabilityService(
+            core: core,
+            verifier: verifier,
+            escalator: FakeShortcutEscalator(),
+            cleanupPollSleep: { sleepCalls.append($0) } // no real sleeping
+        )
+        service.registerOwnedSystemDND()
+
+        let verified = service.performSynchronousDeactivationCleanup(timeoutSeconds: 3)
+
+        #expect(verified) // returned BEFORE the timeout with confirmation
+        #expect(core.deactivations == 1)
+        #expect(!service.hasPendingDeactivationRelease)
+        #expect(service.systemDNDOwnership == .none)
+    }
+
+    @Test func synchronousCleanupTimesOutAndRetainsOwnership() {
+        let core = FakeDNDCore()
+        core.activateDND()
+        let verifier = FakeFocusVerifier()
+        verifier.isFocusActive = true // never confirms
+        let service = DNDReliabilityService(
+            core: core,
+            verifier: verifier,
+            escalator: FakeShortcutEscalator(),
+            cleanupPollSleep: { _ in } // instant fake clock
+        )
+        service.registerOwnedSystemDND()
+
+        let verified = service.performSynchronousDeactivationCleanup(timeoutSeconds: 0)
+
+        #expect(!verified)
+        #expect(core.deactivations == 1) // the deactivation WAS attempted
+        #expect(service.hasPendingDeactivationRelease) // ownership retained for reconciliation
+        #expect(service.systemDNDOwnership == .ownedByFocally)
     }
 }
