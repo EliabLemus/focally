@@ -307,9 +307,11 @@ final class CalendarSlackIntegrationService {
         if let eventFetcher {
             events = eventFetcher().sorted { $0.startTime < $1.startTime }
         } else {
-            let start = Calendar.current.startOfDay(for: Date())
-            let end = Calendar.current.date(byAdding: .day, value: 1, to: start) ?? Date()
-            let predicate = eventStore.predicateForEvents(withStart: start, end: end, calendars: nil)
+            // Task 1.3: extend 24 h back so overnight events still running are fetched.
+            let window = CalendarEventAnalyzer.fetchWindow(for: Date())
+            let predicate = eventStore.predicateForEvents(
+                withStart: window.start, end: window.end, calendars: nil
+            )
             events = eventStore.events(matching: predicate)
                 .map(CalendarMeeting.init(event:))
                 .sorted { $0.startTime < $1.startTime }
@@ -466,14 +468,19 @@ struct CalendarMeeting: Identifiable, Equatable {
     let endTime: Date
     let isAllDay: Bool
     let hasVideoCall: Bool
+    let conferencePlatform: String?
 
-    init(id: String, title: String, startTime: Date, endTime: Date, isAllDay: Bool, hasVideoCall: Bool) {
+    init(
+        id: String, title: String, startTime: Date, endTime: Date, isAllDay: Bool,
+        hasVideoCall: Bool, conferencePlatform: String? = nil
+    ) {
         self.id = id
         self.title = title
         self.startTime = startTime
         self.endTime = endTime
         self.isAllDay = isAllDay
         self.hasVideoCall = hasVideoCall
+        self.conferencePlatform = conferencePlatform
     }
 
     init(event: EKEvent) {
@@ -483,6 +490,8 @@ struct CalendarMeeting: Identifiable, Equatable {
         endTime = event.endDate
         isAllDay = event.isAllDay
 
-        hasVideoCall = CalendarEventAnalyzer.shared.isVideoCall(event)
+        let analyzer = CalendarEventAnalyzer.shared
+        hasVideoCall = analyzer.isVideoCall(event)
+        conferencePlatform = analyzer.conferencePlatform(for: event)
     }
 }

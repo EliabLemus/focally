@@ -63,6 +63,7 @@
 		514A298887A5C0137A1FE5FA /* SlackServiceSingletonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB15EBD18D837EBD03246513 /* SlackServiceSingletonTests.swift */; };
 		51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9D7A94AF842BA26A1156F5E9 /* pt.lproj */; };
 		5353030C6F97863A4C4D3B4A /* TaskItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D115240ADBD4E68FF12E23 /* TaskItemTests.swift */; };
+		55E82F2AE5F68450322AB94C /* CalendarEventAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A3E4583FADE7D477B5DD5E /* CalendarEventAnalyzerTests.swift */; };
 		569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C748C5C5C964CFE0D53D32A8 /* CardModifier.swift */; };
 		57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */; };
 		571CA2D1AB755DC22A237AD4 /* FocusSessionDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F3837E7FF3D0047E0011D3 /* FocusSessionDraft.swift */; };
@@ -271,6 +272,7 @@
 		8106D91600D3C2013F5ACD33 /* bell.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = bell.aiff; sourceTree = "<group>"; };
 		824FFB84C09F608FF1A0E65B /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		867AE7AACA30C0FD8D4ABA7E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		86A3E4583FADE7D477B5DD5E /* CalendarEventAnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventAnalyzerTests.swift; sourceTree = "<group>"; };
 		86E8C1CF44EBDEC378C64D75 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiValidatorTests.swift; sourceTree = "<group>"; };
 		887E284DE9F5C9CF995676B1 /* FocallySpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocallySpacing.swift; sourceTree = "<group>"; };
@@ -451,6 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				6537FE48383B60AE2C68DF98 /* CalendarChangeDebounceTests.swift */,
+				86A3E4583FADE7D477B5DD5E /* CalendarEventAnalyzerTests.swift */,
 				3ED15EC8CBC2E80507AFE7C8 /* CalendarMetricsTrackerTests.swift */,
 				EE81A1130E07A81DA2ECB59C /* CalendarSyncDefaultTests.swift */,
 				E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */,
@@ -929,6 +932,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF7E9E64A362E99F4A3E731A /* CalendarChangeDebounceTests.swift in Sources */,
+				55E82F2AE5F68450322AB94C /* CalendarEventAnalyzerTests.swift in Sources */,
 				57005EBC6667AEE72561F0D6 /* CalendarMetricsTrackerTests.swift in Sources */,
 				8CD18238F903C570D48FDD99 /* CalendarSyncDefaultTests.swift in Sources */,
 				5B17AB1DE2ECBE9BE629812B /* CallClientOverrideTests.swift in Sources */,
