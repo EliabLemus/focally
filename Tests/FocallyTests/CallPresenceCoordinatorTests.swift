@@ -129,7 +129,7 @@ final class CallPresenceCoordinatorTests {
         let slack = RecordingSlackService()
         let dnd = RecordingDNDService()
         let session = FakeCallSessionController()
-        let settings = CallDetectionSettings(callStatusMessage: "Custom In a Call")
+        let settings = CallDetectionSettings(callStatusMessage: "Custom In a Call", uncorroboratedBrowserCapture: .call)
         let coordinator = makeCoordinator(slack: slack, dnd: dnd, session: session, settings: settings)
 
         coordinator.callStarted(chrome)
@@ -148,7 +148,7 @@ final class CallPresenceCoordinatorTests {
         #expect(session.resumeCount == 1)
         #expect(!session.isSessionPaused)
         #expect(coordinator.currentPresence == .idle)
-        #expect(slack.allWrites.last == .clearStatus)
+        #expect(slack.allWrites.last == .restore)
         #expect(dnd.writes == [.activate, .deactivate])
         #expect(!CallActivityTracker.shared.isCallActive)
     }
@@ -157,7 +157,7 @@ final class CallPresenceCoordinatorTests {
 
     @Test func sessionUserPausedBeforeCallIsNotResumedOnCallEnd() {
         let session = FakeCallSessionController(isPaused: true) // user paused manually
-        let coordinator = makeCoordinator(session: session)
+        let coordinator = makeCoordinator(session: session, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
 
         coordinator.callStarted(chrome)
         #expect(session.pauseCount == 0) // already paused; detector did not pause
@@ -191,7 +191,7 @@ final class CallPresenceCoordinatorTests {
 
     @Test func twoClientsSinglePresenceRestoredOnlyAfterLastEnds() {
         let slack = RecordingSlackService()
-        let coordinator = makeCoordinator(slack: slack)
+        let coordinator = makeCoordinator(slack: slack, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
 
         coordinator.callStarted(chrome)
         coordinator.callStarted(slackCall)
@@ -203,7 +203,7 @@ final class CallPresenceCoordinatorTests {
         coordinator.callEnded()
 
         #expect(coordinator.currentPresence == .idle)
-        #expect(slack.allWrites.last == .clearStatus)
+        #expect(slack.allWrites.last == .restore)
     }
 
     @Test func secondCaptureJoiningKeepsFirstClientPresenceAtDetectorLevel() {
@@ -245,7 +245,7 @@ final class CallPresenceCoordinatorTests {
     @Test func quitMidCallClearsStatusAndReleasesOwnedDNDOnly() {
         let slack = RecordingSlackService()
         let externalDND = RecordingDNDService(isDNDActive: true) // user-owned DND
-        let coordinator = makeCoordinator(slack: slack, dnd: externalDND)
+        let coordinator = makeCoordinator(slack: slack, dnd: externalDND, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
 
         coordinator.callStarted(chrome)
         #expect(externalDND.writes.isEmpty) // never activated by Focally
@@ -259,7 +259,7 @@ final class CallPresenceCoordinatorTests {
 
         // Owned case: DND Focally activated IS released.
         let dnd = RecordingDNDService()
-        let coordinator2 = makeCoordinator(slack: RecordingSlackService(), dnd: dnd)
+        let coordinator2 = makeCoordinator(slack: RecordingSlackService(), dnd: dnd, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
         coordinator2.callStarted(chrome)
         coordinator2.callDetectionCleanupOnTerminate()
         #expect(dnd.writes == [.activate, .deactivate])
@@ -273,6 +273,7 @@ final class CallPresenceCoordinatorTests {
         defaults.removePersistentDomain(forName: suiteName)
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let slack = RecordingSlackService()
+        CallDetectionSettingsStore(defaults: defaults).save(CallDetectionSettings(uncorroboratedBrowserCapture: .call))
         let coordinator = makeCoordinator(slack: slack, defaults: defaults)
 
         coordinator.callStarted(chrome)
@@ -281,7 +282,7 @@ final class CallPresenceCoordinatorTests {
 
         // User edits settings between calls (persisted via the store).
         let store = CallDetectionSettingsStore(defaults: defaults)
-        store.save(CallDetectionSettings(callStatusMessage: "Second Call Text", enableDNDDuringCalls: false))
+        store.save(CallDetectionSettings(callStatusMessage: "Second Call Text", enableDNDDuringCalls: false, uncorroboratedBrowserCapture: .call))
 
         let dnd = RecordingDNDService()
         let coordinator2 = makeCoordinator(slack: slack, dnd: dnd, defaults: defaults)
@@ -295,7 +296,7 @@ final class CallPresenceCoordinatorTests {
 
     @Test func dndActiveByUserBeforeCallIsNotDeactivatedOnCallEnd() {
         let dnd = RecordingDNDService(isDNDActive: true)
-        let coordinator = makeCoordinator(dnd: dnd)
+        let coordinator = makeCoordinator(dnd: dnd, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
 
         coordinator.callStarted(chrome)
         #expect(dnd.writes.isEmpty) // Focally did not take ownership
@@ -303,6 +304,133 @@ final class CallPresenceCoordinatorTests {
         coordinator.callEnded()
 
         #expect(dnd.writes.isEmpty) // and never touches the user's DND
+    }
+
+    // MARK: 1.4 — calendar meeting alone drives presence (no detector)
+
+    @Test func calendarMeetingAloneSetsPresenceWithoutCallDetector() {
+        let coordinator = makeCoordinator(session: nil)
+        coordinator.calendarSettingsUpdated(calendarSettings(show: true))
+        #expect(coordinator.currentPresence == .idle)
+
+        coordinator.calendarMeetingUpdated(makeMeeting())
+        #expect(coordinator.currentPresence == .calendarMeeting(makeMeeting()))
+
+        coordinator.calendarMeetingUpdated(nil)
+        #expect(coordinator.currentPresence == .idle)
+    }
+
+    // MARK: 3.1 — presenceMode purity: trusted natives always a call
+
+    @Test func presenceModeTrustedNativesAlwaysCallOthersFollowSetting() {
+        #expect(CallDetectionSettings.presenceMode(forBundlePrefix: "us.zoom.xos", setting: .notice) == .call)
+        #expect(CallDetectionSettings.presenceMode(forBundlePrefix: "com.microsoft.teams", setting: .notice) == .call)
+        #expect(CallDetectionSettings.presenceMode(forBundlePrefix: "com.google.chrome.helper", setting: .notice) == .notice)
+        #expect(CallDetectionSettings.presenceMode(forBundlePrefix: "com.google.chrome.helper", setting: .call) == .call)
+    }
+
+    // MARK: 3.2 — notice presence: no DND, no pause, no Slack status
+
+    @Test func noticeModeCaptureIsSoftPresenceWithNoSideEffects() {
+        let slack = RecordingSlackService()
+        let dnd = RecordingDNDService()
+        let session = FakeCallSessionController()
+        let coordinator = makeCoordinator(slack: slack, dnd: dnd, session: session) // default .notice
+
+        coordinator.callStarted(chrome)
+
+        #expect(coordinator.isNoticePresenceActive)
+        #expect(coordinator.currentPresence == .idle)
+        #expect(slack.allWrites.isEmpty)
+        #expect(dnd.writes.isEmpty)
+        #expect(session.pauseCount == 0)
+        #expect(!CallActivityTracker.shared.isCallActive)
+
+        coordinator.callEnded()
+
+        #expect(coordinator.currentPresence == .idle)
+        #expect(!coordinator.isNoticePresenceActive)
+        #expect(slack.allWrites.isEmpty)
+        #expect(dnd.writes.isEmpty)
+    }
+
+    // MARK: 4.2 — DND ownership ledger
+
+    @Test func externalUserDNDRegisteredNeverReleased() {
+        let dnd = RecordingDNDService(isDNDActive: true) // user-owned
+        let ledger = FakeDNDOwnershipLedger()
+        let coordinator = makeCoordinator(dnd: dnd, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+        coordinator.dndOwnershipLedger = ledger
+
+        coordinator.callStarted(chrome)
+
+        #expect(dnd.writes.isEmpty) // Focally never activates over the user's DND
+        #expect(ledger.externalRegistrations == 1)
+        #expect(ledger.ownedRegistrations == 0)
+
+        coordinator.callEnded()
+
+        #expect(ledger.releases == 0) // external ownership is never released
+        #expect(dnd.writes.isEmpty)
+    }
+
+    @Test func ownedDNDReusedWhileStillWantedAndReleasedOnceAtIdle() {
+        let dnd = RecordingDNDService()
+        let ledger = FakeDNDOwnershipLedger()
+        let coordinator = makeCoordinator(dnd: dnd, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+        coordinator.dndOwnershipLedger = ledger
+
+        // Calendar DND takes ownership first.
+        coordinator.calendarSettingsUpdated(calendarSettings(show: true, dnd: true))
+        coordinator.calendarMeetingUpdated(makeMeeting())
+        #expect(dnd.writes == [.activate])
+        #expect(ledger.ownedRegistrations == 1)
+
+        // Call under the meeting wants the same DND → ownership reused.
+        coordinator.callStarted(chrome)
+        #expect(dnd.writes == [.activate])
+
+        coordinator.callEnded()
+        #expect(ledger.releases == 0) // calendar still wants DND
+        #expect(dnd.writes == [.activate])
+
+        coordinator.calendarMeetingUpdated(nil)
+        #expect(dnd.writes == [.activate, .deactivate])
+        #expect(ledger.releases == 1)
+    }
+
+    // MARK: 6.1 — live status confirmed: re-apply and restore on end
+
+    @Test func confirmedLiveStatusReappliesAndRestoresOnEnd() {
+        let slack = RecordingSlackService() // confirmLiveResult = true
+        let coordinator = makeCoordinator(slack: slack, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+
+        coordinator.callStarted(chrome)
+        #expect(slack.statuses.count == 1)
+
+        coordinator.reapplyActivePresence()
+        #expect(slack.confirmLiveCalls == 1)
+        #expect(slack.statuses.count == 2)
+
+        coordinator.callEnded()
+        #expect(slack.allWrites.last == .restore)
+    }
+
+    // MARK: 6.2 — manual override pauses sync: no re-apply, no restore
+
+    @Test func manualOverrideDetectedPausesSyncUntilNextTransition() {
+        let slack = RecordingSlackService(confirmLiveResult: false)
+        let coordinator = makeCoordinator(slack: slack, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+
+        coordinator.callStarted(chrome)
+        #expect(slack.statuses.count == 1)
+
+        coordinator.reapplyActivePresence()
+        #expect(slack.confirmLiveCalls == 1)
+        #expect(slack.statuses.count == 1) // re-apply suppressed
+
+        coordinator.callEnded()
+        #expect(!slack.allWrites.contains(.restore)) // never clobbers the manual status
     }
 }
 
@@ -320,6 +448,7 @@ private final class RecordingSlackService: PresenceSlackServicing {
     enum Write: Equatable {
         case status(Status)
         case clearStatus
+        case restore
         case enableDND(Int)
         case disableDND
     }
@@ -332,15 +461,37 @@ private final class RecordingSlackService: PresenceSlackServicing {
 
     var isEnabled = true
     private let acceptsDNDRequests: Bool
+    private let confirmLiveResult: Bool
     private(set) var allWrites: [Write] = []
     private(set) var statuses: [Status] = []
     private(set) var dndWrites: [DNDWrite] = []
+    private(set) var confirmLiveCalls = 0
+    private(set) var syncClearCalls = 0
 
-    init(acceptsDNDRequests: Bool = true) {
+    init(acceptsDNDRequests: Bool = true, confirmLiveResult: Bool = true) {
         self.acceptsDNDRequests = acceptsDNDRequests
+        self.confirmLiveResult = confirmLiveResult
     }
 
     func savedStatusEmoji() -> String { ":saved:" }
+
+    func saveCurrentStatus() {}
+
+    func restoreSavedStatus() {
+        allWrites.append(.restore)
+    }
+
+    func confirmFocallyStatusStillLive(completion: @escaping (Bool) -> Void) {
+        confirmLiveCalls += 1
+        completion(confirmLiveResult)
+    }
+
+    @discardableResult
+    func clearStatusSynchronously(timeoutSeconds: TimeInterval) -> Bool {
+        syncClearCalls += 1
+        allWrites.append(.clearStatus)
+        return true
+    }
 
     func setStatus(text: String, expirationTimestamp: Int, taskEmoji: String?, fallbackEmoji: String?) {
         let status = Status(text: text, expiration: expirationTimestamp, emoji: taskEmoji, fallbackEmoji: fallbackEmoji)
@@ -377,6 +528,7 @@ private final class RecordingDNDService: PresenceDNDServicing {
 
     private(set) var isDNDActive: Bool
     private(set) var writes: [Write] = []
+    private var ownedByFocally = false
 
     init(isDNDActive: Bool = false) {
         self.isDNDActive = isDNDActive
@@ -385,12 +537,30 @@ private final class RecordingDNDService: PresenceDNDServicing {
     func activateDND() {
         writes.append(.activate)
         isDNDActive = true
+        ownedByFocally = true
     }
 
     func deactivateDND() {
         writes.append(.deactivate)
         isDNDActive = false
     }
+
+    func performSynchronousDeactivationCleanup(timeoutSeconds: TimeInterval) -> Bool {
+        guard isDNDActive, ownedByFocally else { return false }
+        deactivateDND()
+        ownedByFocally = false
+        return true
+    }
+}
+
+@MainActor
+private final class FakeDNDOwnershipLedger: SystemDNDOwnershipLedging {
+    private(set) var ownedRegistrations = 0
+    private(set) var externalRegistrations = 0
+    private(set) var releases = 0
+    func registerOwnedSystemDND() { ownedRegistrations += 1 }
+    func registerExternalSystemDND() { externalRegistrations += 1 }
+    func releaseOwnedSystemDNDAfterVerifiedDeactivation() { releases += 1 }
 }
 
 // Shared test doubles from MediaDeviceCallDetectorTests.swift (file-private

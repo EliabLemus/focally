@@ -160,7 +160,8 @@ struct CallClientOverrideTests {
             sessionController: OverrideFakeSessionController(),
             callSettingsProvider: {
                 CallDetectionSettings(
-                    callClientEmojiOverrides: ["company.thebrowser": ":video-camera:"]
+                    callClientEmojiOverrides: ["company.thebrowser": ":video-camera:"],
+                    uncorroboratedBrowserCapture: .call
                 )
             }
         )
@@ -180,7 +181,7 @@ struct CallClientOverrideTests {
             dndService: dnd,
             now: { self.now },
             sessionController: OverrideFakeSessionController(),
-            callSettingsProvider: { CallDetectionSettings() }
+            callSettingsProvider: { CallDetectionSettings(uncorroboratedBrowserCapture: .call) }
         )
 
         coordinator.callStarted(CallClientCatalog.client(for: arc))
@@ -198,7 +199,7 @@ struct CallClientOverrideTests {
             now: { self.now },
             sessionController: OverrideFakeSessionController(),
             callSettingsProvider: {
-                CallDetectionSettings(unknownCallClientEmoji: ":crystal-ball:")
+                CallDetectionSettings(unknownCallClientEmoji: ":crystal-ball:", uncorroboratedBrowserCapture: .call)
             }
         )
 

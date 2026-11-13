@@ -397,6 +397,37 @@ class SlackService {
         }
     }
 
+    /// 6.2: checks the live profile against the status Focally last set. A
+    /// fetch failure conservatively reports "still live" (no false pause).
+    func confirmFocallyStatusStillLive(completion: @escaping (Bool) -> Void) {
+        fetchCurrentProfile { [weak self] current in
+            DispatchQueue.main.async {
+                guard let self else { completion(false); return }
+                completion(current == nil || current == self.focallySetStatus)
+            }
+        }
+    }
+
+    /// call-reliability 4.3: blocking status clear for the terminate path
+    /// (≤ timeoutSeconds, real URLSession — the process is dying).
+    @discardableResult
+    func clearStatusSynchronously(timeoutSeconds: TimeInterval) -> Bool {
+        guard isEnabled, let token else { return false }
+        var request = URLRequest(url: Self.profileSetURL, timeoutInterval: timeoutSeconds)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data(#"{"profile":{"status_text":"","status_emoji":""}}"#.utf8)
+        let semaphore = DispatchSemaphore(value: 0)
+        var ok = false
+        URLSession.shared.dataTask(with: request) { _, response, _ in
+            ok = ((response as? HTTPURLResponse)?.statusCode == 200)
+            semaphore.signal()
+        }.resume()
+        _ = semaphore.wait(timeout: .now() + timeoutSeconds + 0.5)
+        return ok
+    }
+
     private func fetchCurrentProfile(completion: @escaping (SlackStatusSnapshot?) -> Void) {
         guard isEnabled, let token else {
             completion(nil)

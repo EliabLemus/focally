@@ -98,6 +98,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // TASK-057: media-device call detection wiring.
         dndService.reliabilityService = dndReliabilityService
+        // 4.2: the coordinator's DND ownership ledger is the reliability service.
+        presenceCoordinator.dndOwnershipLedger = dndReliabilityService
         callDetector.onCallStarted = { [weak self] client in
             self?.presenceCoordinator.callStarted(client)
         }

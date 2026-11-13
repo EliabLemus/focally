@@ -76,12 +76,26 @@ protocol PresenceSlackServicing: AnyObject {
     @discardableResult
     func requestSlackDNDSnooze(minutes: Int) -> Bool
     func disableSlackDND()
+    // slack-presence-sync 6.1/6.2 — status restore & manual-override pause.
+    func saveCurrentStatus()
+    func restoreSavedStatus()
+    /// True when the live Slack profile still shows the status Focally set
+    /// (users.profile.get check). False → the user changed it manually and
+    /// status sync pauses until the next presence transition (6.2).
+    func confirmFocallyStatusStillLive(completion: @escaping (Bool) -> Void)
+    /// call-reliability 4.3: blocking status clear for the terminate path.
+    @discardableResult
+    func clearStatusSynchronously(timeoutSeconds: TimeInterval) -> Bool
 }
 
 extension PresenceSlackServicing {
     /// Default for test fakes: no workspace emoji list loaded, so the
     /// unknown-shortcode warning (TASK-058) is silently skipped.
     var workspaceEmojiCodes: [String] { [] }
+    func saveCurrentStatus() {}
+    func restoreSavedStatus() {}
+    func confirmFocallyStatusStillLive(completion: @escaping (Bool) -> Void) { completion(true) }
+    func clearStatusSynchronously(timeoutSeconds: TimeInterval) -> Bool { false }
 }
 
 @MainActor
@@ -90,12 +104,38 @@ protocol PresenceDNDServicing: AnyObject {
     @discardableResult func refreshDNDStatus() -> Bool
     func activateDND()
     func deactivateDND()
+    /// call-reliability 4.3: blocking DND deactivation for the terminate path.
+    @discardableResult func performSynchronousDeactivationCleanup(timeoutSeconds: TimeInterval) -> Bool
 }
 
 extension PresenceDNDServicing {
     @discardableResult
     func refreshDNDStatus() -> Bool { isDNDActive }
+    /// call-reliability 4.3: blocking DND deactivation for the terminate path.
+    @discardableResult
+    func performSynchronousDeactivationCleanup(timeoutSeconds: TimeInterval) -> Bool { false }
 }
+
+extension DNDService {
+    func performSynchronousDeactivationCleanup(timeoutSeconds: TimeInterval) -> Bool {
+        guard let reliabilityService else { return false }
+        return MainActor.assumeIsolated {
+            reliabilityService.performSynchronousDeactivationCleanup(timeoutSeconds: timeoutSeconds)
+        }
+    }
+}
+
+/// call-reliability 4.2 — ownership ledger seam consumed by the coordinator:
+/// external DND at call start is registered, never released; owned DND is
+/// released exactly once after verified deactivation.
+@MainActor
+protocol SystemDNDOwnershipLedging: AnyObject {
+    func registerOwnedSystemDND()
+    func registerExternalSystemDND()
+    func releaseOwnedSystemDNDAfterVerifiedDeactivation()
+}
+
+extension DNDReliabilityService: SystemDNDOwnershipLedging {}
 
 extension SlackService: PresenceSlackServicing {
     func requestSlackDNDSnooze(minutes: Int) -> Bool {
@@ -149,6 +189,43 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private(set) var ownsSystemDND = false
     private(set) var wantsSystemDND = false
     private var ownedSlackDNDRequest: SlackDNDRequest?
+    /// 4.2: ownership ledger (DNDReliabilityService in production).
+    var dndOwnershipLedger: (any SystemDNDOwnershipLedging)?
+    /// 3.2: notice-mode captures — soft presence (no DND/pause/status).
+    private(set) var isNoticePresenceActive = false
+    private var noticeCallClients: [CallClient] = []
+    /// 6.1: Focally saved the user's status before overwriting → restore (not
+    /// clear) when this presence ends.
+    private var didOverrideStatusForPresence = false
+    private var slackStatusSyncPausedForPresence = false
+    private func resetSlackSyncForTransition() {
+        didOverrideStatusForPresence = false
+        slackStatusSyncPausedForPresence = false
+    }
+    /// 6.2: Slack status sync paused (manual override detected) until the next
+    /// presence transition.
+    private func pauseSlackStatusSyncForPresence() {
+        guard !slackStatusSyncPausedForPresence else { return }
+        slackStatusSyncPausedForPresence = true
+        callEmojiLogger.info("Slack status sync paused for this presence: the user set a manual status; sync resumes on the next transition.")
+    }
+    /// 6.1/6.2: saves the user's status before Focally's first overwrite of
+    /// this presence; on re-applies, overwrites only while Focally's status is
+    /// still live on the profile — a manual change pauses sync until the next
+    /// transition.
+    private func overwriteSlackStatus(_ write: @escaping () -> Void) {
+        guard !slackStatusSyncPausedForPresence else { return }
+        if didOverrideStatusForPresence {
+            slackService.confirmFocallyStatusStillLive { [weak self] live in
+                guard let self else { return }
+                if live { write() } else { self.pauseSlackStatusSyncForPresence() }
+            }
+        } else {
+            didOverrideStatusForPresence = true
+            slackService.saveCurrentStatus()
+            write()
+        }
+    }
 
     private(set) var currentPresence: PresenceState = .idle
     var isManualFocusActive: Bool { manualMode != nil }
@@ -177,16 +254,20 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     func manualFocusStarted(mode: FocusMode, systemDNDEnabled: Bool) {
         manualMode = mode.sanitized()
         manualSystemDNDEnabled = systemDNDEnabled
+        resetSlackSyncForTransition()
         applyWinningPresence()
     }
 
     func manualFocusEnded() {
         manualMode = nil
+        resetSlackSyncForTransition()
         applyWinningPresence()
     }
 
     func calendarMeetingUpdated(_ meeting: CalendarMeeting?) {
+        let changed = meeting?.id != rememberedMeeting?.id
         rememberedMeeting = meeting
+        if changed { resetSlackSyncForTransition() }
         guard manualMode == nil else { return }
         applyWinningPresence()
     }
@@ -205,6 +286,18 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     // MARK: Call detection presence
 
     func callStarted(_ client: CallClient) {
+        let settings = callSettingsProvider()
+        // 3.1: capture without an active meeting — trusted natives are always a
+        // call; anything else follows the configured mode (default .notice).
+        if rememberedMeeting == nil,
+           CallDetectionSettings.presenceMode(forBundlePrefix: client.bundlePrefix, setting: settings.uncorroboratedBrowserCapture) == .notice {
+            guard !noticeCallClients.contains(where: { $0.bundlePrefix == client.bundlePrefix }) else { return }
+            noticeCallClients.append(client)
+            isNoticePresenceActive = true
+            callEmojiLogger.info("Notice presence for \(client.bundlePrefix) (capture without meeting): no DND, no session pause, no Slack status.")
+            return
+        }
+
         guard !activeCallClients.contains(where: { $0.bundlePrefix == client.bundlePrefix }) else { return }
         let isFirstCapture = activeCallClients.isEmpty
         activeCallClients.append(client)
@@ -213,7 +306,6 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         callStartedUnderCalendarPresence = isFirstCapture && manualMode == nil && rememberedMeeting != nil
         guard isFirstCapture else { return }
 
-        let settings = callSettingsProvider()
         if settings.pauseFocusDuringCalls, let sessionController, sessionController.hasActiveSession {
             // A session the USER paused manually must never be resumed by us —
             // and is not paused again (double-pause would double-count pause time).
@@ -228,6 +320,8 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     }
 
     func callEnded() {
+        noticeCallClients = []
+        isNoticePresenceActive = activeCallClients.isEmpty ? false : isNoticePresenceActive
         guard !activeCallClients.isEmpty else { return }
         activeCallClients = []
         callStartedUnderCalendarPresence = false
@@ -249,8 +343,12 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         callStartedUnderCalendarPresence = false
         callPausedSessionByCallDetection = false
         CallActivityTracker.shared.isCallActive = false
-        slackService.clearStatus()
-        releaseOwnedDND()
+        // 4.3: blocking cleanup — the process is dying; no fire-and-forget.
+        slackService.clearStatusSynchronously(timeoutSeconds: 3)
+        if dndService.performSynchronousDeactivationCleanup(timeoutSeconds: 3) {
+            ownsSystemDND = false
+            dndOwnershipLedger?.releaseOwnedSystemDNDAfterVerifiedDeactivation()
+        }
     }
 
     /// While a call is active the call presence wins — except when the call
@@ -289,12 +387,14 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
             )
             warnIfEmojiNotInWorkspace(resolved.emoji)
             let expiration = Int(now().addingTimeInterval(4 * 3600).timeIntervalSince1970)
-            slackService.setStatus(
-                text: settings.sanitizedStatusMessage,
-                expirationTimestamp: expiration,
-                taskEmoji: resolved.emoji,
-                fallbackEmoji: slackService.savedStatusEmoji()
-            )
+            overwriteSlackStatus { [weak self] in
+                self?.slackService.setStatus(
+                    text: settings.sanitizedStatusMessage,
+                    expirationTimestamp: expiration,
+                    taskEmoji: resolved.emoji,
+                    fallbackEmoji: self?.slackService.savedStatusEmoji()
+                )
+            }
         }
         applySystemDND(shouldActivate: settings.enableDNDDuringCalls)
     }
@@ -309,7 +409,14 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     }
 
     private func applyIdle() {
-        slackService.clearStatus()
+        // 6.1: restore (not clear) — but only what Focally overwrote; a manual
+        // user status detected mid-presence was never overwritten (6.2).
+        if didOverrideStatusForPresence && !slackStatusSyncPausedForPresence {
+            slackService.restoreSavedStatus()
+        } else {
+            slackService.clearStatus()
+        }
+        resetSlackSyncForTransition()
         releaseOwnedDND()
     }
 
@@ -349,12 +456,14 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
             let eventEmoji = calendarSettings.useEventEmojisForStatus && !extractedEmojis.isEmpty
                 ? EmojiExtractor.shared.concatenate(emojis: extractedEmojis)
                 : nil
-            slackService.setStatus(
-                text: text,
-                expirationTimestamp: Int(meeting.endTime.timeIntervalSince1970),
-                taskEmoji: eventEmoji,
-                fallbackEmoji: nil
-            )
+            overwriteSlackStatus { [weak self] in
+                self?.slackService.setStatus(
+                    text: text,
+                    expirationTimestamp: Int(meeting.endTime.timeIntervalSince1970),
+                    taskEmoji: eventEmoji,
+                    fallbackEmoji: nil
+                )
+            }
         } else {
             slackService.clearStatus()
         }
@@ -372,13 +481,21 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private func applySystemDND(shouldActivate: Bool) {
         wantsSystemDND = shouldActivate
         if shouldActivate {
-            guard !ownsSystemDND, !dndService.isDNDActive else { return }
+            // 4.2: DND already on and not ours → external ownership (never
+            // released by Focally). Ours (orphan of a failed release) is reused.
+            guard !ownsSystemDND else { return }
+            if dndService.isDNDActive {
+                dndOwnershipLedger?.registerExternalSystemDND()
+                return
+            }
             dndService.activateDND()
             ownsSystemDND = true
+            dndOwnershipLedger?.registerOwnedSystemDND()
         } else if ownsSystemDND {
             if dndService.isDNDActive {
                 dndService.deactivateDND()
                 ownsSystemDND = false
+                dndOwnershipLedger?.releaseOwnedSystemDNDAfterVerifiedDeactivation()
             } else {
                 dndService.deactivateDND()
                 scheduleDNDReconciliation { [weak self] in
@@ -392,6 +509,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         guard ownsSystemDND, !wantsSystemDND else { return }
         dndService.deactivateDND()
         ownsSystemDND = false
+        dndOwnershipLedger?.releaseOwnedSystemDNDAfterVerifiedDeactivation()
     }
 
     private func applySlackDND(request: SlackDNDRequest?) {

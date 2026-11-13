@@ -1,5 +1,11 @@
 import Foundation
 
+/// 3.1: how uncorroborated capture (no active calendar meeting) is treated.
+enum CallCaptureMode: String, Equatable, CaseIterable {
+    case call
+    case notice
+}
+
 /// User-facing call-detection preferences. A plain value read from a store at
 /// each call transition so changes take effect on the NEXT call without an app
 /// restart.
@@ -15,6 +21,9 @@ struct CallDetectionSettings: Equatable {
     var callClientEmojiOverrides: [String: String]
     /// TASK-058: Slack emoji override for the unknown call client.
     var unknownCallClientEmoji: String?
+    /// 3.1: what capture WITHOUT an active calendar meeting means. Trusted
+    /// native conferencing apps always mean `.call` regardless of this value.
+    var uncorroboratedBrowserCapture: CallCaptureMode
 
     init(
         callStatusEnabled: Bool = true,
@@ -22,7 +31,8 @@ struct CallDetectionSettings: Equatable {
         enableDNDDuringCalls: Bool = true,
         pauseFocusDuringCalls: Bool = true,
         callClientEmojiOverrides: [String: String] = [:],
-        unknownCallClientEmoji: String? = nil
+        unknownCallClientEmoji: String? = nil,
+        uncorroboratedBrowserCapture: CallCaptureMode = .notice
     ) {
         self.callStatusEnabled = callStatusEnabled
         self.callStatusMessage = callStatusMessage
@@ -30,6 +40,13 @@ struct CallDetectionSettings: Equatable {
         self.pauseFocusDuringCalls = pauseFocusDuringCalls
         self.callClientEmojiOverrides = callClientEmojiOverrides
         self.unknownCallClientEmoji = unknownCallClientEmoji
+        self.uncorroboratedBrowserCapture = uncorroboratedBrowserCapture
+    }
+
+    /// Pure decision (3.1): trusted native conferencing bundles are always a
+    /// full call; everything else follows the user's mode (default `.notice`).
+    static func presenceMode(forBundlePrefix bundlePrefix: String, setting: CallCaptureMode) -> CallCaptureMode {
+        CallClientCatalog.isTrustedNative(bundlePrefix) ? .call : setting
     }
 
     /// Slack statuses are capped at 256 characters; an empty/whitespace message
@@ -57,6 +74,7 @@ final class CallDetectionSettingsStore {
         static let pauseFocusDuringCalls = "pauseFocusDuringCalls"
         static let callClientEmojiOverrides = "callClientEmojiOverrides"
         static let unknownCallClientEmoji = "unknownCallClientEmoji"
+        static let uncorroboratedBrowserCapture = "uncorroboratedBrowserCapture"
     }
 
     private let defaults: UserDefaults
@@ -91,6 +109,10 @@ final class CallDetectionSettingsStore {
         if defaults.object(forKey: Key.unknownCallClientEmoji) != nil {
             settings.unknownCallClientEmoji = defaults.string(forKey: Key.unknownCallClientEmoji)
         }
+        if let raw = defaults.string(forKey: Key.uncorroboratedBrowserCapture),
+           let mode = CallCaptureMode(rawValue: raw) {
+            settings.uncorroboratedBrowserCapture = mode
+        }
         return settings
     }
 
@@ -110,6 +132,7 @@ final class CallDetectionSettingsStore {
         } else {
             defaults.removeObject(forKey: Key.unknownCallClientEmoji)
         }
+        defaults.set(settings.uncorroboratedBrowserCapture.rawValue, forKey: Key.uncorroboratedBrowserCapture)
     }
 
     var callStatusEnabled: Bool {

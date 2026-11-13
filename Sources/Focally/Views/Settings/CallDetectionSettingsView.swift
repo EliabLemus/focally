@@ -11,6 +11,8 @@ struct CallDetectionSettingsView: View {
     @State private var callStatusMessage = CallDetectionSettings.defaultStatusMessage
     @State private var enableDNDDuringCalls = true
     @State private var pauseFocusDuringCalls = true
+    // 3.1: what a capture WITHOUT an active calendar meeting means.
+    @State private var uncorroboratedBrowserCapture: CallCaptureMode = .notice
 
     // TASK-058: per-client Slack emoji overrides.
     @State private var emojiOverrides: [String: String] = [:]
@@ -51,6 +53,25 @@ struct CallDetectionSettingsView: View {
 
             Toggle("calls_pause_focus", isOn: $pauseFocusDuringCalls)
                 .accessibilityLabel(AppLanguage.shared.localizedString("calls_pause_focus"))
+
+            // 3.1: capture without an active calendar meeting.
+            VStack(alignment: .leading, spacing: 6) {
+                Picker("calls_uncorroborated_capture", selection: $uncorroboratedBrowserCapture) {
+                    Text("calls_capture_mode_call").tag(CallCaptureMode.call)
+                    Text("calls_capture_mode_notice").tag(CallCaptureMode.notice)
+                }
+                .pickerStyle(.radioGroup)
+                .accessibilityLabel(AppLanguage.shared.localizedString("calls_uncorroborated_capture"))
+
+                LocalizedText("calls_capture_mode_help")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+            }
+
+            // 6.6: documented notification-blocking limit.
+            LocalizedText("calls_time_sensitive_note")
+                .font(.focallyCaption)
+                .foregroundStyle(Color.focallyOnSurfaceVariant)
 
             // TASK-058: per-app Slack emoji section.
             VStack(alignment: .leading, spacing: 8) {
@@ -108,6 +129,11 @@ struct CallDetectionSettingsView: View {
         .onChange(of: pauseFocusDuringCalls) { _, newValue in
             var settings = store.currentSettings()
             settings.pauseFocusDuringCalls = newValue
+            store.save(settings)
+        }
+        .onChange(of: uncorroboratedBrowserCapture) { _, newValue in
+            var settings = store.currentSettings()
+            settings.uncorroboratedBrowserCapture = newValue
             store.save(settings)
         }
         .onChange(of: callStatusMessage) { oldValue, newValue in
@@ -248,6 +274,7 @@ struct CallDetectionSettingsView: View {
         callStatusEnabled = settings.callStatusEnabled
         enableDNDDuringCalls = settings.enableDNDDuringCalls
         pauseFocusDuringCalls = settings.pauseFocusDuringCalls
+        uncorroboratedBrowserCapture = settings.uncorroboratedBrowserCapture
         // Surface the stored (sanitized) message so empty shows the default.
         callStatusMessage = store.currentSettings().callStatusMessage
         emojiOverrides = settings.callClientEmojiOverrides

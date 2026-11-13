@@ -347,3 +347,9 @@
 "calls_emoji_placeholder" = ":emoji:";
 "calls_emoji_not_in_workspace" = "Este emoji não foi encontrado na lista de emojis do seu workspace; o Slack pode ignorá-lo.";
 "calls_emoji_help" = "Personalize o emoji do Slack exibido no seu status para cada app de chamada (ex.: :google-meet:).";
+
+"calls_uncorroborated_capture" = "Quando um app captura o microfone sem uma reunião no calendário";
+"calls_capture_mode_call" = "Tratar como chamada (presença completa)";
+"calls_capture_mode_notice" = "Apenas aviso (sem DND, sem status no Slack)";
+"calls_capture_mode_help" = "Apps nativos como Zoom, Teams e Slack são sempre tratados como chamada. Navegadores e apps desconhecidos seguem esta opção quando não há reunião ativa no calendário.";
+"calls_time_sensitive_note" = "Nota: notificações marcadas como Time Sensitive podem atravessar o Não Perturbe, se permitido nos Ajustes do Sistema.";
