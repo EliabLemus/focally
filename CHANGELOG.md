@@ -5,6 +5,20 @@ All notable changes to Focally will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-11-13
+
+### Changed
+- 📅 **El calendario gobierna la detección de llamadas** — una reunión con link de conferencia activa su presencia y DND aunque estés en mute y sin cámara; el detector de micrófono pasa a corroborante (se acabó el "cualquier captura = llamada").
+- 🔕 **Modo aviso** — capturas de micrófono por apps no nativas sin reunión de calendario muestran solo un aviso (configurable a llamada completa en Ajustes).
+
+### Fixed
+- 🛡️ **DND huérfano eliminado** — si la desactivación del Focus falla al colgar, se reintenta con backoff hasta verificar el estado real; el ownership no se suelta sin confirmación.
+- 🚪 **Salir de la app durante una llamada ya no deja estado pegado** — el cleanup al terminar es síncrono (DND verificado + status de Slack limpio antes de morir).
+- 📨 **Status de Slack se restaura, no se borra** — el status previo vuelve al terminar la llamada; un cambio manual tuyo a mitad de llamada se respeta; reintento ante fallo de red.
+- 🔀 **Fin de llamada espurio corregido** — respuestas vacías transitorias de coreaudiod ya no cuelgan la llamada a mitad de conversación.
+- 🧏 **Llamadas muteadas/sin cámara detectadas** vía evento de calendario (era invisible para el detector).
+- 🍎 **FaceTime/Safari ya no se descartan** — la exclusión es por lista de helpers del sistema, no por prefijo `com.apple.`.
+
 ## [0.13.0] - 2026-11-06
 
 ### Fixed
