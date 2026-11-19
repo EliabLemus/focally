@@ -1,6 +1,25 @@
 import Foundation
 import os
 
+/// Static, non-redactable call-presence diagnostic codes. Logged through
+/// `Logger.callPresenceEvent(_:)` so `log stream` with
+/// `subsystem == "app.focally.mac" AND category == "CallDetection"` shows
+/// the code unredacted. Codes are deliberately opaque: no bundle IDs,
+/// meeting/event details, status text, URLs, or tokens. Effects without a
+/// synchronous result API are logged as `requested`, never `applied`.
+enum CallPresenceEvent: String, Equatable, CaseIterable {
+    case callStarted = "call.started"
+    case callEnded = "call.ended"
+    case noticeStarted = "notice.started"
+    case noticeEnded = "notice.ended"
+    case skippedNoticeMode = "skipped:notice_mode"
+    case slackSkippedNotConnected = "slack.skipped:not_connected"
+    case slackStatusRequested = "slack.status:requested"
+    case dndActivateRequested = "dnd.activate:requested"
+    case sessionPauseRequested = "session.pause:requested"
+    case sessionResumeRequested = "session.resume:requested"
+}
+
 /// Wrapper de OSLog para logging estructurado
 /// Basado en docs/architecture/ARCHITECTURE.md y docs/exec-plans/active/PLAN-004_OBSERVABILITY.md
 final class Logger {
@@ -70,6 +89,26 @@ final class Logger {
     /// Log fault level (critical error)
     func fault(_ message: String) {
         osLogger.fault("\(message)")
+    }
+
+    // MARK: - Call presence diagnostic events
+
+    /// Logs one call-presence event code (see `CallPresenceEvent`). Every
+    /// branch uses a compile-time literal format string, so os_log never
+    /// redacts it as `<private>` (dynamic string interpolation would be).
+    func callPresenceEvent(_ event: CallPresenceEvent) {
+        switch event {
+        case .callStarted: osLogger.info("call.started")
+        case .callEnded: osLogger.info("call.ended")
+        case .noticeStarted: osLogger.info("notice.started")
+        case .noticeEnded: osLogger.info("notice.ended")
+        case .skippedNoticeMode: osLogger.info("skipped:notice_mode")
+        case .slackSkippedNotConnected: osLogger.info("slack.skipped:not_connected")
+        case .slackStatusRequested: osLogger.info("slack.status:requested")
+        case .dndActivateRequested: osLogger.info("dnd.activate:requested")
+        case .sessionPauseRequested: osLogger.info("session.pause:requested")
+        case .sessionResumeRequested: osLogger.info("session.resume:requested")
+        }
     }
 
     // MARK: - Convenience Methods

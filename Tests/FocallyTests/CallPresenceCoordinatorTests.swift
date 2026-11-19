@@ -466,6 +466,119 @@ final class CallPresenceCoordinatorTests {
         coordinator.callEnded()
         #expect(!slack.allWrites.contains(.restore)) // never clobbers the manual status
     }
+
+    // MARK: observable diagnostic events + local notice indication
+
+    @Test func callPresenceEventCodesAreStaticDiagnosticCodes() {
+        #expect(CallPresenceEvent.callStarted.rawValue == "call.started")
+        #expect(CallPresenceEvent.callEnded.rawValue == "call.ended")
+        #expect(CallPresenceEvent.noticeStarted.rawValue == "notice.started")
+        #expect(CallPresenceEvent.noticeEnded.rawValue == "notice.ended")
+        #expect(CallPresenceEvent.skippedNoticeMode.rawValue == "skipped:notice_mode")
+        #expect(CallPresenceEvent.slackSkippedNotConnected.rawValue == "slack.skipped:not_connected")
+        #expect(CallPresenceEvent.slackStatusRequested.rawValue == "slack.status:requested")
+        #expect(CallPresenceEvent.dndActivateRequested.rawValue == "dnd.activate:requested")
+        #expect(CallPresenceEvent.sessionPauseRequested.rawValue == "session.pause:requested")
+        #expect(CallPresenceEvent.sessionResumeRequested.rawValue == "session.resume:requested")
+    }
+
+    @Test func noticeTransitionEmitsCodeSequenceWithoutOSLog() {
+        let coordinator = makeCoordinator(session: nil) // default .notice
+        var events: [CallPresenceEvent] = []
+        coordinator.callPresenceEventSink = { events.append($0) }
+
+        coordinator.callStarted(chrome)
+        #expect(coordinator.isNoticePresenceActive)
+        #expect(events == [.noticeStarted, .skippedNoticeMode])
+
+        coordinator.callEnded()
+        #expect(!coordinator.isNoticePresenceActive)
+        #expect(events == [.noticeStarted, .skippedNoticeMode, .noticeEnded])
+    }
+
+    @Test func fullCallEmitsRequestedCodesThenEndSequence() {
+        let coordinator = makeCoordinator(
+            session: FakeCallSessionController(),
+            settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call)
+        )
+        var events: [CallPresenceEvent] = []
+        coordinator.callPresenceEventSink = { events.append($0) }
+
+        coordinator.callStarted(chrome)
+        #expect(events == [.callStarted, .sessionPauseRequested, .slackStatusRequested, .dndActivateRequested])
+
+        coordinator.callEnded()
+        #expect(events == [
+            .callStarted, .sessionPauseRequested, .slackStatusRequested, .dndActivateRequested,
+            .callEnded, .sessionResumeRequested
+        ])
+    }
+
+    @Test func slackNotConnectedEmitsSkippedReasonInsteadOfRequested() {
+        let slack = RecordingSlackService()
+        slack.isEnabled = false
+        let coordinator = makeCoordinator(slack: slack, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+        var events: [CallPresenceEvent] = []
+        coordinator.callPresenceEventSink = { events.append($0) }
+
+        coordinator.callStarted(chrome)
+
+        #expect(events.contains(.callStarted))
+        #expect(events.contains(.slackSkippedNotConnected))
+        #expect(!events.contains(.slackStatusRequested))
+    }
+
+    @Test func noticeStartAndEndPostPerInstanceNotificationForLocalUI() {
+        let coordinator = makeCoordinator(session: nil)
+        let counter = NotificationCounter()
+        NotificationCenter.default.addObserver(
+            counter,
+            selector: #selector(NotificationCounter.onNoticeChange(_:)),
+            name: .noticePresenceDidChange,
+            object: coordinator
+        )
+        defer { NotificationCenter.default.removeObserver(counter) }
+
+        coordinator.callStarted(chrome)
+        #expect(coordinator.isNoticePresenceActive)
+        coordinator.callEnded()
+        #expect(!coordinator.isNoticePresenceActive)
+
+        #expect(counter.count == 2)
+    }
+
+    // MARK: regression — notice capture overlapping a full call must end cleanly
+
+    @Test func noticeOverlappingFullCallEndsCleanlyOnSingleCallEnded() {
+        let coordinator = makeCoordinator(session: nil) // default .notice
+        var events: [CallPresenceEvent] = []
+        coordinator.callPresenceEventSink = { events.append($0) }
+        let counter = NotificationCounter()
+        NotificationCenter.default.addObserver(
+            counter,
+            selector: #selector(NotificationCounter.onNoticeChange(_:)),
+            name: .noticePresenceDidChange,
+            object: coordinator
+        )
+        defer { NotificationCenter.default.removeObserver(counter) }
+
+        // 1. Browser capture without a meeting → notice presence.
+        coordinator.callStarted(chrome)
+        #expect(coordinator.isNoticePresenceActive)
+
+        // 2. A trusted native full call overlaps (zoom is always .call).
+        let zoom = CallClient(bundlePrefix: "us.zoom.xos", displayName: "Zoom", emoji: ":zoom:")
+        coordinator.callStarted(zoom)
+        #expect(!coordinator.activeCallClients.isEmpty)
+
+        // 3. The detector's single callEnded must tear down BOTH presences.
+        coordinator.callEnded()
+
+        #expect(coordinator.activeCallClients.isEmpty)
+        #expect(!coordinator.isNoticePresenceActive)
+        #expect(events.filter { $0 == .noticeEnded }.count == 1)
+        #expect(counter.count == 2) // start + final end
+    }
 }
 
 // MARK: - Fakes (copied from PresenceCoordinatorTests.swift, shared semantics)
@@ -595,6 +708,13 @@ private final class FakeDNDOwnershipLedger: SystemDNDOwnershipLedging {
     func registerOwnedSystemDND() { ownedRegistrations += 1 }
     func registerExternalSystemDND() { externalRegistrations += 1 }
     func releaseOwnedSystemDNDAfterVerifiedDeactivation() { releases += 1 }
+}
+
+/// Selector-based (synchronous) notification counter for the notice presence
+/// notification; plain class, called on the posting (main) thread.
+private final class NotificationCounter: NSObject {
+    var count = 0
+    @objc func onNoticeChange(_ notification: Notification) { count += 1 }
 }
 
 // Shared test doubles from MediaDeviceCallDetectorTests.swift (file-private

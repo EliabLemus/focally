@@ -143,6 +143,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSApplication.didChangeScreenParametersNotification, object: nil
         )
 
+        // Notice presence flips the menu-bar mic indication — event-driven,
+        // no polling.
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(noticePresenceDidChange(_:)),
+            name: .noticePresenceDidChange, object: nil
+        )
+
         let popover = NSPopover()
         popover.contentSize = NSSize(width: 320, height: 520)
         popover.behavior = .transient
@@ -242,6 +249,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showContextMenu(button: NSButton) {
         let menu = NSMenu()
+
+        // Local notice indication: disabled status item while a notice-mode
+        // capture (microphone in use, no full presence) is active.
+        if presenceCoordinator.isNoticePresenceActive {
+            let noticeTitle = "Microphone in use — notice"
+            let noticeItem = NSMenuItem(title: noticeTitle, action: nil, keyEquivalent: "")
+            noticeItem.image = NSImage(systemSymbolName: "mic.fill", accessibilityDescription: noticeTitle)
+            noticeItem.isEnabled = false
+            menu.addItem(noticeItem)
+            menu.addItem(NSMenuItem.separator())
+        }
 
         if timerService.hasSession {
             let pauseTitle = timerService.isPaused ? "Resume Session" : "Pause Session"
@@ -416,6 +434,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc private func noticePresenceDidChange(_ notification: Notification) {
+        updateStatusBar()
+    }
+
     private func updateStatusBar() {
         guard let button = statusItem?.button else { return }
 
@@ -448,6 +470,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             )
             button.image = composite
             if let title = statusTitleAssigner.title(for: "  \(timerService.currentActivity)") {
+                button.title = title
+            }
+        } else if presenceCoordinator.isNoticePresenceActive {
+            // Local notice indication: microphone in use, no full presence.
+            // Reverts via the noticePresenceDidChange observer below.
+            let noticeDescription = "Microphone in use — notice"
+            let micIcon = NSImage(systemSymbolName: "mic.fill", accessibilityDescription: noticeDescription)
+            micIcon?.isTemplate = true
+            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+            button.image = micIcon?.withSymbolConfiguration(config)
+            if let title = statusTitleAssigner.title(for: "") {
                 button.title = title
             }
         } else {

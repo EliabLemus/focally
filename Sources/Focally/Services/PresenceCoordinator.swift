@@ -194,6 +194,19 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     /// 3.2: notice-mode captures — soft presence (no DND/pause/status).
     private(set) var isNoticePresenceActive = false
     private var noticeCallClients: [CallClient] = []
+    /// Test seam: mirrors every emitted diagnostic event code without OSLog.
+    var callPresenceEventSink: ((CallPresenceEvent) -> Void)?
+    private func emitCallPresenceEvent(_ event: CallPresenceEvent) {
+        callEmojiLogger.callPresenceEvent(event)
+        callPresenceEventSink?(event)
+    }
+    /// Local UI (menu bar) reacts to notice start/end through this
+    /// notification — no polling; posted only when the flag flips.
+    private func setNoticePresence(_ active: Bool) {
+        guard isNoticePresenceActive != active else { return }
+        isNoticePresenceActive = active
+        NotificationCenter.default.post(name: .noticePresenceDidChange, object: self)
+    }
     /// 6.1: Focally saved the user's status before overwriting → restore (not
     /// clear) when this presence ends.
     private var didOverrideStatusForPresence = false
@@ -310,8 +323,9 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
            CallDetectionSettings.presenceMode(forBundlePrefix: client.bundlePrefix, setting: settings.uncorroboratedBrowserCapture) == .notice {
             guard !noticeCallClients.contains(where: { $0.bundlePrefix == client.bundlePrefix }) else { return }
             noticeCallClients.append(client)
-            isNoticePresenceActive = true
-            callEmojiLogger.info("Notice presence for \(client.bundlePrefix) (capture without meeting): no DND, no session pause, no Slack status.")
+            setNoticePresence(true)
+            emitCallPresenceEvent(.noticeStarted)
+            emitCallPresenceEvent(.skippedNoticeMode)
             return
         }
 
@@ -323,6 +337,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         callStartedUnderCalendarPresence = isFirstCapture && manualMode == nil && rememberedMeeting != nil
         guard isFirstCapture else { return }
 
+        emitCallPresenceEvent(.callStarted)
         if settings.pauseFocusDuringCalls, let sessionController, sessionController.hasActiveSession {
             // A session the USER paused manually must never be resumed by us —
             // and is not paused again (double-pause would double-count pause time).
@@ -330,6 +345,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
             callPausedSessionByCallDetection = !alreadyPausedByUser
             if !alreadyPausedByUser {
                 sessionController.pauseSession()
+                emitCallPresenceEvent(.sessionPauseRequested)
             }
         }
         CallActivityTracker.shared.isCallActive = true
@@ -337,12 +353,21 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     }
 
     func callEnded() {
+        // The detector's single callEnded tears down EVERYTHING — notice
+        // captures and full calls alike. Clear notice presence
+        // unconditionally: a notice capture overlapping a full call must not
+        // leave isNoticePresenceActive stuck on after the final end.
+        let hadNoticePresence = isNoticePresenceActive
         noticeCallClients = []
-        isNoticePresenceActive = activeCallClients.isEmpty ? false : isNoticePresenceActive
+        setNoticePresence(false)
+        if hadNoticePresence {
+            emitCallPresenceEvent(.noticeEnded)
+        }
         guard !activeCallClients.isEmpty else { return }
         activeCallClients = []
         callStartedUnderCalendarPresence = false
         CallActivityTracker.shared.isCallActive = false
+        emitCallPresenceEvent(.callEnded)
         let hadOwnedPause = callPausedSessionByCallDetection
         callPausedSessionByCallDetection = false
         // Only resume a session the detector paused; if the session ended while
@@ -350,6 +375,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         if hadOwnedPause, let sessionController,
            sessionController.hasActiveSession, sessionController.isSessionPaused {
             sessionController.resumeSession()
+            emitCallPresenceEvent(.sessionResumeRequested)
         }
         applyWinningPresence()
     }
@@ -395,23 +421,34 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
 
     private func applyActiveCall(_ client: CallClient) {
         let settings = callSettingsProvider()
-        if settings.callStatusEnabled, slackService.isEnabled {
-            // TASK-058: apply the user's per-client emoji overrides (emoji only;
-            // attribution and display name stay code-defined).
-            let resolved = client.applyingEmojiOverrides(
-                settings.callClientEmojiOverrides,
-                unknownEmoji: settings.unknownCallClientEmoji
-            )
-            warnIfEmojiNotInWorkspace(resolved.emoji)
-            let expiration = Int(now().addingTimeInterval(4 * 3600).timeIntervalSince1970)
-            overwriteSlackStatus { [weak self] in
-                self?.slackService.setStatus(
-                    text: settings.sanitizedStatusMessage,
-                    expirationTimestamp: expiration,
-                    taskEmoji: resolved.emoji,
-                    fallbackEmoji: self?.slackService.savedStatusEmoji()
+        if settings.callStatusEnabled {
+            if slackService.isEnabled {
+                emitCallPresenceEvent(.slackStatusRequested)
+                // TASK-058: apply the user's per-client emoji overrides (emoji only;
+                // attribution and display name stay code-defined).
+                let resolved = client.applyingEmojiOverrides(
+                    settings.callClientEmojiOverrides,
+                    unknownEmoji: settings.unknownCallClientEmoji
                 )
+                warnIfEmojiNotInWorkspace(resolved.emoji)
+                let expiration = Int(now().addingTimeInterval(4 * 3600).timeIntervalSince1970)
+                overwriteSlackStatus { [weak self] in
+                    self?.slackService.setStatus(
+                        text: settings.sanitizedStatusMessage,
+                        expirationTimestamp: expiration,
+                        taskEmoji: resolved.emoji,
+                        fallbackEmoji: self?.slackService.savedStatusEmoji()
+                    )
+                }
+            } else {
+                // Known branch: Slack integration not connected — the status
+                // write is skipped for that reason (static reason code).
+                emitCallPresenceEvent(.slackSkippedNotConnected)
             }
+        }
+        if settings.enableDNDDuringCalls {
+            // No synchronous result API here — this is a request, not "applied".
+            emitCallPresenceEvent(.dndActivateRequested)
         }
         applySystemDND(shouldActivate: settings.enableDNDDuringCalls)
     }
@@ -545,4 +582,10 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         applySystemDND(shouldActivate: false)
         applySlackDND(request: nil)
     }
+}
+
+extension Notification.Name {
+    /// Posted by `DefaultPresenceCoordinator` (object: the coordinator) when
+    /// `isNoticePresenceActive` flips — local UI indication, no polling.
+    static let noticePresenceDidChange = Notification.Name("noticePresenceDidChange")
 }

@@ -66,6 +66,12 @@ struct CallDetectionSettingsView: View {
                 LocalizedText("calls_capture_mode_help")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
+
+                // Explicit local-only contract for notice mode: no Slack, no
+                // DND, no focus-session pause — just a menu-bar indication.
+                LocalizedText("calls_capture_mode_notice_help")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
             }
 
             // 6.6: documented notification-blocking limit.
