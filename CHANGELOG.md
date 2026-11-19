@@ -3,7 +3,15 @@
 All notable changes to Focally will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0).
+
+## [0.14.1] - 2026-11-19
+
+### Fixed
+- 📞 **Pausa de foco durante llamadas restaurada** — el detector ahora recibe el `FocusTimerService` real al lanzar; una llamada configurada como presencia completa pausa y reanuda únicamente la sesión que Focally pausó.
+- 🔎 **Diagnóstico de llamadas verificable** — los eventos de presencia (`call.started`, `call.ended`, aviso, Slack/DND solicitados) ya son legibles en el log unificado y no exponen detalles de llamadas, URLs, estados de Slack ni tokens.
+- 🎙️ **Modo aviso útil** — capturas sin reunión en `Notice only` muestran micrófono activo en la barra de menú y explican que no cambian Slack, DND ni la sesión de foco.
+- 🧹 **Cierre de presencia robusto** — un aviso que coincide con una llamada completa ya no queda activo al colgar.
 
 ## [0.14.0] - 2026-11-13
 
