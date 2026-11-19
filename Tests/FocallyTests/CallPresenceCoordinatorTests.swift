@@ -167,6 +167,40 @@ final class CallPresenceCoordinatorTests {
         #expect(session.resumeCount == 0)
     }
 
+    // MARK: Task 2.1 — attach wiring (production singleton has no controller at init)
+
+    @Test func attachedAfterInitSessionPausesAndResumesExactlyOnce() {
+        // Mirrors DefaultPresenceCoordinator.shared: built without a session
+        // controller, attached later by AppDelegate during launch.
+        let session = FakeCallSessionController()
+        let coordinator = makeCoordinator(session: nil, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+
+        // Attaching twice with the identical controller is harmless.
+        coordinator.attachSessionController(session)
+        coordinator.attachSessionController(session)
+
+        coordinator.callStarted(chrome)
+        #expect(session.pauseCount == 1)
+        #expect(session.isSessionPaused)
+
+        coordinator.callEnded()
+        #expect(session.resumeCount == 1)
+        #expect(!session.isSessionPaused)
+    }
+
+    @Test func attachingDifferentControllerAfterOneIsAttachedIsRefused() {
+        let session = FakeCallSessionController()
+        let coordinator = makeCoordinator(session: nil, settings: CallDetectionSettings(uncorroboratedBrowserCapture: .call))
+        coordinator.attachSessionController(session)
+
+        let other = FakeCallSessionController()
+        coordinator.attachSessionController(other)
+
+        coordinator.callStarted(chrome)
+        #expect(session.pauseCount == 1)
+        #expect(other.pauseCount == 0) // the replacement never took effect
+    }
+
     // MARK: Test 7 — calendar overlap precedence
 
     @Test func callUnderCalendarPresencePausesSessionButKeepsCalendarPresence() {

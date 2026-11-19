@@ -183,7 +183,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private(set) var activeCallClients: [CallClient] = []
     private var callStartedUnderCalendarPresence = false
     private var callPausedSessionByCallDetection = false
-    private let sessionController: (any CallFocusSessionControlling)?
+    private var sessionController: (any CallFocusSessionControlling)?
     private let callSettingsProvider: () -> CallDetectionSettings
     private let callEmojiLogger = Logger.callDetection
     private(set) var ownsSystemDND = false
@@ -249,6 +249,23 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         self.scheduleDNDReconciliation = scheduleDNDReconciliation
         self.sessionController = sessionController
         self.callSettingsProvider = callSettingsProvider
+    }
+
+    /// Task 2.1: the `shared` singleton is built before the app's
+    /// FocusTimerService exists, so AppDelegate attaches it at launch.
+    /// Idempotent for the identical controller; replacing a different
+    /// controller is refused (the singleton must not change mid-run).
+    @discardableResult
+    func attachSessionController(_ controller: any CallFocusSessionControlling) -> Bool {
+        if let existing = sessionController {
+            guard existing === controller else {
+                callEmojiLogger.error("Refusing to replace an already-attached session controller.")
+                return false
+            }
+            return true
+        }
+        sessionController = controller
+        return true
     }
 
     func manualFocusStarted(mode: FocusMode, systemDNDEnabled: Bool) {

@@ -69,12 +69,12 @@ final class MediaDeviceCallDetector: CaptureSignaling {
     private let schedule: (TimeInterval, @escaping @MainActor () -> Void) -> Void
     private let cancel: (UUID) -> Void
 
-    /// DEPRECATED for decisions: call presence decisions come from the calendar
-    /// gate + `currentSnapshot()`. Kept only for test/compat consumers.
-    @available(*, deprecated, message: "Use CaptureSignaling.currentSnapshot() — detector is corroborative, not decisive")
+    /// Canonical push transition: fired exactly once when a corroborated call
+    /// starts (first capturing client). Consumed by the PresenceCoordinator
+    /// (wired in AppDelegate).
     var onCallStarted: ((CallClient) -> Void)?
-    /// DEPRECATED for decisions: see `onCallStarted`.
-    @available(*, deprecated, message: "Use CaptureSignaling.currentSnapshot() — detector is corroborative, not decisive")
+    /// Canonical push transition: fired exactly once when the last client
+    /// stops capturing. See `onCallStarted`.
     var onCallEnded: (() -> Void)?
 
     private var tokens: [MediaListenerToken] = []

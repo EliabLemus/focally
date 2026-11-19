@@ -100,6 +100,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         dndService.reliabilityService = dndReliabilityService
         // 4.2: the coordinator's DND ownership ledger is the reliability service.
         presenceCoordinator.dndOwnershipLedger = dndReliabilityService
+        // Task 2.1: the coordinator singleton is built before timerService
+        // exists — attach it now so calls pause/resume the focus session.
+        presenceCoordinator.attachSessionController(timerService)
         callDetector.onCallStarted = { [weak self] client in
             self?.presenceCoordinator.callStarted(client)
         }
