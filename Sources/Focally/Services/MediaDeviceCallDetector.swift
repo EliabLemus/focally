@@ -121,6 +121,10 @@ final class MediaDeviceCallDetector: CaptureSignaling {
             deviceListener.addListener(for: $0, onChange: handler)
         }
         logger.info("Call detector observing \(self.tokens.count) devices")
+        // A call already capturing before launch never fires a device event;
+        // run one debounced evaluation so it is detected without a rejoin.
+        // One-shot only — idle cost stays zero (no periodic timer).
+        handleDeviceEvent()
     }
 
     func stop() {

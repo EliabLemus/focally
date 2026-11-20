@@ -287,6 +287,27 @@ final class MediaDeviceCallDetectorTests {
         #expect(clients.first?.emoji == ":phone:")
     }
 
+    // MARK: - Pre-existing capture at startup
+
+    // A call already capturing when Focally launches never fires a device
+    // event; start() itself must schedule the one debounced evaluation.
+    @Test("startup with capture already active fires call start once")
+    func startWhileCaptureAlreadyActiveEventuallyFiresCallStart() {
+        let scheduler = ManualScheduler()
+        let (detector, _, _) = makeDetector(devices: [audio], bundleIDs: [chromeBundle], scheduler: scheduler)
+        var starts = 0
+        detector.onCallStarted = { _ in starts += 1 }
+        detector.start()
+
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        #expect(starts == 0) // start grace not elapsed
+
+        scheduler.advance(MediaDeviceCallDetector.startGraceInterval)
+
+        #expect(starts == 1)
+        #expect(detector.isCallActive)
+    }
+
     // MARK: - Change calendar-first-call-detection (Lane A)
 
     // 2.1 — detector emits a boolean snapshot; bundle identity is naming only.
@@ -366,13 +387,18 @@ final class MediaDeviceCallDetectorTests {
         #expect(!detector.isCallActive)
     }
 
-    @Test("2.5: idle detector schedules zero timers")
+    @Test("2.5: idle detector keeps zero recurring timers")
     func idleDetectorRunsNoTimers() {
         let scheduler = ManualScheduler()
         let (detector, _, _) = makeDetector(devices: [audio], bundleIDs: [], scheduler: scheduler)
+        var starts = 0
+        detector.onCallStarted = { _ in starts += 1 }
         detector.start()
+        // The startup evaluation is one-shot: settle it, then nothing remains.
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
         #expect(scheduler.pending.isEmpty)
-        #expect(detector.evaluationCount == 0)
+        #expect(detector.evaluationCount == 1)
+        #expect(starts == 0)
         #expect(!detector.isCallActive)
     }
 
