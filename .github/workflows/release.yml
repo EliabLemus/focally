@@ -70,6 +70,10 @@ jobs:
           end
           EOF
 
-          git add -A
-          git commit -m "Update focally cask to ${VERSION}"
-          git push
+          git add Casks/focally.rb
+          if git diff --cached --quiet; then
+            echo "Cask already at ${VERSION}; nothing to commit"
+          else
+            git commit -m "Update focally cask to ${VERSION}"
+            git push
+          fi
