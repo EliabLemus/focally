@@ -5,6 +5,14 @@ All notable changes to Focally will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0).
 
+## [0.14.3] - 2026-11-25
+
+### Added
+- 🔎 **Diagnóstico privado de llamadas dentro de Focally** — Settings → Calls muestra hasta 50 códigos de eventos recientes con hora y permite limpiarlos, sin requerir `log stream`.
+
+### Privacy
+- El historial vive únicamente en memoria: no incluye bundle IDs, títulos, URLs, texto de Slack ni tokens; no se guarda, exporta ni persiste entre reinicios.
+
 ## [0.14.2] - 2026-11-20
 
 ### Fixed
