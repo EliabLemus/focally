@@ -196,8 +196,13 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
     private var noticeCallClients: [CallClient] = []
     /// Test seam: mirrors every emitted diagnostic event code without OSLog.
     var callPresenceEventSink: ((CallPresenceEvent) -> Void)?
+    /// In-app diagnostics (audit-call-presence-lifecycle): every production
+    /// event is also recorded here so Calls settings can show recent history
+    /// without a terminal. In memory only, bounded, opaque codes only.
+    private let diagnostics: CallPresenceDiagnostics
     private func emitCallPresenceEvent(_ event: CallPresenceEvent) {
         callEmojiLogger.callPresenceEvent(event)
+        diagnostics.record(event)
         callPresenceEventSink?(event)
     }
     /// Local UI (menu bar) reacts to notice start/end through this
@@ -254,7 +259,8 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { action() }
         },
         sessionController: (any CallFocusSessionControlling)? = nil,
-        callSettingsProvider: @escaping () -> CallDetectionSettings = { CallDetectionSettingsStore().currentSettings() }
+        callSettingsProvider: @escaping () -> CallDetectionSettings = { CallDetectionSettingsStore().currentSettings() },
+        diagnostics: CallPresenceDiagnostics = .shared
     ) {
         self.slackService = slackService
         self.dndService = dndService
@@ -262,6 +268,7 @@ final class DefaultPresenceCoordinator: PresenceCoordinating {
         self.scheduleDNDReconciliation = scheduleDNDReconciliation
         self.sessionController = sessionController
         self.callSettingsProvider = callSettingsProvider
+        self.diagnostics = diagnostics
     }
 
     /// Task 2.1: the `shared` singleton is built before the app's

@@ -352,3 +352,7 @@
 "calls_capture_mode_notice" = "Solo aviso (sin DND, sin estado en Slack)";
 "calls_capture_mode_help" = "Apps nativas como Zoom, Teams y Slack siempre se tratan como llamada. Navegadores y apps desconocidos siguen esta opción cuando no hay reunión activa en el calendario.";
 "calls_time_sensitive_note" = "Nota: las notificaciones marcadas como Time Sensitive pueden atravesar el No Molestar, si está permitido en Ajustes del Sistema.";
+"calls_diagnostics_title" = "Eventos recientes de detección de llamadas";
+"calls_diagnostics_help" = "Últimos eventos de la detección de llamadas, los más recientes al final. Muestra solo códigos de evento no sensibles — nunca detalles de llamadas, calendario ni Slack. Solo en memoria; se borra al cerrar Focally.";
+"calls_diagnostics_empty" = "Aún no hay eventos de detección de llamadas. Entra o sal de una llamada para verlos aquí.";
+"calls_diagnostics_clear" = "Borrar";

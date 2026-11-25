@@ -49,6 +49,7 @@
 		42238CB9D8ABDFB1628167C2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ECF6F0911D78E7836F5068 /* Localizable.strings */; };
 		455B5B3F024DD1A1600E242C /* QuickStartSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C59EC7C5610A6D2D3BAA3A4 /* QuickStartSheet.swift */; };
 		4683E849AD08C7A96C6BE70A /* StatusTitleAssignerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 382FFBBFCA6607343E1CA3AC /* StatusTitleAssignerTests.swift */; };
+		46D2A3BB291E3E19B7208C9A /* CallPresenceDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD5183BE7982939C6003269 /* CallPresenceDiagnostics.swift */; };
 		470674ED676ABCEE360D6491 /* ManagedFocusShortcutsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4F2AE23DFD90F463FD655 /* ManagedFocusShortcutsService.swift */; };
 		4904DB087CDE1FDE69A95334 /* PersistedFocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C58CA0622113E115928BCB /* PersistedFocusSession.swift */; };
 		4918E9CBBD4CC68BA3921FA3 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 7E2AD28154EB8F29CA62613D /* en.lproj */; };
@@ -61,6 +62,7 @@
 		4E171CBDCAE413F2F4D0F49F /* FocallyTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E8B02857EA57B0B2F2F757 /* FocallyTab.swift */; };
 		4FB5438F682F7F45FE34DD9D /* CallPresenceCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12D9826E005A1441D06B376 /* CallPresenceCoordinatorTests.swift */; };
 		502C0C2CECF49B7B51437EA5 /* IdleDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B860787C9D927F44E814A0E0 /* IdleDashboardView.swift */; };
+		50B37573600D6F7B74F65C51 /* CallPresenceDiagnosticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E2108B308320364C5645CB /* CallPresenceDiagnosticsTests.swift */; };
 		514A298887A5C0137A1FE5FA /* SlackServiceSingletonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB15EBD18D837EBD03246513 /* SlackServiceSingletonTests.swift */; };
 		51CC745EDB82F7DA9B0F6417 /* pt.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9D7A94AF842BA26A1156F5E9 /* pt.lproj */; };
 		5353030C6F97863A4C4D3B4A /* TaskItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D115240ADBD4E68FF12E23 /* TaskItemTests.swift */; };
@@ -293,6 +295,7 @@
 		A6CB6CB34222336A36C79677 /* FocusTypeDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTypeDescriptor.swift; sourceTree = "<group>"; };
 		A7C81AE90F26064902AB1692 /* DayOfMonthFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOfMonthFilterSheet.swift; sourceTree = "<group>"; };
 		AAA4827B88BFD89DE59D72D3 /* PresenceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceCoordinatorTests.swift; sourceTree = "<group>"; };
+		ACD5183BE7982939C6003269 /* CallPresenceDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallPresenceDiagnostics.swift; sourceTree = "<group>"; };
 		B2B5970FA7EF557D967A4558 /* NotificationCenterPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterPresenter.swift; sourceTree = "<group>"; };
 		B309416511CC57079912AFE6 /* FocusMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusMode.swift; sourceTree = "<group>"; };
 		B3380D59838114A5E74EC8FB /* LanguageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSettingsView.swift; sourceTree = "<group>"; };
@@ -322,6 +325,7 @@
 		E0B0A006AE023C6292115993 /* FocusTypesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusTypesSettingsView.swift; sourceTree = "<group>"; };
 		E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallClientOverrideTests.swift; sourceTree = "<group>"; };
 		E2BC49EFF50AC94A6253C1A4 /* SidebarItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarItemView.swift; sourceTree = "<group>"; };
+		E2E2108B308320364C5645CB /* CallPresenceDiagnosticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallPresenceDiagnosticsTests.swift; sourceTree = "<group>"; };
 		E4F7814C1833FF79761439FC /* WeeklyMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyMetricsView.swift; sourceTree = "<group>"; };
 		E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCacheService.swift; sourceTree = "<group>"; };
 		E6D891CCE8D1B47F36A376EF /* SoundPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayerService.swift; sourceTree = "<group>"; };
@@ -460,6 +464,7 @@
 				EE81A1130E07A81DA2ECB59C /* CalendarSyncDefaultTests.swift */,
 				E1CC5CC085B7FF70482833F0 /* CallClientOverrideTests.swift */,
 				C12D9826E005A1441D06B376 /* CallPresenceCoordinatorTests.swift */,
+				E2E2108B308320364C5645CB /* CallPresenceDiagnosticsTests.swift */,
 				1EDAA38B7B05CE5FA61616AF /* DNDReliabilityTests.swift */,
 				CE4A33A10E33CF3C551D6C4B /* EmojiUsageTrackerTests.swift */,
 				87D7FFEBF6758DED03A99F75 /* EmojiValidatorTests.swift */,
@@ -637,6 +642,7 @@
 				997B8F1D411EBDB0ECE90EE3 /* CalendarEventAnalyzer.swift */,
 				6ABA83AD5557CE51522B2385 /* CalendarMetricsTracker.swift */,
 				09083B42E25E01699D0688CD /* CalendarSlackIntegrationService.swift */,
+				ACD5183BE7982939C6003269 /* CallPresenceDiagnostics.swift */,
 				11B301A9C51825B582FF1BC7 /* DNDReliabilityService.swift */,
 				F2E3F6355136EFD90EE198C8 /* DNDService.swift */,
 				E557172E7F71C3EFA1EC26BD /* EmojiCacheService.swift */,
@@ -842,6 +848,7 @@
 				A9F5BE2EACA5842550643E95 /* CallClient.swift in Sources */,
 				16F7B7869819BCD32F32E749 /* CallDetectionSettings.swift in Sources */,
 				A2A63082CABD524DF29ADA0B /* CallDetectionSettingsView.swift in Sources */,
+				46D2A3BB291E3E19B7208C9A /* CallPresenceDiagnostics.swift in Sources */,
 				569C27BAFE95086403B5EBD0 /* CardModifier.swift in Sources */,
 				99C49A6A97E0A50348B5B80C /* DNDReliabilityService.swift in Sources */,
 				7C262F088F990DED923716C5 /* DNDService.swift in Sources */,
@@ -940,6 +947,7 @@
 				8CD18238F903C570D48FDD99 /* CalendarSyncDefaultTests.swift in Sources */,
 				5B17AB1DE2ECBE9BE629812B /* CallClientOverrideTests.swift in Sources */,
 				4FB5438F682F7F45FE34DD9D /* CallPresenceCoordinatorTests.swift in Sources */,
+				50B37573600D6F7B74F65C51 /* CallPresenceDiagnosticsTests.swift in Sources */,
 				249269B71EE06E5256DEE7F9 /* DNDReliabilityTests.swift in Sources */,
 				F2B418ABC78985467BC39DC0 /* EmojiUsageTrackerTests.swift in Sources */,
 				C3864524ED31392C860C9CB0 /* EmojiValidatorTests.swift in Sources */,

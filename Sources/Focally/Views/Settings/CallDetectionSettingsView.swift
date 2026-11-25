@@ -20,6 +20,10 @@ struct CallDetectionSettingsView: View {
     @State private var activeEmojiPickerKey: String?
     @State private var emojiSearchResults: [(shortcode: String, emoji: String)] = []
 
+    // In-app call diagnostics (audit-call-presence-lifecycle): recent static
+    // event codes + timestamps, in memory only — no terminal log stream needed.
+    @State private var callDiagnostics = CallPresenceDiagnostics.shared
+
     private static let messageCharacterLimit = CallDetectionSettings.slackStatusCharacterLimit
 
     var body: some View {
@@ -111,6 +115,47 @@ struct CallDetectionSettingsView: View {
                 )
 
                 LocalizedText("calls_emoji_help")
+                    .font(.focallyCaption)
+                    .foregroundStyle(Color.focallyOnSurfaceVariant)
+            }
+
+            // In-app diagnostics (audit-call-presence-lifecycle): recent
+            // static CallPresenceEvent codes with timestamps, oldest first.
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    LocalizedText("calls_diagnostics_title")
+                        .font(.focallyBodyBold)
+                    Spacer()
+                    Button(AppLanguage.shared.localizedString("calls_diagnostics_clear")) {
+                        callDiagnostics.clear()
+                    }
+                    .disabled(callDiagnostics.entries.isEmpty)
+                    .accessibilityLabel(AppLanguage.shared.localizedString("calls_diagnostics_clear"))
+                }
+
+                if callDiagnostics.entries.isEmpty {
+                    LocalizedText("calls_diagnostics_empty")
+                        .font(.focallyCaption)
+                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+                } else {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 2) {
+                            ForEach(callDiagnostics.entries) { entry in
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text(entry.code.rawValue)
+                                        .font(.system(size: 12, design: .monospaced))
+                                    Spacer()
+                                    Text(entry.date.formatted(date: .omitted, time: .standard))
+                                        .font(.focallyCaption)
+                                        .foregroundStyle(Color.focallyOnSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
+                    .frame(maxHeight: 180)
+                }
+
+                LocalizedText("calls_diagnostics_help")
                     .font(.focallyCaption)
                     .foregroundStyle(Color.focallyOnSurfaceVariant)
             }

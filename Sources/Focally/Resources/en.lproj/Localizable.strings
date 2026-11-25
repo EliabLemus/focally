@@ -353,3 +353,7 @@
 "calls_capture_mode_help" = "Native apps like Zoom, Teams and Slack are always treated as calls. Browsers and unknown apps follow this setting when there is no active calendar meeting.";
 "calls_capture_mode_notice_help" = "Notice only is a local microphone notice: the menu bar shows when your microphone is in use. It does NOT change your Slack status, does not turn on Do Not Disturb, and does not pause a focus session.";
 "calls_time_sensitive_note" = "Note: notifications marked Time Sensitive may still break through Do Not Disturb, if allowed in System Settings.";
+"calls_diagnostics_title" = "Recent call detection events";
+"calls_diagnostics_help" = "Latest events from call detection, newest at the bottom. Shows only non-sensitive event codes — never call, calendar, or Slack details. Kept in memory only; cleared when Focally quits.";
+"calls_diagnostics_empty" = "No call detection events yet. Join or leave a call to see them here.";
+"calls_diagnostics_clear" = "Clear";
