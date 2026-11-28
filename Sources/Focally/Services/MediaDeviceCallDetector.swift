@@ -34,6 +34,14 @@ protocol MediaDeviceListening: AnyObject {
     /// Re-queried inside callbacks — never trust the event payload (Bluetooth
     /// devices can report stale values).
     func isDeviceRunning(_ device: MediaDeviceID) -> Bool
+    /// Hardware device-list change (hot-plug). The system implementation
+    /// observes `kAudioHardwarePropertyDevices`; test doubles fire it manually.
+    func setDeviceListChangeHandler(_ handler: (@MainActor () -> Void)?)
+}
+
+extension MediaDeviceListening {
+    /// Default no-op so existing conformers (test fakes) keep compiling.
+    func setDeviceListChangeHandler(_ handler: (@MainActor () -> Void)?) {}
 }
 
 @MainActor
@@ -114,6 +122,13 @@ final class MediaDeviceCallDetector: CaptureSignaling {
     func start() {
         guard !isObserving else { return }
         isObserving = true
+        // Hot-plug: watch the hardware device list itself. A device connected
+        // after launch never fires an event on the old per-device listeners;
+        // this observer refreshes registration (idempotent — guarded here by
+        // isObserving and in the listener by its install guard).
+        deviceListener.setDeviceListChangeHandler { [weak self] in
+            self?.handleDeviceListChange()
+        }
         let handler: @MainActor () -> Void = { [weak self] in
             self?.handleDeviceEvent()
         }
@@ -130,6 +145,7 @@ final class MediaDeviceCallDetector: CaptureSignaling {
     func stop() {
         guard isObserving else { return }
         isObserving = false
+        deviceListener.setDeviceListChangeHandler(nil)
         for token in tokens {
             deviceListener.removeListener(token)
         }
@@ -159,6 +175,15 @@ final class MediaDeviceCallDetector: CaptureSignaling {
         for device in current where !registered.contains(device) {
             tokens.append(deviceListener.addListener(for: device, onChange: handler))
         }
+    }
+
+    /// Hardware device list changed (hot-plug): re-register per-device
+    /// listeners, then run the existing debounced re-evaluation so a call on
+    /// the newly connected device is observed. Callback-driven — no polling.
+    func handleDeviceListChange() {
+        guard isObserving else { return }
+        refreshDeviceRegistration()
+        handleDeviceEvent()
     }
 
     /// Raw system-callback entry point. Re-queries real state; the event payload
@@ -332,6 +357,10 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
     private var audioCallbacks: [UInt32: @Sendable () -> Void] = [:]
     private var cmioCallbacks: [UInt32: @Sendable () -> Void] = [:]
     private var handlerBox: HandlerBox?
+    /// Dedicated box for the device-list (hot-plug) handler — separate from
+    /// `handlerBox` so per-device re-registrations never clobber it.
+    private var deviceListBox: HandlerBox?
+    private var deviceListListenerInstalled = false
     private var registeredAudioIDs: [UInt32] = []
     private var registeredVideoIDs: [UInt32] = []
 
@@ -410,6 +439,38 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         }
     }
 
+    /// Hardware device-list (hot-plug) observer: `kAudioHardwarePropertyDevices`
+    /// on the system object. Install is idempotent — a second non-nil handler
+    /// only updates the stored closure, never a second CoreAudio listener.
+    func setDeviceListChangeHandler(_ handler: (@MainActor () -> Void)?) {
+        guard let handler else {
+            if deviceListListenerInstalled {
+                deviceListListenerInstalled = false
+                removeDeviceListListener { [weak self] in
+                    self?.fireDeviceListChange()
+                }
+            }
+            deviceListBox = nil
+            return
+        }
+        let box = deviceListBox ?? {
+            let box = HandlerBox(handler: {})
+            deviceListBox = box
+            return box
+        }()
+        box.handler = handler
+        guard !deviceListListenerInstalled else { return }
+        deviceListListenerInstalled = true
+        Self.addDeviceListListener(queue: queue) { [weak self] in
+            self?.fireDeviceListChange()
+        }
+    }
+
+    private func fireDeviceListChange() {
+        guard let box = deviceListBox else { return }
+        Task { @MainActor in box.handler() }
+    }
+
     func isDeviceRunning(_ device: MediaDeviceID) -> Bool {
         var running: UInt32 = 0
         var size = UInt32(MemoryLayout<UInt32>.size)
@@ -484,6 +545,30 @@ final class SystemMediaDeviceListener: MediaDeviceListening {
         )
         AudioObjectAddPropertyListenerBlock(deviceID, &address, queue) { _, _ in
             fire(deviceID)
+        }
+    }
+
+    /// System-object device-list listener: fires on any hot-plug/unplug
+    /// (kAudioHardwarePropertyDevices). No polling — pure push from coreaudiod.
+    private static func addDeviceListListener(queue: DispatchQueue, fire: @escaping () -> Void) {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue) { _, _ in
+            fire()
+        }
+    }
+
+    private func removeDeviceListListener(fire: @escaping () -> Void) {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue) { _, _ in
+            fire()
         }
     }
 

@@ -15,16 +15,25 @@ private final class FakeMediaDeviceListener: MediaDeviceListening {
 
     private(set) var added: [MediaDeviceID] = []
     private(set) var removed: [MediaDeviceID] = []
+    private(set) var enumerateCount = 0
     var enumerated: [MediaDeviceID]
     /// Raw capturing bundle ids re-queried on every evaluation.
     var capturingBundleIDs: [String] = []
     private var handlers: [MediaDeviceID: @MainActor () -> Void] = [:]
+    private var deviceListHandler: (@MainActor () -> Void)?
 
     init(devices: [MediaDeviceID]) {
         self.enumerated = devices
     }
 
-    func enumeratedDeviceIDs() -> [MediaDeviceID] { enumerated }
+    func enumeratedDeviceIDs() -> [MediaDeviceID] {
+        enumerateCount += 1
+        return enumerated
+    }
+
+    func setDeviceListChangeHandler(_ handler: (@MainActor () -> Void)?) {
+        deviceListHandler = handler
+    }
 
     func addListener(for device: MediaDeviceID, onChange: @escaping @MainActor () -> Void) -> MediaListenerToken {
         added.append(device)
@@ -42,6 +51,11 @@ private final class FakeMediaDeviceListener: MediaDeviceListening {
     /// Simulates the system firing a device property-change event.
     func fire(device: MediaDeviceID) {
         handlers[device]?()
+    }
+
+    /// Simulates the system firing a kAudioHardwarePropertyDevices change.
+    func fireDeviceListChange() {
+        deviceListHandler?()
     }
 }
 
@@ -423,5 +437,51 @@ final class MediaDeviceCallDetectorTests {
         #expect(snapshot.anyOutputNative == true)
         #expect(snapshot.cameraRunning == true)
         #expect(snapshot.anyInput == false) // muted: no input capture
+    }
+
+    // MARK: - Hot-plug after start (t_9dbbfe89)
+
+    // A device connected after launch never fires an event on the *old*
+    // listeners: the hardware device-list change must refresh registration
+    // (exactly once per change) and re-evaluate, so a call starting on the
+    // new device is still detected.
+    @Test("hot-plug: device-list change refreshes once and detects the call on the new device")
+    func deviceListChangeRefreshesRegistrationOnceAndDetectsCallOnNewDevice() {
+        let scheduler = ManualScheduler()
+        let (detector, listener, attributor) = makeDetector(devices: [audio], bundleIDs: [], scheduler: scheduler)
+        var starts = 0
+        detector.onCallStarted = { _ in starts += 1 }
+        detector.start()
+        // Settle the one-shot startup evaluation.
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        #expect(listener.enumerateCount == 1) // start() only — nothing refreshes yet
+        #expect(detector.evaluationCount == 1)
+        #expect(scheduler.pending.isEmpty) // idle: zero recurring timers
+
+        // Hot-plug: a new input device joins the hardware device list while
+        // a call is already capturing on it (e.g. headset plugged mid-call).
+        listener.enumerated = [audio, audio2]
+        attributor.bundleIDs = [chromeBundle]
+        listener.fireDeviceListChange()
+
+        #expect(listener.enumerateCount == 2) // exactly one refresh per change
+        #expect(listener.added.filter { $0 == audio2 }.count == 1) // new device observed once
+
+        scheduler.advance(MediaDeviceCallDetector.debounceInterval)
+        #expect(detector.evaluationCount == 2) // re-evaluated via the debounced path
+
+        scheduler.advance(MediaDeviceCallDetector.startGraceInterval)
+        #expect(starts == 1)
+        #expect(detector.isCallActive) // call on the new device IS detected
+
+        // A second device-list change triggers exactly one more refresh —
+        // no handler accumulation, no duplicate installs.
+        listener.fireDeviceListChange()
+        #expect(listener.enumerateCount == 3)
+
+        // stop() detaches the device-list observer: no refresh afterwards.
+        detector.stop()
+        listener.fireDeviceListChange()
+        #expect(listener.enumerateCount == 3)
     }
 }
